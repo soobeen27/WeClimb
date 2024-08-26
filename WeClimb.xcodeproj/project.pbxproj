@@ -13,6 +13,12 @@
 		F4892BEE2C7C237700C5FF16 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = F4892BED2C7C237700C5FF16 /* Base */; };
 		F4892BF02C7C237900C5FF16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4892BEF2C7C237900C5FF16 /* Assets.xcassets */; };
 		F4892BF32C7C237900C5FF16 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = F4892BF22C7C237900C5FF16 /* Base */; };
+		F4892BFC2C7C239900C5FF16 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = F4892BFB2C7C239900C5FF16 /* SnapKit */; };
+		F4892BFF2C7C23AC00C5FF16 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = F4892BFE2C7C23AC00C5FF16 /* RxCocoa */; };
+		F4892C012C7C23CE00C5FF16 /* CommitConvention.md in Resources */ = {isa = PBXBuildFile; fileRef = F4892C002C7C23CE00C5FF16 /* CommitConvention.md */; };
+		F4892C032C7C23D400C5FF16 /* CodeConvention.md in Resources */ = {isa = PBXBuildFile; fileRef = F4892C022C7C23D400C5FF16 /* CodeConvention.md */; };
+		F4892C062C7C23FA00C5FF16 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = F4892C052C7C23FA00C5FF16 /* Kingfisher */; };
+		F4892C082C7C249300C5FF16 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = F4892C072C7C249300C5FF16 /* .gitignore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +30,9 @@
 		F4892BEF2C7C237900C5FF16 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F4892BF22C7C237900C5FF16 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F4892BF42C7C237900C5FF16 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F4892C002C7C23CE00C5FF16 /* CommitConvention.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CommitConvention.md; sourceTree = "<group>"; };
+		F4892C022C7C23D400C5FF16 /* CodeConvention.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CodeConvention.md; sourceTree = "<group>"; };
+		F4892C072C7C249300C5FF16 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +40,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4892C062C7C23FA00C5FF16 /* Kingfisher in Frameworks */,
+				F4892BFF2C7C23AC00C5FF16 /* RxCocoa in Frameworks */,
+				F4892BFC2C7C239900C5FF16 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,6 +52,9 @@
 		F4892BDA2C7C237700C5FF16 = {
 			isa = PBXGroup;
 			children = (
+				F4892C072C7C249300C5FF16 /* .gitignore */,
+				F4892C022C7C23D400C5FF16 /* CodeConvention.md */,
+				F4892C002C7C23CE00C5FF16 /* CommitConvention.md */,
 				F4892BE52C7C237700C5FF16 /* WeClimb */,
 				F4892BE42C7C237700C5FF16 /* Products */,
 			);
@@ -83,6 +98,11 @@
 			dependencies = (
 			);
 			name = WeClimb;
+			packageProductDependencies = (
+				F4892BFB2C7C239900C5FF16 /* SnapKit */,
+				F4892BFE2C7C23AC00C5FF16 /* RxCocoa */,
+				F4892C052C7C23FA00C5FF16 /* Kingfisher */,
+			);
 			productName = WeClimb;
 			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +131,11 @@
 				Base,
 			);
 			mainGroup = F4892BDA2C7C237700C5FF16;
+			packageReferences = (
+				F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				F4892BFD2C7C23AC00C5FF16 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				F4892C042C7C23FA00C5FF16 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+			);
 			productRefGroup = F4892BE42C7C237700C5FF16 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -127,6 +152,9 @@
 			files = (
 				F4892BF02C7C237900C5FF16 /* Assets.xcassets in Resources */,
 				F4892BF32C7C237900C5FF16 /* Base in Resources */,
+				F4892C012C7C23CE00C5FF16 /* CommitConvention.md in Resources */,
+				F4892C032C7C23D400C5FF16 /* CodeConvention.md in Resources */,
+				F4892C082C7C249300C5FF16 /* .gitignore in Resources */,
 				F4892BEE2C7C237700C5FF16 /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -363,6 +391,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		F4892BFD2C7C23AC00C5FF16 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.7.1;
+			};
+		};
+		F4892C042C7C23FA00C5FF16 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F4892BFB2C7C239900C5FF16 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		F4892BFE2C7C23AC00C5FF16 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4892BFD2C7C23AC00C5FF16 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		F4892C052C7C23FA00C5FF16 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4892C042C7C23FA00C5FF16 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F4892BDB2C7C237700C5FF16 /* Project object */;
 }
