@@ -11,8 +11,6 @@ import SnapKit
 
 class SectionTableViewCell: UITableViewCell {
     
-    static let identifier = "SectionTableViewCell"
-    
     private let gymLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black

@@ -8,8 +8,8 @@
 import UIKit
 
 import SnapKit
-import RxSwift
 import RxCocoa
+import RxSwift
 
 class ClimbingGymVC: UIViewController {
     
@@ -84,17 +84,17 @@ class ClimbingGymVC: UIViewController {
         actions()
         
         // 임시레지스터
-        tableView.register(SectionTableViewCell.self, forCellReuseIdentifier: SectionTableViewCell.identifier)
+        tableView.register(SectionTableViewCell.self, forCellReuseIdentifier: Identifiers.sectionTableViewCell)
     }
     
     // MARK: - addAction 부분 (버튼, 세그먼트 컨트롤) DS
     private func actions() {
         followButton.addAction(UIAction { [weak self] _ in
             guard let self = self else { return }
-            if self.followButton.title(for: .normal) == "팔로우" {
-                self.followButton.setTitle("언팔로우", for: .normal)
+            if self.followButton.title(for: .normal) == Identifiers.follow {
+                self.followButton.setTitle(Identifiers.unFollow, for: .normal)
             } else {
-                self.followButton.setTitle("팔로우", for: .normal)
+                self.followButton.setTitle(Identifiers.follow, for: .normal)
             }
         }, for: .touchUpInside)
         
@@ -107,7 +107,7 @@ class ClimbingGymVC: UIViewController {
     // MARK: - 바인딩 DS
     private func bindSectionData() {
         viewModel.dummys
-            .bind(to: tableView.rx.items(cellIdentifier: SectionTableViewCell.identifier, cellType: UITableViewCell.self)) { row, item, cell in
+            .bind(to: tableView.rx.items(cellIdentifier: Identifiers.sectionTableViewCell, cellType: UITableViewCell.self)) { row, item, cell in
                 cell.textLabel?.text = item.name
             }
             .disposed(by: disposeBag)

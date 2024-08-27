@@ -7,8 +7,8 @@
 
 import UIKit
 
-import RxSwift
 import RxCocoa
+import RxSwift
 
 class ClimbingGymVM {
     
@@ -19,11 +19,16 @@ class ClimbingGymVM {
     let selectedSegment = BehaviorRelay<Int>(value: 0)
     
     // Output: 더미 데이터와 선택된 아이템
-    let dummys: Observable<[Item]>
-    let selectedItem: Observable<Item>
+    lazy var dummys: Observable<[Item]> = self.dummyDataObservable()
+    lazy var selectedItem: Observable<Item> = self.createSelectedItemObservable()
     
     init() {
-        dummys = selectedSegment
+
+        setupBindings()
+    }
+    
+    private func dummyDataObservable() -> Observable<[Item]> {
+        return selectedSegment
             .map { segmentIndex in
                 switch segmentIndex {
                 case 0:
@@ -43,20 +48,23 @@ class ClimbingGymVM {
                 }
             }
             .share(replay: 1, scope: .whileConnected)
-        
-        // 선택된 아이템 처리
-        self.selectedItem = itemSelected
+    }
+    
+    private func createSelectedItemObservable() -> Observable<Item> {
+        return itemSelected
             .withLatestFrom(dummys) { indexPath, items in
                 return items[indexPath.row]
             }
-        
-        // 선택된 아이템을 콘솔에 출력
-        self.selectedItem
+    }
+    // Binding 설정을 위한 메서드
+    private func setupBindings() {
+        selectedItem
             .subscribe(onNext: { item in
                 print("Selected item: \(item.name)")
             })
             .disposed(by: disposeBag)
     }
+    
 }
 
 struct Item {
