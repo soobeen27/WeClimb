@@ -7,8 +7,13 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
 class ClimbingGymVC: UIViewController {
+    
+    private let disposeBag = DisposeBag()
+    private let viewModel = ClimbingGymVM()
     
     // MARK: - 간단 레이블 구성 DS
     private let profileImageView: UIImageView = {
@@ -56,16 +61,72 @@ class ClimbingGymVC: UIViewController {
         return view
     }()
     
+    // MARK: - 테이블 뷰
+    lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = UIColor.lightGray
+        tableView.clipsToBounds = true
+        tableView.layer.cornerRadius = 10
+        
+        tableView.separatorStyle = .singleLine // 기본 선 스타일
+        tableView.separatorColor = .black // 구분선 색상
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15) // 좌우 여백
+        return tableView
+    }()
+    
     // MARK: - 라이프 사이클 DS
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
+        bindSectionData()
+        actions()
+        
+        // 임시레지스터
+        tableView.register(SectionTableViewCell.self, forCellReuseIdentifier: SectionTableViewCell.identifier)
     }
     
+    // MARK: - addAction 부분 (버튼, 세그먼트 컨트롤) DS
+    private func actions() {
+        followButton.addAction(UIAction { [weak self] _ in
+            guard let self = self else { return }
+            if self.followButton.title(for: .normal) == "팔로우" {
+                self.followButton.setTitle("언팔로우", for: .normal)
+            } else {
+                self.followButton.setTitle("팔로우", for: .normal)
+            }
+        }, for: .touchUpInside)
+        
+        segmentControl.addAction(UIAction { [weak self] _ in
+            guard let self = self else { return }
+            self.viewModel.selectedSegment.accept(self.segmentControl.selectedSegmentIndex)
+        }, for: .valueChanged)
+    }
+    
+    // MARK: - 바인딩 DS
+    private func bindSectionData() {
+        viewModel.dummys
+            .bind(to: tableView.rx.items(cellIdentifier: SectionTableViewCell.identifier, cellType: UITableViewCell.self)) { row, item, cell in
+                cell.textLabel?.text = item.name
+            }
+            .disposed(by: disposeBag)
+
+        tableView.rx.itemSelected
+            .bind(to: viewModel.itemSelected)
+            .disposed(by: disposeBag)
+
+    }
+    
+    // MARK: - 레이아웃 구성 DS
     private func setLayout() {
         view.backgroundColor = .white
-        
+    
+        setupUI()
+        setConstraints()
+    }
+    
+    // MARK: - 에드섭뷰 해주기 DS
+    private func setupUI() {
         [
             profileImageView,
             profileNameLabel,
@@ -74,11 +135,13 @@ class ClimbingGymVC: UIViewController {
             segmentControl,
             contentView
         ].forEach { view.addSubview($0) }
-    
-        setConstraints()
+        
+        [
+            tableView
+        ].forEach { contentView.addSubview($0)}
     }
     
-    // MARK: - 레이아웃 구성 DS
+    // MARK: - 레이아웃 잡기 DS
     private func setConstraints() {
         profileImageView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).offset(16)
@@ -113,6 +176,10 @@ class ClimbingGymVC: UIViewController {
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.bottom.equalToSuperview()
+        }
+        
+        tableView.snp.makeConstraints {
+            $0.edges.equalTo(contentView)
         }
     }
 }

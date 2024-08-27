@@ -1,0 +1,64 @@
+//
+//  ClimbingGymVM.swift
+//  WeClimb
+//
+//  Created by 머성이 on 8/26/24.
+//
+
+import UIKit
+import RxSwift
+import RxCocoa
+
+class ClimbingGymVM {
+    
+    private let disposeBag = DisposeBag()
+    
+    // Input: 셀이 눌렸을 때
+    let itemSelected = PublishSubject<IndexPath>()
+    let selectedSegment = BehaviorRelay<Int>(value: 0)
+    
+    // Output: 더미 데이터와 선택된 아이템
+    let dummys: Observable<[Item]>
+    let selectedItem: Observable<Item>
+    
+    init() {
+        
+        dummys = selectedSegment
+            .map { segmentIndex in
+                switch segmentIndex {
+                case 0:
+                    return [
+                        Item(name: "안농"),
+                        Item(name: "과연"),
+                        Item(name: "나올까?"),
+                    ]
+                case 1:
+                    return [
+                        Item(name: "와"),
+                        Item(name: "이게"),
+                        Item(name: "나오네"),
+                    ]
+                default:
+                    return []
+                }
+            }
+            .share(replay: 1, scope: .whileConnected)
+        
+        // 선택된 아이템 처리
+        self.selectedItem = itemSelected
+            .withLatestFrom(dummys) { indexPath, items in
+                return items[indexPath.row]
+            }
+        
+        // 선택된 아이템을 콘솔에 출력
+        self.selectedItem
+            .subscribe(onNext: { item in
+                print("Selected item: \(item.name)")
+            })
+            .disposed(by: disposeBag)
+    }
+}
+
+struct Item {
+    let name: String
+}
