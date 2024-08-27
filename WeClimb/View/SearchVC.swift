@@ -52,12 +52,16 @@ class SearchVC: UIViewController {
     
     private func setNavigationBar() {
         let Label = UILabel()
-        Label.text = "Discover"
-        Label.textColor = .black
-        Label.font = UIFont.systemFont(ofSize: 17)
+//        Label.text = "Discover"
+//        Label.textColor = .black
+//        Label.font = UIFont.systemFont(ofSize: 17)
+//
+//        let leftBarButtonItem = UIBarButtonItem(customView: Label)
+//        navigationItem.leftBarButtonItem = leftBarButtonItem
         
-        let leftBarButtonItem = UIBarButtonItem(customView: Label)
-        navigationItem.leftBarButtonItem = leftBarButtonItem
+        self.title = "Discover"
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
     }
     
     private func setSearchController() {

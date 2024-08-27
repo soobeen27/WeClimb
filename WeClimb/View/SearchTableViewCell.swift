@@ -12,7 +12,7 @@ class SearchTableViewCell: UITableViewCell {
     
     static let id = "SearchTableViewCell"
     
-    private let gymView: UIImageView = {
+    private let gymImage: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .gray
         imageView.contentMode = .scaleAspectFill
@@ -46,23 +46,23 @@ class SearchTableViewCell: UITableViewCell {
     }
     
     private func setLayout() {
-        [gymView, titleLabel, addressLabel]
+        [gymImage, titleLabel, addressLabel]
             .forEach { contentView.addSubview($0) }
         
-        gymView.snp.makeConstraints {
+        gymImage.snp.makeConstraints {
             $0.leading.equalTo(contentView.snp.leading).offset(15)
             $0.centerY.equalTo(contentView.snp.centerY)
             $0.width.height.equalTo(56)
         }
         
         titleLabel.snp.makeConstraints {
-            $0.leading.equalTo(gymView.snp.trailing).offset(10)
+            $0.leading.equalTo(gymImage.snp.trailing).offset(10)
             $0.top.equalTo(contentView.snp.top).offset(20)
             $0.trailing.equalTo(contentView.snp.trailing).offset(-15)
         }
         
         addressLabel.snp.makeConstraints {
-            $0.leading.equalTo(gymView.snp.trailing).offset(10)
+            $0.leading.equalTo(gymImage.snp.trailing).offset(10)
             $0.top.equalTo(titleLabel.snp.bottom).offset(5)
             $0.trailing.equalTo(contentView.snp.trailing).offset(-15)
             $0.bottom.equalTo(contentView.snp.bottom).offset(-20)
@@ -70,7 +70,7 @@ class SearchTableViewCell: UITableViewCell {
     }
     
     func configure(with image: UIImage?, title: String, address: String) {
-        gymView.image = image
+        gymImage.image = image
         titleLabel.text = title
         addressLabel.text = address
     }
