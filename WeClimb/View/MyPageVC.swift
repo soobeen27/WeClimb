@@ -10,6 +10,10 @@ import SnapKit
 
 class MyPageVC: UIViewController {
 
+    //    로그아웃 하는 액션에 넣어주면 로그인창으로 돌아갑니다.
+    //    guard let backVC = self.tabBarController?.navigationController else { return }
+    //    backVC.popToRootViewController(animated: true)
+    
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .gray
