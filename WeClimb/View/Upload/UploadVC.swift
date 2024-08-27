@@ -48,7 +48,7 @@ class UploadVC: UIViewController {
     
     private let selectedMediaView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemGray
+        view.backgroundColor = .secondarySystemBackground
         return view
     }()
 
@@ -57,7 +57,7 @@ class UploadVC: UIViewController {
         button.setTitle("추가", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
-        button.backgroundColor = .systemBlue // 앱 틴트 컬러
+        button.backgroundColor = UIColor(named: "MainColor") // 앱 틴트 컬러
         button.layer.cornerRadius = 10
         return button
     }()
@@ -71,14 +71,16 @@ class UploadVC: UIViewController {
        let button = UIButton()
         button.setTitle("게시", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-        button.backgroundColor = .systemBlue // 앱 틴트 컬러
+        button.backgroundColor = UIColor(named: "MainColor") // 앱 틴트 컬러
         button.layer.cornerRadius = 10
         return button
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "새 게시물"
         setLayout()
+        setTableView()
     }
     
     private func setTableView() {
@@ -99,7 +101,8 @@ class UploadVC: UIViewController {
         selectedMediaView.addSubview(callPHPickerButton)
         
         selectedMediaView.snp.makeConstraints {
-            $0.top.left.right.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.left.right.equalToSuperview()
             $0.height.equalTo(view.frame.width)
         }
         
@@ -116,7 +119,7 @@ class UploadVC: UIViewController {
         
         postButton.snp.makeConstraints {
             $0.left.right.equalToSuperview().inset(16)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-16)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-16)
             $0.height.equalTo(50)
         }
         
@@ -148,9 +151,18 @@ extension UploadVC : UITableViewDelegate, UITableViewDataSource {
                 }
             }
         }
-        
         return cell
     }
+    
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        let cellType = cellTypes[indexPath.row]
+//         switch cellType {
+//         case .caption:
+//             return 200
+//         case .option:
+//             return 100
+//         }
+//    }
     
     
 }

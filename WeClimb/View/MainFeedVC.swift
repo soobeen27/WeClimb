@@ -26,7 +26,7 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         self.title = "WeClimb"
         self.navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationController?.hidesBarsOnSwipe = true
+//        self.navigationController?.hidesBarsOnSwipe = true
         
         setTableView()
         setLayout()

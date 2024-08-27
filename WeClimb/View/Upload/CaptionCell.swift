@@ -12,7 +12,6 @@ import SnapKit
 class CaptionCell : UITableViewCell {
     private let textField: UITextField = {
         let textField = UITextField()
-        
         return textField
     }()
     
@@ -35,11 +34,18 @@ class CaptionCell : UITableViewCell {
     
     private func setLayout() {
         self.backgroundColor = .systemBackground
-        contentView.addSubview(textField)
-        
+        [textField, textFieldPlaceholder]
+            .forEach {
+                self.addSubview($0)
+            }
         textField.snp.makeConstraints {
             $0.edges.equalToSuperview()
             $0.height.equalTo(100)
+        }
+        
+        textFieldPlaceholder.snp.makeConstraints {
+            $0.top.equalTo(textField.snp.top).offset(8)
+            $0.leading.equalTo(textField.snp.leading).offset(16)
         }
     }
     

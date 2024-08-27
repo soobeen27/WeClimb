@@ -14,13 +14,14 @@ class UploadOptionCell: UITableViewCell {
     private let symbolImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "figure.climbing")
+        imageView.tintColor = .label
         return imageView
     }()
     
     private let optionLabel: UILabel = {
         let label = UILabel()
         label.text = UploadNameSpace.gym
-        label.font = .systemFont(ofSize: 17, weight: .bold)
+        label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = .label
         return label
     }()
@@ -51,9 +52,9 @@ class UploadOptionCell: UITableViewCell {
     }
     
     private func setLayout() {
-        [symbolImageView, optionLabel]
+        [symbolImageView, optionLabel, greaterThanSign, selectedLabel]
             .forEach {
-                contentView.addSubview($0)
+                self.addSubview($0)
             }
         
         symbolImageView.snp.makeConstraints {
