@@ -81,11 +81,19 @@ class LoginVC: UIViewController {
         setLayout()
         buttonTapped()
     }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        //로그인 창으로 돌아왔을때 네비게이션 바 보이기
+        navigationController?.setNavigationBarHidden(false, animated: true)
+    }
     
     private func buttonTapped() {
         guestLoginButton.rx.tap
             .bind { [weak self] in
                 self?.navigationController?.pushViewController(TabBarController(), animated: true)
+                //탭바로 넘어갈 때 네비게이션바 가리기
+                self?.navigationController?.setNavigationBarHidden(true, animated: true)
             }
             .disposed(by: disposeBag)
     }
