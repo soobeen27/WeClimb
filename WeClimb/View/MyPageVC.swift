@@ -14,10 +14,6 @@ class MyPageVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = MyPageVM()
     
-    //    로그아웃 하는 액션에 넣어주면 로그인창으로 돌아갑니다.
-    //    guard let backVC = self.tabBarController?.navigationController else { return }
-    //    backVC.popToRootViewController(animated: true)
-    
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .gray
@@ -164,6 +160,36 @@ class MyPageVC: UIViewController {
         
         setupLayout()
         bind()
+        setNavigation()
+    }
+    
+    // MARK: - 로그아웃 버튼 YJ
+    // 이 기능은 아직 보류지만 로그아웃을 위해 우선 여기에..
+    func setNavigation() {
+        let rightBarButton = UIBarButtonItem(
+            image: UIImage(systemName: "ellipsis"),
+            style: .plain,
+            target: self,
+            action: #selector(rightBarButtonTapped)
+        )
+        navigationController?.navigationBar.tintColor = .black
+        navigationItem.rightBarButtonItem = rightBarButton
+    }
+    
+    @objc private func rightBarButtonTapped() {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let logout = UIAlertAction(title: "로그아웃", style: .default) { _ in
+            guard let navigationController = self.tabBarController?.navigationController else { return }
+            navigationController.popToRootViewController(animated: true)
+        }
+        
+        let close = UIAlertAction(title: "닫기", style: .cancel)
+        
+        [logout, close]
+            .forEach { actionSheet.addAction($0) }
+        
+        present(actionSheet, animated: true)
     }
     
     private func setupLayout() {
