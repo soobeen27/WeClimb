@@ -6,24 +6,26 @@
 //
 
 import UIKit
+import SnapKit
 
 class SearchVC: UIViewController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        
+        view.backgroundColor = .white
+        
+        setNavigationBar()
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    private func setNavigationBar() {
+        let Label = UILabel()
+        Label.text = "Discover"
+        Label.textColor = .black
+        Label.font = UIFont.systemFont(ofSize: 17)
+        
+        let leftBarButtonItem = UIBarButtonItem(customView: Label)
+        navigationItem.leftBarButtonItem = leftBarButtonItem
     }
-    */
-
+    
 }
