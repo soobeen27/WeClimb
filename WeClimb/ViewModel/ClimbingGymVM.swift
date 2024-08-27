@@ -6,6 +6,7 @@
 //
 
 import UIKit
+
 import RxSwift
 import RxCocoa
 
@@ -22,7 +23,6 @@ class ClimbingGymVM {
     let selectedItem: Observable<Item>
     
     init() {
-        
         dummys = selectedSegment
             .map { segmentIndex in
                 switch segmentIndex {

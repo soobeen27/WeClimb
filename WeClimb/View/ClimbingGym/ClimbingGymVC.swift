@@ -6,6 +6,7 @@
 //
 
 import UIKit
+
 import SnapKit
 import RxSwift
 import RxCocoa
@@ -114,7 +115,6 @@ class ClimbingGymVC: UIViewController {
         tableView.rx.itemSelected
             .bind(to: viewModel.itemSelected)
             .disposed(by: disposeBag)
-
     }
     
     // MARK: - 레이아웃 구성 DS
@@ -138,7 +138,7 @@ class ClimbingGymVC: UIViewController {
         
         [
             tableView
-        ].forEach { contentView.addSubview($0)}
+        ].forEach { contentView.addSubview($0) }
     }
     
     // MARK: - 레이아웃 잡기 DS
