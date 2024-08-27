@@ -8,5 +8,6 @@
 import Foundation
 
 enum Identifiers {
-    static let albumCell = "AlbumCell"
+    static let captionCell = "CaptionCell"
+    static let uploadOptionCell = "UploadOptionCell"
 }
