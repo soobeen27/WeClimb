@@ -5,10 +5,14 @@
 //  Created by Soo Jang on 8/26/24.
 //
 
-import UIKit
+import RxSwift
 import SnapKit
+import UIKit
 
 class SearchVC: UIViewController {
+    
+    private let disposeBag = DisposeBag()
+    private let searchViewModel = SearchViewModel()
     
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: nil)
@@ -18,6 +22,23 @@ class SearchVC: UIViewController {
         return searchController
     }()
     
+    private let nearbyLabel: UILabel = {
+        let label = UILabel()
+        label.text = "내 주변 암장"
+        label.textAlignment = .left
+        label.font = UIFont.systemFont(ofSize: 13)
+        label.textColor = .black
+        return label
+    }()
+    
+    private let tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = .white
+        tableView.separatorStyle = .none // 구분선 제거
+        tableView.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchTableViewCell.id)
+        return tableView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -25,6 +46,8 @@ class SearchVC: UIViewController {
         
         setNavigationBar()
         setSearchController()
+        setLayout()
+        bind()
     }
     
     private func setNavigationBar() {
@@ -43,6 +66,28 @@ class SearchVC: UIViewController {
         definesPresentationContext = false // 검색바 유지
     }
     
+    private func setLayout() {
+        [nearbyLabel, tableView]
+            .forEach { view.addSubview($0) }
+        
+        nearbyLabel.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview().inset(15)
+        }
+        
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(nearbyLabel.snp.bottom).offset(8)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
+    }
+    
+    private func bind() {
+        searchViewModel.data
+            .bind(to: tableView.rx.items(cellIdentifier: SearchTableViewCell.id, cellType: SearchTableViewCell.self)) { index, data, cell in
+                cell.configure(with: data.image, title: data.title, address: data.address)
+            }
+            .disposed(by: disposeBag)
+    }
 }
 
 extension SearchVC : UISearchResultsUpdating {
