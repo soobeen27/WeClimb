@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C40397B72C7CB4CC00923777 /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B62C7CB4CC00923777 /* Extension.swift */; };
+		C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */; };
 		F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892BE62C7C237700C5FF16 /* AppDelegate.swift */; };
 		F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */; };
 		F4892BF02C7C237900C5FF16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4892BEF2C7C237900C5FF16 /* Assets.xcassets */; };
@@ -31,6 +33,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C40397B62C7CB4CC00923777 /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
+		C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedTabelCell.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892BE32C7C237700C5FF16 /* WeClimb.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeClimb.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4892BE62C7C237700C5FF16 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -44,8 +48,8 @@
 		F4892C0F2C7C27D800C5FF16 /* ExampleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleModel.swift; sourceTree = "<group>"; };
 		F4892C112C7C27F500C5FF16 /* ExampleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleVM.swift; sourceTree = "<group>"; };
 		F4892C132C7C973800C5FF16 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
-		F4892C152C7C981000C5FF16 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
-		F4892C172C7C983A00C5FF16 /* MainFeedVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFeedVC.swift; sourceTree = "<group>"; };
+		F4892C152C7C981000C5FF16 /* LoginVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		F4892C172C7C983A00C5FF16 /* MainFeedVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C192C7C984A00C5FF16 /* SearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVC.swift; sourceTree = "<group>"; };
 		F4892C1B2C7C988A00C5FF16 /* ClimbingGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVC.swift; sourceTree = "<group>"; };
 		F4892C1D2C7C98A100C5FF16 /* MyPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageVC.swift; sourceTree = "<group>"; };
@@ -92,6 +96,7 @@
 			children = (
 				F4892BE62C7C237700C5FF16 /* AppDelegate.swift */,
 				F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */,
+				C40397B62C7CB4CC00923777 /* Extension.swift */,
 				F4892C0C2C7C27A800C5FF16 /* Common */,
 				F4892C0A2C7C278C00C5FF16 /* Model */,
 				F4892C092C7C278500C5FF16 /* View */,
@@ -109,6 +114,7 @@
 				F4892C132C7C973800C5FF16 /* TabBarController.swift */,
 				F4892C152C7C981000C5FF16 /* LoginVC.swift */,
 				F4892C172C7C983A00C5FF16 /* MainFeedVC.swift */,
+				C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */,
 				F4892C192C7C984A00C5FF16 /* SearchVC.swift */,
 				F4892C1B2C7C988A00C5FF16 /* ClimbingGymVC.swift */,
 				F4892C1D2C7C98A100C5FF16 /* MyPageVC.swift */,
@@ -234,6 +240,8 @@
 				F4892C202C7C98B700C5FF16 /* UploadVC.swift in Sources */,
 				F4892C1A2C7C984A00C5FF16 /* SearchVC.swift in Sources */,
 				F4892C1C2C7C988B00C5FF16 /* ClimbingGymVC.swift in Sources */,
+				C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */,
+				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				F4892C142C7C973800C5FF16 /* TabBarController.swift in Sources */,
 				F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */,
 				F4892C0E2C7C27BE00C5FF16 /* ExampleCommon.swift in Sources */,

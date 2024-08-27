@@ -7,23 +7,81 @@
 
 import UIKit
 
-class MainFeedVC: UIViewController {
+import SnapKit
 
+class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    let tableView = UITableView()
+    
+    //  let mainFeedTitleLabel = {
+    //    let label = UILabel()
+    //    label.text = "WeClimb"
+    //    label.font = .systemFont(ofSize: 17, weight: .bold)
+    //    label.textColor = UIColor(named: "MainColor")
+    //    return label
+    //  }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        
+        self.title = "WeClimb"
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+        self.navigationController?.hidesBarsOnSwipe = true
+        
+        setTableView()
+        setLayout()
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    func setTableView() {
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.separatorStyle = .none  //셀 사이 라인 삭제
+        tableView.register(MainFeedTabelCell.self, forCellReuseIdentifier: "MainFeedTabelCell")
     }
-    */
+    
+    func setLayout() {
+        view.addSubview(tableView)
+        
+        tableView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 5  //추후 변경
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 450
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "MainFeedTabelCell", for: indexPath) as? MainFeedTabelCell else {
+            return UITableViewCell()
+        }
+        cell.feedProfileImage.image = UIImage(named: "testImage")
+        cell.feedprofileNameLabel.text = "더 클라임 신림"
+        cell.feedprofileAddressLabel.text = "서울시 관악구 신림동"
+        cell.levelLabel.text = "V6"
+        cell.sectorLabel.text = "1섹터"
+        cell.dDayLabel.text = "D-13"
+        
+        // 컬렉션 뷰의 데이터 소스 및 델리게이트 설정
+        cell.collectionView.delegate = self
+        cell.collectionView.dataSource = self
+        
+        return cell
+    }
+}
 
+extension MainFeedVC: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 5
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "YourCollectionViewCellIdentifier", for: indexPath)
+        
+        return cell
+    }
 }
