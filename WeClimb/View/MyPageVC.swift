@@ -7,9 +7,13 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 class MyPageVC: UIViewController {
-
+    
+    private let disposeBag = DisposeBag()
+    private let viewModel = MyPageVM()
+    
     //    로그아웃 하는 액션에 넣어주면 로그인창으로 돌아갑니다.
     //    guard let backVC = self.tabBarController?.navigationController else { return }
     //    backVC.popToRootViewController(animated: true)
@@ -136,15 +140,34 @@ class MyPageVC: UIViewController {
         stackView.alignment = .center
         return stackView
     }()
-
+    
+    private lazy var collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        
+        // 셀 사이의 스페이싱 설정
+        layout.minimumInteritemSpacing = 1.0
+        layout.minimumLineSpacing = 1.0
+        
+        let width = (UIScreen.main.bounds.width - 2 * 16 - 2 * 1.0) / 3 // 전체 화면 - 양옆 여백 - 셀끼리의 스페이싱 / 3
+        layout.itemSize = CGSize(width: width, height: width)
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MyPageCell.id)
+        
+        return collectionView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = .white
+        
         setupLayout()
+        bind()
     }
-
+    
     private func setupLayout() {
-        [profileImage, profileStackView, totalStackView]
+        [profileImage, profileStackView, totalStackView, collectionView]
             .forEach{ view.addSubview($0) }
         
         [nameStackView, infoLabel, editButton]
@@ -158,10 +181,10 @@ class MyPageVC: UIViewController {
         
         [followingCountLabel, followingLabel]
             .forEach{ followingStackView.addArrangedSubview($0) }
-
+        
         [followStackView, followingStackView]
             .forEach{ totalStackView.addArrangedSubview($0) }
-
+        
         profileImage.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).inset(8)
             $0.leading.equalToSuperview().inset(16)
@@ -183,5 +206,19 @@ class MyPageVC: UIViewController {
             $0.centerY.equalTo(profileImage.snp.centerY)
             $0.height.equalTo(80)
         }
+        
+        collectionView.snp.makeConstraints {
+            $0.top.equalTo(profileStackView.snp.bottom).offset(32)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
+        }
+    }
+    
+    private func bind() {
+        viewModel.profileImages
+            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.id, cellType: MyPageCell.self)) { _, image, cell in
+                cell.configure(with: image)
+            }
+            .disposed(by: disposeBag)
     }
 }
