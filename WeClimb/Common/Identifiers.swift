@@ -13,4 +13,10 @@ enum Identifiers {
     
     //MainFeed CollectionView Cell
     static let yourCollectionViewCellIdentifier = "YourCollectionViewCellIdentifier"
+    // ClimbingGymVC
+    static let follow = "팔로우"
+    static let unFollow = "언팔로우"
+    
+    // SectionTableViewCell
+    static let sectionTableViewCell = "SectionTableViewCell"
 }
