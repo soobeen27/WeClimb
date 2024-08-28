@@ -22,4 +22,6 @@ extension UIColor {
         
         self.init(red: red, green: green, blue: blue, alpha: 1.0)
     }
+    
+    static let mainPurple = UIColor(hex: "#512BBB")
 }

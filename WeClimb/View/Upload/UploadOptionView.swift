@@ -1,15 +1,15 @@
 //
-//  GymSelectCell.swift
+//  UploadOptionView.swift
 //  WeClimb
 //
-//  Created by Soo Jang on 8/27/24.
+//  Created by Soo Jang on 8/28/24.
 //
 
 import UIKit
 
 import SnapKit
 
-class UploadOptionCell: UITableViewCell {
+class UploadOptionView : UIView {
     
     private let symbolImageView: UIImageView = {
         let imageView = UIImageView()
@@ -41,9 +41,9 @@ class UploadOptionCell: UITableViewCell {
         label.textColor = .secondaryLabel
         return label
     }()
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         setLayout()
     }
     
@@ -51,7 +51,12 @@ class UploadOptionCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override var intrinsicContentSize: CGSize {
+        return CGSize(width: UIView.noIntrinsicMetric, height: 41)
+    }
+
     private func setLayout() {
+        self.backgroundColor = .systemBackground
         [symbolImageView, optionLabel, greaterThanSign, selectedLabel]
             .forEach {
                 self.addSubview($0)
@@ -84,5 +89,4 @@ class UploadOptionCell: UITableViewCell {
         optionLabel.text = option
         selectedLabel.text = selected
     }
-    
 }
