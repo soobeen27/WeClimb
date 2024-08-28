@@ -61,7 +61,7 @@
 		F4892C1F2C7C98B700C5FF16 /* UploadVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadVC.swift; sourceTree = "<group>"; };
 		F4892C212C7C9DC700C5FF16 /* CodingConvention.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CodingConvention.md; sourceTree = "<group>"; };
 		F4892C232C7CBC8700C5FF16 /* UploadVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadVM.swift; sourceTree = "<group>"; };
-		F4892C2A2C7CCDF200C5FF16 /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
+		F4892C2A2C7CCDF200C5FF16 /* Identifiers.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C2C2C7D9D2100C5FF16 /* CaptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptionCell.swift; sourceTree = "<group>"; };
 		F4892C2E2C7D9EA700C5FF16 /* UploadNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadNameSpace.swift; sourceTree = "<group>"; };
 		F4892C302C7DA07F00C5FF16 /* UploadOptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadOptionCell.swift; sourceTree = "<group>"; };

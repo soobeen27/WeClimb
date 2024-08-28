@@ -10,4 +10,7 @@ import Foundation
 enum Identifiers {
     static let captionCell = "CaptionCell"
     static let uploadOptionCell = "UploadOptionCell"
+    
+    //MainFeed CollectionView Cell
+    static let yourCollectionViewCellIdentifier = "YourCollectionViewCellIdentifier"
 }

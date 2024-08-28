@@ -16,7 +16,7 @@ class MainFeedTabelCell: UITableViewCell {
         layout.scrollDirection = .horizontal //가로 스크롤
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "YourCollectionViewCellIdentifier")
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.yourCollectionViewCellIdentifier)
         collectionView.backgroundColor = .gray
         //        collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
         return collectionView
@@ -94,7 +94,7 @@ class MainFeedTabelCell: UITableViewCell {
         fatalError("*T_T*")
     }
     
-    func setLayout() {
+    private func setLayout() {
         [feedProfileImage, feedProfiletackView, collectionView, gymInfoStackView]
             .forEach {
                 contentView.addSubview($0)
