@@ -5,9 +5,10 @@
 //  Created by Soo Jang on 8/26/24.
 //
 
+import UIKit
+
 import RxSwift
 import SnapKit
-import UIKit
 
 class MyPageVC: UIViewController {
     
@@ -148,7 +149,7 @@ class MyPageVC: UIViewController {
         layout.itemSize = CGSize(width: width, height: width)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: MypageNameSpace.id)
+        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MypageNameSpace.id)
         
         return collectionView
     }()
@@ -242,7 +243,7 @@ class MyPageVC: UIViewController {
     
     private func bind() {
         viewModel.profileImages
-            .bind(to: collectionView.rx.items(cellIdentifier: MypageNameSpace.id, cellType: CollectionViewCell.self)) { _, image, cell in
+            .bind(to: collectionView.rx.items(cellIdentifier: MypageNameSpace.id, cellType: MyPageCell.self)) { _, image, cell in
                 cell.configure(with: image)
             }
             .disposed(by: disposeBag)

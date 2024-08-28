@@ -8,7 +8,7 @@
 import Foundation
 
 enum UserPageNameSpace {
-    static let id = "CollectionViewCell"
+    static let id = "MyPageCell"
     static let follow = "팔로우"
     static let following = "팔로잉"
     static let logout = "로그아웃"
