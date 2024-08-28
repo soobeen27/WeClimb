@@ -53,7 +53,7 @@ class MyPageVC: UIViewController {
     
     private let editButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("프로필 편집", for: .normal)
+        button.setTitle(MypageNameSpace.edit, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 13)
         button.backgroundColor = .systemGray6
         button.setTitleColor(.black, for: .normal)
@@ -81,7 +81,7 @@ class MyPageVC: UIViewController {
     
     private let followLabel: UILabel = {
         let label = UILabel()
-        label.text = "팔로우"
+        label.text = MypageNameSpace.follow
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
@@ -90,7 +90,7 @@ class MyPageVC: UIViewController {
     
     private let followingLabel: UILabel = {
         let label = UILabel()
-        label.text = "팔로잉"
+        label.text = MypageNameSpace.following
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
@@ -148,7 +148,7 @@ class MyPageVC: UIViewController {
         layout.itemSize = CGSize(width: width, height: width)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MyPageCell.id)
+        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MypageNameSpace.id)
         
         return collectionView
     }()
@@ -179,12 +179,12 @@ class MyPageVC: UIViewController {
     @objc private func rightBarButtonTapped() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        let logout = UIAlertAction(title: "로그아웃", style: .default) { _ in
+        let logout = UIAlertAction(title: MypageNameSpace.logout, style: .default) { _ in
             guard let navigationController = self.tabBarController?.navigationController else { return }
             navigationController.popToRootViewController(animated: true)
         }
         
-        let close = UIAlertAction(title: "닫기", style: .cancel)
+        let close = UIAlertAction(title: MypageNameSpace.close, style: .cancel)
         
         [logout, close]
             .forEach { actionSheet.addAction($0) }
@@ -242,7 +242,7 @@ class MyPageVC: UIViewController {
     
     private func bind() {
         viewModel.profileImages
-            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.id, cellType: MyPageCell.self)) { _, image, cell in
+            .bind(to: collectionView.rx.items(cellIdentifier: MypageNameSpace.id, cellType: MyPageCell.self)) { _, image, cell in
                 cell.configure(with: image)
             }
             .disposed(by: disposeBag)

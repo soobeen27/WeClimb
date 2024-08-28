@@ -10,8 +10,6 @@ import SnapKit
 
 class MyPageCell: UICollectionViewCell {
     
-    static let id = "MyPageCell"
-    
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .tertiaryLabel
