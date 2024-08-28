@@ -8,6 +8,8 @@
 import Foundation
 
 enum Identifiers {
+    // Upload 뷰용 아이디
+    static let addVideoCell = "AddVideoCell"
     static let captionCell = "CaptionCell"
     static let uploadOptionCell = "UploadOptionCell"
     
