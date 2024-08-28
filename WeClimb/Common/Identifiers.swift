@@ -11,6 +11,8 @@ enum Identifiers {
     static let captionCell = "CaptionCell"
     static let uploadOptionCell = "UploadOptionCell"
     
+    //MainFeed CollectionView Cell
+    static let yourCollectionViewCellIdentifier = "YourCollectionViewCellIdentifier"
     // ClimbingGymVC
     static let follow = "팔로우"
     static let unFollow = "언팔로우"
