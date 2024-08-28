@@ -177,6 +177,7 @@
 			isa = PBXGroup;
 			children = (
 				F4892C112C7C27F500C5FF16 /* ExampleVM.swift */,
+				436AEAE12C7D69F000E0D85A /* SearchVM.swift */,
 				6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */,
 				F4892C232C7CBC8700C5FF16 /* UploadVM.swift */,
 				436AEAE12C7D69F000E0D85A /* SearchVM.swift */,
@@ -317,6 +318,7 @@
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				F4892C142C7C973800C5FF16 /* TabBarController.swift in Sources */,
 				F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */,
+				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
 				F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */,
 				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
 				F4892C0E2C7C27BE00C5FF16 /* ExampleCommon.swift in Sources */,
