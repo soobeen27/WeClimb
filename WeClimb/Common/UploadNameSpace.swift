@@ -11,4 +11,8 @@ enum UploadNameSpace {
     static let placeholder = "등반에 관한 설명을 추가하세요!"
     static let gym = "클라이밍장 선택"
     static let greaterThan = ">"
+    
+    // ClimbingGymVC
+    static let follow = "팔로우"
+    static let unFollow = "언팔로우"
 }

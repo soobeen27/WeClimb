@@ -36,6 +36,9 @@ class ClimbingGymVM {
                         Item(name: "1섹터"),
                         Item(name: "2섹터"),
                         Item(name: "3섹터"),
+                        Item(name: "4섹터"),
+                        Item(name: "5섹터"),
+                        Item(name: "6섹터"),
                     ]
                 case 1:
                     return [
@@ -64,40 +67,12 @@ class ClimbingGymVM {
             }
             .bind(to: dummys)
             .disposed(by: disposeBag)
-        
-        selectedItem
-            .subscribe(onNext: { [weak self] item in
-                self?.updateTableViewData(for: item.name)
-            })
-            .disposed(by: disposeBag)
-    }
-    
-    private func updateTableViewData(for sectorName: String) {
-        switch sectorName {
-        case "1섹터":
-            dummys.accept([
-                Item(name: "1섹터 - 정보 1"),
-                Item(name: "1섹터 - 정보 2"),
-                Item(name: "1섹터 - 정보 3")
-            ])
-        case "2섹터":
-            dummys.accept([
-                Item(name: "2섹터 - 정보 1"),
-                Item(name: "2섹터 - 정보 2"),
-                Item(name: "2섹터 - 정보 3")
-            ])
-        case "3섹터":
-            dummys.accept([
-                Item(name: "3섹터 - 정보 1"),
-                Item(name: "3섹터 - 정보 2"),
-                Item(name: "3섹터 - 정보 3")
-            ])
-        default:
-            dummys.accept([])
-        }
     }
 }
 
 struct Item {
     let name: String
-}
+//    let image: UIImage? // 이미지를 옵셔널로 설정
+    }
+
+
