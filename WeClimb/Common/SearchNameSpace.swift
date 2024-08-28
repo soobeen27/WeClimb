@@ -12,7 +12,4 @@ enum SearchNameSpace {
     static let placeholder = "암장이름, 지역"
     static let nearby = "내 주변 암장"
     static let title = "Discover"
-    
-    static let logout = "로그아웃"
-    static let close = "닫기"
 }

@@ -10,8 +10,6 @@ import UIKit
 
 class SearchTableViewCell: UITableViewCell {
     
-    static let id = "SearchTableViewCell"
-    
     private let gymImage: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .gray

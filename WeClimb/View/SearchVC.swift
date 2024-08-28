@@ -18,13 +18,13 @@ class SearchVC: UIViewController {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "암장이름, 지역"
+        searchController.searchBar.placeholder = SearchNameSpace.placeholder
         return searchController
     }()
     
     private let nearbyLabel: UILabel = {
         let label = UILabel()
-        label.text = "내 주변 암장"
+        label.text = SearchNameSpace.nearby
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .black
@@ -35,7 +35,7 @@ class SearchVC: UIViewController {
         let tableView = UITableView()
         tableView.backgroundColor = .white
         tableView.separatorStyle = .none // 구분선 제거
-        tableView.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchTableViewCell.id)
+        tableView.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchNameSpace.id)
         return tableView
     }()
     
@@ -51,15 +51,7 @@ class SearchVC: UIViewController {
     }
     
     private func setNavigationBar() {
-        let Label = UILabel()
-//        Label.text = "Discover"
-//        Label.textColor = .black
-//        Label.font = UIFont.systemFont(ofSize: 17)
-//
-//        let leftBarButtonItem = UIBarButtonItem(customView: Label)
-//        navigationItem.leftBarButtonItem = leftBarButtonItem
-        
-        self.title = "Discover"
+        self.title = SearchNameSpace.title
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
     }
@@ -87,7 +79,7 @@ class SearchVC: UIViewController {
     
     private func bind() {
         searchViewModel.data
-            .bind(to: tableView.rx.items(cellIdentifier: SearchTableViewCell.id, cellType: SearchTableViewCell.self)) { index, data, cell in
+            .bind(to: tableView.rx.items(cellIdentifier: SearchNameSpace.id, cellType: SearchTableViewCell.self)) { index, data, cell in
                 cell.configure(with: data.image, title: data.title, address: data.address)
             }
             .disposed(by: disposeBag)
