@@ -26,20 +26,20 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         self.title = "WeClimb"
         self.navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationController?.hidesBarsOnSwipe = true
+//        self.navigationController?.hidesBarsOnSwipe = true
         
         setTableView()
         setLayout()
     }
     
-    func setTableView() {
+    private func setTableView() {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.separatorStyle = .none  //셀 사이 라인 삭제
         tableView.register(MainFeedTabelCell.self, forCellReuseIdentifier: "MainFeedTabelCell")
     }
     
-    func setLayout() {
+    private func setLayout() {
         view.addSubview(tableView)
         
         tableView.snp.makeConstraints {
@@ -69,6 +69,7 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // 컬렉션 뷰의 데이터 소스 및 델리게이트 설정
         cell.collectionView.delegate = self
         cell.collectionView.dataSource = self
+        cell.selectionStyle = .none
         
         return cell
     }
