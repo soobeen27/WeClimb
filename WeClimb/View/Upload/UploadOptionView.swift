@@ -1,26 +1,27 @@
 //
-//  GymSelectCell.swift
+//  UploadOptionView.swift
 //  WeClimb
 //
-//  Created by Soo Jang on 8/27/24.
+//  Created by Soo Jang on 8/28/24.
 //
 
 import UIKit
 
 import SnapKit
 
-class UploadOptionCell: UITableViewCell {
+class UploadOptionView : UIView {
     
     private let symbolImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "figure.climbing")
+        imageView.tintColor = .label
         return imageView
     }()
     
     private let optionLabel: UILabel = {
         let label = UILabel()
         label.text = UploadNameSpace.gym
-        label.font = .systemFont(ofSize: 17, weight: .bold)
+        label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = .label
         return label
     }()
@@ -40,9 +41,9 @@ class UploadOptionCell: UITableViewCell {
         label.textColor = .secondaryLabel
         return label
     }()
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         setLayout()
     }
     
@@ -50,10 +51,15 @@ class UploadOptionCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override var intrinsicContentSize: CGSize {
+        return CGSize(width: UIView.noIntrinsicMetric, height: 41)
+    }
+
     private func setLayout() {
-        [symbolImageView, optionLabel]
+        self.backgroundColor = .systemBackground
+        [symbolImageView, optionLabel, greaterThanSign, selectedLabel]
             .forEach {
-                contentView.addSubview($0)
+                self.addSubview($0)
             }
         
         symbolImageView.snp.makeConstraints {
@@ -83,5 +89,4 @@ class UploadOptionCell: UITableViewCell {
         optionLabel.text = option
         selectedLabel.text = selected
     }
-    
 }

@@ -31,6 +31,7 @@ class LoginVC: UIViewController {
         label.text = "We climb, 위클"
         label.font = .systemFont(ofSize: 30, weight: .bold)
         label.textColor = UIColor(named: "MainColor")
+        
         return label
     }()
     
@@ -120,7 +121,7 @@ class LoginVC: UIViewController {
     }
     
     private func setLayout() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         [loginTitleLabel, buttonStackView]
             .forEach {
                 view.addSubview($0)
