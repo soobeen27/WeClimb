@@ -38,7 +38,7 @@ class LoginVC: UIViewController {
         let button = UIButton(type: .system)
         if let buttonImage = UIImage(named: "Kakao_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
-            button.addTarget(self, action: #selector(googleLoginTapped), for: .touchUpInside)
+            button.addTarget(self, action: #selector(kakaoLoginTapped), for: .touchUpInside)
         } else {
             print("이미지 없는데?")
         }
@@ -49,7 +49,7 @@ class LoginVC: UIViewController {
         let button = UIButton(type: .system)
         if let buttonImage = UIImage(named: "Apple_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
-            button.addTarget(self, action: #selector(kakaoLoginTapped), for: .touchUpInside)
+            button.addTarget(self, action: #selector(appleLoginTapped), for: .touchUpInside)
         } else {
             print("이미지 없는데?")
         }
@@ -60,7 +60,7 @@ class LoginVC: UIViewController {
         let button = UIButton(type: .system)
         if let buttonImage = UIImage(named: "Google_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
-            button.addTarget(self, action: #selector(appleLoginTapped), for: .touchUpInside)
+            button.addTarget(self, action: #selector(googleLoginTapped), for: .touchUpInside)
         } else {
             print("이미지 없는데?")
         }
