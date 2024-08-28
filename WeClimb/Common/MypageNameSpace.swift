@@ -8,7 +8,7 @@
 import Foundation
 
 enum MypageNameSpace {
-    static let id = "MyPageCell"
+    static let id = "CollectionViewCell"
     static let edit = "프로필 편집"
     static let follow = "팔로우"
     static let following = "팔로잉"
