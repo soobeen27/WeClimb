@@ -9,6 +9,18 @@
 /* Begin PBXBuildFile section */
 		6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */; };
 		6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */; };
+		6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F972C7EEA3F00B34083 /* GoogleSignIn */; };
+		6BC91F9A2C7EEA5A00B34083 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F992C7EEA5A00B34083 /* GoogleSignInSwift */; };
+		6BC91F9D2C7EEACF00B34083 /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F9C2C7EEACF00B34083 /* KakaoSDK */; };
+		6BC91F9F2C7EEACF00B34083 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F9E2C7EEACF00B34083 /* KakaoSDKAuth */; };
+		6BC91FA12C7EEACF00B34083 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA02C7EEACF00B34083 /* KakaoSDKCommon */; };
+		6BC91FA32C7EEACF00B34083 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA22C7EEACF00B34083 /* KakaoSDKUser */; };
+		6BC91FA62C7EEB4E00B34083 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA52C7EEB4E00B34083 /* FirebaseAnalytics */; };
+		6BC91FA82C7EEB4E00B34083 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA72C7EEB4E00B34083 /* FirebaseAuth */; };
+		6BC91FAA2C7EEB4E00B34083 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA92C7EEB4E00B34083 /* FirebaseDatabase */; };
+		6BC91FAC2C7EEB4E00B34083 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FAB2C7EEB4E00B34083 /* FirebaseFirestore */; };
+		6BC91FAE2C7EEB4E00B34083 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FAD2C7EEB4E00B34083 /* FirebaseFunctions */; };
+		6BC91FB02C7EEB4E00B34083 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */; };
 		C40397B72C7CB4CC00923777 /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B62C7CB4CC00923777 /* Extension.swift */; };
 		C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */; };
 		F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892BE62C7C237700C5FF16 /* AppDelegate.swift */; };
@@ -76,9 +88,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6BC91FA12C7EEACF00B34083 /* KakaoSDKCommon in Frameworks */,
+				6BC91FAE2C7EEB4E00B34083 /* FirebaseFunctions in Frameworks */,
+				6BC91FAC2C7EEB4E00B34083 /* FirebaseFirestore in Frameworks */,
+				6BC91F9F2C7EEACF00B34083 /* KakaoSDKAuth in Frameworks */,
+				6BC91F9A2C7EEA5A00B34083 /* GoogleSignInSwift in Frameworks */,
 				F4892C062C7C23FA00C5FF16 /* Kingfisher in Frameworks */,
+				6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */,
 				F4892BFF2C7C23AC00C5FF16 /* RxCocoa in Frameworks */,
+				6BC91FB02C7EEB4E00B34083 /* FirebaseStorage in Frameworks */,
+				6BC91FAA2C7EEB4E00B34083 /* FirebaseDatabase in Frameworks */,
 				F4892BFC2C7C239900C5FF16 /* SnapKit in Frameworks */,
+				6BC91FA82C7EEB4E00B34083 /* FirebaseAuth in Frameworks */,
+				6BC91F9D2C7EEACF00B34083 /* KakaoSDK in Frameworks */,
+				6BC91FA62C7EEB4E00B34083 /* FirebaseAnalytics in Frameworks */,
+				6BC91FA32C7EEACF00B34083 /* KakaoSDKUser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -204,6 +228,18 @@
 				F4892BFB2C7C239900C5FF16 /* SnapKit */,
 				F4892BFE2C7C23AC00C5FF16 /* RxCocoa */,
 				F4892C052C7C23FA00C5FF16 /* Kingfisher */,
+				6BC91F972C7EEA3F00B34083 /* GoogleSignIn */,
+				6BC91F992C7EEA5A00B34083 /* GoogleSignInSwift */,
+				6BC91F9C2C7EEACF00B34083 /* KakaoSDK */,
+				6BC91F9E2C7EEACF00B34083 /* KakaoSDKAuth */,
+				6BC91FA02C7EEACF00B34083 /* KakaoSDKCommon */,
+				6BC91FA22C7EEACF00B34083 /* KakaoSDKUser */,
+				6BC91FA52C7EEB4E00B34083 /* FirebaseAnalytics */,
+				6BC91FA72C7EEB4E00B34083 /* FirebaseAuth */,
+				6BC91FA92C7EEB4E00B34083 /* FirebaseDatabase */,
+				6BC91FAB2C7EEB4E00B34083 /* FirebaseFirestore */,
+				6BC91FAD2C7EEB4E00B34083 /* FirebaseFunctions */,
+				6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */,
 			);
 			productName = WeClimb;
 			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
@@ -237,6 +273,9 @@
 				F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				F4892BFD2C7C23AC00C5FF16 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				F4892C042C7C23FA00C5FF16 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
+				6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = F4892BE42C7C237700C5FF16 /* Products */;
 			projectDirPath = "";
@@ -505,6 +544,30 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.22.6;
+			};
+		};
+		6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.1.0;
+			};
+		};
 		F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -532,6 +595,66 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		6BC91F972C7EEA3F00B34083 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		6BC91F992C7EEA5A00B34083 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		6BC91F9C2C7EEACF00B34083 /* KakaoSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDK;
+		};
+		6BC91F9E2C7EEACF00B34083 /* KakaoSDKAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKAuth;
+		};
+		6BC91FA02C7EEACF00B34083 /* KakaoSDKCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKCommon;
+		};
+		6BC91FA22C7EEACF00B34083 /* KakaoSDKUser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKUser;
+		};
+		6BC91FA52C7EEB4E00B34083 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		6BC91FA72C7EEB4E00B34083 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		6BC91FA92C7EEB4E00B34083 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		6BC91FAB2C7EEB4E00B34083 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		6BC91FAD2C7EEB4E00B34083 /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
+		};
+		6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
 		F4892BFB2C7C239900C5FF16 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */;
