@@ -6,7 +6,7 @@
 //
 
 import AVKit
-import Photos
+import PhotosUI
 import UIKit
 
 import SnapKit
@@ -82,11 +82,37 @@ class UploadVC: UIViewController {
         title = UploadNameSpace.title
         textView.delegate = self
         setLayout()
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
+        postButton.rx.tap.bind 
+        { [weak self] in
+            print("tapped")
+            self?.phpickerVCPresent()
+        }
+        .disposed(by: disposeBag)
+        
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        view.endEditing(true)
+    @objc
+    func handleTap(sender: UITapGestureRecognizer) {
+        if sender.state == .ended {
+            textView.resignFirstResponder()
+            scrollToTop()
+        }
+        sender.cancelsTouchesInView = false
+    }
+    
+    func scrollToTop() {
+        let offset = CGPoint(x: 0, y: selectedMediaView.frame.origin.y)
+        scrollView.setContentOffset(offset, animated: true)
+    }
+    
+    func phpickerVCPresent() {
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 0
+        configuration.filter = .any(of: [.images, .videos])
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        self.present(picker, animated: true, completion: nil)
     }
     
     private func setLayout() {
@@ -167,10 +193,26 @@ extension UploadVC : UITextViewDelegate {
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         if (text == "\n") {
             textView.resignFirstResponder()
-            
-            let offset = CGPoint(x: 0, y: selectedMediaView.frame.origin.y)
-            scrollView.setContentOffset(offset, animated: true)
+            scrollToTop()
         }
         return true
     }
+}
+
+extension UploadVC : PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true) // 1
+        let itemProvider = results.first?.itemProvider // 2
+        if let itemProvider = itemProvider,
+           itemProvider.canLoadObject(ofClass: UIImage.self) { // 3
+            itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in // 4
+                DispatchQueue.main.async {
+                    //                              self.myImageView.image = image as? UIImage // 5
+                }
+            }
+        } else {
+        }
+    }
+    
+    
 }
