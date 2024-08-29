@@ -59,6 +59,7 @@
 		F4892C2F2C7D9EA700C5FF16 /* UploadNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C2E2C7D9EA700C5FF16 /* UploadNameSpace.swift */; };
 		F4892C3E2C7EFD4700C5FF16 /* UploadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C3D2C7EFD4700C5FF16 /* UploadVC.swift */; };
 		F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C362C7E26D900C5FF16 /* UploadOptionView.swift */; };
+		F4892C422C8038B500C5FF16 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F4892C412C8038B500C5FF16 /* RxSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -123,6 +124,7 @@
 				6BC91FA82C7EEB4E00B34083 /* FirebaseAuth in Frameworks */,
 				6BC91F9D2C7EEACF00B34083 /* KakaoSDK in Frameworks */,
 				6BC91FA62C7EEB4E00B34083 /* FirebaseAnalytics in Frameworks */,
+				F4892C422C8038B500C5FF16 /* RxSwift in Frameworks */,
 				6BC91FA32C7EEACF00B34083 /* KakaoSDKUser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -167,6 +169,7 @@
 				F4892C002C7C23CE00C5FF16 /* CommitConvention.md */,
 				F4892BE52C7C237700C5FF16 /* WeClimb */,
 				F4892BE42C7C237700C5FF16 /* Products */,
+				F4892C402C8038B500C5FF16 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -256,6 +259,13 @@
 			path = Upload;
 			sourceTree = "<group>";
 		};
+		F4892C402C8038B500C5FF16 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -288,6 +298,7 @@
 				6BC91FAB2C7EEB4E00B34083 /* FirebaseFirestore */,
 				6BC91FAD2C7EEB4E00B34083 /* FirebaseFunctions */,
 				6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */,
+				F4892C412C8038B500C5FF16 /* RxSwift */,
 			);
 			productName = WeClimb;
 			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
@@ -534,6 +545,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = WeClimb/WeClimb.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -570,6 +582,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = WeClimb/WeClimb.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -748,6 +761,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F4892C042C7C23FA00C5FF16 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		F4892C412C8038B500C5FF16 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4892BFD2C7C23AC00C5FF16 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
