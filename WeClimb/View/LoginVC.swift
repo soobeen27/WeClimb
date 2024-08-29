@@ -30,7 +30,7 @@ class LoginVC: UIViewController {
         let label = UILabel()
         label.text = "We climb, 위클"
         label.font = .systemFont(ofSize: 30, weight: .bold)
-        label.textColor = UIColor(named: "MainColor")
+        label.textColor = .mainPurple
         
         return label
     }()
@@ -40,8 +40,6 @@ class LoginVC: UIViewController {
         if let buttonImage = UIImage(named: "Kakao_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
             button.addTarget(self, action: #selector(kakaoLoginTapped), for: .touchUpInside)
-        } else {
-            print("이미지 없는데?")
         }
         return button
     }()
@@ -51,8 +49,6 @@ class LoginVC: UIViewController {
         if let buttonImage = UIImage(named: "Apple_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
             button.addTarget(self, action: #selector(appleLoginTapped), for: .touchUpInside)
-        } else {
-            print("이미지 없는데?")
         }
         return button
     }()
@@ -62,8 +58,6 @@ class LoginVC: UIViewController {
         if let buttonImage = UIImage(named: "Google_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
             button.addTarget(self, action: #selector(googleLoginTapped), for: .touchUpInside)
-        } else {
-            print("이미지 없는데?")
         }
         return button
     }()
