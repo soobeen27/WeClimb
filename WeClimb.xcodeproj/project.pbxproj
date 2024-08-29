@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		436AEAE02C7D69CB00E0D85A /* SearchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEADF2C7D69CB00E0D85A /* SearchTableViewCell.swift */; };
 		436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAE12C7D69F000E0D85A /* SearchVM.swift */; };
-		436AEAE82C7DC9D800E0D85A /* UploadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAE72C7DC9D800E0D85A /* UploadVC.swift */; };
 		436AEAEA2C7DCD1100E0D85A /* MyPageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAE92C7DCD1100E0D85A /* MyPageCell.swift */; };
 		436AEAEC2C7DCE3C00E0D85A /* MyPageVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */; };
 		436AEAEE2C7EC1F500E0D85A /* MypageNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAED2C7EC1F500E0D85A /* MypageNameSpace.swift */; };
@@ -44,14 +43,13 @@
 		F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C232C7CBC8700C5FF16 /* UploadVM.swift */; };
 		F4892C2B2C7CCDF200C5FF16 /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C2A2C7CCDF200C5FF16 /* Identifiers.swift */; };
 		F4892C2F2C7D9EA700C5FF16 /* UploadNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C2E2C7D9EA700C5FF16 /* UploadNameSpace.swift */; };
-		F4892C372C7E26D900C5FF16 /* UploadOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C362C7E26D900C5FF16 /* UploadOptionView.swift */; };
 		F4892C3E2C7EFD4700C5FF16 /* UploadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C3D2C7EFD4700C5FF16 /* UploadVC.swift */; };
+		F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C362C7E26D900C5FF16 /* UploadOptionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		436AEADF2C7D69CB00E0D85A /* SearchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableViewCell.swift; sourceTree = "<group>"; };
 		436AEAE12C7D69F000E0D85A /* SearchVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVM.swift; sourceTree = "<group>"; };
-		436AEAE72C7DC9D800E0D85A /* UploadVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadVC.swift; sourceTree = "<group>"; };
 		436AEAE92C7DCD1100E0D85A /* MyPageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageCell.swift; sourceTree = "<group>"; };
 		436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageVM.swift; sourceTree = "<group>"; };
 		436AEAED2C7EC1F500E0D85A /* MypageNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MypageNameSpace.swift; sourceTree = "<group>"; };
@@ -320,8 +318,8 @@
 				F4892C162C7C981000C5FF16 /* LoginVC.swift in Sources */,
 				F4892C102C7C27D800C5FF16 /* ExampleModel.swift in Sources */,
 				436AEAEA2C7DCD1100E0D85A /* MyPageCell.swift in Sources */,
+				F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */,
 				436AEAF42C7EEE9900E0D85A /* UserPageVC.swift in Sources */,
-				F4892C2D2C7D9D2100C5FF16 /* CaptionCell.swift in Sources */,
 				F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */,
 				F4892C3E2C7EFD4700C5FF16 /* UploadVC.swift in Sources */,
 				F4892C1A2C7C984A00C5FF16 /* SearchVC.swift in Sources */,

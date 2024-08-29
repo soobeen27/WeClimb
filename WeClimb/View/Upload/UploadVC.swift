@@ -42,12 +42,6 @@ class UploadVC: UIViewController {
         return view
     }()
     
-    private let seperateLine: UIView = {
-        let view = UIView()
-        view.backgroundColor = .tertiarySystemBackground
-        return view
-    }()
-    
     private lazy var selectedMediaView: UIView = {
         let view = UIView()
         view.backgroundColor = .secondarySystemBackground
@@ -128,7 +122,7 @@ class UploadVC: UIViewController {
         textView.snp.makeConstraints {
             $0.left.right.equalToSuperview().inset(16)
             $0.top.equalTo(selectedMediaView.snp.bottom).offset(8)
-            $0.height.equalTo(100)
+            $0.height.equalTo(80)
         }
         
         gymView.snp.makeConstraints {
