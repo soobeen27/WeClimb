@@ -557,6 +557,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeClimb/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진앱 권한을 확인해주세요";
@@ -593,6 +594,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeClimb/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진앱 권한을 확인해주세요";

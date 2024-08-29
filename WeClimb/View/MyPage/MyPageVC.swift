@@ -170,7 +170,7 @@ class MyPageVC: UIViewController {
             target: self,
             action: #selector(rightBarButtonTapped)
         )
-        navigationController?.navigationBar.tintColor = .black
+        navigationController?.navigationBar.tintColor = .label
         navigationItem.rightBarButtonItem = rightBarButton
     }
     
