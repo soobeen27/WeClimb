@@ -57,8 +57,9 @@ class MyPageVC: UIViewController {
         button.setTitle(MypageNameSpace.edit, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 13)
         button.backgroundColor = .systemGray6
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(.label, for: .normal)
         button.layer.cornerRadius = 5
+        button.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -66,7 +67,6 @@ class MyPageVC: UIViewController {
         let label = UILabel()
         label.text = "123"
         label.font = UIFont.boldSystemFont(ofSize: 13)
-        label.textColor = .black
         label.textAlignment = .center
         return label
     }()
@@ -75,7 +75,6 @@ class MyPageVC: UIViewController {
         let label = UILabel()
         label.text = "456"
         label.font = UIFont.boldSystemFont(ofSize: 13)
-        label.textColor = .black
         label.textAlignment = .center
         return label
     }()
@@ -84,7 +83,6 @@ class MyPageVC: UIViewController {
         let label = UILabel()
         label.text = MypageNameSpace.follow
         label.font = UIFont.systemFont(ofSize: 13)
-        label.textColor = .black
         label.textAlignment = .center
         return label
     }()
@@ -93,7 +91,6 @@ class MyPageVC: UIViewController {
         let label = UILabel()
         label.text = MypageNameSpace.following
         label.font = UIFont.systemFont(ofSize: 13)
-        label.textColor = .black
         label.textAlignment = .center
         return label
     }()
@@ -157,7 +154,7 @@ class MyPageVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         setupLayout()
         bind()
@@ -191,6 +188,13 @@ class MyPageVC: UIViewController {
             .forEach { actionSheet.addAction($0) }
         
         present(actionSheet, animated: true)
+    }
+    
+    @objc private func editButtonTapped() {
+        let editPageVC = EditPageVC()
+        
+        // Push the EditPage view controller
+        navigationController?.pushViewController(editPageVC, animated: true)
     }
     
     private func setupLayout() {
