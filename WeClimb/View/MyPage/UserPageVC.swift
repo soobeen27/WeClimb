@@ -1,8 +1,8 @@
 //
-//  MyPageVC.swift
+//  UserPageVC.swift
 //  WeClimb
 //
-//  Created by Soo Jang on 8/26/24.
+//  Created by 강유정 on 8/28/24.
 //
 
 import UIKit
@@ -10,10 +10,12 @@ import UIKit
 import RxSwift
 import SnapKit
 
-class MyPageVC: UIViewController {
+class UserPageVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private let viewModel = MyPageVM()
+    
+    private var isFollowing = false
     
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
@@ -26,7 +28,7 @@ class MyPageVC: UIViewController {
     
     private let nameLabel: UILabel = {
         let label = UILabel()
-        label.text = "iOSClimber"
+        label.text = "qockqock"
         label.font = UIFont.systemFont(ofSize: 17)
         label.numberOfLines = 1
         return label
@@ -34,8 +36,8 @@ class MyPageVC: UIViewController {
     
     private let levelLabel: UILabel = {
         let label = UILabel()
-        label.text = "V6"
-        label.backgroundColor = .purple
+        label.text = "V4"
+        label.backgroundColor = .systemGreen
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .white
         label.layer.cornerRadius = 5
@@ -45,26 +47,27 @@ class MyPageVC: UIViewController {
     
     private let infoLabel: UILabel = {
         let label = UILabel()
-        label.text = "체형: 177cm | 183cm"
+        label.text = "체형: 183cm | 185cm"
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .gray
         label.numberOfLines = 1
         return label
     }()
     
-    private let editButton: UIButton = {
+    private let followFollowingButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle(MypageNameSpace.edit, for: .normal)
+        button.setTitle(UserPageNameSpace.following, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 13)
-        button.backgroundColor = .systemGray6
-        button.setTitleColor(.black, for: .normal)
+        button.backgroundColor = .systemBlue
+        button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 5
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return button
     }()
     
     private let followCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "123"
+        label.text = "654"
         label.font = UIFont.boldSystemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
@@ -73,7 +76,7 @@ class MyPageVC: UIViewController {
     
     private let followingCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "456"
+        label.text = "321"
         label.font = UIFont.boldSystemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
@@ -82,7 +85,7 @@ class MyPageVC: UIViewController {
     
     private let followLabel: UILabel = {
         let label = UILabel()
-        label.text = MypageNameSpace.follow
+        label.text = UserPageNameSpace.follow
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
@@ -91,7 +94,7 @@ class MyPageVC: UIViewController {
     
     private let followingLabel: UILabel = {
         let label = UILabel()
-        label.text = MypageNameSpace.following
+        label.text = UserPageNameSpace.following
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
@@ -138,6 +141,12 @@ class MyPageVC: UIViewController {
         return stackView
     }()
     
+    private let segmentControl: UISegmentedControl = {
+        let segmentControl = UISegmentedControl(items: [UIImage(systemName: "square.grid.2x2") ?? UIImage(), UserPageNameSpace.none])
+        segmentControl.selectedSegmentIndex = 0
+        return segmentControl
+    }()
+    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         
@@ -149,7 +158,7 @@ class MyPageVC: UIViewController {
         layout.itemSize = CGSize(width: width, height: width)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MypageNameSpace.id)
+        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: UserPageNameSpace.id)
         
         return collectionView
     }()
@@ -180,12 +189,12 @@ class MyPageVC: UIViewController {
     @objc private func rightBarButtonTapped() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        let logout = UIAlertAction(title: MypageNameSpace.logout, style: .default) { _ in
+        let logout = UIAlertAction(title: UserPageNameSpace.logout, style: .default) { _ in
             guard let navigationController = self.tabBarController?.navigationController else { return }
             navigationController.popToRootViewController(animated: true)
         }
         
-        let close = UIAlertAction(title: MypageNameSpace.close, style: .cancel)
+        let close = UIAlertAction(title: UserPageNameSpace.close, style: .cancel)
         
         [logout, close]
             .forEach { actionSheet.addAction($0) }
@@ -193,11 +202,25 @@ class MyPageVC: UIViewController {
         present(actionSheet, animated: true)
     }
     
+    @objc private func buttonTapped() {
+        isFollowing.toggle()
+
+        if isFollowing {
+            followFollowingButton.setTitle(UserPageNameSpace.follow, for: .normal)
+            followFollowingButton.backgroundColor = .systemGray6
+            followFollowingButton.setTitleColor(.black, for: .normal)
+        } else {
+            followFollowingButton.setTitle(UserPageNameSpace.following, for: .normal)
+            followFollowingButton.backgroundColor = .systemBlue
+            followFollowingButton.setTitleColor(.white, for: .normal)
+        }
+    }
+    
     private func setupLayout() {
-        [profileImage, profileStackView, totalStackView, collectionView]
+        [profileImage, profileStackView, totalStackView, segmentControl, collectionView]
             .forEach{ view.addSubview($0) }
         
-        [nameStackView, infoLabel, editButton]
+        [nameStackView, infoLabel, followFollowingButton]
             .forEach{ profileStackView.addArrangedSubview($0) }
         
         [nameLabel, levelLabel]
@@ -224,7 +247,7 @@ class MyPageVC: UIViewController {
             $0.height.equalTo(80)
         }
         
-        editButton.snp.makeConstraints {
+        followFollowingButton.snp.makeConstraints {
             $0.width.equalTo(120)
         }
         
@@ -234,8 +257,13 @@ class MyPageVC: UIViewController {
             $0.height.equalTo(80)
         }
         
+        segmentControl.snp.makeConstraints {
+            $0.top.equalTo(profileImage.snp.bottom).offset(32)
+            $0.leading.trailing.equalToSuperview().inset(16)
+        }
+        
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(profileStackView.snp.bottom).offset(32)
+            $0.top.equalTo(segmentControl.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
         }
@@ -243,9 +271,10 @@ class MyPageVC: UIViewController {
     
     private func bind() {
         viewModel.profileImages
-            .bind(to: collectionView.rx.items(cellIdentifier: MypageNameSpace.id, cellType: MyPageCell.self)) { _, image, cell in
+            .bind(to: collectionView.rx.items(cellIdentifier: UserPageNameSpace.id, cellType: MyPageCell.self)) { _, image, cell in
                 cell.configure(with: image)
             }
             .disposed(by: disposeBag)
     }
 }
+

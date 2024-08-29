@@ -6,9 +6,10 @@
 //
 
 import UIKit
+
 import SnapKit
 
-class CollectionViewCell: UICollectionViewCell {
+class MyPageCell: UICollectionViewCell {
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
