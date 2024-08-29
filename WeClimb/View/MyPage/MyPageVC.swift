@@ -193,7 +193,6 @@ class MyPageVC: UIViewController {
     @objc private func editButtonTapped() {
         let editPageVC = EditPageVC()
         
-        // Push the EditPage view controller
         navigationController?.pushViewController(editPageVC, animated: true)
     }
     

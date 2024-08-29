@@ -9,6 +9,6 @@ import UIKit
 
 class EditPageVC: UIViewController {
     override func viewDidLoad() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
     }
 }
