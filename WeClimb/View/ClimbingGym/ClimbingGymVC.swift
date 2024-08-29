@@ -85,16 +85,17 @@ class ClimbingGymVC: UIViewController {
         
         // 임시레지스터
         tableView.register(SectionTableViewCell.self, forCellReuseIdentifier: Identifiers.sectionTableViewCell)
+        tableView.delegate = self
     }
     
     // MARK: - addAction 부분 (버튼, 세그먼트 컨트롤) DS
     private func actions() {
         followButton.addAction(UIAction { [weak self] _ in
             guard let self = self else { return }
-            if self.followButton.title(for: .normal) == Identifiers.follow {
-                self.followButton.setTitle(Identifiers.unFollow, for: .normal)
+            if self.followButton.title(for: .normal) == UploadNameSpace.follow {
+                self.followButton.setTitle(UploadNameSpace.unFollow, for: .normal)
             } else {
-                self.followButton.setTitle(Identifiers.follow, for: .normal)
+                self.followButton.setTitle(UploadNameSpace.follow, for: .normal)
             }
         }, for: .touchUpInside)
         
@@ -184,3 +185,9 @@ class ClimbingGymVC: UIViewController {
     }
 }
 
+// 테이블 뷰 높이 설정
+extension ClimbingGymVC: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 120  // 원하는 고정 높이로 설정
+    }
+}

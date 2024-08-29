@@ -19,6 +19,20 @@
 		436AEAF82C7F0EEE00E0D85A /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */; };
 		6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */; };
 		6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */; };
+		6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F972C7EEA3F00B34083 /* GoogleSignIn */; };
+		6BC91F9A2C7EEA5A00B34083 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F992C7EEA5A00B34083 /* GoogleSignInSwift */; };
+		6BC91F9D2C7EEACF00B34083 /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F9C2C7EEACF00B34083 /* KakaoSDK */; };
+		6BC91F9F2C7EEACF00B34083 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F9E2C7EEACF00B34083 /* KakaoSDKAuth */; };
+		6BC91FA12C7EEACF00B34083 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA02C7EEACF00B34083 /* KakaoSDKCommon */; };
+		6BC91FA32C7EEACF00B34083 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA22C7EEACF00B34083 /* KakaoSDKUser */; };
+		6BC91FA62C7EEB4E00B34083 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA52C7EEB4E00B34083 /* FirebaseAnalytics */; };
+		6BC91FA82C7EEB4E00B34083 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA72C7EEB4E00B34083 /* FirebaseAuth */; };
+		6BC91FAA2C7EEB4E00B34083 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA92C7EEB4E00B34083 /* FirebaseDatabase */; };
+		6BC91FAC2C7EEB4E00B34083 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FAB2C7EEB4E00B34083 /* FirebaseFirestore */; };
+		6BC91FAE2C7EEB4E00B34083 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FAD2C7EEB4E00B34083 /* FirebaseFunctions */; };
+		6BC91FB02C7EEB4E00B34083 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */; };
+		6BC91FB32C7F016A00B34083 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */; };
+		6BC91FB42C7F016A00B34083 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6BC91FB22C7F016A00B34083 /* Config.xcconfig */; };
 		C40397B72C7CB4CC00923777 /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B62C7CB4CC00923777 /* Extension.swift */; };
 		C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */; };
 		F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892BE62C7C237700C5FF16 /* AppDelegate.swift */; };
@@ -61,6 +75,9 @@
 		436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
 		6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTableViewCell.swift; sourceTree = "<group>"; };
 		6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVM.swift; sourceTree = "<group>"; };
+		6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		6BC91FB22C7F016A00B34083 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		6BC91FB52C7F16D800B34083 /* WeClimb.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeClimb.entitlements; sourceTree = "<group>"; };
 		C40397B62C7CB4CC00923777 /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedTabelCell.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892BE32C7C237700C5FF16 /* WeClimb.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeClimb.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,9 +111,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6BC91FA12C7EEACF00B34083 /* KakaoSDKCommon in Frameworks */,
+				6BC91FAE2C7EEB4E00B34083 /* FirebaseFunctions in Frameworks */,
+				6BC91FAC2C7EEB4E00B34083 /* FirebaseFirestore in Frameworks */,
+				6BC91F9F2C7EEACF00B34083 /* KakaoSDKAuth in Frameworks */,
+				6BC91F9A2C7EEA5A00B34083 /* GoogleSignInSwift in Frameworks */,
 				F4892C062C7C23FA00C5FF16 /* Kingfisher in Frameworks */,
+				6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */,
 				F4892BFF2C7C23AC00C5FF16 /* RxCocoa in Frameworks */,
+				6BC91FB02C7EEB4E00B34083 /* FirebaseStorage in Frameworks */,
+				6BC91FAA2C7EEB4E00B34083 /* FirebaseDatabase in Frameworks */,
 				F4892BFC2C7C239900C5FF16 /* SnapKit in Frameworks */,
+				6BC91FA82C7EEB4E00B34083 /* FirebaseAuth in Frameworks */,
+				6BC91F9D2C7EEACF00B34083 /* KakaoSDK in Frameworks */,
+				6BC91FA62C7EEB4E00B34083 /* FirebaseAnalytics in Frameworks */,
+				6BC91FA32C7EEACF00B34083 /* KakaoSDKUser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,6 +183,7 @@
 		F4892BE52C7C237700C5FF16 /* WeClimb */ = {
 			isa = PBXGroup;
 			children = (
+				6BC91FB52C7F16D800B34083 /* WeClimb.entitlements */,
 				F4892BE62C7C237700C5FF16 /* AppDelegate.swift */,
 				F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */,
 				C40397B62C7CB4CC00923777 /* Extension.swift */,
@@ -164,6 +194,8 @@
 				F4892BF12C7C237900C5FF16 /* LaunchScreen.storyboard */,
 				F4892BEF2C7C237900C5FF16 /* Assets.xcassets */,
 				F4892BF42C7C237900C5FF16 /* Info.plist */,
+				6BC91FB22C7F016A00B34083 /* Config.xcconfig */,
+				6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */,
 			);
 			path = WeClimb;
 			sourceTree = "<group>";
@@ -246,6 +278,18 @@
 				F4892BFB2C7C239900C5FF16 /* SnapKit */,
 				F4892BFE2C7C23AC00C5FF16 /* RxCocoa */,
 				F4892C052C7C23FA00C5FF16 /* Kingfisher */,
+				6BC91F972C7EEA3F00B34083 /* GoogleSignIn */,
+				6BC91F992C7EEA5A00B34083 /* GoogleSignInSwift */,
+				6BC91F9C2C7EEACF00B34083 /* KakaoSDK */,
+				6BC91F9E2C7EEACF00B34083 /* KakaoSDKAuth */,
+				6BC91FA02C7EEACF00B34083 /* KakaoSDKCommon */,
+				6BC91FA22C7EEACF00B34083 /* KakaoSDKUser */,
+				6BC91FA52C7EEB4E00B34083 /* FirebaseAnalytics */,
+				6BC91FA72C7EEB4E00B34083 /* FirebaseAuth */,
+				6BC91FA92C7EEB4E00B34083 /* FirebaseDatabase */,
+				6BC91FAB2C7EEB4E00B34083 /* FirebaseFirestore */,
+				6BC91FAD2C7EEB4E00B34083 /* FirebaseFunctions */,
+				6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */,
 			);
 			productName = WeClimb;
 			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
@@ -279,6 +323,9 @@
 				F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				F4892BFD2C7C23AC00C5FF16 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				F4892C042C7C23FA00C5FF16 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
+				6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = F4892BE42C7C237700C5FF16 /* Products */;
 			projectDirPath = "";
@@ -298,8 +345,10 @@
 				F4892BF32C7C237900C5FF16 /* Base in Resources */,
 				F4892C012C7C23CE00C5FF16 /* CommitConvention.md in Resources */,
 				F4892C222C7C9DC700C5FF16 /* CodingConvention.md in Resources */,
+				6BC91FB42C7F016A00B34083 /* Config.xcconfig in Resources */,
 				F4892C032C7C23D400C5FF16 /* CodeConvention.md in Resources */,
 				F4892C082C7C249300C5FF16 /* .gitignore in Resources */,
+				6BC91FB32C7F016A00B34083 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,6 +410,7 @@
 /* Begin XCBuildConfiguration section */
 		F4892BF52C7C237900C5FF16 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6BC91FB22C7F016A00B34083 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -424,6 +474,7 @@
 		};
 		F4892BF62C7C237900C5FF16 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6BC91FB22C7F016A00B34083 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -480,14 +531,20 @@
 		};
 		F4892BF82C7C237900C5FF16 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6BC91FB22C7F016A00B34083 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = WeClimb/WeClimb.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 72GVCX2P2A;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeClimb/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진앱 권한을 확인해주세요";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진앱 권한을 확인해주세요.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -500,6 +557,8 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -508,14 +567,20 @@
 		};
 		F4892BF92C7C237900C5FF16 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6BC91FB22C7F016A00B34083 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = WeClimb/WeClimb.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 72GVCX2P2A;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeClimb/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진앱 권한을 확인해주세요";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진앱 권한을 확인해주세요.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -528,6 +593,8 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -558,6 +625,30 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.22.6;
+			};
+		};
+		6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.1.0;
+			};
+		};
 		F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -585,6 +676,66 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		6BC91F972C7EEA3F00B34083 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		6BC91F992C7EEA5A00B34083 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		6BC91F9C2C7EEACF00B34083 /* KakaoSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDK;
+		};
+		6BC91F9E2C7EEACF00B34083 /* KakaoSDKAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKAuth;
+		};
+		6BC91FA02C7EEACF00B34083 /* KakaoSDKCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKCommon;
+		};
+		6BC91FA22C7EEACF00B34083 /* KakaoSDKUser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKUser;
+		};
+		6BC91FA52C7EEB4E00B34083 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		6BC91FA72C7EEB4E00B34083 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		6BC91FA92C7EEB4E00B34083 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		6BC91FAB2C7EEB4E00B34083 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		6BC91FAD2C7EEB4E00B34083 /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
+		};
+		6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
 		F4892BFB2C7C239900C5FF16 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */;
