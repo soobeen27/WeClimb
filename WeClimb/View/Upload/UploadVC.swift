@@ -4,7 +4,6 @@
 //
 //  Created by Soo Jang on 8/26/24.
 //
-
 import AVKit
 import PhotosUI
 import UIKit
@@ -49,13 +48,19 @@ class UploadVC: UIViewController {
         return view
     }()
     
-    private let callPHPickerButton: UIButton = {
+    private lazy var callPHPickerButton: UIButton = {
         let button = UIButton()
         button.setTitle(UploadNameSpace.add, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
         button.backgroundColor = .mainPurple // 앱 틴트 컬러
         button.layer.cornerRadius = 10
+        button.rx.tap
+            .bind { [weak self] in
+            print("tapped")
+            self?.phpickerVCPresent()
+        }
+        .disposed(by: disposeBag)
         return button
     }()
     
@@ -83,13 +88,6 @@ class UploadVC: UIViewController {
         textView.delegate = self
         setLayout()
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
-        postButton.rx.tap.bind 
-        { [weak self] in
-            print("tapped")
-            self?.phpickerVCPresent()
-        }
-        .disposed(by: disposeBag)
-        
     }
     
     @objc
@@ -108,7 +106,7 @@ class UploadVC: UIViewController {
     
     func phpickerVCPresent() {
         var configuration = PHPickerConfiguration()
-        configuration.selectionLimit = 0
+        configuration.selectionLimit = 10
         configuration.filter = .any(of: [.images, .videos])
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = self
