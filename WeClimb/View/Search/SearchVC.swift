@@ -5,9 +5,10 @@
 //  Created by Soo Jang on 8/26/24.
 //
 
+import UIKit
+
 import RxSwift
 import SnapKit
-import UIKit
 
 class SearchVC: UIViewController {
     
@@ -27,13 +28,11 @@ class SearchVC: UIViewController {
         label.text = SearchNameSpace.nearby
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 13)
-        label.textColor = .black
         return label
     }()
     
     private let tableView: UITableView = {
         let tableView = UITableView()
-        tableView.backgroundColor = .white
         tableView.separatorStyle = .none // 구분선 제거
         tableView.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchNameSpace.id)
         return tableView
@@ -42,7 +41,7 @@ class SearchVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         setNavigationBar()
         setSearchController()
