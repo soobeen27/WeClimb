@@ -158,7 +158,7 @@ class UserPageVC: UIViewController {
         layout.itemSize = CGSize(width: width, height: width)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: UserPageNameSpace.id)
+        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MyPageCell.className)
         
         return collectionView
     }()
@@ -271,7 +271,7 @@ class UserPageVC: UIViewController {
     
     private func bind() {
         viewModel.profileImages
-            .bind(to: collectionView.rx.items(cellIdentifier: UserPageNameSpace.id, cellType: MyPageCell.self)) { _, image, cell in
+            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { _, image, cell in
                 cell.configure(with: image)
             }
             .disposed(by: disposeBag)

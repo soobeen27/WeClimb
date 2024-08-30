@@ -6,7 +6,6 @@
 //
 
 import RxSwift
-import UIKit
 
 class MyPageVM {
 

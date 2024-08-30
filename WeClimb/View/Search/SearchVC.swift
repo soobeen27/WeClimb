@@ -34,7 +34,7 @@ class SearchVC: UIViewController {
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .none // 구분선 제거
-        tableView.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchNameSpace.id)
+        tableView.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchTableViewCell.className)
         return tableView
     }()
     
@@ -78,7 +78,7 @@ class SearchVC: UIViewController {
     
     private func bind() {
         searchViewModel.data
-            .bind(to: tableView.rx.items(cellIdentifier: SearchNameSpace.id, cellType: SearchTableViewCell.self)) { index, data, cell in
+            .bind(to: tableView.rx.items(cellIdentifier: SearchTableViewCell.className, cellType: SearchTableViewCell.self)) { index, data, cell in
                 cell.configure(with: data.image, title: data.title, address: data.address)
             }
             .disposed(by: disposeBag)

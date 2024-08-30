@@ -146,7 +146,7 @@ class MyPageVC: UIViewController {
         layout.itemSize = CGSize(width: width, height: width)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MypageNameSpace.id)
+        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MyPageCell.className)
         
         return collectionView
     }()
@@ -156,7 +156,7 @@ class MyPageVC: UIViewController {
         
         view.backgroundColor = .systemBackground
         
-        setupLayout()
+        setLayout()
         bind()
         setNavigation()
     }
@@ -196,7 +196,7 @@ class MyPageVC: UIViewController {
         navigationController?.pushViewController(editPageVC, animated: true)
     }
     
-    private func setupLayout() {
+    private func setLayout() {
         [profileImage, profileStackView, totalStackView, collectionView]
             .forEach{ view.addSubview($0) }
         
@@ -246,7 +246,7 @@ class MyPageVC: UIViewController {
     
     private func bind() {
         viewModel.profileImages
-            .bind(to: collectionView.rx.items(cellIdentifier: MypageNameSpace.id, cellType: MyPageCell.self)) { _, image, cell in
+            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { _, image, cell in
                 cell.configure(with: image)
             }
             .disposed(by: disposeBag)
