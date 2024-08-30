@@ -5,6 +5,8 @@
 //  Created by 강유정 on 8/27/24.
 //
 
+import UIKit
+
 import RxSwift
 
 class SearchViewModel {

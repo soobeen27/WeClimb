@@ -31,14 +31,14 @@ class EditPageCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 15)
-        label.textColor = .black
+        label.textColor = .label
         return label
     }()
     
     private let infoLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 15)
-        label.textColor = .black
+        label.textColor = .label
         return label
     }()
     
@@ -51,6 +51,8 @@ class EditPageCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setColor()
+        
         setLayout()
     }
     
@@ -80,6 +82,18 @@ class EditPageCell: UITableViewCell {
         
         titleLabel.snp.makeConstraints {
             $0.height.equalTo(44)
+        }
+    }
+    
+    // MARK: - 커스텀 색상 YJ
+    private func setColor() {
+        contentView.backgroundColor = UIColor {
+            switch $0.userInterfaceStyle {
+            case .dark:
+                return UIColor.secondarySystemBackground
+            default:
+                return UIColor.white
+            }
         }
     }
     

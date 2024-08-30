@@ -27,12 +27,13 @@ class EditPageVC: UIViewController {
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.layer.cornerRadius = 20
+        tableView.isScrollEnabled = false // 스크롤 되지 않도록
         tableView.register(EditPageCell.self, forCellReuseIdentifier: EditPageCell.className)
         return tableView
     }()
     
     override func viewDidLoad() {
-        view.backgroundColor = .systemGroupedBackground
+        setColor()
         
         setNavigation()
         setLayout()
@@ -56,7 +57,19 @@ class EditPageVC: UIViewController {
         tableView.snp.makeConstraints {
             $0.top.equalTo(profileImage.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(340)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(335)
+        }
+    }
+    
+    // MARK: - 커스텀 색상 YJ
+    private func setColor() {
+        view.backgroundColor = UIColor {
+            switch $0.userInterfaceStyle {
+            case .dark:
+                return UIColor(named: "BackgroundColor") ?? .black
+            default:
+                return UIColor.systemGroupedBackground
+            }
         }
     }
     
