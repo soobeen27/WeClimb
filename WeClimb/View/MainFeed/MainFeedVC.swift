@@ -16,12 +16,23 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setNavigationBar()
+        setTableView()
+        setLayout()
+    }
+    
+    private func setNavigationBar() {
         self.title = "WeClimb"
         self.navigationController?.navigationBar.prefersLargeTitles = true
 //        self.navigationController?.hidesBarsOnSwipe = true
         
-        setTableView()
-        setLayout()
+        let appearance = UINavigationBarAppearance()
+        appearance.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        appearance.shadowColor = .clear
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
     }
     
     private func setTableView() {
@@ -31,9 +42,8 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         tableView.register(MainFeedTabelCell.self, forCellReuseIdentifier: "MainFeedTabelCell")
     }
     
-    private func setLayout() {
+    private func setLayout() {        
         view.addSubview(tableView)
-        
         tableView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
@@ -44,7 +54,7 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 520
+        return 540
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -54,8 +64,8 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         if let image = UIImage(named: "testImage") {
             cell.configure(userProfileImage: image, userName: "더 클라임 신림",
-                           address: "서울시 관악구 신림동", caption: "클리이밍 재밌다!",
-                           level: "V6", sector: "1섹터", dDay: "D-14", likeCounter: "300")
+                           address: "서울시 관악구 신림동", caption: "클라이밍 재밌다아아아아아아아아아아아아아아아아아아아아아아아아아",
+                           level: "V6", sector: "1섹터", dDay: "D-14", likeCounter: "444")
         }
         
         // 컬렉션 뷰의 데이터 소스 및 델리게이트 설정

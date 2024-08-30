@@ -115,7 +115,7 @@ class LoginVC: UIViewController {
     }
     
     private func setLayout() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         [loginTitleLabel, buttonStackView]
             .forEach {
                 view.addSubview($0)
