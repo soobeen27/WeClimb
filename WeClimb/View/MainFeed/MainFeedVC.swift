@@ -31,9 +31,8 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         tableView.register(MainFeedTabelCell.self, forCellReuseIdentifier: "MainFeedTabelCell")
     }
     
-    private func setLayout() {
+    private func setLayout() {        
         view.addSubview(tableView)
-        
         tableView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
@@ -54,7 +53,7 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         if let image = UIImage(named: "testImage") {
             cell.configure(userProfileImage: image, userName: "더 클라임 신림",
-                           address: "서울시 관악구 신림동", caption: "클리이밍 재밌다!",
+                           address: "서울시 관악구 신림동", caption: "클라이밍 재밌다아아아아아아아아아아아아아아아아아아아아아아아아아",
                            level: "V6", sector: "1섹터", dDay: "D-14", likeCounter: "300")
         }
         

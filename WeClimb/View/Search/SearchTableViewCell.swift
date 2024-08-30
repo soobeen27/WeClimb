@@ -44,6 +44,8 @@ class SearchTableViewCell: UITableViewCell {
     }
     
     private func setLayout() {
+      self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+      
         [gymImage, titleLabel, addressLabel]
             .forEach { contentView.addSubview($0) }
         

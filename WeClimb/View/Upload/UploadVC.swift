@@ -23,7 +23,7 @@ class UploadVC: UIViewController {
     
     private lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
-        scroll.backgroundColor = .systemBackground
+        scroll.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         scroll.addSubview(contentView)
         return scroll
     }()
@@ -34,7 +34,7 @@ class UploadVC: UIViewController {
     
     private lazy var contentView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         [selectedMediaView, callPHPickerButton, textView, gymView, levelView]
             .forEach {
                 view.addSubview($0)
@@ -96,7 +96,7 @@ class UploadVC: UIViewController {
     }
     
     private func setLayout() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         [scrollView, postButton]
             .forEach {
                 view.addSubview($0)
