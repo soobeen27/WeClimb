@@ -5,9 +5,10 @@
 //  Created by Soo Jang on 8/26/24.
 //
 
+import UIKit
+
 import RxSwift
 import SnapKit
-import UIKit
 
 class SearchVC: UIViewController {
     
@@ -27,7 +28,6 @@ class SearchVC: UIViewController {
         label.text = SearchNameSpace.nearby
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 13)
-        label.textColor = .black
         return label
     }()
     

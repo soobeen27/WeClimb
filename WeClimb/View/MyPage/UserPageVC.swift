@@ -168,7 +168,7 @@ class UserPageVC: UIViewController {
         
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
-        setupLayout()
+        setLayout()
         bind()
         setNavigation()
     }
@@ -216,7 +216,7 @@ class UserPageVC: UIViewController {
         }
     }
     
-    private func setupLayout() {
+    private func setLayout() {
         [profileImage, profileStackView, totalStackView, segmentControl, collectionView]
             .forEach{ view.addSubview($0) }
         

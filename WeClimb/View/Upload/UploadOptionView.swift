@@ -42,6 +42,12 @@ class UploadOptionView : UIView {
         return label
     }()
     
+    private let seperatorLine: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .secondarySystemBackground
+        return label
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setLayout()
@@ -52,7 +58,7 @@ class UploadOptionView : UIView {
     }
     
     override var intrinsicContentSize: CGSize {
-        return CGSize(width: UIView.noIntrinsicMetric, height: 41)
+        return CGSize(width: UIView.noIntrinsicMetric, height: 57)
     }
 
     private func setLayout() {
@@ -62,10 +68,16 @@ class UploadOptionView : UIView {
                 self.addSubview($0)
             }
         
+        seperatorLine.snp.makeConstraints {
+            $0.height.equalTo(1)
+            $0.left.right.equalToSuperview()
+            $0.top.equalToSuperview()
+        }
+        
         symbolImageView.snp.makeConstraints {
             $0.size.equalTo(25)
             $0.leading.equalToSuperview().offset(16)
-            $0.top.bottom.equalToSuperview().inset(8)
+            $0.top.bottom.equalToSuperview().inset(16)
         }
         
         optionLabel.snp.makeConstraints {

@@ -5,8 +5,9 @@
 //  Created by 강유정 on 8/27/24.
 //
 
-import SnapKit
 import UIKit
+
+import SnapKit
 
 class SearchTableViewCell: UITableViewCell {
     
