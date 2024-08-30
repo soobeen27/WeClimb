@@ -103,10 +103,10 @@ class MainFeedTabelCell: UITableViewCell {
         return stackView
     }()
     
-    private let likeStackView = {
-        let stackView = UIView()
-//        stackView.axis = .horizontal
-//        stackView.spacing = 4
+    private let likeStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 4
         return stackView
     }()
     
@@ -130,7 +130,7 @@ class MainFeedTabelCell: UITableViewCell {
             }
         [likeButton, likeButtonCounter]
             .forEach {
-                likeStackView.addSubview($0)
+                likeStackView.addArrangedSubview($0)
             }
         [levelLabel, sectorLabel, dDayLabel]
             .forEach {
