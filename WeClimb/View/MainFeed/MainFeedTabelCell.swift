@@ -22,17 +22,16 @@ class MainFeedTabelCell: UITableViewCell {
         return collectionView
     }()
     
-    private let feedCaptionLabel = {
+    private let feedCaptionLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
         label.textAlignment = .left
         label.numberOfLines = 1  //1줄까지만 표시
         label.lineBreakMode = .byTruncatingTail  //1줄 이상 시 ... 표기
-        //        label.lineBreakMode = .byWordWrapping  //자동 줄바꿈
         return label
     }()
     
-    private let feedUserProfileImage = {
+    private let feedUserProfileImage: UIImageView = {
         let Image = UIImageView()
         Image.layer.cornerRadius = 20
         Image.clipsToBounds = true
@@ -40,14 +39,14 @@ class MainFeedTabelCell: UITableViewCell {
         return Image
     }()
     
-    private let feedUserNameLabel = {
+    private let feedUserNameLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 15)
         return label
     }()
     
-    private let feedProfileAddressLabel = {
+    private let feedProfileAddressLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
         label.textColor = .systemGray2
@@ -55,7 +54,7 @@ class MainFeedTabelCell: UITableViewCell {
         return label
     }()
     
-    private let levelLabel = {
+    private let levelLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
         label.backgroundColor = .mainPurple
@@ -63,40 +62,26 @@ class MainFeedTabelCell: UITableViewCell {
         return label
     }()
     
-    private let sectorLabel = {
-        let label = UILabel()
-        return label
-    }()
+    private let sectorLabel = UILabel()
     
-    private let dDayLabel = {
-        let label = UILabel()
-        return label
-    }()
+    private let dDayLabel = UILabel()
     
     private let likeButton = UIButton()
     
-//    private let likeButton = {
-//        let button = UIButton()
-//        button.setImage(UIImage(systemName: "heart"), for: .normal)
-//        button.imageView?.contentMode = .scaleAspectFit
-//        button.tintColor = .mainPurple
-//        return button
-//    }()
-    
-    private let likeButtonCounter = {
+    private let likeButtonCounter: UILabel = {
         let label = UILabel()
         label.font = .boldSystemFont(ofSize: 15)
         return label
     }()
     
-    private let feedProfileStackView = {
+    private let feedProfileStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 6
         return stackView
     }()
     
-    private let gymInfoStackView = {
+    private let gymInfoStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 7

@@ -16,12 +16,23 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setNavigationBar()
+        setTableView()
+        setLayout()
+    }
+    
+    private func setNavigationBar() {
         self.title = "WeClimb"
         self.navigationController?.navigationBar.prefersLargeTitles = true
 //        self.navigationController?.hidesBarsOnSwipe = true
         
-        setTableView()
-        setLayout()
+        let appearance = UINavigationBarAppearance()
+        appearance.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        appearance.shadowColor = .clear
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
     }
     
     private func setTableView() {
@@ -43,7 +54,7 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 520
+        return 540
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
