@@ -33,6 +33,7 @@ class SearchVC: UIViewController {
     
     private let tableView: UITableView = {
         let tableView = UITableView()
+        tableView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         tableView.separatorStyle = .none // 구분선 제거
         tableView.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchTableViewCell.className)
         return tableView
@@ -41,7 +42,7 @@ class SearchVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
         setNavigationBar()
         setSearchController()
