@@ -11,10 +11,11 @@ import SnapKit
 
 class SectionTableViewCell: UITableViewCell {
     
-    private let gymLabel: UILabel = {
+    private let sectorLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
         label.font = .systemFont(ofSize: 13)
+        label.numberOfLines = 0
         return label
     }()
     
@@ -30,16 +31,28 @@ class SectionTableViewCell: UITableViewCell {
     }
     
     private func configureUI() {
-        self.backgroundColor = .lightGray
+        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
         [
-            gymLabel
+            sectorLabel
         ].forEach { addSubview($0) }
     }
     
     private func setLayout() {
-        gymLabel.snp.makeConstraints {
+        
+        sectorLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(16)
             $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().offset(-16)
         }
     }
 }
+
+
+//private let sectorImageView: UIImageView = {
+//    let imageView = UIImageView()
+//    imageView.contentMode = .scaleAspectFill
+//    imageView.clipsToBounds = true
+//    imageView.layer.cornerRadius = 8
+//    return imageView
+//}()

@@ -5,8 +5,9 @@
 //  Created by 강유정 on 8/27/24.
 //
 
-import SnapKit
 import UIKit
+
+import SnapKit
 
 class SearchTableViewCell: UITableViewCell {
     
@@ -44,6 +45,8 @@ class SearchTableViewCell: UITableViewCell {
     }
     
     private func setLayout() {
+      self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+      
         [gymImage, titleLabel, addressLabel]
             .forEach { contentView.addSubview($0) }
         

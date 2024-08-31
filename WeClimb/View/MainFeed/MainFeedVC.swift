@@ -13,23 +13,26 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     let tableView = UITableView()
     
-    //  let mainFeedTitleLabel = {
-    //    let label = UILabel()
-    //    label.text = "WeClimb"
-    //    label.font = .systemFont(ofSize: 17, weight: .bold)
-    //    label.textColor = UIColor(named: "MainColor")
-    //    return label
-    //  }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setNavigationBar()
+        setTableView()
+        setLayout()
+    }
+    
+    private func setNavigationBar() {
         self.title = "WeClimb"
         self.navigationController?.navigationBar.prefersLargeTitles = true
 //        self.navigationController?.hidesBarsOnSwipe = true
         
-        setTableView()
-        setLayout()
+        let appearance = UINavigationBarAppearance()
+        appearance.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        appearance.shadowColor = .clear
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
     }
     
     private func setTableView() {
@@ -39,9 +42,8 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         tableView.register(MainFeedTabelCell.self, forCellReuseIdentifier: "MainFeedTabelCell")
     }
     
-    private func setLayout() {
+    private func setLayout() {        
         view.addSubview(tableView)
-        
         tableView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
@@ -52,19 +54,19 @@ class MainFeedVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 450
+        return 540
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MainFeedTabelCell", for: indexPath) as? MainFeedTabelCell else {
             return UITableViewCell()
         }
-        cell.feedProfileImage.image = UIImage(named: "testImage")
-        cell.feedprofileNameLabel.text = "더 클라임 신림"
-        cell.feedprofileAddressLabel.text = "서울시 관악구 신림동"
-        cell.levelLabel.text = "V6"
-        cell.sectorLabel.text = "1섹터"
-        cell.dDayLabel.text = "D-13"
+
+        if let image = UIImage(named: "testImage") {
+            cell.configure(userProfileImage: image, userName: "더 클라임 신림",
+                           address: "서울시 관악구 신림동", caption: "클라이밍 재밌다아아아아아아아아아아아아아아아아아아아아아아아아아",
+                           level: "V6", sector: "1섹터", dDay: "D-14", likeCounter: "444")
+        }
         
         // 컬렉션 뷰의 데이터 소스 및 델리게이트 설정
         cell.collectionView.delegate = self
