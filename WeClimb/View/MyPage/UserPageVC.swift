@@ -61,7 +61,6 @@ class UserPageVC: UIViewController {
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 5
-        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -202,7 +201,7 @@ class UserPageVC: UIViewController {
         present(actionSheet, animated: true)
     }
     
-    @objc private func buttonTapped() {
+    private func buttonTapped() {
         isFollowing.toggle()
 
         if isFollowing {
@@ -275,6 +274,13 @@ class UserPageVC: UIViewController {
                 cell.configure(with: image)
             }
             .disposed(by: disposeBag)
+        
+        followFollowingButton.rx.tap
+          .bind { [weak self] in
+          print("followFollowingButton tapped")
+          self?.buttonTapped()
+        }
+        .disposed(by: disposeBag)
     }
 }
 

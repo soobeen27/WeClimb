@@ -59,7 +59,6 @@ class MyPageVC: UIViewController {
         button.backgroundColor = .systemGray6
         button.setTitleColor(.label, for: .normal)
         button.layer.cornerRadius = 5
-        button.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -190,7 +189,7 @@ class MyPageVC: UIViewController {
         present(actionSheet, animated: true)
     }
     
-    @objc private func editButtonTapped() {
+    private func editButtonTapped() {
         let editPageVC = EditPageVC()
         
         navigationController?.pushViewController(editPageVC, animated: true)
@@ -250,5 +249,12 @@ class MyPageVC: UIViewController {
                 cell.configure(with: image)
             }
             .disposed(by: disposeBag)
+        
+        editButton.rx.tap
+          .bind { [weak self] in
+          print("editButton tapped")
+          self?.editButtonTapped()
+        }
+        .disposed(by: disposeBag)
     }
 }

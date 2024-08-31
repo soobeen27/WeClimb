@@ -57,7 +57,7 @@ class EditPageVC: UIViewController {
         tableView.snp.makeConstraints {
             $0.top.equalTo(profileImage.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(335)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(336)
         }
     }
     
