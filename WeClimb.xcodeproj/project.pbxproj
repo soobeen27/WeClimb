@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		435B7E402C80139100EB9816 /* UploadOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C362C7E26D900C5FF16 /* UploadOptionView.swift */; };
 		435B7E422C8024AB00EB9816 /* EditPageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435B7E412C8024AB00EB9816 /* EditPageVC.swift */; };
 		436AEAE02C7D69CB00E0D85A /* SearchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEADF2C7D69CB00E0D85A /* SearchTableViewCell.swift */; };
 		436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAE12C7D69F000E0D85A /* SearchVM.swift */; };
@@ -18,6 +17,8 @@
 		436AEAF42C7EEE9900E0D85A /* UserPageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAF32C7EEE9900E0D85A /* UserPageVC.swift */; };
 		436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAF52C7EEF0A00E0D85A /* UserPageNameSpace.swift */; };
 		436AEAF82C7F0EEE00E0D85A /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */; };
+		43A79ACA2C81717500B960A2 /* EditPageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AC92C81717500B960A2 /* EditPageCell.swift */; };
+		43A79ACC2C819CB200B960A2 /* EditPageVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79ACB2C819CB200B960A2 /* EditPageVM.swift */; };
 		6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */; };
 		6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */; };
 		6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F972C7EEA3F00B34083 /* GoogleSignIn */; };
@@ -77,6 +78,8 @@
 		436AEAF32C7EEE9900E0D85A /* UserPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPageVC.swift; sourceTree = "<group>"; };
 		436AEAF52C7EEF0A00E0D85A /* UserPageNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPageNameSpace.swift; sourceTree = "<group>"; };
 		436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
+		43A79AC92C81717500B960A2 /* EditPageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPageCell.swift; sourceTree = "<group>"; };
+		43A79ACB2C819CB200B960A2 /* EditPageVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPageVM.swift; sourceTree = "<group>"; };
 		6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTableViewCell.swift; sourceTree = "<group>"; };
 		6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVM.swift; sourceTree = "<group>"; };
 		6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -146,6 +149,7 @@
 				436AEAE92C7DCD1100E0D85A /* MyPageCell.swift */,
 				436AEAF32C7EEE9900E0D85A /* UserPageVC.swift */,
 				435B7E412C8024AB00EB9816 /* EditPageVC.swift */,
+				43A79AC92C81717500B960A2 /* EditPageCell.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -251,6 +255,7 @@
 				F4892C232C7CBC8700C5FF16 /* UploadVM.swift */,
 				436AEAE12C7D69F000E0D85A /* SearchVM.swift */,
 				436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */,
+				43A79ACB2C819CB200B960A2 /* EditPageVM.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -393,6 +398,7 @@
 				F4892C2B2C7CCDF200C5FF16 /* Identifiers.swift in Sources */,
 				F4892C182C7C983A00C5FF16 /* MainFeedVC.swift in Sources */,
 				436AEAF82C7F0EEE00E0D85A /* SearchModel.swift in Sources */,
+				43A79ACC2C819CB200B960A2 /* EditPageVM.swift in Sources */,
 				F4892C162C7C981000C5FF16 /* LoginVC.swift in Sources */,
 				F4892C102C7C27D800C5FF16 /* ExampleModel.swift in Sources */,
 				436AEAEA2C7DCD1100E0D85A /* MyPageCell.swift in Sources */,
@@ -401,6 +407,7 @@
 				F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */,
 				F4892C3E2C7EFD4700C5FF16 /* UploadVC.swift in Sources */,
 				F4892C1A2C7C984A00C5FF16 /* SearchVC.swift in Sources */,
+				43A79ACA2C81717500B960A2 /* EditPageCell.swift in Sources */,
 				436AEAE02C7D69CB00E0D85A /* SearchTableViewCell.swift in Sources */,
 				C4E29C172C806F170076BCA6 /* MainFeedVM.swift in Sources */,
 				C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */,
