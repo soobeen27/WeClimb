@@ -200,16 +200,7 @@ extension UploadVC : UITextViewDelegate {
 extension UploadVC : PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
-        let itemProvider = results.first?.itemProvider
-        if let itemProvider = itemProvider,
-           itemProvider.canLoadObject(ofClass: UIImage.self) {
-            itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
-                DispatchQueue.main.async {
-                    //                              self.myImageView.image = image as? UIImage // 5
-                }
-            }
-        } else {
-        }
+        viewModel.mediaItems.accept(results)
     }
     
     
