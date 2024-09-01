@@ -62,8 +62,8 @@ class UploadOptionView : UIView {
     }
 
     private func setLayout() {
-        self.backgroundColor = .systemBackground
-        [seperatorLine, symbolImageView, optionLabel, greaterThanSign, selectedLabel]
+        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        [symbolImageView, seperatorLine, optionLabel, greaterThanSign, selectedLabel]
             .forEach {
                 self.addSubview($0)
             }
