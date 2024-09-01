@@ -61,7 +61,6 @@ class UserPageVC: UIViewController {
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 5
-        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -158,7 +157,7 @@ class UserPageVC: UIViewController {
         layout.itemSize = CGSize(width: width, height: width)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: UserPageNameSpace.id)
+        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MyPageCell.className)
         
         return collectionView
     }()
@@ -202,7 +201,7 @@ class UserPageVC: UIViewController {
         present(actionSheet, animated: true)
     }
     
-    @objc private func buttonTapped() {
+    private func buttonTapped() {
         isFollowing.toggle()
 
         if isFollowing {
@@ -271,10 +270,17 @@ class UserPageVC: UIViewController {
     
     private func bind() {
         viewModel.profileImages
-            .bind(to: collectionView.rx.items(cellIdentifier: UserPageNameSpace.id, cellType: MyPageCell.self)) { _, image, cell in
+            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { _, image, cell in
                 cell.configure(with: image)
             }
             .disposed(by: disposeBag)
+        
+        followFollowingButton.rx.tap
+          .bind { [weak self] in
+          print("followFollowingButton tapped")
+          self?.buttonTapped()
+        }
+        .disposed(by: disposeBag)
     }
 }
 

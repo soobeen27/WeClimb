@@ -59,7 +59,6 @@ class MyPageVC: UIViewController {
         button.backgroundColor = .systemGray6
         button.setTitleColor(.label, for: .normal)
         button.layer.cornerRadius = 5
-        button.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -146,7 +145,7 @@ class MyPageVC: UIViewController {
         layout.itemSize = CGSize(width: width, height: width)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MypageNameSpace.id)
+        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MyPageCell.className)
         
         return collectionView
     }()
@@ -156,7 +155,7 @@ class MyPageVC: UIViewController {
         
         view.backgroundColor = .systemBackground
         
-        setupLayout()
+        setLayout()
         bind()
         setNavigation()
     }
@@ -190,13 +189,13 @@ class MyPageVC: UIViewController {
         present(actionSheet, animated: true)
     }
     
-    @objc private func editButtonTapped() {
+    private func editButtonTapped() {
         let editPageVC = EditPageVC()
         
         navigationController?.pushViewController(editPageVC, animated: true)
     }
     
-    private func setupLayout() {
+    private func setLayout() {
         [profileImage, profileStackView, totalStackView, collectionView]
             .forEach{ view.addSubview($0) }
         
@@ -246,9 +245,16 @@ class MyPageVC: UIViewController {
     
     private func bind() {
         viewModel.profileImages
-            .bind(to: collectionView.rx.items(cellIdentifier: MypageNameSpace.id, cellType: MyPageCell.self)) { _, image, cell in
+            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { _, image, cell in
                 cell.configure(with: image)
             }
             .disposed(by: disposeBag)
+        
+        editButton.rx.tap
+          .bind { [weak self] in
+          print("editButton tapped")
+          self?.editButtonTapped()
+        }
+        .disposed(by: disposeBag)
     }
 }
