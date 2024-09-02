@@ -18,4 +18,7 @@ enum Identifiers {
     
     // SectionTableViewCell
     static let sectionTableViewCell = "SectionTableViewCell"
+    
+    // sectionDetailTableViewCell
+    static let sectionDetailTableViewCell = "SectionDetailTableViewCell"
 }

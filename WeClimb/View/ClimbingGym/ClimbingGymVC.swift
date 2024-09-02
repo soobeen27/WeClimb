@@ -72,6 +72,8 @@ class ClimbingGymVC: UIViewController {
         tableView.separatorStyle = .singleLine // 기본 선 스타일
         tableView.separatorColor = .black // 구분선 색상
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15) // 좌우 여백
+        
+//        tableView.rowHeight = 120
         return tableView
     }()
     
@@ -85,7 +87,12 @@ class ClimbingGymVC: UIViewController {
         
         // 임시레지스터
         tableView.register(SectionTableViewCell.self, forCellReuseIdentifier: Identifiers.sectionTableViewCell)
-        tableView.delegate = self
+        
+    }
+    
+    // MARK: - 네비게이션 부분
+    private func navigation() {
+        
     }
     
     // MARK: - addAction 부분 (버튼, 세그먼트 컨트롤) DS
@@ -114,8 +121,24 @@ class ClimbingGymVC: UIViewController {
             .disposed(by: disposeBag)
 
         tableView.rx.itemSelected
-            .bind(to: viewModel.itemSelected)
+            .subscribe(onNext: { [weak self] indexPath in
+                self?.viewModel.itemSelected.onNext(indexPath)
+            })
             .disposed(by: disposeBag)
+        
+//        tableView.rx.itemSelected
+//            .subscribe(onNext: { [weak self] indexPath in
+//                guard let self else { return }
+//                let selectedItem = self.viewModel.dummys.value[indexPath.row]
+//                print("Table cell selected at row: \(indexPath.row)")
+//                
+//                // ClimbingDetailGymVC로 이동
+//                let detailVC = ClimbingDetailGymVC()
+//                detailVC.detailData.accept(self.viewModel.detailData.value) // 전달할 데이터 설정
+//                self.navigationController?.pushViewController(detailVC, animated: true)
+//            })
+//            .disposed(by: disposeBag)
+//        tableView.rx.setDelegate(self).disposed(by: disposeBag)
     }
     
     // MARK: - 레이아웃 구성 DS

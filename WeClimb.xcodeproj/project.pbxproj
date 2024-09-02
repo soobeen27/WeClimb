@@ -16,6 +16,9 @@
 		436AEAF42C7EEE9900E0D85A /* UserPageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAF32C7EEE9900E0D85A /* UserPageVC.swift */; };
 		436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAF52C7EEF0A00E0D85A /* UserPageNameSpace.swift */; };
 		436AEAF82C7F0EEE00E0D85A /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */; };
+		6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */; };
+		6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */; };
+		6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */; };
 		6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */; };
 		6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */; };
 		6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F972C7EEA3F00B34083 /* GoogleSignIn */; };
@@ -72,6 +75,9 @@
 		436AEAF32C7EEE9900E0D85A /* UserPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPageVC.swift; sourceTree = "<group>"; };
 		436AEAF52C7EEF0A00E0D85A /* UserPageNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPageNameSpace.swift; sourceTree = "<group>"; };
 		436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
+		6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionDetailTableViewCell.swift; sourceTree = "<group>"; };
+		6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDeatilGymVC.swift; sourceTree = "<group>"; };
+		6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDetailGymVM.swift; sourceTree = "<group>"; };
 		6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTableViewCell.swift; sourceTree = "<group>"; };
 		6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVM.swift; sourceTree = "<group>"; };
 		6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -156,7 +162,9 @@
 			isa = PBXGroup;
 			children = (
 				F4892C1B2C7C988A00C5FF16 /* ClimbingGymVC.swift */,
+				6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */,
 				6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */,
+				6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */,
 			);
 			path = ClimbingGym;
 			sourceTree = "<group>";
@@ -240,6 +248,7 @@
 			children = (
 				F4892C112C7C27F500C5FF16 /* ExampleVM.swift */,
 				6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */,
+				6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */,
 				F4892C232C7CBC8700C5FF16 /* UploadVM.swift */,
 				436AEAE12C7D69F000E0D85A /* SearchVM.swift */,
 				436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */,
@@ -386,6 +395,7 @@
 				436AEAF82C7F0EEE00E0D85A /* SearchModel.swift in Sources */,
 				F4892C162C7C981000C5FF16 /* LoginVC.swift in Sources */,
 				F4892C102C7C27D800C5FF16 /* ExampleModel.swift in Sources */,
+				6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */,
 				436AEAEA2C7DCD1100E0D85A /* MyPageCell.swift in Sources */,
 				F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */,
 				436AEAF42C7EEE9900E0D85A /* UserPageVC.swift in Sources */,
@@ -395,6 +405,7 @@
 				436AEAE02C7D69CB00E0D85A /* SearchTableViewCell.swift in Sources */,
 				C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */,
 				6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */,
+				6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */,
 				6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */,
 				F4892C1C2C7C988B00C5FF16 /* ClimbingGymVC.swift in Sources */,
 				436AEAF02C7EE63C00E0D85A /* SearchNameSpace.swift in Sources */,
@@ -407,6 +418,7 @@
 				F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */,
 				F4892C0E2C7C27BE00C5FF16 /* ExampleCommon.swift in Sources */,
 				436AEAEC2C7DCE3C00E0D85A /* MyPageVM.swift in Sources */,
+				6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
