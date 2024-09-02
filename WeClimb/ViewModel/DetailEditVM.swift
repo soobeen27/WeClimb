@@ -9,15 +9,13 @@ import RxSwift
 import RxCocoa
 
 class DetailEditVM {
-    // 선택된 항목을 저장하는 BehaviorRelay
-    private let selectedItemRelay = BehaviorRelay<EditModel?>(value: nil)
+    private let selectedItemRelay = BehaviorRelay<EditModel>(value: EditModel(title: "", info: ""))
     
-    // 선택된 항목을 옵저버블로 제공
-    var selectedItem: Observable<EditModel?> {
+    var selectedItem: Observable<EditModel> {
         return selectedItemRelay.asObservable()
     }
     
-    // 선택된 항목을 설정
+    //MARK: - 새로운 값을 받고 업데이트하는 메서드 YJ
     func selectItem(_ item: EditModel) {
         selectedItemRelay.accept(item)
     }

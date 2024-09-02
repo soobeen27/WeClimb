@@ -13,7 +13,7 @@ import SnapKit
 class DetailEditVC: UIViewController {
     
     private let disposeBag = DisposeBag()
-    private let viewModel = EditPageVM()
+    private let viewModel: DetailEditVM
     
     private let tableView: UITableView = {
         let tableView = UITableView()
@@ -23,6 +23,15 @@ class DetailEditVC: UIViewController {
         tableView.register(DetailEditCell.self, forCellReuseIdentifier: DetailEditCell.className)
         return tableView
     }()
+    
+    init(viewModel: DetailEditVM) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+     
+     required init?(coder: NSCoder) {
+         fatalError("init(coder:) has not been implemented")
+     }
     
     override func viewDidLoad() {
         setColor()
@@ -44,7 +53,11 @@ class DetailEditVC: UIViewController {
     }
     
     func setNavigation() {
-        self.title = MypageNameSpace.edit
+        // 네비게이션 바 제목 설정
+        viewModel.selectedItem
+            .map { $0.title + " 변경" }
+            .bind(to: rx.title) 
+            .disposed(by: disposeBag)
     }
     
     private func setLayout() {
@@ -59,9 +72,10 @@ class DetailEditVC: UIViewController {
     }
     
     private func bind() {
-        viewModel.items
-            .bind(to: tableView.rx.items(cellIdentifier: DetailEditCell.className, cellType: DetailEditCell.self)) { row, model, cell in
-                cell.configure(with: model)
+        viewModel.selectedItem
+            .map { [$0] } // 단일 항목을 배열로 변환
+            .bind(to: tableView.rx.items(cellIdentifier: DetailEditCell.className, cellType: DetailEditCell.self)) { row, item, cell in
+                cell.configure(with: item)
             }
             .disposed(by: disposeBag)
     }

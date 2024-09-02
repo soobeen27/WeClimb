@@ -8,6 +8,6 @@
 import Foundation
 
 struct EditModel {
-    let title: String?
+    let title: String
     let info: String?
 }

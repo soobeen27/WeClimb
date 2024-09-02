@@ -34,8 +34,6 @@ class EditPageVC: UIViewController {
         return tableView
     }()
     
-    
-    
     override func viewDidLoad() {
         setColor()
         setNavigation()
@@ -94,7 +92,7 @@ class EditPageVC: UIViewController {
                 self.detailEditVM.selectItem(item)
                 
                 // 화면 전환
-                let detailVC = DetailEditVC()
+                let detailVC = DetailEditVC(viewModel: detailEditVM)
                 self.navigationController?.pushViewController(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
