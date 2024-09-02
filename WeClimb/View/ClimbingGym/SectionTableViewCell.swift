@@ -44,7 +44,7 @@ class SectionTableViewCell: UITableViewCell {
     }
     
     private func configureUI() {
-        self.backgroundColor = .lightGray
+        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
         [
             sectorLabel,

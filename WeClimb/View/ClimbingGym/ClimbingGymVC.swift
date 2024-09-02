@@ -143,7 +143,7 @@ class ClimbingGymVC: UIViewController {
     
     // MARK: - 레이아웃 구성 DS
     private func setLayout() {
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
     
         setupUI()
         setConstraints()

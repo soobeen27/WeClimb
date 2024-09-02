@@ -57,7 +57,7 @@ class MyPageVC: UIViewController {
         button.setTitle(MypageNameSpace.edit, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 13)
         button.backgroundColor = .systemGray6
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(.label, for: .normal)
         button.layer.cornerRadius = 5
         return button
     }()
@@ -66,7 +66,6 @@ class MyPageVC: UIViewController {
         let label = UILabel()
         label.text = "123"
         label.font = UIFont.boldSystemFont(ofSize: 13)
-        label.textColor = .black
         label.textAlignment = .center
         return label
     }()
@@ -75,7 +74,6 @@ class MyPageVC: UIViewController {
         let label = UILabel()
         label.text = "456"
         label.font = UIFont.boldSystemFont(ofSize: 13)
-        label.textColor = .black
         label.textAlignment = .center
         return label
     }()
@@ -84,7 +82,6 @@ class MyPageVC: UIViewController {
         let label = UILabel()
         label.text = MypageNameSpace.follow
         label.font = UIFont.systemFont(ofSize: 13)
-        label.textColor = .black
         label.textAlignment = .center
         return label
     }()
@@ -93,7 +90,6 @@ class MyPageVC: UIViewController {
         let label = UILabel()
         label.text = MypageNameSpace.following
         label.font = UIFont.systemFont(ofSize: 13)
-        label.textColor = .black
         label.textAlignment = .center
         return label
     }()
@@ -149,7 +145,7 @@ class MyPageVC: UIViewController {
         layout.itemSize = CGSize(width: width, height: width)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MypageNameSpace.id)
+        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MyPageCell.className)
         
         return collectionView
     }()
@@ -157,9 +153,9 @@ class MyPageVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
-        setupLayout()
+        setLayout()
         bind()
         setNavigation()
     }
@@ -173,7 +169,7 @@ class MyPageVC: UIViewController {
             target: self,
             action: #selector(rightBarButtonTapped)
         )
-        navigationController?.navigationBar.tintColor = .black
+        navigationController?.navigationBar.tintColor = .label
         navigationItem.rightBarButtonItem = rightBarButton
     }
     
@@ -193,7 +189,13 @@ class MyPageVC: UIViewController {
         present(actionSheet, animated: true)
     }
     
-    private func setupLayout() {
+    private func editButtonTapped() {
+        let editPageVC = EditPageVC()
+        
+        navigationController?.pushViewController(editPageVC, animated: true)
+    }
+    
+    private func setLayout() {
         [profileImage, profileStackView, totalStackView, collectionView]
             .forEach{ view.addSubview($0) }
         
@@ -243,9 +245,16 @@ class MyPageVC: UIViewController {
     
     private func bind() {
         viewModel.profileImages
-            .bind(to: collectionView.rx.items(cellIdentifier: MypageNameSpace.id, cellType: MyPageCell.self)) { _, image, cell in
+            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { _, image, cell in
                 cell.configure(with: image)
             }
             .disposed(by: disposeBag)
+        
+        editButton.rx.tap
+          .bind { [weak self] in
+          print("editButton tapped")
+          self?.editButtonTapped()
+        }
+        .disposed(by: disposeBag)
     }
 }
