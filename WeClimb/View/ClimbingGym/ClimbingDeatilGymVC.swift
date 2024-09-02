@@ -20,7 +20,6 @@ class ClimbingDetailGymVC: UIViewController {
         let tableView = UITableView()
         tableView.backgroundColor = .lightGray
         tableView.clipsToBounds = true
-//        tableView.layer.cornerRadius = 10
         return tableView
     }()
     
@@ -35,14 +34,16 @@ class ClimbingDetailGymVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupLayout()
+        setLayout()
         bindTableView()
     }
     
-    private func setupLayout() {
+    private func setLayout() {
         view.backgroundColor = .white
         
-        view.addSubview(tableView)
+        [
+            tableView
+        ].forEach { view.addSubview($0)}
         
         tableView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).offset(32)

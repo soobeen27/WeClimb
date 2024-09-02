@@ -61,10 +61,10 @@ class ClimbingGymVC: UIViewController {
     private func actions() {
         headerView.followButton.addAction(UIAction { [weak self] _ in
             guard let self else { return }
-            if self.headerView.followButton.title(for: .normal) == UploadNameSpace.follow {
-                self.headerView.followButton.setTitle(UploadNameSpace.unFollow, for: .normal)
+            if self.headerView.followButton.title(for: .normal) == ClimbingGymNameSpace.follow {
+                self.headerView.followButton.setTitle(ClimbingGymNameSpace.unFollow, for: .normal)
             } else {
-                self.headerView.followButton.setTitle(UploadNameSpace.follow, for: .normal)
+                self.headerView.followButton.setTitle(ClimbingGymNameSpace.follow, for: .normal)
             }
         }, for: .touchUpInside)
         

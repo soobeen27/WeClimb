@@ -15,8 +15,4 @@ enum UploadNameSpace {
     static let title = "새 게시물"
     static let post = "게시"
     static let add = "추가"
-
-    // ClimbingGymVC
-    static let follow = "팔로우"
-    static let unFollow = "언팔로우"
 }

@@ -21,14 +21,14 @@ class GymHeaderView: UIView {
     
     let profileNameLabel: UILabel = {
         let label = UILabel()
-        label.text = "000 클라이밍"
+        label.text = ClimbingGymNameSpace.profileName
         label.font = UIFont.boldSystemFont(ofSize: 17)
         return label
     }()
     
     let followerLabel: UILabel = {
         let label = UILabel()
-        label.text = "1999 팔로워"
+        label.text = ClimbingGymNameSpace.follower
         label.font = UIFont.systemFont(ofSize: 15)
         label.textColor = .gray
         return label
@@ -51,7 +51,7 @@ class GymHeaderView: UIView {
     
     let followButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("팔로우", for: .normal)
+        button.setTitle(ClimbingGymNameSpace.follow, for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 13)
         button.backgroundColor = .lightGray
@@ -60,21 +60,21 @@ class GymHeaderView: UIView {
     }()
     
     let segmentControl: UISegmentedControl = {
-        let segmentControl = UISegmentedControl(items: ["세팅", "정보"])
+        let segmentControl = UISegmentedControl(items: [ClimbingGymNameSpace.segmentFirst, ClimbingGymNameSpace.segmentSecond])
         segmentControl.selectedSegmentIndex = 0
         return segmentControl
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupLayout()
+        setLayout()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupLayout() {
+    private func setLayout() {
         [profileImageView, profileNameLabel, followerLabel, socialStackView, followButton, segmentControl].forEach {
             addSubview($0)
         }

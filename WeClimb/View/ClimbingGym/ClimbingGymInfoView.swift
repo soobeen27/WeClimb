@@ -14,7 +14,7 @@ class ClimbingGymInfoView: UIView {
     // 시설 정보 레이블
     private let facilityLabel: UILabel = {
         let label = UILabel()
-        label.text = "시설 정보"
+        label.text = ClimbingGymNameSpace.facility
         label.font = UIFont.boldSystemFont(ofSize: 17)
         label.textColor = .black
         return label
@@ -32,7 +32,7 @@ class ClimbingGymInfoView: UIView {
     // 난이도 레이블
     private let difficultyLabel: UILabel = {
         let label = UILabel()
-        label.text = "난이도"
+        label.text = ClimbingGymNameSpace.difficulty
         label.font = UIFont.boldSystemFont(ofSize: 17)
         label.textColor = .black
         return label
@@ -58,7 +58,7 @@ class ClimbingGymInfoView: UIView {
     // 난이도 설명 레이블
     private let difficultyDescriptionLabel: UILabel = {
         let label = UILabel()
-        label.text = "총 8개의 난이도가 있어요!"
+        label.text = ClimbingGymNameSpace.difficultyDescription
         label.font = UIFont.systemFont(ofSize: 15)
         label.textColor = .gray
         return label
@@ -67,7 +67,7 @@ class ClimbingGymInfoView: UIView {
     // 정보 없음 알림 레이블
     private let noInfoLabel: UILabel = {
         let label = UILabel()
-        label.text = "정보가 없거나 잘못된 정보가 있다면 알려주세요!"
+        label.text = ClimbingGymNameSpace.noInfo
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .lightGray
         label.textAlignment = .center
@@ -77,7 +77,7 @@ class ClimbingGymInfoView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setLayout()
-        setupFacilityInfo() // 시설 정보 초기화
+        setupFacilityInfo()
     }
     
     required init?(coder: NSCoder) {
@@ -132,10 +132,10 @@ class ClimbingGymInfoView: UIView {
     
     private func setupFacilityInfo() {
         let facilityItems = [
-            ("지구력", "hand.raised.fill"),
-            ("스트레칭존", "ruler.fill"),
-            ("트레이닝존", "dumbbell.fill"),
-            ("샤워실", "shower.fill")
+            (ClimbingGymNameSpace.FacilityFirst, "hand.raised.fill"),
+            (ClimbingGymNameSpace.FacilitySecond, "ruler.fill"),
+            (ClimbingGymNameSpace.FacilityThird, "dumbbell.fill"),
+            (ClimbingGymNameSpace.FacilityFourth, "shower.fill")
         ]
         
         for (title, systemName) in facilityItems {
