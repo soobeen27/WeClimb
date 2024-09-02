@@ -16,8 +16,9 @@ class ClimbingGymVM {
     
     let itemSelected = PublishSubject<IndexPath>()
     let selectedSegment = BehaviorRelay<Int>(value: 0)
-    
     let dummys = BehaviorRelay<[Item]>(value: [])
+
+    var onItemSelected: (([DetailItem]) -> Void)?
     
     init() {
         setupBindings()
@@ -36,20 +37,18 @@ class ClimbingGymVM {
                 guard let self = self else { return }
                 let selectedItem = self.dummys.value[indexPath.row]
                 
-                // 안전하게 이미지 로드
                 let detailItems = [
-                    DetailItem(image: UIImage(named: "testImage") ?? UIImage(), description: "\(selectedItem.name) detail 1"),
-                    DetailItem(image: UIImage(named: "testImage") ?? UIImage(), description: "\(selectedItem.name) detail 2")
+                    DetailItem(image: UIImage(named: "testImage"), description: "\(selectedItem.name) 파랑보라", videoCount: selectedItem.itemCount),
+                    DetailItem(image: UIImage(named: "testImage"), description: "\(selectedItem.name) 파랑보라", videoCount: selectedItem.itemCount),
+                    DetailItem(image: UIImage(named: "testImage"), description: "\(selectedItem.name) 파랑보라", videoCount: selectedItem.itemCount)
                 ]
                 
-                // 로그 출력
-                print("Item selected at \(indexPath.row)")
+                self.onItemSelected?(detailItems)
             })
             .disposed(by: disposeBag)
     }
-    
+
     private func dummyDataObservable(for segmentIndex: Int) -> Observable<[Item]> {
-        // 섹션 데이터
         return Observable.just(segmentIndex)
             .map { segmentIndex in
                 switch segmentIndex {
@@ -68,16 +67,3 @@ class ClimbingGymVM {
             }
     }
 }
-
-struct Item {
-    let name: String
-    let progress: Float
-    let itemCount: Int
-    
-    init(name: String, progress: Float = 0.0, itemCount: Int = 0) {
-        self.name = name
-        self.progress = progress
-        self.itemCount = itemCount
-    }
-}
-

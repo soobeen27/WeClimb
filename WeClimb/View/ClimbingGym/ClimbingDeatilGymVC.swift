@@ -13,37 +13,49 @@ import RxSwift
 
 class ClimbingDetailGymVC: UIViewController {
     
-    let disposeBag = DisposeBag()
+    private let disposeBag = DisposeBag()
+    private let viewModel: ClimbingDetailGymVM
     
-    // 상세 화면에 표시할 데이터를 담는 프로퍼티
-    let detailData = BehaviorRelay<[DetailItem]>(value: [])
-    
-    // 테이블 뷰 구성
-    private let tableView: UITableView = {
+    lazy var tableView: UITableView = {
         let tableView = UITableView()
-        tableView.backgroundColor = .white
+        tableView.backgroundColor = .lightGray
+        tableView.clipsToBounds = true
+        tableView.layer.cornerRadius = 10
         return tableView
     }()
     
+    init(viewModel: ClimbingDetailGymVM) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
         setupLayout()
         bindTableView()
     }
     
     private func setupLayout() {
+        view.backgroundColor = .white
+        
         view.addSubview(tableView)
         
-        tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.equalToSuperview().offset(16)
+            $0.trailing.equalToSuperview().offset(-16)
+            $0.bottom.equalToSuperview()
         }
     }
     
     private func bindTableView() {
         tableView.register(SectionDetailTableViewCell.self, forCellReuseIdentifier: Identifiers.sectionDetailTableViewCell)
         
-        detailData
+        viewModel.detailData
             .bind(to: tableView.rx.items(cellIdentifier: Identifiers.sectionDetailTableViewCell, cellType: SectionDetailTableViewCell.self)) { row, detailItem, cell in
                 cell.configure(with: detailItem)
             }
