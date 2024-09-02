@@ -13,6 +13,7 @@ import RxSwift
 
 import FirebaseCore
 import FirebaseAuth
+import FirebaseFirestore
 import GoogleSignIn
 import CryptoKit
 import AuthenticationServices
@@ -97,7 +98,7 @@ class LoginVC: UIViewController {
         setLayout()
         buttonTapped()
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         //로그인 창으로 돌아왔을때 네비게이션 바 보이기
@@ -178,10 +179,19 @@ extension LoginVC {
             
             // ...
             
-            Auth.auth().signIn(with: credential) { result, error in
-                
-                // At this point, our user is signed in
+            Auth.auth().signIn(with: credential) { authResult, error in
+                if let error = error {
+                    print("Error signing in: \(error.localizedDescription)")
+                    return
+                }
+                // 구글 로그인 성공 시 Firestore에 저장
+                print("Login successful, saving user to Firestore.")
+                if let user = authResult?.user {
+                    self.saveUserToFirestoreWithSerialNumber(user: user, loginType: "google")
+                }
             }
+            
+            // At this point, our user is signed in
         }
     }
 }
@@ -269,6 +279,11 @@ extension LoginVC: ASAuthorizationControllerDelegate {
                     print(error?.localizedDescription)
                     return
                 }
+                // 애플 로그인 성공 시 Firestore에 저장
+                print("Apple login successful, saving user to Firestore.")
+                if let user = authResult?.user {
+                    self.saveUserToFirestoreWithSerialNumber(user: user, loginType: "apple")
+                }
                 // User is signed in to Firebase with Apple.
                 // ...
                 print(#fileID, #function, #line, "- 애플 로그인 성공")
@@ -302,11 +317,87 @@ extension LoginVC {
                     print(#fileID, #function, #line, "- 에러 \(error)")
                     return
                 }
+                // 카카오 로그인 성공 시 Firestore에 저장
+                print("Kakao login successful, saving user to Firestore.")
+                if let user = authResult?.user {
+                    self.saveUserToFirestoreWithSerialNumber(user: user, loginType: "kakao")
+                }
                 // User is signed in.
                 // IdP data available in authResult?.additionalUserInfo?.profile
                 print(#fileID, #function, #line, "- 카카오 로그인 성공")
             }
         })
+    }
+    
+    func saveUserToFirestoreWithSerialNumber(user: FirebaseAuth.User, loginType: String) {
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(user.uid)
+        
+        userRef.getDocument { (document, error) in
+            if let document = document, document.exists {
+                // 사용자가 이미 존재하는 경우, 새로운 일련번호를 할당하지 않음
+                print("User already exists with UID: \(user.uid), skipping serial number assignment.")
+            } else {
+                // 사용자가 존재하지 않으면 일련번호 부여 및 사용자 데이터 저장
+                let serialNumberRef = db.collection("counters").document("users")
+                
+                serialNumberRef.getDocument { (document, error) in
+                    if let document = document, document.exists {
+                        // 일련번호 증가 및 사용자 데이터 저장
+                        self.runTransactionToUpdateSerialNumber(user: user, loginType: loginType, serialNumberRef: serialNumberRef)
+                    } else {
+                        // 일련번호 문서가 없으면 생성 후 일련번호 부여
+                        serialNumberRef.setData(["serialNumber": 0]) { error in
+                            if let error = error {
+                                print("Error initializing serial number document: \(error.localizedDescription)")
+                            } else {
+                                self.runTransactionToUpdateSerialNumber(user: user, loginType: loginType, serialNumberRef: serialNumberRef)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func runTransactionToUpdateSerialNumber(user: FirebaseAuth.User, loginType: String, serialNumberRef: DocumentReference) {
+        let db = Firestore.firestore()
+        
+        db.runTransaction({ (transaction, errorPointer) -> Any? in
+            let serialNumberDoc: DocumentSnapshot
+            do {
+                serialNumberDoc = try transaction.getDocument(serialNumberRef)
+            } catch {
+                print("Error fetching document in transaction: \(error.localizedDescription)")
+                return nil
+            }
+            
+            var currentSerialNumber = serialNumberDoc.data()?["serialNumber"] as? Int ?? 0
+            let nextSerialNumber = currentSerialNumber + 1
+            transaction.updateData(["serialNumber": nextSerialNumber], forDocument: serialNumberRef)
+            
+            let now = Timestamp(date: Date())
+            let userData: [String: Any] = [
+                "authToken": user.uid,
+                "lastModified": now,
+                "loginType": loginType,
+                "registrationDate": now,
+                // userName 받는 페이지 필요.....?
+                "userName": user.displayName ?? "홍길동",
+                "userRole": "user",
+                "userSerialNumber": nextSerialNumber
+            ]
+            
+            transaction.setData(userData, forDocument: db.collection("users").document(user.uid))
+            
+            return nil
+        }) { (object, error) in
+            if let error = error {
+                print("Error saving user with serial number: \(error.localizedDescription)")
+            } else {
+                print("User successfully saved with serial number!")
+            }
+        }
     }
     
     // 카카오 로그인 하고 OpenID 토큰 가져오기
