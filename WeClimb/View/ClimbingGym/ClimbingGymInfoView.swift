@@ -16,7 +16,6 @@ class ClimbingGymInfoView: UIView {
         let label = UILabel()
         label.text = ClimbingGymNameSpace.facility
         label.font = UIFont.boldSystemFont(ofSize: 17)
-        label.textColor = .black
         return label
     }()
     
@@ -34,7 +33,6 @@ class ClimbingGymInfoView: UIView {
         let label = UILabel()
         label.text = ClimbingGymNameSpace.difficulty
         label.font = UIFont.boldSystemFont(ofSize: 17)
-        label.textColor = .black
         return label
     }()
     
@@ -60,7 +58,7 @@ class ClimbingGymInfoView: UIView {
         let label = UILabel()
         label.text = ClimbingGymNameSpace.difficultyDescription
         label.font = UIFont.systemFont(ofSize: 15)
-        label.textColor = .gray
+        label.textColor = .systemGray
         return label
     }()
     
@@ -140,14 +138,13 @@ class ClimbingGymInfoView: UIView {
         
         for (title, systemName) in facilityItems {
             let iconImageView = UIImageView(image: UIImage(systemName: systemName))
-            iconImageView.tintColor = .black
+            iconImageView.tintColor = .label
             iconImageView.contentMode = .scaleAspectFit
             iconImageView.snp.makeConstraints { $0.size.equalTo(CGSize(width: 24, height: 24)) }
             
             let label = UILabel()
             label.text = title
             label.font = UIFont.systemFont(ofSize: 15)
-            label.textColor = .black
             
             let horizontalStackView = UIStackView(arrangedSubviews: [iconImageView, label])
             horizontalStackView.axis = .horizontal
