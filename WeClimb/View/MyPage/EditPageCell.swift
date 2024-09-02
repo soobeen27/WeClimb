@@ -97,9 +97,9 @@ class EditPageCell: UITableViewCell {
         }
     }
     
-    func configure(with title: String, info: String) {
-        titleLabel.text = title
-        infoLabel.text = info
+    func configure(with model: EditModel) {
+        titleLabel.text = model.title
+        infoLabel.text = model.info
     }
     
 }
