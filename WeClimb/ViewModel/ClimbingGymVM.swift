@@ -40,6 +40,10 @@ class ClimbingGymVM {
                 let detailItems = [
                     DetailItem(image: UIImage(named: "testImage"), description: "\(selectedItem.name) 파랑보라", videoCount: selectedItem.itemCount),
                     DetailItem(image: UIImage(named: "testImage"), description: "\(selectedItem.name) 파랑보라", videoCount: selectedItem.itemCount),
+                    DetailItem(image: UIImage(named: "testImage"), description: "\(selectedItem.name) 파랑보라", videoCount: selectedItem.itemCount),
+                    DetailItem(image: UIImage(named: "testImage"), description: "\(selectedItem.name) 파랑보라", videoCount: selectedItem.itemCount),
+                    DetailItem(image: UIImage(named: "testImage"), description: "\(selectedItem.name) 파랑보라", videoCount: selectedItem.itemCount),
+                    DetailItem(image: UIImage(named: "testImage"), description: "\(selectedItem.name) 파랑보라", videoCount: selectedItem.itemCount),
                     DetailItem(image: UIImage(named: "testImage"), description: "\(selectedItem.name) 파랑보라", videoCount: selectedItem.itemCount)
                 ]
                 

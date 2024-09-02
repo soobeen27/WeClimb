@@ -17,4 +17,9 @@ class ClimbingDetailGymVM {
     init(detailItems: [DetailItem]) {
         self.detailData.accept(detailItems)
     }
+    
+    // detailData개수를 계산
+    func numberOfDetails() -> Int {
+        return detailData.value.count
+    }
 }

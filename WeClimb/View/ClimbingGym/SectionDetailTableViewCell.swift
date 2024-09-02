@@ -48,7 +48,12 @@ class SectionDetailTableViewCell: UITableViewCell {
     private func configureUI() {
         self.backgroundColor = .lightGray
         
-        [detailImageView, detailLabel, videoCountLabel].forEach { addSubview($0) }
+        [
+            detailImageView,
+            detailLabel,
+            videoCountLabel
+        ].forEach { addSubview($0) }
+        
     }
     
     private func setLayout() {

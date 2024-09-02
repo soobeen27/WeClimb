@@ -21,7 +21,10 @@ class SectionTableViewCell: UITableViewCell {
     
     private let progressBar: UIProgressView = {
         let progressView = UIProgressView(progressViewStyle: .default)
-        progressView.progressTintColor = .blue
+        progressView.progressTintColor = .mainPurple // 프로그래스 바의 색상
+        progressView.trackTintColor = .blue // 트랙의 색상
+        progressView.layer.cornerRadius = 4
+        progressView.clipsToBounds = true
         return progressView
     }()
     
@@ -44,7 +47,7 @@ class SectionTableViewCell: UITableViewCell {
     }
     
     private func configureUI() {
-        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .white
         
         [
             sectorLabel,
@@ -56,26 +59,33 @@ class SectionTableViewCell: UITableViewCell {
     private func setLayout() {
         sectorLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(16)
-            $0.top.equalToSuperview().offset(8)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.centerY.equalToSuperview()
+            $0.width.equalTo(50)
         }
         
         progressBar.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(16)
-            $0.top.equalTo(sectorLabel.snp.bottom).offset(8)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.leading.equalTo(sectorLabel.snp.trailing).offset(16)
+            $0.centerY.equalTo(sectorLabel.snp.centerY)
+            $0.height.equalTo(8)
         }
         
         itemCountLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(16)
-            $0.top.equalTo(progressBar.snp.bottom).offset(8)
-            $0.bottom.equalToSuperview().offset(-8)
+            $0.leading.equalTo(progressBar.snp.trailing).offset(16)
+            $0.trailing.equalToSuperview().offset(-16)
+            $0.centerY.equalTo(progressBar.snp.centerY)
+        }
+        
+        progressBar.snp.makeConstraints {
+            $0.trailing.equalTo(itemCountLabel.snp.leading).offset(-16)
         }
     }
     
-    func configure(with item: Item, progress: Float, itemCount: Int) {
+    func configure(with item: Item, completedCount: Int, totalCount: Int) {
         sectorLabel.text = item.name
+        let progress = Float(completedCount) / Float(totalCount)
         progressBar.progress = progress
-        itemCountLabel.text = "\(itemCount) items"
+        itemCountLabel.text = "\(completedCount)/\(totalCount)"
     }
 }
+
+

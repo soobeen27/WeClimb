@@ -28,6 +28,7 @@ class ClimbingGymVC: UIViewController {
         tableView.separatorStyle = .singleLine // 기본 구분선 스타일
         tableView.separatorColor = .black // 구분선 색상
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15) // 좌우 여백
+        tableView.rowHeight = 120
         
         return tableView
     }()
@@ -41,6 +42,7 @@ class ClimbingGymVC: UIViewController {
         navigation()
         
         tableView.register(SectionTableViewCell.self, forCellReuseIdentifier: Identifiers.sectionTableViewCell)
+        
     }
     
     // MARK: - 네비게이션 - DS
@@ -74,11 +76,20 @@ class ClimbingGymVC: UIViewController {
     // MARK: - 데이터 바인딩 - DS
     private func bindSectionData() {
         viewModel.dummys
-            .bind(to: tableView.rx.items(cellIdentifier: Identifiers.sectionTableViewCell, cellType: UITableViewCell.self)) { row, item, cell in
-                cell.textLabel?.text = item.name
+            .bind(to: tableView.rx.items(cellIdentifier: Identifiers.sectionTableViewCell, cellType: SectionTableViewCell.self)) { row, item, cell in
+                // Detail Items에 대한 ViewModel 생성
+                let detailVM = ClimbingDetailGymVM(detailItems: item.detailItems)
+                
+                // detailData의 개수를 완료된 항목 수로 설정
+                let completedCount = detailVM.numberOfDetails()
+                let totalCount = item.itemCount
+                
+                // 셀 설정
+                cell.configure(with: item, completedCount: completedCount, totalCount: totalCount)
             }
             .disposed(by: disposeBag)
-
+        
+        
         tableView.rx.itemSelected
             .subscribe(onNext: { [weak self] indexPath in
                 self?.viewModel.itemSelected.onNext(indexPath)
@@ -89,7 +100,7 @@ class ClimbingGymVC: UIViewController {
     // MARK: - 레이아웃 설정 - DS
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-    
+        
         [
             headerView,
             tableView
