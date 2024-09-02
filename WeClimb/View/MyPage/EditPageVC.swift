@@ -17,6 +17,8 @@ class EditPageVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let detailEditVM = DetailEditVM()
     
+    private let profileImagePicker = ProfileImagePickerVC()
+    
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .gray
@@ -30,6 +32,7 @@ class EditPageVC: UIViewController {
         let tableView = UITableView()
         tableView.layer.cornerRadius = 20
         tableView.isScrollEnabled = false // 스크롤 되지 않도록
+        tableView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         tableView.register(EditPageCell.self, forCellReuseIdentifier: EditPageCell.className)
         return tableView
     }()
@@ -39,6 +42,7 @@ class EditPageVC: UIViewController {
         setNavigation()
         setLayout()
         bind()
+        setProfileImageTap()
     }
     
     func setNavigation() {
@@ -85,7 +89,7 @@ class EditPageVC: UIViewController {
             .withLatestFrom(editPageViewModel.items) { indexPath, items in
                 items[indexPath.row]
             }
-            // 구독
+        // 구독
             .subscribe(onNext: { [weak self] item in
                 guard let self = self else { return }
                 // 선택된 항목을 DetailEditVM에 전달
@@ -98,4 +102,19 @@ class EditPageVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    //MARK: - 탭 제스처를 추가하고, 이미지 피커 띄우기 YJ
+    private func setProfileImageTap() {
+        let tapGesture = UITapGestureRecognizer()
+        profileImage.isUserInteractionEnabled = true
+        profileImage.addGestureRecognizer(tapGesture)
+        
+        tapGesture.rx.event
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                // 현재 인스턴스 메서드에 넣어주기
+                self.profileImagePicker.presentImagePicker(from: self)
+            })
+            .disposed(by: disposeBag)
+    }
 }

@@ -23,6 +23,7 @@
 		43A79AD22C83ADCD00B960A2 /* DetailEditCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AD12C83ADCD00B960A2 /* DetailEditCell.swift */; };
 		43A79AD62C853EC100B960A2 /* EditModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AD52C853EC100B960A2 /* EditModel.swift */; };
 		43A79AD82C85481300B960A2 /* DetailEditVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AD72C85481300B960A2 /* DetailEditVM.swift */; };
+		43A79ADA2C85930A00B960A2 /* ProfileImagePickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AD92C85930A00B960A2 /* ProfileImagePickerVC.swift */; };
 		6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */; };
 		6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */; };
 		6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F972C7EEA3F00B34083 /* GoogleSignIn */; };
@@ -87,6 +88,7 @@
 		43A79AD12C83ADCD00B960A2 /* DetailEditCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailEditCell.swift; sourceTree = "<group>"; };
 		43A79AD52C853EC100B960A2 /* EditModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditModel.swift; sourceTree = "<group>"; };
 		43A79AD72C85481300B960A2 /* DetailEditVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailEditVM.swift; sourceTree = "<group>"; };
+		43A79AD92C85930A00B960A2 /* ProfileImagePickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImagePickerVC.swift; sourceTree = "<group>"; };
 		6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTableViewCell.swift; sourceTree = "<group>"; };
 		6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVM.swift; sourceTree = "<group>"; };
 		6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 				43A79AC92C81717500B960A2 /* EditPageCell.swift */,
 				43A79ACF2C83380F00B960A2 /* DetailEditVC.swift */,
 				43A79AD12C83ADCD00B960A2 /* DetailEditCell.swift */,
+				43A79AD92C85930A00B960A2 /* ProfileImagePickerVC.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -413,6 +416,7 @@
 				43A79ACC2C819CB200B960A2 /* EditPageVM.swift in Sources */,
 				F4892C162C7C981000C5FF16 /* LoginVC.swift in Sources */,
 				F4892C102C7C27D800C5FF16 /* ExampleModel.swift in Sources */,
+				43A79ADA2C85930A00B960A2 /* ProfileImagePickerVC.swift in Sources */,
 				436AEAEA2C7DCD1100E0D85A /* MyPageCell.swift in Sources */,
 				F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */,
 				436AEAF42C7EEE9900E0D85A /* UserPageVC.swift in Sources */,

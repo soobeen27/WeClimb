@@ -196,6 +196,8 @@ class MyPageVC: UIViewController {
     }
     
     private func setLayout() {
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        
         [profileImage, profileStackView, totalStackView, collectionView]
             .forEach{ view.addSubview($0) }
         
@@ -251,10 +253,10 @@ class MyPageVC: UIViewController {
             .disposed(by: disposeBag)
         
         editButton.rx.tap
-          .bind { [weak self] in
-          print("editButton tapped")
-          self?.editButtonTapped()
-        }
-        .disposed(by: disposeBag)
+            .bind { [weak self] in
+                print("editButton tapped")
+                self?.editButtonTapped()
+            }
+            .disposed(by: disposeBag)
     }
 }
