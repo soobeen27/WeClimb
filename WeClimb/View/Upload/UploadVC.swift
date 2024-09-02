@@ -57,10 +57,10 @@ class UploadVC: UIViewController {
         button.layer.cornerRadius = 10
         button.rx.tap
             .bind { [weak self] in
-            print("tapped")
-            self?.phpickerVCPresent()
-        }
-        .disposed(by: disposeBag)
+                print("tapped")
+                self?.phpickerVCPresent()
+            }
+            .disposed(by: disposeBag)
         return button
     }()
     
@@ -87,6 +87,7 @@ class UploadVC: UIViewController {
         title = UploadNameSpace.title
         textView.delegate = self
         setLayout()
+        mediaItemsBind()
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
     }
     
@@ -108,9 +109,37 @@ class UploadVC: UIViewController {
         var configuration = PHPickerConfiguration()
         configuration.selectionLimit = 10
         configuration.filter = .any(of: [.images, .videos])
+        configuration.preferredAssetRepresentationMode = .current
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = self
         self.present(picker, animated: true, completion: nil)
+    }
+    
+    func mediaItemsBind() {
+        viewModel.mediaItems
+            .subscribe(onNext: { [weak self] items in
+                guard let self else { return }
+                if self.viewModel.mediaItems.value == [] {
+                    self.callPHPickerButton.isHidden = false
+                } else {
+                    let feed = FeedView(frame: CGRect(origin: CGPoint(), size: CGSize(width: self.view.frame.width, height: self.view.frame.width)), mediaItems: items)
+                    print("called")
+                    self.callPHPickerButton.isHidden = true
+                    self.selectedMediaView.addSubview(feed)
+                    
+                    feed.snp.makeConstraints {
+                        $0.size.equalToSuperview()
+                        $0.edges.equalToSuperview()
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func removeAllSubview(view: UIView) {
+        view.subviews.forEach { subview in
+            subview.removeFromSuperview()
+        }
     }
     
     private func setLayout() {
@@ -199,9 +228,7 @@ extension UploadVC : UITextViewDelegate {
 
 extension UploadVC : PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        picker.dismiss(animated: true)
         viewModel.mediaItems.accept(results)
+        picker.dismiss(animated: true)
     }
-    
-    
 }
