@@ -34,6 +34,21 @@ class GymHeaderView: UIView {
         return label
     }()
     
+    let socialStackView: UIStackView = {
+        let instagramImageView = UIImageView(image: UIImage(systemName: "camera.fill"))
+        instagramImageView.tintColor = .systemPink
+        instagramImageView.snp.makeConstraints { $0.size.equalTo(CGSize(width: 20, height: 20)) }
+        
+        let naverMapImageView = UIImageView(image: UIImage(systemName: "map.fill"))
+        naverMapImageView.tintColor = .systemGreen
+        naverMapImageView.snp.makeConstraints { $0.size.equalTo(CGSize(width: 20, height: 20)) }
+        
+        let stackView = UIStackView(arrangedSubviews: [naverMapImageView, instagramImageView])
+        stackView.axis = .horizontal
+        stackView.spacing = 16
+        return stackView
+    }()
+    
     let followButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("팔로우", for: .normal)
@@ -60,7 +75,7 @@ class GymHeaderView: UIView {
     }
     
     private func setupLayout() {
-        [profileImageView, profileNameLabel, followerLabel, followButton, segmentControl].forEach {
+        [profileImageView, profileNameLabel, followerLabel, socialStackView, followButton, segmentControl].forEach {
             addSubview($0)
         }
         
@@ -74,10 +89,15 @@ class GymHeaderView: UIView {
             $0.top.equalTo(profileImageView.snp.top)
             $0.leading.equalTo(profileImageView.snp.trailing).offset(16)
         }
-
+        
         followerLabel.snp.makeConstraints {
             $0.top.equalTo(profileNameLabel.snp.bottom).offset(8)
             $0.leading.equalTo(profileNameLabel.snp.leading)
+        }
+        
+        socialStackView.snp.makeConstraints {
+            $0.top.equalTo(followerLabel.snp.bottom).offset(8)
+            $0.leading.equalTo(followerLabel.snp.leading)
         }
         
         followButton.snp.makeConstraints {

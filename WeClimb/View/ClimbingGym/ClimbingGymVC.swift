@@ -15,6 +15,7 @@ class ClimbingGymVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private let viewModel = ClimbingGymVM()
+    private let climbingGymInfoView = ClimbingGymInfoView()
     
     // MARK: - 공통 헤더 뷰 - DS
     private let headerView = GymHeaderView()
@@ -25,9 +26,9 @@ class ClimbingGymVC: UIViewController {
         tableView.backgroundColor = UIColor.lightGray
         tableView.clipsToBounds = true
         tableView.layer.cornerRadius = 10
-        tableView.separatorStyle = .singleLine // 기본 구분선 스타일
-        tableView.separatorColor = .black // 구분선 색상
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15) // 좌우 여백
+        tableView.separatorStyle = .singleLine
+        tableView.separatorColor = .black
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
         tableView.rowHeight = 120
         
         return tableView
@@ -47,7 +48,7 @@ class ClimbingGymVC: UIViewController {
     
     // MARK: - 네비게이션 - DS
     private func navigation() {
-        viewModel.onItemSelected = { [weak self] (detailItems: [DetailItem]) in  // 타입 명시
+        viewModel.onItemSelected = { [weak self] (detailItems: [DetailItem]) in
             guard let self else { return }
             
             let detailVM = ClimbingDetailGymVM(detailItems: detailItems)
@@ -69,7 +70,16 @@ class ClimbingGymVC: UIViewController {
         
         headerView.segmentControl.addAction(UIAction { [weak self] _ in
             guard let self else { return }
-            self.viewModel.selectedSegment.accept(self.headerView.segmentControl.selectedSegmentIndex)
+            let selectedIndex = self.headerView.segmentControl.selectedSegmentIndex
+            self.viewModel.selectedSegment.accept(selectedIndex)
+            
+            if selectedIndex == 1 {
+                self.tableView.isHidden = true
+                self.climbingGymInfoView.isHidden = false
+            } else {
+                self.tableView.isHidden = false
+                self.climbingGymInfoView.isHidden = true
+            }
         }, for: .valueChanged)
     }
     
@@ -103,7 +113,8 @@ class ClimbingGymVC: UIViewController {
         
         [
             headerView,
-            tableView
+            tableView,
+            climbingGymInfoView
         ].forEach { view.addSubview($0) }
         
         headerView.snp.makeConstraints {
@@ -117,5 +128,13 @@ class ClimbingGymVC: UIViewController {
             $0.trailing.equalToSuperview().offset(-16)
             $0.bottom.equalToSuperview()
         }
+        
+        climbingGymInfoView.snp.makeConstraints {
+            $0.top.equalTo(headerView.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.bottom.equalToSuperview().offset(-16)
+        }
+        
+        climbingGymInfoView.isHidden = true
     }
 }
