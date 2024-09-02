@@ -19,3 +19,18 @@ enum Identifiers {
     // SectionTableViewCell
     static let sectionTableViewCell = "SectionTableViewCell"
 }
+
+// MARK: - 클래스 이름을 문자열로 반환
+extension NSObject {
+    
+    // 인스턴스가 어떤 클래스의 객체인지 문자열로 반환
+    var className: String {
+        return String(describing: type(of: self))
+    }
+    
+    // 클래스 자체의 타입 이름을 문자열로 반환
+    class var className: String {
+        return String(describing: self)
+    }
+    
+}
