@@ -24,6 +24,11 @@
 		43A79AD62C853EC100B960A2 /* EditModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AD52C853EC100B960A2 /* EditModel.swift */; };
 		43A79AD82C85481300B960A2 /* DetailEditVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AD72C85481300B960A2 /* DetailEditVM.swift */; };
 		43A79ADA2C85930A00B960A2 /* ProfileImagePickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AD92C85930A00B960A2 /* ProfileImagePickerVC.swift */; };
+		43A79ADC2C85AA7400B960A2 /* SettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79ADB2C85AA7400B960A2 /* SettingVC.swift */; };
+		43A79AE02C85BB7E00B960A2 /* SettingVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79ADF2C85BB7E00B960A2 /* SettingVM.swift */; };
+		43A79AE22C85BD3B00B960A2 /* SettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE12C85BD3B00B960A2 /* SettingModel.swift */; };
+		43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE32C85C3B800B960A2 /* SettingCell.swift */; };
+		43A79AE62C86CEFE00B960A2 /* SettingNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */; };
 		6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */; };
 		6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */; };
 		6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F972C7EEA3F00B34083 /* GoogleSignIn */; };
@@ -89,6 +94,11 @@
 		43A79AD52C853EC100B960A2 /* EditModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditModel.swift; sourceTree = "<group>"; };
 		43A79AD72C85481300B960A2 /* DetailEditVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailEditVM.swift; sourceTree = "<group>"; };
 		43A79AD92C85930A00B960A2 /* ProfileImagePickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImagePickerVC.swift; sourceTree = "<group>"; };
+		43A79ADB2C85AA7400B960A2 /* SettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingVC.swift; sourceTree = "<group>"; };
+		43A79ADF2C85BB7E00B960A2 /* SettingVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingVM.swift; sourceTree = "<group>"; };
+		43A79AE12C85BD3B00B960A2 /* SettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingModel.swift; sourceTree = "<group>"; };
+		43A79AE32C85C3B800B960A2 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
+		43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNameSpace.swift; sourceTree = "<group>"; };
 		6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTableViewCell.swift; sourceTree = "<group>"; };
 		6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVM.swift; sourceTree = "<group>"; };
 		6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -162,6 +172,8 @@
 				43A79ACF2C83380F00B960A2 /* DetailEditVC.swift */,
 				43A79AD12C83ADCD00B960A2 /* DetailEditCell.swift */,
 				43A79AD92C85930A00B960A2 /* ProfileImagePickerVC.swift */,
+				43A79ADB2C85AA7400B960A2 /* SettingVC.swift */,
+				43A79AE32C85C3B800B960A2 /* SettingCell.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -255,6 +267,7 @@
 				C45DC9D42C80519100FC4C1D /* FeedModel.swift */,
 				436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */,
 				43A79AD52C853EC100B960A2 /* EditModel.swift */,
+				43A79AE12C85BD3B00B960A2 /* SettingModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -270,6 +283,7 @@
 				436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */,
 				43A79ACB2C819CB200B960A2 /* EditPageVM.swift */,
 				43A79AD72C85481300B960A2 /* DetailEditVM.swift */,
+				43A79ADF2C85BB7E00B960A2 /* SettingVM.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -283,6 +297,7 @@
 				436AEAED2C7EC1F500E0D85A /* MypageNameSpace.swift */,
 				436AEAEF2C7EE63C00E0D85A /* SearchNameSpace.swift */,
 				436AEAF52C7EEF0A00E0D85A /* UserPageNameSpace.swift */,
+				43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -414,13 +429,17 @@
 				F4892C182C7C983A00C5FF16 /* MainFeedVC.swift in Sources */,
 				436AEAF82C7F0EEE00E0D85A /* SearchModel.swift in Sources */,
 				43A79ACC2C819CB200B960A2 /* EditPageVM.swift in Sources */,
+				43A79AE02C85BB7E00B960A2 /* SettingVM.swift in Sources */,
 				F4892C162C7C981000C5FF16 /* LoginVC.swift in Sources */,
+				43A79AE22C85BD3B00B960A2 /* SettingModel.swift in Sources */,
 				F4892C102C7C27D800C5FF16 /* ExampleModel.swift in Sources */,
 				43A79ADA2C85930A00B960A2 /* ProfileImagePickerVC.swift in Sources */,
 				436AEAEA2C7DCD1100E0D85A /* MyPageCell.swift in Sources */,
 				F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */,
 				436AEAF42C7EEE9900E0D85A /* UserPageVC.swift in Sources */,
 				F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */,
+				43A79ADC2C85AA7400B960A2 /* SettingVC.swift in Sources */,
+				43A79AE62C86CEFE00B960A2 /* SettingNameSpace.swift in Sources */,
 				F4892C3E2C7EFD4700C5FF16 /* UploadVC.swift in Sources */,
 				F4892C1A2C7C984A00C5FF16 /* SearchVC.swift in Sources */,
 				43A79ACA2C81717500B960A2 /* EditPageCell.swift in Sources */,
@@ -434,6 +453,7 @@
 				436AEAF02C7EE63C00E0D85A /* SearchNameSpace.swift in Sources */,
 				C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */,
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
+				43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */,
 				43A79AD82C85481300B960A2 /* DetailEditVM.swift in Sources */,
 				F4892C142C7C973800C5FF16 /* TabBarController.swift in Sources */,
 				F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */,

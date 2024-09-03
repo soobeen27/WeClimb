@@ -9,6 +9,7 @@ import RxSwift
 import RxCocoa
 
 class DetailEditVM {
+    
     private let selectedItemRelay = BehaviorRelay<EditModel>(value: EditModel(title: "", info: ""))
     
     var selectedItem: Observable<EditModel> {

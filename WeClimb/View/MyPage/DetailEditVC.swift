@@ -53,7 +53,7 @@ class DetailEditVC: UIViewController {
     }
     
     func setNavigation() {
-        // 네비게이션 바 제목 설정
+        // 네비게이션바 타이틀 설정
         viewModel.selectedItem
             .map { $0.title + " 변경" }
             .bind(to: rx.title) 
