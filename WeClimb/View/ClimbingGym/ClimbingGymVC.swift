@@ -24,9 +24,10 @@ class ClimbingGymVC: UIViewController {
     // MARK: - 테이블 뷰 구성 - DS
     lazy var tableView: UITableView = {
         let tableView = UITableView()
-        tableView.backgroundColor = UIColor.lightGray
+        tableView.backgroundColor = .clear
         tableView.clipsToBounds = true
         tableView.layer.cornerRadius = 10
+        tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
         tableView.separatorColor = UIColor.label.withAlphaComponent(0.2)
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
