@@ -75,9 +75,14 @@ class GymHeaderView: UIView {
     }
     
     private func setLayout() {
-        [profileImageView, profileNameLabel, followerLabel, socialStackView, followButton, segmentControl].forEach {
-            addSubview($0)
-        }
+        [
+            profileImageView,
+            profileNameLabel,
+            followerLabel,
+            socialStackView,
+            followButton,
+            segmentControl
+        ].forEach { addSubview($0) }
         
         profileImageView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(16)

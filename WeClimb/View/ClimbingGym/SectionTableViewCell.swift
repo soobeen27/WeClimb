@@ -13,7 +13,7 @@ class SectionTableViewCell: UITableViewCell {
     
     private let sectorLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = .label
         label.font = .systemFont(ofSize: 13)
         label.numberOfLines = 0
         return label
@@ -30,7 +30,7 @@ class SectionTableViewCell: UITableViewCell {
     
     private let itemCountLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .gray
+        label.textColor = .systemGray
         label.font = .systemFont(ofSize: 13)
         return label
     }()

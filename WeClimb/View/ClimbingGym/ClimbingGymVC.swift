@@ -27,7 +27,7 @@ class ClimbingGymVC: UIViewController {
         tableView.clipsToBounds = true
         tableView.layer.cornerRadius = 10
         tableView.separatorStyle = .singleLine
-        tableView.separatorColor = .black
+        tableView.separatorColor = UIColor.label.withAlphaComponent(0.2)
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
         tableView.rowHeight = 120
         
