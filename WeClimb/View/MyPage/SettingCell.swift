@@ -32,7 +32,7 @@ class SettingCell: UITableViewCell {
         
         titleLabel.snp.makeConstraints {
             $0.leading.trailing.equalTo(contentView).inset(16)
-            $0.top.bottom.equalTo(contentView).inset(8)
+            $0.top.bottom.equalTo(contentView).inset(16)
         }
     }
     
