@@ -69,6 +69,7 @@ class UploadVC: UIViewController {
         textView.font = .systemFont(ofSize: 15)
         textView.textColor = .secondaryLabel
         textView.text = UploadNameSpace.placeholder
+        textView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         textView.returnKeyType = .done
         return textView
     }()
@@ -122,8 +123,9 @@ class UploadVC: UIViewController {
                 if self.viewModel.mediaItems.value == [] {
                     self.callPHPickerButton.isHidden = false
                 } else {
-                    let feed = FeedView(frame: CGRect(origin: CGPoint(), size: CGSize(width: self.view.frame.width, height: self.view.frame.width)), mediaItems: items)
-                    print("called")
+                    let feed = FeedView(frame: CGRect(origin: CGPoint(), 
+                                                      size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
+                                        mediaItems: items)
                     self.callPHPickerButton.isHidden = true
                     self.selectedMediaView.addSubview(feed)
                     
