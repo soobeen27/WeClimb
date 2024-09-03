@@ -16,6 +16,7 @@ class ClimbingGymVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = ClimbingGymVM()
     private let climbingGymInfoView = ClimbingGymInfoView()
+    private var gymData: SearchModel?
     
     // MARK: - 공통 헤더 뷰 - DS
     private let headerView = GymHeaderView()
@@ -44,6 +45,10 @@ class ClimbingGymVC: UIViewController {
         
         tableView.register(SectionTableViewCell.self, forCellReuseIdentifier: Identifiers.sectionTableViewCell)
         
+    }
+    
+    func configure(with data: SearchModel) {
+        self.gymData = data
     }
     
     // MARK: - 네비게이션 - DS
