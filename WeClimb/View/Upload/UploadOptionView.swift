@@ -34,12 +34,12 @@ class UploadOptionView : UIView {
         return label
     }()
     
-    private let greaterThanSign: UILabel = {
-        let label = UILabel()
-        label.text = UploadNameSpace.greaterThan
-        label.font = .systemFont(ofSize: 17, weight: .regular)
-        label.textColor = .secondaryLabel
-        return label
+    private let greaterThanSign: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(systemName: "greaterthan")
+        imageView.contentMode = .scaleAspectFill
+        imageView.tintColor = .secondaryLabel
+        return imageView
     }()
     
     private let seperatorLine: UILabel = {
@@ -93,6 +93,7 @@ class UploadOptionView : UIView {
         selectedLabel.snp.makeConstraints {
             $0.trailing.equalTo(greaterThanSign.snp.leading).offset(-8)
             $0.centerY.equalToSuperview()
+            $0.size.equalTo(30)
         }
     }
     
