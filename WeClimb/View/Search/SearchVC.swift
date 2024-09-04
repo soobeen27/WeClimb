@@ -77,13 +77,13 @@ class SearchVC: UIViewController {
         
         // 세그먼트 컨트롤의 위치 설정
         segmentedControl.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
-            $0.leading.trailing.equalToSuperview().inset(15)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
         
         nearbyLabel.snp.makeConstraints {
             $0.top.equalTo(segmentedControl.snp.bottom).offset(10)
-            $0.leading.trailing.equalToSuperview().inset(15)
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
         
         tableView.snp.makeConstraints {
@@ -119,6 +119,31 @@ class SearchVC: UIViewController {
                     print("유저검색 탭 선택됨")
                     // 유저검색 관련 데이터 처리
                 }
+            })
+            .disposed(by: disposeBag)
+        
+        searchController.searchBar.rx.textDidBeginEditing
+            .subscribe(onNext: { [weak self] in
+                // 서치바가 클릭되면 나머지 뷰들을 숨김
+                UIView.animate(withDuration: 0.2, animations: {
+                    self?.segmentedControl.alpha = 0.0
+                    self?.nearbyLabel.alpha = 0.0
+                    self?.tableView.alpha = 0.0
+                })
+                
+                UIView.animate(withDuration: 0.6, animations: {
+                    self?.segmentedControl.alpha = 1
+                })
+            })
+            .disposed(by: disposeBag)
+        
+        searchController.searchBar.rx.textDidEndEditing
+            .subscribe(onNext: { [weak self] in
+                // 서치바에서 나갈 때 나머지 뷰들을 다시 보이게 함
+                UIView.animate(withDuration: 0.2, animations: {
+                    self?.nearbyLabel.alpha = 1.0
+                    self?.tableView.alpha = 1.0
+                })
             })
             .disposed(by: disposeBag)
     }
