@@ -18,6 +18,9 @@ enum Identifiers {
     
     // SectionTableViewCell
     static let sectionTableViewCell = "SectionTableViewCell"
+    
+    // sectionDetailTableViewCell
+    static let sectionDetailTableViewCell = "SectionDetailTableViewCell"
 }
 
 // MARK: - 클래스 이름을 문자열로 반환

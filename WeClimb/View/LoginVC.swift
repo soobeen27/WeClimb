@@ -13,6 +13,7 @@ import RxSwift
 
 import FirebaseCore
 import FirebaseAuth
+import FirebaseFirestore
 import GoogleSignIn
 import CryptoKit
 import AuthenticationServices
@@ -94,10 +95,12 @@ class LoginVC: UIViewController {
         super.viewDidLoad()
         print("loaded")
         
+        autoLoginCheck()
+        
         setLayout()
         buttonTapped()
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         //로그인 창으로 돌아왔을때 네비게이션 바 보이기
@@ -146,6 +149,18 @@ class LoginVC: UIViewController {
             $0.width.equalTo(300)
         }
     }
+    
+    // 자동 로그인 체크
+    private func autoLoginCheck() {
+        // Firebase Auth의 현재 사용자 확인
+        if let currentUser = Auth.auth().currentUser {
+            // 사용자가 로그인되어 있는 경우 메인 화면으로 이동
+            print("User already logged in with UID: \(currentUser.uid), navigating to main feed.")
+            self.navigateToMainFeedVC()
+        } else {
+            print("No user is currently logged in, displaying login screen.")
+        }
+    }
 }
 
 //MARK: - 구글 로그인
@@ -178,10 +193,21 @@ extension LoginVC {
             
             // ...
             
-            Auth.auth().signIn(with: credential) { result, error in
-                
-                // At this point, our user is signed in
+            Auth.auth().signIn(with: credential) { authResult, error in
+                if let error = error {
+                    print("Error signing in: \(error.localizedDescription)")
+                    return
+                }
+                // 구글 로그인 성공 시 Firestore에 저장
+                print("Login successful, saving user to Firestore.")
+                if let user = authResult?.user {
+                    self.saveUserToFirestoreWithSerialNumber(user: user, loginType: "google") {
+                        self.navigateToMainFeedVC()
+                    }
+                }
             }
+            
+            // At this point, our user is signed in
         }
     }
 }
@@ -263,11 +289,14 @@ extension LoginVC: ASAuthorizationControllerDelegate {
             // Sign in with Firebase.
             Auth.auth().signIn(with: credential) { (authResult, error) in
                 if error != nil {
-                    // Error. If error.code == .MissingOrInvalidNonce, make sure
-                    // you're sending the SHA256-hashed nonce as a hex string with
-                    // your request to Apple.
-                    print(error?.localizedDescription)
+                    print(error?.localizedDescription ?? "Error signing in with Apple.")
                     return
+                }
+                print("Apple login successful, saving user to Firestore.")
+                if let user = authResult?.user {
+                    self.saveUserToFirestoreWithSerialNumber(user: user, loginType: "apple") {
+                        self.navigateToMainFeedVC()
+                    }
                 }
                 // User is signed in to Firebase with Apple.
                 // ...
@@ -298,15 +327,110 @@ extension LoginVC {
             )
             Auth.auth().signIn(with: credential) { authResult, error in
                 if error != nil {
-                    // Handle error.
-                    print(#fileID, #function, #line, "- 에러 \(error)")
+                    print("Error signing in with Kakao: \(error?.localizedDescription ?? "")")
                     return
+                }
+                print("Kakao login successful, saving user to Firestore.")
+                if let user = authResult?.user {
+                    self.saveUserToFirestoreWithSerialNumber(user: user, loginType: "kakao") {
+                        self.navigateToMainFeedVC()
+                    }
                 }
                 // User is signed in.
                 // IdP data available in authResult?.additionalUserInfo?.profile
                 print(#fileID, #function, #line, "- 카카오 로그인 성공")
             }
         })
+    }
+    
+    func saveUserToFirestoreWithSerialNumber(user: FirebaseAuth.User, loginType: String, completion: @escaping () -> Void) {
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(user.uid)
+        
+        userRef.getDocument { (document, error) in
+            if let document = document, document.exists {
+                print("User already exists with UID: \(user.uid), skipping serial number assignment.")
+                completion()  // 이미 유저가 존재할 경우에도 화면 이동
+            } else {
+                let serialNumberRef = db.collection("counters").document("users")
+                
+                serialNumberRef.getDocument { (document, error) in
+                    if let document = document, document.exists {
+                        self.runTransactionToUpdateSerialNumber(user: user, loginType: loginType, serialNumberRef: serialNumberRef, completion: completion)
+                    } else {
+                        serialNumberRef.setData(["serialNumber": 0]) { error in
+                            if let error = error {
+                                print("Error initializing serial number document: \(error.localizedDescription)")
+                            } else {
+                                self.runTransactionToUpdateSerialNumber(user: user, loginType: loginType, serialNumberRef: serialNumberRef, completion: completion)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    func runTransactionToUpdateSerialNumber(user: FirebaseAuth.User, loginType: String, serialNumberRef: DocumentReference, completion: @escaping () -> Void) {
+        let db = Firestore.firestore()
+        
+        db.runTransaction({ (transaction, errorPointer) -> Any? in
+            let serialNumberDoc: DocumentSnapshot
+            do {
+                serialNumberDoc = try transaction.getDocument(serialNumberRef)
+            } catch {
+                print("Error fetching document in transaction: \(error.localizedDescription)")
+                return nil
+            }
+            
+            var currentSerialNumber = serialNumberDoc.data()?["serialNumber"] as? Int ?? 0
+            let nextSerialNumber = currentSerialNumber + 1
+            transaction.updateData(["serialNumber": nextSerialNumber], forDocument: serialNumberRef)
+            
+            let now = Timestamp(date: Date())
+            let userData: [String: Any] = [
+                "authToken": user.uid,
+                "lastModified": now,
+                "loginType": loginType,
+                "registrationDate": now,
+                "userName": user.displayName ?? "홍길동",
+                "userRole": "user",
+                "userSerialNumber": nextSerialNumber
+            ]
+            
+            // 사용자 데이터를 설정
+            transaction.setData(userData, forDocument: db.collection("users").document(user.uid))
+            
+            // 하위 컬렉션 userDetails 생성 및 기본 데이터 추가
+            // codable
+            let userDetailsData: [String: Any] = [
+                "profileImage": "", // 기본 프로필 이미지 URL
+                "nickname": user.displayName ?? "홍길동", // 기본 닉네임
+                "height": 0, // 기본 키 (예시로 0으로 설정)
+                "armReach": 0, // 기본 암리치 (예시로 0으로 설정)
+                "region": "", // 기본 지역
+                "followers": [], // 팔로워 목록 (배열)
+                "following": [] // 팔로잉 목록 (배열)
+            ]
+            
+            let userDetailsRef = db.collection("users").document(user.uid).collection("userDetails").document("details")
+            transaction.setData(userDetailsData, forDocument: userDetailsRef)
+            
+            return nil
+        }) { (object, error) in
+            if let error = error {
+                print("Error saving user with serial number: \(error.localizedDescription)")
+            } else {
+                print("User and userDetails successfully saved!")
+            }
+            completion()
+        }
+    }
+    
+    func navigateToMainFeedVC() {
+        let TabBarController = TabBarController()
+        navigationController?.pushViewController(TabBarController, animated: true)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
     // 카카오 로그인 하고 OpenID 토큰 가져오기

@@ -7,16 +7,16 @@
 
 import RxSwift
 
-class EditPageViewModel {
+class EditPageVM {
     
-    let items: Observable<[(title: String, info: String)]>
+    let items: Observable<[EditModel]>
     
     // 샘플 데이터 YJ
-    private let sampleData: [(String, String)] = [
-        ("이름", "홍길동"),
-        ("이메일", "aaa@naver.com"),
-        ("전화번호", "000-0000-0000"),
-        ("생년월일", "0000.00.00")
+    private let sampleData: [EditModel] = [
+        EditModel(title: "이름", info: "홍길동"),
+        EditModel(title: "이메일", info: "aaa@naver.com"),
+        EditModel(title: "전화번호", info: "000-0000-0000"),
+        EditModel(title: "생년월일", info: "0000.00.00")
     ]
     
     init() {

@@ -9,6 +9,7 @@ import UIKit
 
 import RxSwift
 import SnapKit
+import FirebaseAuth
 
 class MyPageVC: UIViewController {
     
@@ -152,16 +153,12 @@ class MyPageVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = .systemBackground
-        
         setLayout()
         bind()
         setNavigation()
     }
     
-    // MARK: - 로그아웃 버튼 YJ
-    // 이 기능은 아직 보류지만 로그아웃을 위해 우선 여기에..
+    // MARK: - 설정 버튼 YJ
     func setNavigation() {
         let rightBarButton = UIBarButtonItem(
             image: UIImage(systemName: "ellipsis"),
@@ -173,14 +170,43 @@ class MyPageVC: UIViewController {
         navigationItem.rightBarButtonItem = rightBarButton
     }
     
+//    @objc private func rightBarButtonTapped() {
+//        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//        
+//        let logout = UIAlertAction(title: MypageNameSpace.logout, style: .default) { _ in
+//            guard let navigationController = self.tabBarController?.navigationController else { return }
+//            navigationController.popToRootViewController(animated: true)
+//        }
+//        
+//        let close = UIAlertAction(title: MypageNameSpace.close, style: .cancel)
+//        
+//        [logout, close]
+//            .forEach { actionSheet.addAction($0) }
+//        
+//        present(actionSheet, animated: true)
+//    }
+    
+    // WL 파이어베이스 로그아웃 로직 추가
     @objc private func rightBarButtonTapped() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
+        // 로그아웃 액션
         let logout = UIAlertAction(title: MypageNameSpace.logout, style: .default) { _ in
-            guard let navigationController = self.tabBarController?.navigationController else { return }
-            navigationController.popToRootViewController(animated: true)
+            do {
+                // Firebase Auth에서 로그아웃 수행
+                try Auth.auth().signOut()
+                print("User logged out successfully.")
+                
+                // 네비게이션 스택을 초기화하고 루트 뷰 컨트롤러로 이동
+                guard let navigationController = self.tabBarController?.navigationController else { return }
+                navigationController.popToRootViewController(animated: true)
+                
+            } catch let signOutError as NSError {
+                print("Error signing out: %@", signOutError)
+            }
         }
         
+        // 닫기 액션
         let close = UIAlertAction(title: MypageNameSpace.close, style: .cancel)
         
         [logout, close]
@@ -191,11 +217,12 @@ class MyPageVC: UIViewController {
     
     private func editButtonTapped() {
         let editPageVC = EditPageVC()
-        
         navigationController?.pushViewController(editPageVC, animated: true)
     }
     
     private func setLayout() {
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        
         [profileImage, profileStackView, totalStackView, collectionView]
             .forEach{ view.addSubview($0) }
         
@@ -250,11 +277,13 @@ class MyPageVC: UIViewController {
             }
             .disposed(by: disposeBag)
         
+        // 프로필 편집 버튼 눌렀을 때 YJ
         editButton.rx.tap
-          .bind { [weak self] in
-          print("editButton tapped")
-          self?.editButtonTapped()
-        }
-        .disposed(by: disposeBag)
+            .bind { [weak self] in
+                print("editButton tapped")
+                self?.editButtonTapped()
+            }
+            .disposed(by: disposeBag)
     }
 }
+
