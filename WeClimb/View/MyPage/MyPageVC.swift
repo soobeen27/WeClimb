@@ -9,6 +9,7 @@ import UIKit
 
 import RxSwift
 import SnapKit
+import FirebaseAuth
 
 class MyPageVC: UIViewController {
     
@@ -173,14 +174,43 @@ class MyPageVC: UIViewController {
         navigationItem.rightBarButtonItem = rightBarButton
     }
     
+//    @objc private func rightBarButtonTapped() {
+//        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//        
+//        let logout = UIAlertAction(title: MypageNameSpace.logout, style: .default) { _ in
+//            guard let navigationController = self.tabBarController?.navigationController else { return }
+//            navigationController.popToRootViewController(animated: true)
+//        }
+//        
+//        let close = UIAlertAction(title: MypageNameSpace.close, style: .cancel)
+//        
+//        [logout, close]
+//            .forEach { actionSheet.addAction($0) }
+//        
+//        present(actionSheet, animated: true)
+//    }
+    
+    // WL 파이어베이스 로그아웃 로직 추가
     @objc private func rightBarButtonTapped() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
+        // 로그아웃 액션
         let logout = UIAlertAction(title: MypageNameSpace.logout, style: .default) { _ in
-            guard let navigationController = self.tabBarController?.navigationController else { return }
-            navigationController.popToRootViewController(animated: true)
+            do {
+                // Firebase Auth에서 로그아웃 수행
+                try Auth.auth().signOut()
+                print("User logged out successfully.")
+                
+                // 네비게이션 스택을 초기화하고 루트 뷰 컨트롤러로 이동
+                guard let navigationController = self.tabBarController?.navigationController else { return }
+                navigationController.popToRootViewController(animated: true)
+                
+            } catch let signOutError as NSError {
+                print("Error signing out: %@", signOutError)
+            }
         }
         
+        // 닫기 액션
         let close = UIAlertAction(title: MypageNameSpace.close, style: .cancel)
         
         [logout, close]
@@ -258,3 +288,4 @@ class MyPageVC: UIViewController {
         .disposed(by: disposeBag)
     }
 }
+
