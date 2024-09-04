@@ -39,6 +39,15 @@ class SearchVC: UIViewController {
         return tableView
     }()
     
+    // 세그먼트 컨트롤 - DS
+    private let segmentedControl: UISegmentedControl = {
+        let items = ["암장", "유저검색"]
+        let segmentedControl = UISegmentedControl(items: items)
+        segmentedControl.selectedSegmentIndex = 0
+        segmentedControl.backgroundColor = .systemBackground // 배경색 설정 (필요에 따라 수정 가능)
+        return segmentedControl
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -63,11 +72,17 @@ class SearchVC: UIViewController {
     }
     
     private func setLayout() {
-        [nearbyLabel, tableView]
+        [segmentedControl, nearbyLabel, tableView]
             .forEach { view.addSubview($0) }
         
+        // 세그먼트 컨트롤의 위치 설정
+        segmentedControl.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
+            $0.leading.trailing.equalToSuperview().inset(15)
+        }
+        
         nearbyLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.top.equalTo(segmentedControl.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview().inset(15)
         }
         
@@ -90,6 +105,20 @@ class SearchVC: UIViewController {
                 let climbingGymVC = ClimbingGymVC()
                 climbingGymVC.configure(with: selectedGym)
                 self?.navigationController?.pushViewController(climbingGymVC, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        // 세그먼트 컨트롤 선택 이벤트 처리
+        segmentedControl.rx.selectedSegmentIndex
+            .subscribe(onNext: { [weak self] index in
+                // 선택된 세그먼트에 따라 다른 데이터를 처리하거나 UI 업데이트
+                if index == 0 {
+                    print("암장 탭 선택됨")
+                    // 암장 관련 데이터 처리
+                } else {
+                    print("유저검색 탭 선택됨")
+                    // 유저검색 관련 데이터 처리
+                }
             })
             .disposed(by: disposeBag)
     }

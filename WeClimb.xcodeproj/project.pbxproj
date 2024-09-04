@@ -23,6 +23,7 @@
 		6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6B376D2C85807800C9C87A /* GymHeaderView.swift */; };
 		6B8467BC2C85DDE9006B062D /* ClimbingGymInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */; };
 		6B8467BE2C86129B006B062D /* ClimbingGymNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */; };
+		6B8467C02C87F7C1006B062D /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BF2C87F7C1006B062D /* FirebaseManager.swift */; };
 		6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */; };
 		6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */; };
 		6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */; };
@@ -90,6 +91,7 @@
 		6B6B376D2C85807800C9C87A /* GymHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymHeaderView.swift; sourceTree = "<group>"; };
 		6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymInfoView.swift; sourceTree = "<group>"; };
 		6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymNameSpace.swift; sourceTree = "<group>"; };
+		6B8467BF2C87F7C1006B062D /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
 		6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionDetailTableViewCell.swift; sourceTree = "<group>"; };
 		6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDeatilGymVC.swift; sourceTree = "<group>"; };
 		6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDetailGymVM.swift; sourceTree = "<group>"; };
@@ -289,6 +291,7 @@
 				436AEAED2C7EC1F500E0D85A /* MypageNameSpace.swift */,
 				436AEAEF2C7EE63C00E0D85A /* SearchNameSpace.swift */,
 				436AEAF52C7EEF0A00E0D85A /* UserPageNameSpace.swift */,
+				6B8467BF2C87F7C1006B062D /* FirebaseManager.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -440,6 +443,7 @@
 				6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */,
 				F4892C1C2C7C988B00C5FF16 /* ClimbingGymVC.swift in Sources */,
 				436AEAF02C7EE63C00E0D85A /* SearchNameSpace.swift in Sources */,
+				6B8467C02C87F7C1006B062D /* FirebaseManager.swift in Sources */,
 				C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */,
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				F4892C142C7C973800C5FF16 /* TabBarController.swift in Sources */,
