@@ -52,9 +52,9 @@ class GymHeaderView: UIView {
     let followButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle(ClimbingGymNameSpace.follow, for: .normal)
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 13)
-        button.backgroundColor = .lightGray
+        button.backgroundColor = .mainPurple
         button.layer.cornerRadius = 10
         return button
     }()
@@ -117,5 +117,11 @@ class GymHeaderView: UIView {
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().offset(-16)
         }
+    }
+}
+
+extension GymHeaderView {
+    func updateFollowersCount(_ newFollwerCount: String) {
+        self.followerLabel.text = newFollwerCount
     }
 }

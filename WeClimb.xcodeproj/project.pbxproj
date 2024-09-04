@@ -89,9 +89,9 @@
 		43A79AC92C81717500B960A2 /* EditPageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPageCell.swift; sourceTree = "<group>"; };
 		43A79ACB2C819CB200B960A2 /* EditPageVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPageVM.swift; sourceTree = "<group>"; };
 		6B2815452C8572A800BE1D40 /* ClimbingGym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGym.swift; sourceTree = "<group>"; };
-		6B6B376D2C85807800C9C87A /* GymHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymHeaderView.swift; sourceTree = "<group>"; };
+		6B6B376D2C85807800C9C87A /* GymHeaderView.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = GymHeaderView.swift; sourceTree = "<group>"; tabWidth = 4; };
 		6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymInfoView.swift; sourceTree = "<group>"; };
-		6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymNameSpace.swift; sourceTree = "<group>"; };
+		6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ClimbingGymNameSpace.swift; sourceTree = "<group>"; tabWidth = 4; };
 		6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionDetailTableViewCell.swift; sourceTree = "<group>"; };
 		6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDeatilGymVC.swift; sourceTree = "<group>"; };
 		6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDetailGymVM.swift; sourceTree = "<group>"; };
@@ -122,7 +122,7 @@
 		F4892C152C7C981000C5FF16 /* LoginVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C172C7C983A00C5FF16 /* MainFeedVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C192C7C984A00C5FF16 /* SearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVC.swift; sourceTree = "<group>"; };
-		F4892C1B2C7C988A00C5FF16 /* ClimbingGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVC.swift; sourceTree = "<group>"; };
+		F4892C1B2C7C988A00C5FF16 /* ClimbingGymVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ClimbingGymVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C1D2C7C98A100C5FF16 /* MyPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageVC.swift; sourceTree = "<group>"; };
 		F4892C212C7C9DC700C5FF16 /* CodingConvention.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CodingConvention.md; sourceTree = "<group>"; };
 		F4892C232C7CBC8700C5FF16 /* UploadVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadVM.swift; sourceTree = "<group>"; };
