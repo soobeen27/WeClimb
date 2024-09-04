@@ -83,6 +83,15 @@ class SearchVC: UIViewController {
                 cell.configure(with: model)
             }
             .disposed(by: disposeBag)
+        
+        // 셀 선택 이벤트 처리
+        tableView.rx.modelSelected(SearchModel.self)
+            .subscribe(onNext: { [weak self] selectedGym in
+                let climbingGymVC = ClimbingGymVC()
+                climbingGymVC.configure(with: selectedGym)
+                self?.navigationController?.pushViewController(climbingGymVC, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
