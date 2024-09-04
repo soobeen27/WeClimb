@@ -94,8 +94,8 @@ class SearchVC: UIViewController {
     
     private func bind() {
         searchViewModel.data
-            .bind(to: tableView.rx.items(cellIdentifier: SearchTableViewCell.className, cellType: SearchTableViewCell.self)) { index, data, cell in
-                cell.configure(with: data.image, title: data.title, address: data.address)
+            .bind(to: tableView.rx.items(cellIdentifier: SearchTableViewCell.className, cellType: SearchTableViewCell.self)) { index, model, cell in
+                cell.configure(with: model)
             }
             .disposed(by: disposeBag)
         

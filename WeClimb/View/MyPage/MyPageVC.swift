@@ -152,16 +152,12 @@ class MyPageVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = .systemBackground
-        
         setLayout()
         bind()
         setNavigation()
     }
     
-    // MARK: - 로그아웃 버튼 YJ
-    // 이 기능은 아직 보류지만 로그아웃을 위해 우선 여기에..
+    // MARK: - 설정 버튼 YJ
     func setNavigation() {
         let rightBarButton = UIBarButtonItem(
             image: UIImage(systemName: "ellipsis"),
@@ -174,28 +170,18 @@ class MyPageVC: UIViewController {
     }
     
     @objc private func rightBarButtonTapped() {
-        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        let logout = UIAlertAction(title: MypageNameSpace.logout, style: .default) { _ in
-            guard let navigationController = self.tabBarController?.navigationController else { return }
-            navigationController.popToRootViewController(animated: true)
-        }
-        
-        let close = UIAlertAction(title: MypageNameSpace.close, style: .cancel)
-        
-        [logout, close]
-            .forEach { actionSheet.addAction($0) }
-        
-        present(actionSheet, animated: true)
+        let settingVC = SettingVC()
+        navigationController?.pushViewController(settingVC, animated: true)
     }
     
     private func editButtonTapped() {
         let editPageVC = EditPageVC()
-        
         navigationController?.pushViewController(editPageVC, animated: true)
     }
     
     private func setLayout() {
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        
         [profileImage, profileStackView, totalStackView, collectionView]
             .forEach{ view.addSubview($0) }
         
@@ -250,11 +236,12 @@ class MyPageVC: UIViewController {
             }
             .disposed(by: disposeBag)
         
+        // 프로필 편집 버튼 눌렀을 때 YJ
         editButton.rx.tap
-          .bind { [weak self] in
-          print("editButton tapped")
-          self?.editButtonTapped()
-        }
-        .disposed(by: disposeBag)
+            .bind { [weak self] in
+                print("editButton tapped")
+                self?.editButtonTapped()
+            }
+            .disposed(by: disposeBag)
     }
 }
