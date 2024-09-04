@@ -70,9 +70,9 @@ class SearchTableViewCell: UITableViewCell {
         }
     }
     
-    func configure(with image: UIImage?, title: String, address: String) {
-        gymImage.image = image
-        titleLabel.text = title
-        addressLabel.text = address
+    func configure(with model: SearchModel) {
+        gymImage.image = model.image
+        titleLabel.text = model.title
+        addressLabel.text = model.address
     }
 }

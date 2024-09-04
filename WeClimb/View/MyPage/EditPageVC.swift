@@ -7,13 +7,17 @@
 
 import UIKit
 
+import RxCocoa
 import RxSwift
 import SnapKit
 
 class EditPageVC: UIViewController {
     
-    private let viewModel = EditPageViewModel()
+    private let editPageViewModel = EditPageVM()
     private let disposeBag = DisposeBag()
+    private let detailEditVM = DetailEditVM()
+    
+    private let profileImagePicker = ProfileImagePickerVC()
     
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
@@ -28,21 +32,22 @@ class EditPageVC: UIViewController {
         let tableView = UITableView()
         tableView.layer.cornerRadius = 20
         tableView.isScrollEnabled = false // 스크롤 되지 않도록
+        tableView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         tableView.register(EditPageCell.self, forCellReuseIdentifier: EditPageCell.className)
         return tableView
     }()
     
     override func viewDidLoad() {
         setColor()
-        
         setNavigation()
         setLayout()
         bind()
+        setProfileImageTap()
     }
     
     func setNavigation() {
         self.title = MypageNameSpace.edit
-        }
+    }
     
     private func setLayout() {
         [profileImage, tableView]
@@ -74,11 +79,42 @@ class EditPageVC: UIViewController {
     }
     
     private func bind() {
-        viewModel.items
+        editPageViewModel.items
             .bind(to: tableView.rx.items(cellIdentifier: EditPageCell.className, cellType: EditPageCell.self)) { row, item, cell in
-                 cell.configure(with: item.title, info: item.info)
-             }
-             .disposed(by: disposeBag)
-     }
+                cell.configure(with: item)
+            }
+            .disposed(by: disposeBag)
+        
+        tableView.rx.itemSelected   // 셀을 선택했을 때 발생하는 이벤트를 방출
+            .withLatestFrom(editPageViewModel.items) { indexPath, items in
+                items[indexPath.row]
+            }
+        // 구독
+            .subscribe(onNext: { [weak self] item in
+                guard let self = self else { return }
+                // 선택된 항목을 DetailEditVM에 전달
+                self.detailEditVM.selectItem(item)
+                
+                // 화면 전환
+                let detailVC = DetailEditVC(viewModel: detailEditVM)
+                self.navigationController?.pushViewController(detailVC, animated: true)
+            })
+            .disposed(by: disposeBag)
+    }
     
+    //MARK: - 탭 제스처를 추가하고, 이미지 피커 띄우기 YJ
+    private func setProfileImageTap() {
+        let tapGesture = UITapGestureRecognizer()
+        profileImage.isUserInteractionEnabled = true
+        profileImage.addGestureRecognizer(tapGesture)
+        
+        tapGesture.rx.event
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                // 현재 인스턴스 메서드에 넣어주기
+                self.profileImagePicker.presentImagePicker(from: self)
+            })
+            .disposed(by: disposeBag)
+    }
 }
