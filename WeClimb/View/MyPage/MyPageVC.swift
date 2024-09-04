@@ -155,6 +155,7 @@ class MyPageVC: UIViewController {
         setLayout()
         bind()
         setNavigation()
+        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     }
     
     // MARK: - 설정 버튼 YJ
@@ -178,7 +179,7 @@ class MyPageVC: UIViewController {
         let editPageVC = EditPageVC()
         navigationController?.pushViewController(editPageVC, animated: true)
     }
-    
+ 
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
@@ -245,3 +246,22 @@ class MyPageVC: UIViewController {
             .disposed(by: disposeBag)
     }
 }
+
+extension MyPageVC: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let modalVC = MyPageModalVC()
+        modalVC.modalPresentationStyle = .pageSheet
+        
+        if let sheet = modalVC.sheetPresentationController {
+            let customDetent = UISheetPresentationController.Detent.custom { context in
+                return context.maximumDetentValue * 0.9
+            }
+            sheet.detents = [customDetent]
+            sheet.preferredCornerRadius = 20
+        }
+
+        present(modalVC, animated: true, completion: nil)
+    }
+}
+

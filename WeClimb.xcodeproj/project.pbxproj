@@ -57,6 +57,7 @@
 		C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */; };
 		C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C45DC9D42C80519100FC4C1D /* FeedModel.swift */; };
 		C4E29C172C806F170076BCA6 /* MainFeedVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E29C162C806F170076BCA6 /* MainFeedVM.swift */; };
+		C4E29C1B2C8874780076BCA6 /* MyPageModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E29C1A2C8874780076BCA6 /* MyPageModalVC.swift */; };
 		F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892BE62C7C237700C5FF16 /* AppDelegate.swift */; };
 		F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */; };
 		F4892BF02C7C237900C5FF16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4892BEF2C7C237900C5FF16 /* Assets.xcassets */; };
@@ -126,6 +127,7 @@
 		C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedTabelCell.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C45DC9D42C80519100FC4C1D /* FeedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedModel.swift; sourceTree = "<group>"; };
 		C4E29C162C806F170076BCA6 /* MainFeedVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFeedVM.swift; sourceTree = "<group>"; };
+		C4E29C1A2C8874780076BCA6 /* MyPageModalVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MyPageModalVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892BE32C7C237700C5FF16 /* WeClimb.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeClimb.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4892BE62C7C237700C5FF16 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -143,7 +145,7 @@
 		F4892C172C7C983A00C5FF16 /* MainFeedVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C192C7C984A00C5FF16 /* SearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVC.swift; sourceTree = "<group>"; };
 		F4892C1B2C7C988A00C5FF16 /* ClimbingGymVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ClimbingGymVC.swift; sourceTree = "<group>"; tabWidth = 4; };
-		F4892C1D2C7C98A100C5FF16 /* MyPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageVC.swift; sourceTree = "<group>"; };
+		F4892C1D2C7C98A100C5FF16 /* MyPageVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MyPageVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C212C7C9DC700C5FF16 /* CodingConvention.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CodingConvention.md; sourceTree = "<group>"; };
 		F4892C232C7CBC8700C5FF16 /* UploadVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadVM.swift; sourceTree = "<group>"; };
 		F4892C2A2C7CCDF200C5FF16 /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 			children = (
 				F4892C1D2C7C98A100C5FF16 /* MyPageVC.swift */,
 				436AEAE92C7DCD1100E0D85A /* MyPageCell.swift */,
+				C4E29C1A2C8874780076BCA6 /* MyPageModalVC.swift */,
 				436AEAF32C7EEE9900E0D85A /* UserPageVC.swift */,
 				435B7E412C8024AB00EB9816 /* EditPageVC.swift */,
 				43A79AC92C81717500B960A2 /* EditPageCell.swift */,
@@ -487,6 +490,7 @@
 				C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */,
 				916D64D32C848BE00064B766 /* FeedCell.swift in Sources */,
 				6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */,
+				C4E29C1B2C8874780076BCA6 /* MyPageModalVC.swift in Sources */,
 				6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */,
 				6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */,
 				F4892C1C2C7C988B00C5FF16 /* ClimbingGymVC.swift in Sources */,

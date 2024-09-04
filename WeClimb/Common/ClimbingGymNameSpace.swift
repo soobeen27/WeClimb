@@ -14,9 +14,9 @@ enum ClimbingGymNameSpace {
     
     // GymHeaderView
     static let profileName = "000클라이밍"
-    static var followersCount: Int = 1999
+    static var totalFollow: Int = 1999
     static var follower: String {
-        return "\(followersCount) 팔로워"
+        return "\(totalFollow) 팔로워"
     }
     static let segmentFirst = "세팅"
     static let segmentSecond = "정보"
