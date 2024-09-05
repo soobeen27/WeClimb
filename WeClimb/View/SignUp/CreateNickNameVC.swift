@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import RxSwift
 
-class PersonalDetailsVC: UIViewController {
+class CreateNickNameVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private let viewModel = PersonalDetailsVM()
@@ -202,7 +202,7 @@ class PersonalDetailsVC: UIViewController {
     }
 }
 
-extension PersonalDetailsVC: UITextFieldDelegate {
+extension CreateNickNameVC: UITextFieldDelegate {
     // UITextFieldDelegate 메서드: 텍스트 입력 시 글자 수를 제한하는 로직
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         // 현재 텍스트 필드에 있는 텍스트와 새로 입력된 문자열을 합쳐서 미리 계산

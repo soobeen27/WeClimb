@@ -284,7 +284,7 @@ class PrivacyPolicyVC: UIViewController {
         
         confirmButton.rx.tap
             .subscribe(onNext: { [weak self] in
-                let personalDetailsVC = PersonalDetailsVC()
+                let personalDetailsVC = CreateNickNameVC()
                 self?.navigationController?.pushViewController(personalDetailsVC, animated: true)
             })
             .disposed(by: disposeBag)
