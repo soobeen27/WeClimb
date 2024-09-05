@@ -36,7 +36,7 @@
 		6B8F38B92C888F6B0018C40D /* PrivacyPolicyVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38B82C888F6A0018C40D /* PrivacyPolicyVC.swift */; };
 		6B8F38C72C894BC50018C40D /* CreateNickNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38C62C894BC50018C40D /* CreateNickNameVC.swift */; };
 		6B8F38CB2C8955350018C40D /* PrivacyPolicyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */; };
-		6B8F38CD2C8989D10018C40D /* PersonalDetailsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38CC2C8989D10018C40D /* PersonalDetailsVM.swift */; };
+		6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38CC2C8989D10018C40D /* CreateNickNameVM.swift */; };
 		6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */; };
 		6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */; };
 		6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */; };
@@ -119,7 +119,7 @@
 		6B8F38B82C888F6A0018C40D /* PrivacyPolicyVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyVC.swift; sourceTree = "<group>"; };
 		6B8F38C62C894BC50018C40D /* CreateNickNameVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNickNameVC.swift; sourceTree = "<group>"; };
 		6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyVM.swift; sourceTree = "<group>"; };
-		6B8F38CC2C8989D10018C40D /* PersonalDetailsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalDetailsVM.swift; sourceTree = "<group>"; };
+		6B8F38CC2C8989D10018C40D /* CreateNickNameVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNickNameVM.swift; sourceTree = "<group>"; };
 		6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionDetailTableViewCell.swift; sourceTree = "<group>"; };
 		6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDeatilGymVC.swift; sourceTree = "<group>"; };
 		6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDetailGymVM.swift; sourceTree = "<group>"; };
@@ -235,7 +235,7 @@
 			isa = PBXGroup;
 			children = (
 				6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */,
-				6B8F38CC2C8989D10018C40D /* PersonalDetailsVM.swift */,
+				6B8F38CC2C8989D10018C40D /* CreateNickNameVM.swift */,
 			);
 			path = SignUpVM;
 			sourceTree = "<group>";
@@ -538,7 +538,7 @@
 				F4892C142C7C973800C5FF16 /* TabBarController.swift in Sources */,
 				F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */,
 				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
-				6B8F38CD2C8989D10018C40D /* PersonalDetailsVM.swift in Sources */,
+				6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */,
 				43A79AD02C83380F00B960A2 /* DetailEditVC.swift in Sources */,
 				916D64D02C848A540064B766 /* FeedView.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
