@@ -74,17 +74,25 @@ extension FeedView : UICollectionViewDelegate, UICollectionViewDataSource, UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedCell.className
-                                                            , for: indexPath) as? FeedCell
-        else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedCell.className, for: indexPath) as? FeedCell else {
+            return UICollectionViewCell()
+        }
         cell.configure(mediaItem: mediaItems[indexPath.row])
         return cell
     }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let pageIndex = round(scrollView.contentOffset.x / self.frame.width)
-                pageControl.currentPage = Int(pageIndex)
+
+        func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            // 현재 페이지 인덱스 계산
+            let pageIndex = round(scrollView.contentOffset.x / self.frame.width)
+            pageControl.currentPage = Int(pageIndex)
+            
+            // 셀의 비디오 재생 상태를 관리하기 위한 셀의 `configure(with:)` 메서드를 호출
+            for cell in collectionView.visibleCells as! [FeedCell] {
+                if let indexPath = collectionView.indexPath(for: cell ), indexPath.row == Int(pageIndex) {
+                    cell.configure(mediaItem: mediaItems[indexPath.row])
+                } else {
+                    cell.stopVideo()
+                }
+            }
+        }
     }
-    
-    
-}

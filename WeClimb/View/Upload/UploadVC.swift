@@ -27,9 +27,8 @@ class UploadVC: UIViewController {
         return scroll
     }()
     
-    private let gymView = UploadOptionView()
-    
-    private let levelView = UploadOptionView()
+    private let gymView = UploadOptionView(symbolImage: UIImage(systemName: "figure.climbing") ?? UIImage(), optionText: UploadNameSpace.selectGym)
+    private let levelView = UploadOptionView(symbolImage: UIImage(systemName: "flag") ?? UIImage(), optionText: UploadNameSpace.selectSector)
     
     private lazy var contentView: UIView = {
         let view = UIView()
@@ -146,6 +145,7 @@ class UploadVC: UIViewController {
     
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        
         [scrollView, postButton]
             .forEach {
                 view.addSubview($0)

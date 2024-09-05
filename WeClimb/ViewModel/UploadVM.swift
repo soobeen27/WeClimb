@@ -12,7 +12,17 @@ import RxCocoa
 import RxSwift
 
 class UploadVM {
+    // 피커뷰
     var mediaItems = BehaviorRelay(value: [PHPickerResult]())
     
-    private let disposeBag = DisposeBag()
+    let navigateToGymPage = PublishSubject<Void>()
+    let showDropDownMenu = PublishSubject<Void>()
+    
+    func optionSelected(optionText: String) {
+        if optionText == UploadNameSpace.selectGym {
+            navigateToGymPage.onNext(())
+        } else if optionText == UploadNameSpace.selectSector {
+            showDropDownMenu.onNext(())
+        }
+    }
 }
