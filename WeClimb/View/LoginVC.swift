@@ -108,6 +108,7 @@ class LoginVC: UIViewController {
         guestLoginButton.rx.tap
             .bind { [weak self] in
                 self?.navigationController?.pushViewController(TabBarController(), animated: true)
+                print("비회원 로그인 성공")
                 //탭바로 넘어갈 때 네비게이션바 가리기
                 self?.navigationController?.setNavigationBarHidden(true, animated: true)
             }
@@ -340,7 +341,6 @@ extension LoginVC {
                     completion(oauthToken?.idToken)
                 }
             }
-            
         }
     }
 }

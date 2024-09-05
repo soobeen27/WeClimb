@@ -82,6 +82,9 @@ class EditPageVC: UIViewController {
         editPageViewModel.items
             .bind(to: tableView.rx.items(cellIdentifier: EditPageCell.className, cellType: EditPageCell.self)) { row, item, cell in
                 cell.configure(with: item)
+              
+              //셀 선택 스타일을 없애서 라인이 사라지지 않도록 설정(SB)
+              cell.selectionStyle = .none
             }
             .disposed(by: disposeBag)
         

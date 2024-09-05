@@ -1,15 +1,15 @@
 //
-//  MyPageModalVC.swift
+//  SFCollectionViewCell.swift
 //  WeClimb
 //
-//  Created by 김솔비 on 9/4/24.
+//  Created by 김솔비 on 9/5/24.
 //
 
 import UIKit
 
 import SnapKit
 
-class MyPageDetailFeedVC: UIViewController {
+class SFCollectionViewCell: UICollectionViewCell {
     
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -18,6 +18,7 @@ class MyPageDetailFeedVC: UIViewController {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.yourCollectionViewCellIdentifier)
         collectionView.backgroundColor = .gray
+        //        collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
         return collectionView
     }()
     
@@ -25,7 +26,8 @@ class MyPageDetailFeedVC: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
         label.textAlignment = .left
-        label.numberOfLines = 0
+        label.numberOfLines = 1  //1줄까지만 표시
+        label.lineBreakMode = .byTruncatingTail  //1줄 이상 시 ... 표기
         return label
     }()
     
@@ -34,7 +36,6 @@ class MyPageDetailFeedVC: UIViewController {
         Image.layer.cornerRadius = 20
         Image.clipsToBounds = true
         Image.layer.borderColor = UIColor.systemGray3.cgColor
-        Image.backgroundColor = .systemGray //데이터 연결 시 삭제
         return Image
     }()
     
@@ -94,20 +95,23 @@ class MyPageDetailFeedVC: UIViewController {
         return stackView
     }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         
         likeButton.configureHeartButton()
         setLayout()
-        configure()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("*T_T*")
     }
     
     private func setLayout() {
-        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
         [feedUserProfileImage, feedProfileStackView, collectionView, gymInfoStackView, likeStackView, feedCaptionLabel]
             .forEach {
-                view.addSubview($0)
+                contentView.addSubview($0)
             }
         [likeButton, likeButtonCounter]
             .forEach {
@@ -172,27 +176,20 @@ class MyPageDetailFeedVC: UIViewController {
         }
         feedUserProfileImage.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 40, height: 40))
-            $0.top.equalTo(view.safeAreaLayoutGuide).inset(16)
             $0.leading.equalToSuperview().inset(16)
         }
     }
     
-    private func configure(userProfileImage: UIImage? = nil, userName: String? = nil, address: String? = nil, caption: String? = nil, level: String? = nil, sector: String? = nil, dDay: String? = nil, likeCounter: String? = nil) {
-        feedUserProfileImage.image = userProfileImage ?? UIImage(named: "testImage")
-        feedUserNameLabel.text = userName ?? "김애옹"
-        feedProfileAddressLabel.text = address ?? "관악구 신림동"
-        feedCaptionLabel.text = caption ?? """
-        1. 언성이 높아지면 애옹체로 말하기 (ex:이거 시간안에 못끝내면 안된다애옹🐱)
-        2. 정기 회의는 일 2회 (10:00 / 19:00) 참여가 힘든경우 미리(최소 한시간 전) 말하기
-        3. 알잘딱
-        4. 잡담 많이하기
-        5. 불만있으면 바로 얘기하기
-        6. 19시 정기회의시 진행상황 간단하게 브리핑하는 시간 갖기
-        7. 고민이 30분 이상 넘어가면 바로 질문박기
-        """
-        levelLabel.text = level ?? "V6"
-        sectorLabel.text = sector ?? "1섹터"
-        dDayLabel.text = dDay ?? "D-14"
-        likeButtonCounter.text = likeCounter ?? "111"
+    func configure(userProfileImage: UIImage, userName: String, address: String, caption: String, level: String, sector: String, dDay: String, likeCounter: String) {
+        feedUserProfileImage.image = userProfileImage
+        feedUserNameLabel.text = userName
+        feedProfileAddressLabel.text = address
+        feedCaptionLabel.text = caption
+        levelLabel.text = level
+        sectorLabel.text = sector
+        dDayLabel.text = dDay
+        likeButtonCounter.text = likeCounter
     }
 }
+
+
