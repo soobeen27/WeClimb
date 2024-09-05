@@ -18,7 +18,7 @@ class PersonalDetailsVC: UIViewController {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "어떤 프로필로 참여할까요?"
-        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
         label.textColor = .black
         return label
     }()
@@ -27,7 +27,7 @@ class PersonalDetailsVC: UIViewController {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "testStone") // 기본 프로필 이미지
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 60
+        imageView.layer.cornerRadius = 55
         imageView.clipsToBounds = true
         return imageView
     }()
@@ -69,12 +69,56 @@ class PersonalDetailsVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         bindViewModel()
+        setNavigationBar()
         
         nicknameTextField.delegate = self
+        registerForKeyboardNotifications()
+    }
+    
+    private func setNavigationBar() {
+        self.title = ""
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.shadowColor = .clear
+        
+        appearance.largeTitleTextAttributes = [
+            NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 1),
+            NSAttributedString.Key.foregroundColor: UIColor.mainPurple
+        ]
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+    }
+    
+    // 키보드 알림 등록
+    private func registerForKeyboardNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    // 키보드 알림 해제
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // 키보드가 나타났을 때
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
+        if self.view.frame.origin.y == 0 {
+            self.view.frame.origin.y -= keyboardSize.height / 20// 뷰를 키보드 크기의 절반만큼 위로 이동
+        }
+    }
+    
+    // 키보드가 사라졌을 때
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        if self.view.frame.origin.y != 0 {
+            self.view.frame.origin.y = 0  // 뷰를 원래 위치로 복귀
+        }
     }
     
     private func setLayout() {
         view.backgroundColor = .white
+        navigationItem.largeTitleDisplayMode = .never
         
         [
             titleLabel,
@@ -86,7 +130,7 @@ class PersonalDetailsVC: UIViewController {
         ].forEach { view.addSubview($0) }
         
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(30)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(8)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.width.height.equalTo(40)
@@ -95,7 +139,7 @@ class PersonalDetailsVC: UIViewController {
         profileImageView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.top.equalTo(titleLabel.snp.bottom).offset(16)
-            $0.width.height.equalTo(120)
+            $0.width.height.equalTo(110)
         }
         
         addProfileImageButton.snp.makeConstraints {
@@ -143,6 +187,18 @@ class PersonalDetailsVC: UIViewController {
         viewModel.nicknameCharacterCount
             .bind(to: characterCountLabel.rx.text)
             .disposed(by: disposeBag)
+        
+        // 네비게이션
+        confirmButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                let tabBarController = TabBarController()
+                self?.navigationController?.pushViewController(tabBarController, animated: true)
+                //탭바로 넘어갈 때 네비게이션바 가리기
+                self?.navigationController?.setNavigationBarHidden(true, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        
     }
 }
 
@@ -156,5 +212,5 @@ extension PersonalDetailsVC: UITextFieldDelegate {
         // 글자 수가 12자 이하면 true, 초과하면 false로 입력을 막음
         return newText.count <= 12
     }
-
+    
 }

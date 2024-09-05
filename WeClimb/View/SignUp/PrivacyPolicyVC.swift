@@ -17,16 +17,8 @@ class PrivacyPolicyVC: UIViewController {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "WeClimb"
-        label.font = UIFont.boldSystemFont(ofSize: 24)
-        label.textColor = UIColor.mainPurple
-        return label
-    }()
-    
-    private let titleSubLabel: UILabel = {
-        let label = UILabel()
         label.text = "서비스 이용에 동의해\n주세요!"
-        label.font = UIFont.boldSystemFont(ofSize: 24)
+        label.font = UIFont.boldSystemFont(ofSize: 20)
         label.numberOfLines = 2
         label.textColor = UIColor.black
         return label
@@ -110,12 +102,32 @@ class PrivacyPolicyVC: UIViewController {
         bindViewModel()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setNavigationBar()
+    }
+    
+    private func setNavigationBar() {
+        self.title = "WeClimb"
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.shadowColor = .clear
+        
+        appearance.largeTitleTextAttributes = [
+            NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 32),
+            NSAttributedString.Key.foregroundColor: UIColor.mainPurple
+        ]
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+    }
+    
     private func setLayout() {
         view.backgroundColor = .white
         
         [
             titleLabel,
-            titleSubLabel,
             allAgreeCheckBox,
             termsCheckBox1,
             termsCheckBox2,
@@ -123,21 +135,15 @@ class PrivacyPolicyVC: UIViewController {
             termsCheckBox4,
             confirmButton
         ].forEach { view.addSubview($0) }
-        
+    
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(30)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
-        }
-        
-        titleSubLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(8)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
         }
         
         allAgreeCheckBox.snp.makeConstraints {
-            $0.top.equalTo(titleSubLabel.snp.bottom).offset(30)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(30)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.height.equalTo(50)
@@ -273,6 +279,13 @@ class PrivacyPolicyVC: UIViewController {
         termsCheckBox4.rx.tap // 선택 항목에 대한 액션 처리
             .subscribe(onNext: { [weak self] in
                 self?.viewModel.toggleTerms4()
+            })
+            .disposed(by: disposeBag)
+        
+        confirmButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                let personalDetailsVC = PersonalDetailsVC()
+                self?.navigationController?.pushViewController(personalDetailsVC, animated: true)
             })
             .disposed(by: disposeBag)
     }

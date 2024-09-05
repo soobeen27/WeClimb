@@ -52,5 +52,6 @@ class PrivacyPolicyVM {
         isTerms1Agreed.accept(newState)
         isTerms2Agreed.accept(newState)
         isTerms3Agreed.accept(newState)
+        isTerms4Agreed.accept(newState)
     }
 }
