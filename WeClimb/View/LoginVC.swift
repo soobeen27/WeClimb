@@ -314,6 +314,34 @@ extension LoginVC: ASAuthorizationControllerDelegate {
 
 //MARK: - 카카오 로그인
 extension LoginVC {
+//    func startKakaoFirebaseLoginFlow(){
+//        print(#fileID, #function, #line, "-")
+//        fetchKakaoOpenIDToken(completion: { idToken in
+//            guard let idToken = idToken else { return }
+//            
+//            let credential = OAuthProvider.credential(
+//                withProviderID: "oidc.kakao",  // As registered in Firebase console.
+//                idToken: idToken,  // ID token from OpenID Connect flow.
+//                // 파이어베이스 문서에서 rawNonce: nil로 써있지만 rawNonce가 String이라 nil이 안된다고 오류가 떠서 ""로 임시 조치함
+//                rawNonce: ""
+//            )
+//            Auth.auth().signIn(with: credential) { authResult, error in
+//                if error != nil {
+//                    print("Error signing in with Kakao: \(error?.localizedDescription ?? "")")
+//                    return
+//                }
+//                print("Kakao login successful, saving user to Firestore.")
+//                if let user = authResult?.user {
+//                    self.saveUserToFirestoreWithSerialNumber(user: user, loginType: "kakao") {
+//                        self.navigateToMainFeedVC()
+//                    }
+//                }
+//                // User is signed in.
+//                // IdP data available in authResult?.additionalUserInfo?.profile
+//                print(#fileID, #function, #line, "- 카카오 로그인 성공")
+//            }
+//        })
+//    }
     func startKakaoFirebaseLoginFlow(){
         print(#fileID, #function, #line, "-")
         fetchKakaoOpenIDToken(completion: { idToken in
@@ -370,101 +398,102 @@ extension LoginVC {
             }
         }
     }
-
-    func runTransactionToUpdateSerialNumber(user: FirebaseAuth.User, loginType: String, serialNumberRef: DocumentReference, completion: @escaping () -> Void) {
-        let db = Firestore.firestore()
         
-        db.runTransaction({ (transaction, errorPointer) -> Any? in
-            let serialNumberDoc: DocumentSnapshot
-            do {
-                serialNumberDoc = try transaction.getDocument(serialNumberRef)
-            } catch {
-                print("Error fetching document in transaction: \(error.localizedDescription)")
+        func runTransactionToUpdateSerialNumber(user: FirebaseAuth.User, loginType: String, serialNumberRef: DocumentReference, completion: @escaping () -> Void) {
+            let db = Firestore.firestore()
+            
+            db.runTransaction({ (transaction, errorPointer) -> Any? in
+                let serialNumberDoc: DocumentSnapshot
+                do {
+                    serialNumberDoc = try transaction.getDocument(serialNumberRef)
+                } catch {
+                    print("Error fetching document in transaction: \(error.localizedDescription)")
+                    return nil
+                }
+                
+                var currentSerialNumber = serialNumberDoc.data()?["serialNumber"] as? Int ?? 0
+                let nextSerialNumber = currentSerialNumber + 1
+                transaction.updateData(["serialNumber": nextSerialNumber], forDocument: serialNumberRef)
+                
+                let now = Timestamp(date: Date())
+                let userData: [String: Any] = [
+                    "authToken": user.uid,
+                    "lastModified": now,
+                    "loginType": loginType,
+                    "registrationDate": now,
+                    "userName": user.displayName ?? "홍길동",
+                    "userRole": "user",
+                    "userSerialNumber": nextSerialNumber
+                ]
+                
+                // 사용자 데이터를 설정
+                transaction.setData(userData, forDocument: db.collection("users").document(user.uid))
+                
+                // 하위 컬렉션 userDetails 생성 및 기본 데이터 추가
+                // codable
+                let userDetailsData: [String: Any] = [
+                    "profileImage": "", // 기본 프로필 이미지 URL
+                    "nickname": user.displayName ?? "홍길동", // 기본 닉네임
+                    "height": 0, // 기본 키 (예시로 0으로 설정)
+                    "armReach": 0, // 기본 암리치 (예시로 0으로 설정)
+                    "region": "", // 기본 지역
+                    "followers": [], // 팔로워 목록 (배열)
+                    "following": [] // 팔로잉 목록 (배열)
+                ]
+                
+                let userDetailsRef = db.collection("users").document(user.uid).collection("userDetails").document("details")
+                transaction.setData(userDetailsData, forDocument: userDetailsRef)
+                
                 return nil
+            }) { (object, error) in
+                if let error = error {
+                    print("Error saving user with serial number: \(error.localizedDescription)")
+                } else {
+                    print("User and userDetails successfully saved!")
+                }
+                completion()
             }
-            
-            var currentSerialNumber = serialNumberDoc.data()?["serialNumber"] as? Int ?? 0
-            let nextSerialNumber = currentSerialNumber + 1
-            transaction.updateData(["serialNumber": nextSerialNumber], forDocument: serialNumberRef)
-            
-            let now = Timestamp(date: Date())
-            let userData: [String: Any] = [
-                "authToken": user.uid,
-                "lastModified": now,
-                "loginType": loginType,
-                "registrationDate": now,
-                "userName": user.displayName ?? "홍길동",
-                "userRole": "user",
-                "userSerialNumber": nextSerialNumber
-            ]
-            
-            // 사용자 데이터를 설정
-            transaction.setData(userData, forDocument: db.collection("users").document(user.uid))
-            
-            // 하위 컬렉션 userDetails 생성 및 기본 데이터 추가
-            // codable
-            let userDetailsData: [String: Any] = [
-                "profileImage": "", // 기본 프로필 이미지 URL
-                "nickname": user.displayName ?? "홍길동", // 기본 닉네임
-                "height": 0, // 기본 키 (예시로 0으로 설정)
-                "armReach": 0, // 기본 암리치 (예시로 0으로 설정)
-                "region": "", // 기본 지역
-                "followers": [], // 팔로워 목록 (배열)
-                "following": [] // 팔로잉 목록 (배열)
-            ]
-            
-            let userDetailsRef = db.collection("users").document(user.uid).collection("userDetails").document("details")
-            transaction.setData(userDetailsData, forDocument: userDetailsRef)
-            
-            return nil
-        }) { (object, error) in
-            if let error = error {
-                print("Error saving user with serial number: \(error.localizedDescription)")
+        }
+        
+        func navigateToMainFeedVC() {
+            let TabBarController = TabBarController()
+            navigationController?.pushViewController(TabBarController, animated: true)
+            self.navigationController?.setNavigationBarHidden(true, animated: true)
+        }
+        
+        // 카카오 로그인 하고 OpenID 토큰 가져오기
+        func fetchKakaoOpenIDToken(completion: @escaping (String?) -> Void){
+            // 카카오톡이 설치되어 있다면
+            if (UserApi.isKakaoTalkLoginAvailable()) {
+                // 카카오톡으로 로그인
+                UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
+                    if let error = error {
+                        print(error)
+                    }
+                    else {
+                        print("loginWithKakaoTalk() success.")
+                        
+                        //do something
+                        _ = oauthToken
+                        completion(oauthToken?.idToken)
+                    }
+                }
             } else {
-                print("User and userDetails successfully saved!")
+                // 웹 브라우저로 로그인 시도
+                UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
+                    if let error = error {
+                        print(error)
+                    }
+                    else {
+                        print("loginWithKakaoAccount() success.")
+                        
+                        //do something
+                        _ = oauthToken
+                        completion(oauthToken?.idToken)
+                    }
+                }
+                
             }
-            completion()
         }
     }
-    
-    func navigateToMainFeedVC() {
-        let TabBarController = TabBarController()
-        navigationController?.pushViewController(TabBarController, animated: true)
-        self.navigationController?.setNavigationBarHidden(true, animated: true)
-    }
-    
-    // 카카오 로그인 하고 OpenID 토큰 가져오기
-    func fetchKakaoOpenIDToken(completion: @escaping (String?) -> Void){
-        // 카카오톡이 설치되어 있다면
-        if (UserApi.isKakaoTalkLoginAvailable()) {
-            // 카카오톡으로 로그인
-            UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
-                if let error = error {
-                    print(error)
-                }
-                else {
-                    print("loginWithKakaoTalk() success.")
-                    
-                    //do something
-                    _ = oauthToken
-                    completion(oauthToken?.idToken)
-                }
-            }
-        } else {
-            // 웹 브라우저로 로그인 시도
-            UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
-                if let error = error {
-                    print(error)
-                }
-                else {
-                    print("loginWithKakaoAccount() success.")
-                    
-                    //do something
-                    _ = oauthToken
-                    completion(oauthToken?.idToken)
-                }
-            }
-            
-        }
-    }
-}
+
