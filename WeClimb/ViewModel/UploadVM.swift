@@ -15,14 +15,7 @@ class UploadVM {
     // 피커뷰
     var mediaItems = BehaviorRelay(value: [PHPickerResult]())
     
-    let navigateToGymPage = PublishSubject<Void>()
-    let showDropDownMenu = PublishSubject<Void>()
-    
     func optionSelected(optionText: String) {
-        if optionText == UploadNameSpace.selectGym {
-            navigateToGymPage.onNext(())
-        } else if optionText == UploadNameSpace.selectSector {
-            showDropDownMenu.onNext(())
-        }
+        print("선택된 옵션: \(optionText)")
     }
 }

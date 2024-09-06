@@ -84,11 +84,12 @@ class UploadVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = UploadNameSpace.title
         textView.delegate = self
         setLayout()
         mediaItemsBind()
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
+        setGymView()
+        setlevelView()
     }
     
     @objc
@@ -135,6 +136,48 @@ class UploadVC: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func setGymView() {
+        let gymTapGesture = UITapGestureRecognizer()
+        gymView.isUserInteractionEnabled = true
+        gymView.addGestureRecognizer(gymTapGesture)
+        
+        gymTapGesture.rx.event
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] _ in
+                guard let self = self else { return }
+                // 화면 전환
+                let searchVC = SearchVC()
+                let navigationController = UINavigationController(rootViewController: searchVC)
+                navigationController.modalPresentationStyle = .pageSheet
+                self.present(navigationController, animated: true, completion: nil)
+            }
+            .disposed(by: disposeBag)
+    }
+
+    private func setlevelView() {
+        let button = UIButton(primaryAction: nil)
+        
+        let menuItems: [UIAction] = ["섹터 1", "섹터 2", "섹터 3"].map { sector in
+            UIAction(title: sector) { [weak self] _ in
+                self?.viewModel.optionSelected(optionText: sector)
+            }
+        }
+    
+        let menu = UIMenu(title: "", options: .displayInline, children: menuItems)
+        
+        button.menu = menu
+        button.showsMenuAsPrimaryAction = true  // 버튼을 탭하면 메뉴 노출
+        button.backgroundColor = .clear
+
+        levelView.addSubview(button)
+        
+        button.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview()
+            $0.trailing.equalToSuperview()
+            $0.width.equalTo(levelView).multipliedBy(0.5) // levelView의 절반
+        }
     }
     
     func removeAllSubview(view: UIView) {
