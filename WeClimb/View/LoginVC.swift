@@ -92,7 +92,8 @@ class LoginVC: UIViewController {
                         self.navigationController?.pushViewController(tabBarVC, animated: true)
                     case .createAccount:
                         // 회원가입 페이지 푸시
-                        print("회원가입 페이지 ㄱㄱ")
+                        let signUpVC = CreateNickNameVC()
+                        self.navigationController?.pushViewController(signUpVC, animated: true)
                     }
                 }
             }
