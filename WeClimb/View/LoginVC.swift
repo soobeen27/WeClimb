@@ -23,6 +23,10 @@ import KakaoSDKUser
 
 
 class LoginVC: UIViewController {
+
+    private lazy var viewModel: LoginVM = {
+       return LoginVM()
+    }()
     
     private let disposeBag = DisposeBag()
     fileprivate var currentNonce: String?
@@ -36,34 +40,31 @@ class LoginVC: UIViewController {
         return label
     }()
     
-    private let kakaoLoginButton = {
+    private let kakaoLoginButton: UIButton = {
         let button = UIButton(type: .system)
         if let buttonImage = UIImage(named: "Kakao_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
-            button.addTarget(self, action: #selector(kakaoLoginTapped), for: .touchUpInside)
         }
         return button
     }()
     
-    private let appleLoginButton = {
+    private let appleLoginButton: UIButton = {
         let button = UIButton(type: .system)
         if let buttonImage = UIImage(named: "Apple_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
-            button.addTarget(self, action: #selector(appleLoginTapped), for: .touchUpInside)
         }
         return button
     }()
     
-    private let googleLoginButton = {
+    private let googleLoginButton: UIButton = {
         let button = UIButton(type: .system)
         if let buttonImage = UIImage(named: "Google_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
-            button.addTarget(self, action: #selector(googleLoginTapped), for: .touchUpInside)
         }
         return button
     }()
     
-    private let guestLoginButton = {
+    private let guestLoginButton: UIButton = {
         let button = UIButton()
         button.setTitle("비회원으로 둘러보기", for: .normal)
         button.setTitleColor(.darkGray, for: .normal)
@@ -71,7 +72,7 @@ class LoginVC: UIViewController {
         return button
     }()
     
-    private let buttonStackView = {
+    private let buttonStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 15
@@ -79,16 +80,24 @@ class LoginVC: UIViewController {
     }()
     
     // MARK: - 버튼 이벤트
-    @objc func googleLoginTapped() {
-        startGoogleLoginFlow()
-    }
-    
-    @objc func kakaoLoginTapped() {
-        startKakaoFirebaseLoginFlow()
-    }
-    
-    @objc func appleLoginTapped() {
-        startSignInWithAppleFlow()
+    func googleLoginButtonTapped() {
+        googleLoginButton.rx.tap.bind { [weak self] in
+            guard let self else { return }
+            self.viewModel.googleLogin(presenter: self) { credential in
+                self.viewModel.logIn(with: credential, loginType: .google) { result in
+                    switch result {
+                    case .login:
+                        print("success")
+                        let tabBarVC = TabBarController()
+                        self.navigationController?.pushViewController(tabBarVC, animated: true)
+                    case .createAccount:
+                        // 회원가입 페이지 푸시
+                        print("회원가입 페이지 ㄱㄱ")
+                    }
+                }
+            }
+        }
+        .disposed(by: disposeBag)
     }
     
     override func viewDidLoad() {
@@ -96,7 +105,7 @@ class LoginVC: UIViewController {
         print("loaded")
         
         autoLoginCheck()
-        
+        googleLoginButtonTapped()
         setLayout()
         buttonTapped()
     }
@@ -314,34 +323,6 @@ extension LoginVC: ASAuthorizationControllerDelegate {
 
 //MARK: - 카카오 로그인
 extension LoginVC {
-//    func startKakaoFirebaseLoginFlow(){
-//        print(#fileID, #function, #line, "-")
-//        fetchKakaoOpenIDToken(completion: { idToken in
-//            guard let idToken = idToken else { return }
-//            
-//            let credential = OAuthProvider.credential(
-//                withProviderID: "oidc.kakao",  // As registered in Firebase console.
-//                idToken: idToken,  // ID token from OpenID Connect flow.
-//                // 파이어베이스 문서에서 rawNonce: nil로 써있지만 rawNonce가 String이라 nil이 안된다고 오류가 떠서 ""로 임시 조치함
-//                rawNonce: ""
-//            )
-//            Auth.auth().signIn(with: credential) { authResult, error in
-//                if error != nil {
-//                    print("Error signing in with Kakao: \(error?.localizedDescription ?? "")")
-//                    return
-//                }
-//                print("Kakao login successful, saving user to Firestore.")
-//                if let user = authResult?.user {
-//                    self.saveUserToFirestoreWithSerialNumber(user: user, loginType: "kakao") {
-//                        self.navigateToMainFeedVC()
-//                    }
-//                }
-//                // User is signed in.
-//                // IdP data available in authResult?.additionalUserInfo?.profile
-//                print(#fileID, #function, #line, "- 카카오 로그인 성공")
-//            }
-//        })
-//    }
     func startKakaoFirebaseLoginFlow(){
         print(#fileID, #function, #line, "-")
         fetchKakaoOpenIDToken(completion: { idToken in
@@ -496,4 +477,3 @@ extension LoginVC {
             }
         }
     }
-
