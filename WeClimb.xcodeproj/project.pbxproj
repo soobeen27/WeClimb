@@ -33,6 +33,12 @@
 		6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6B376D2C85807800C9C87A /* GymHeaderView.swift */; };
 		6B8467BC2C85DDE9006B062D /* ClimbingGymInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */; };
 		6B8467BE2C86129B006B062D /* ClimbingGymNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */; };
+		6B8F38B92C888F6B0018C40D /* PrivacyPolicyVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38B82C888F6A0018C40D /* PrivacyPolicyVC.swift */; };
+		6B8F38C72C894BC50018C40D /* CreateNickNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38C62C894BC50018C40D /* CreateNickNameVC.swift */; };
+		6B8F38CB2C8955350018C40D /* PrivacyPolicyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */; };
+		6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38CC2C8989D10018C40D /* CreateNickNameVM.swift */; };
+		6B9033402C89DB1B0012D955 /* PersonalDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B90333F2C89DB1B0012D955 /* PersonalDetailsVC.swift */; };
+		6B9033422C8AAA5E0012D955 /* RangePickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9033412C8AAA5E0012D955 /* RangePickerVC.swift */; };
 		6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */; };
 		6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */; };
 		6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */; };
@@ -116,6 +122,12 @@
 		6B6B376D2C85807800C9C87A /* GymHeaderView.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = GymHeaderView.swift; sourceTree = "<group>"; tabWidth = 4; };
 		6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymInfoView.swift; sourceTree = "<group>"; };
 		6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ClimbingGymNameSpace.swift; sourceTree = "<group>"; tabWidth = 4; };
+		6B8F38B82C888F6A0018C40D /* PrivacyPolicyVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyVC.swift; sourceTree = "<group>"; };
+		6B8F38C62C894BC50018C40D /* CreateNickNameVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNickNameVC.swift; sourceTree = "<group>"; };
+		6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyVM.swift; sourceTree = "<group>"; };
+		6B8F38CC2C8989D10018C40D /* CreateNickNameVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNickNameVM.swift; sourceTree = "<group>"; };
+		6B90333F2C89DB1B0012D955 /* PersonalDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalDetailsVC.swift; sourceTree = "<group>"; };
+		6B9033412C8AAA5E0012D955 /* RangePickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangePickerVC.swift; sourceTree = "<group>"; };
 		6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionDetailTableViewCell.swift; sourceTree = "<group>"; };
 		6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDeatilGymVC.swift; sourceTree = "<group>"; };
 		6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDetailGymVM.swift; sourceTree = "<group>"; };
@@ -214,6 +226,35 @@
 			path = Search;
 			sourceTree = "<group>";
 		};
+		6B8F38B72C888F4E0018C40D /* SignUp */ = {
+			isa = PBXGroup;
+			children = (
+				6B8F38B82C888F6A0018C40D /* PrivacyPolicyVC.swift */,
+				6B9033412C8AAA5E0012D955 /* RangePickerVC.swift */,
+				6B8F38C62C894BC50018C40D /* CreateNickNameVC.swift */,
+				6B90333F2C89DB1B0012D955 /* PersonalDetailsVC.swift */,
+			);
+			path = SignUp;
+			sourceTree = "<group>";
+		};
+		6B8F38C82C8954FD0018C40D /* ClimbingGymVM */ = {
+			isa = PBXGroup;
+			children = (
+				6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */,
+				6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */,
+			);
+			path = ClimbingGymVM;
+			sourceTree = "<group>";
+		};
+		6B8F38C92C89551E0018C40D /* SignUpVM */ = {
+			isa = PBXGroup;
+			children = (
+				6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */,
+				6B8F38CC2C8989D10018C40D /* CreateNickNameVM.swift */,
+			);
+			path = SignUpVM;
+			sourceTree = "<group>";
+		};
 		6BC91F912C7CC79300B34083 /* ClimbingGym */ = {
 			isa = PBXGroup;
 			children = (
@@ -292,6 +333,7 @@
 		F4892C092C7C278500C5FF16 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				6B8F38B72C888F4E0018C40D /* SignUp */,
 				916D64D12C848BA70064B766 /* Feed */,
 				F4892C152C7C981000C5FF16 /* LoginVC.swift */,
 				C45DC9D32C80502E00FC4C1D /* MainFeed */,
@@ -320,10 +362,10 @@
 		F4892C0B2C7C279300C5FF16 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				6B8F38C92C89551E0018C40D /* SignUpVM */,
+				6B8F38C82C8954FD0018C40D /* ClimbingGymVM */,
 				F4892C112C7C27F500C5FF16 /* ExampleVM.swift */,
 				C4E29C162C806F170076BCA6 /* MainFeedVM.swift */,
-				6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */,
-				6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */,
 				F4892C232C7CBC8700C5FF16 /* UploadVM.swift */,
 				436AEAE12C7D69F000E0D85A /* SearchVM.swift */,
 				436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */,
@@ -467,8 +509,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				436AEAEE2C7EC1F500E0D85A /* MypageNameSpace.swift in Sources */,
+				6B8F38CB2C8955350018C40D /* PrivacyPolicyVM.swift in Sources */,
 				6B8467BE2C86129B006B062D /* ClimbingGymNameSpace.swift in Sources */,
 				F4892C1E2C7C98A100C5FF16 /* MyPageVC.swift in Sources */,
+				6B8F38B92C888F6B0018C40D /* PrivacyPolicyVC.swift in Sources */,
 				435B7E422C8024AB00EB9816 /* EditPageVC.swift in Sources */,
 				6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */,
 				F4892C122C7C27F500C5FF16 /* ExampleVM.swift in Sources */,
@@ -479,7 +523,9 @@
 				F4892C182C7C983A00C5FF16 /* MainFeedVC.swift in Sources */,
 				436AEAF82C7F0EEE00E0D85A /* SearchModel.swift in Sources */,
 				43A79ACC2C819CB200B960A2 /* EditPageVM.swift in Sources */,
+				6B9033422C8AAA5E0012D955 /* RangePickerVC.swift in Sources */,
 				43A79AE02C85BB7E00B960A2 /* SettingVM.swift in Sources */,
+				6B9033402C89DB1B0012D955 /* PersonalDetailsVC.swift in Sources */,
 				F4892C162C7C981000C5FF16 /* LoginVC.swift in Sources */,
 				43A79AE22C85BD3B00B960A2 /* SettingModel.swift in Sources */,
 				F4892C102C7C27D800C5FF16 /* ExampleModel.swift in Sources */,
@@ -498,6 +544,7 @@
 				43A79ACA2C81717500B960A2 /* EditPageCell.swift in Sources */,
 				C4E29C1F2C898DC80076BCA6 /* SFCollectionViewCell.swift in Sources */,
 				436AEAE02C7D69CB00E0D85A /* SearchTableViewCell.swift in Sources */,
+				6B8F38C72C894BC50018C40D /* CreateNickNameVC.swift in Sources */,
 				C4E29C172C806F170076BCA6 /* MainFeedVM.swift in Sources */,
 				C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */,
 				916D64D32C848BE00064B766 /* FeedCell.swift in Sources */,
@@ -515,6 +562,7 @@
 				F4892C142C7C973800C5FF16 /* TabBarController.swift in Sources */,
 				F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */,
 				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
+				6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */,
 				43A79AD02C83380F00B960A2 /* DetailEditVC.swift in Sources */,
 				916D64D02C848A540064B766 /* FeedView.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
