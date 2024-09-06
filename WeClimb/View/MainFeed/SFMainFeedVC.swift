@@ -8,8 +8,12 @@
 import UIKit
 
 import SnapKit
+import RxSwift
+import RxCocoa
 
 class SFMainFeedVC: UIViewController {
+    
+    private let disposeBag = DisposeBag()
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -23,10 +27,13 @@ class SFMainFeedVC: UIViewController {
         super.viewDidLoad()
         
         setNavigationBar()
+        setTabBar()
         setCollectionView()
         setLayout()
     }
     
+    
+    //MARK: - 네비게이션바, 탭바 세팅
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: animated)
@@ -43,6 +50,17 @@ class SFMainFeedVC: UIViewController {
         self.navigationController?.navigationBar.isTranslucent = true
     }
     
+    private func setTabBar(){
+        if let tabBar = self.tabBarController?.tabBar {
+            tabBar.backgroundImage = UIImage()  //탭바 배경 투명하게 설정
+//            tabBar.shadowImage = UIImage()  //탭바 하단 그림자 제거
+            tabBar.isTranslucent = true  //탭바 반투명
+            tabBar.backgroundColor = .clear  //탭바 배경투명
+        }
+    }
+    
+
+    //MARK: - 컬렉션뷰 & 레이아웃 설정
     private func setCollectionView() {
         collectionView.register(SFCollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.mainCollectionViewCell)
         
@@ -56,6 +74,7 @@ class SFMainFeedVC: UIViewController {
 //        collectionView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)  //스크롤 인디케이터 위치 조정(효과없음)
     }
     
+    
     private func setLayout() {
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints {
@@ -63,6 +82,7 @@ class SFMainFeedVC: UIViewController {
         }
     }
 }
+
 
 //MARK: - 컬렉션뷰 프로토콜 설정
 extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -81,9 +101,10 @@ extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlow
                            address: "서울시 관악구 신림동",
                            caption: "클라이밍 재밌다아아아아아아아아아아아아아아아아아아아아아아아아아",
                            level: "V6",
-                           sector: "S1",
-                           dDay: "D14",
-                           likeCounter: "444")
+                           sector: "1섹터",
+                           dDay: "D-14",
+                           likeCounter: "330",
+                           commentCounter: "17")
         }
         return cell
     }

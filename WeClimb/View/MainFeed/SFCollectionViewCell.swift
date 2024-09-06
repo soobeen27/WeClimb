@@ -11,7 +11,9 @@ import SnapKit
 
 class SFCollectionViewCell: UICollectionViewCell {
     
+    var commentButtonTapped: (() -> Void)? // 클로저 정의
     
+    //MARK: - UI 세팅
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal //가로 스크롤
@@ -71,23 +73,55 @@ class SFCollectionViewCell: UICollectionViewCell {
     private let levelLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
-        label.backgroundColor = .mainPurple
+        label.backgroundColor = .mainPurple.withAlphaComponent(0.5)
         label.clipsToBounds = true
         return label
     }()
     
-    private let sectorLabel = UILabel()
+    private let sectorLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+        return label
+    }()
     
-    private let dDayLabel = UILabel()
+    private let dDayLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+        return label
+    }()
     
     private let likeButton = UIButton()
-    
+
     private let likeButtonCounter: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 15)
+        label.font = .systemFont(ofSize: 15, weight: .light)
         label.textColor = .white
         label.textAlignment = .center
         return label
+    }()
+    
+    let commentButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "bubble"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.tintColor = .white
+        return button
+    }()
+    
+    private let commentButtonCounter: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 15, weight: .light)
+        label.textColor = .white
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private let ellipsisButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.tintColor = .white
+        return button
     }()
     
     private let feedProfileStackView: UIStackView = {
@@ -99,7 +133,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     private let gymInfoStackView: UIStackView = {
         let stackView = UIStackView()
-        stackView.axis = .vertical
+        stackView.axis = .horizontal
         stackView.spacing = 15
         return stackView
     }()
@@ -111,6 +145,15 @@ class SFCollectionViewCell: UICollectionViewCell {
         return stackView
     }()
     
+    private let commentStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 3
+        return stackView
+    }()
+    
+
+    //MARK: - 코드 시작
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -134,21 +177,21 @@ class SFCollectionViewCell: UICollectionViewCell {
     }
     
     private func setCollectionView() {
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.collectionViewCell)
+        
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.collectionViewCell)
         
         collectionView.isPagingEnabled = true
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)  //컬렉션뷰 상단좌우 여백 삭제
-//        collectionView.contentInsetAdjustmentBehavior = .always  //네비게이션바 아래에서 컬렉션뷰 시작하기(효과없음)
-//        collectionView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)  //스크롤 인디케이터 위치(효과없음)
     }
     
+    
+    //MARK: - 레이아웃 설정
     private func setLayout() {
-//        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         self.backgroundColor = UIColor(hex: "#0C1014")
         self.addSubview(collectionView)
-        [feedProfileStackView, followButton, likeStackView, gymInfoStackView, feedCaptionLabel]
+        [feedProfileStackView, followButton, likeStackView, commentStackView, gymInfoStackView, feedCaptionLabel, ellipsisButton]
             .forEach {
                 self.addSubview($0)
             }
@@ -159,16 +202,21 @@ class SFCollectionViewCell: UICollectionViewCell {
         [likeButton, likeButtonCounter]
             .forEach {
                 likeStackView.addArrangedSubview($0)
+            }        
+        [commentButton, commentButtonCounter]
+            .forEach {
+                commentStackView.addArrangedSubview($0)
             }
         [levelLabel, sectorLabel, dDayLabel]
             .forEach {
                 gymInfoStackView.addArrangedSubview($0)
-                $0.font = .systemFont(ofSize: 15)
+                $0.font = .systemFont(ofSize: 13)
                 $0.textColor = .white
                 $0.textAlignment = .center
-                $0.layer.cornerRadius = 10
+                $0.layer.cornerRadius = 5
                 $0.layer.borderWidth = 0.5
                 $0.layer.borderColor = UIColor.systemGray3.cgColor
+                $0.layer.masksToBounds = true // 코너를 넘지 않도록 설정
             }
         
         collectionView.snp.makeConstraints {
@@ -186,40 +234,61 @@ class SFCollectionViewCell: UICollectionViewCell {
             $0.size.equalTo(CGSize(width: 100, height: 40))
         }
         followButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 45, height: 20))
+            $0.size.equalTo(CGSize(width: 50, height: 20))
             $0.centerY.equalTo(feedProfileStackView.snp.centerY)
-            $0.leading.equalTo(feedProfileStackView.snp.trailing).offset(7)
+            $0.leading.equalTo(feedProfileStackView.snp.trailing)
         }
         feedCaptionLabel.snp.makeConstraints {
-            $0.top.equalTo(feedProfileStackView.snp.bottom).offset(15)
+            $0.top.equalTo(feedProfileStackView.snp.bottom).offset(12)
             $0.leading.trailing.equalToSuperview().inset(16)
+        }        
+        gymInfoStackView.snp.makeConstraints {
+            $0.top.equalTo(feedCaptionLabel.snp.bottom).offset(12)
+            $0.leading.equalToSuperview().inset(16)
+        }
+        levelLabel.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 45, height: 20))
+        }
+        sectorLabel.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 45, height: 20))
+        }
+        dDayLabel.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 45, height: 20))
         }
         likeStackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.5)
+            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.5)  //기기화면 절반
             $0.trailing.equalToSuperview().inset(16)
         }
         likeButton.imageView?.snp.makeConstraints {
-            $0.width.height.equalTo(40)
+            $0.size.equalTo(CGSize(width: 40, height: 35))
         }
         likeButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 40, height: 40))
+            $0.size.equalTo(CGSize(width: 40, height: 35))
         }
-        gymInfoStackView.snp.makeConstraints {
-            $0.top.equalTo(likeStackView.snp.bottom).offset(15)
+        commentStackView.snp.makeConstraints {
+            $0.top.equalTo(likeStackView.snp.bottom).offset(20)
             $0.trailing.equalToSuperview().inset(16)
         }
-        levelLabel.snp.makeConstraints {
+        commentButton.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 40, height: 40))
+            $0.top.equalTo(likeStackView.snp.bottom).offset(20)
         }
-        sectorLabel.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 40, height: 40))
+        commentButton.imageView?.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 35, height: 35))
         }
-        dDayLabel.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 40, height: 40))
+        ellipsisButton.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 40, height: 22))
+            $0.top.equalTo(self.safeAreaLayoutGuide).offset(15)
+            $0.trailing.equalToSuperview().inset(16)
+        }
+        ellipsisButton.imageView?.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 40, height: 22))     
         }
     }
+  
     
-    func configure(userProfileImage: UIImage, userName: String, address: String, caption: String, level: String, sector: String, dDay: String, likeCounter: String) {
+    //MARK: - configure
+    func configure(userProfileImage: UIImage, userName: String, address: String, caption: String, level: String, sector: String, dDay: String, likeCounter: String, commentCounter: String) {
         feedUserProfileImage.image = userProfileImage
         feedUserNameLabel.text = userName
         feedProfileAddressLabel.text = address
@@ -228,10 +297,12 @@ class SFCollectionViewCell: UICollectionViewCell {
         sectorLabel.text = sector
         dDayLabel.text = dDay
         likeButtonCounter.text = likeCounter
+        commentButtonCounter.text = commentCounter
     }
 }
 
 
+    //MARK: - 컬렉션뷰 프로토콜 설정
 extension SFCollectionViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 1
@@ -239,7 +310,7 @@ extension SFCollectionViewCell: UICollectionViewDelegate, UICollectionViewDataSo
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Identifiers.collectionViewCell, for: indexPath)
-        cell.backgroundColor = .systemPink
+        cell.backgroundColor = UIColor(hex: "#0C1014")
         print("내부 컬렉션뷰셀의 cellForItemAt 호출됨: \(indexPath)")
         return cell
     }
