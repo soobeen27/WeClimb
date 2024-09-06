@@ -9,10 +9,11 @@ import UIKit
 import PhotosUI
 
 import SnapKit
+import RxRelay
+import RxSwift
 
 class FeedView : UIView {
-    
-    var mediaItems: [PHPickerResult]
+    private var disposeBag = DisposeBag()
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -22,8 +23,6 @@ class FeedView : UIView {
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.isPagingEnabled = true
-        collectionView.delegate = self
-        collectionView.dataSource = self
         collectionView.register(FeedCell.self, forCellWithReuseIdentifier: FeedCell.className)
         collectionView.showsHorizontalScrollIndicator = false
         
@@ -32,7 +31,7 @@ class FeedView : UIView {
     
     private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
-        pageControl.numberOfPages = mediaItems.count
+        pageControl.numberOfPages = viewModel.mediaItems.count
         pageControl.currentPage = 0
         pageControl.pageIndicatorTintColor = .lightGray
         pageControl.currentPageIndicatorTintColor = .black
@@ -40,10 +39,13 @@ class FeedView : UIView {
         return pageControl
     }()
     
-    init(frame: CGRect, mediaItems: [PHPickerResult]) {
-        self.mediaItems = mediaItems
+    private let viewModel: FeedViewModel
+    
+    init(frame: CGRect, viewModel: FeedViewModel) {
+        self.viewModel = viewModel
         super.init(frame: frame)
         setLayout()
+        bind()
     }
     
     required init?(coder: NSCoder) {
@@ -65,34 +67,41 @@ class FeedView : UIView {
         }
     }
     
-    
-}
-
-extension FeedView : UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        mediaItems.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeedCell.className, for: indexPath) as? FeedCell else {
-            return UICollectionViewCell()
-        }
-        cell.configure(mediaItem: mediaItems[indexPath.row])
-        return cell
-    }
-
-        func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            // 현재 페이지 인덱스 계산
-            let pageIndex = round(scrollView.contentOffset.x / self.frame.width)
-            pageControl.currentPage = Int(pageIndex)
-            
-            // 셀의 비디오 재생 상태를 관리하기 위한 셀의 `configure(with:)` 메서드를 호출
-            for cell in collectionView.visibleCells as! [FeedCell] {
-                if let indexPath = collectionView.indexPath(for: cell ), indexPath.row == Int(pageIndex) {
-                    cell.configure(mediaItem: mediaItems[indexPath.row])
-                } else {
-                    cell.stopVideo()
+    private func bind() {
+        viewModel.feedRelay
+            .bind(to: collectionView.rx.items(
+                cellIdentifier: FeedCell.className, cellType: FeedCell.self)
+            ) { row, element, cell in
+                // 셀에 데이터 설정
+                cell.configure(with: element)
+                // 첫 번째 셀에 비디오 URL이 있다면 비디오 재생
+                if row == 0, element.videoURL != nil {
+                    cell.playVideo()
                 }
             }
-        }
+            .disposed(by: disposeBag)
+        
+        // 델리게이트 self 설정
+        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     }
+}
+
+extension FeedView : UICollectionViewDelegate {
+    // MARK: - 사용자가 스크롤을 할 때 호출
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // 현재 페이지 인덱스 계산
+        let pageIndex = Int(round(scrollView.contentOffset.x / self.frame.width))
+        pageControl.currentPage = pageIndex
+        
+        collectionView.visibleCells // 현재 화면에 표시되고 있는 셀들 반환
+            .enumerated()
+            .forEach { index, cell in
+                guard let feedCell = cell as? FeedCell else { return }
+                if index == pageIndex {
+                    feedCell.playVideo()
+                } else {
+                    feedCell.stopVideo()
+                }
+            }
+    }
+}

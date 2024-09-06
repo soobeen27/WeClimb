@@ -123,9 +123,11 @@ class UploadVC: UIViewController {
                 if self.viewModel.mediaItems.value == [] {
                     self.callPHPickerButton.isHidden = false
                 } else {
-                    let feed = FeedView(frame: CGRect(origin: CGPoint(), 
+                    let feedViewModel = FeedViewModel(mediaItems: items)
+                    let feed = FeedView(frame: CGRect(origin: CGPoint(),
                                                       size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
-                                        mediaItems: items)
+                                        viewModel: feedViewModel
+                    )
                     self.callPHPickerButton.isHidden = true
                     self.selectedMediaView.addSubview(feed)
                     
@@ -176,7 +178,7 @@ class UploadVC: UIViewController {
         button.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
             $0.trailing.equalToSuperview()
-            $0.width.equalTo(levelView).multipliedBy(0.5) // levelView의 절반
+            $0.width.equalTo(levelView).multipliedBy(2.0 / 3.0) // levelView의 2/3
         }
     }
     

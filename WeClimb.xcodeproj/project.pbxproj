@@ -29,6 +29,7 @@
 		43A79AE22C85BD3B00B960A2 /* SettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE12C85BD3B00B960A2 /* SettingModel.swift */; };
 		43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE32C85C3B800B960A2 /* SettingCell.swift */; };
 		43A79AE62C86CEFE00B960A2 /* SettingNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */; };
+		43EC6ACB2C8B5026004A2E2F /* FeedCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */; };
 		6B2815462C8572A800BE1D40 /* ClimbingGym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2815452C8572A800BE1D40 /* ClimbingGym.swift */; };
 		6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6B376D2C85807800C9C87A /* GymHeaderView.swift */; };
 		6B8467BC2C85DDE9006B062D /* ClimbingGymInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */; };
@@ -57,6 +58,7 @@
 		C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */; };
 		C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C45DC9D42C80519100FC4C1D /* FeedModel.swift */; };
 		C4E29C172C806F170076BCA6 /* MainFeedVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E29C162C806F170076BCA6 /* MainFeedVM.swift */; };
+		EFBC78D22C8AFA4900B6ED83 /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFBC78D12C8AFA4900B6ED83 /* FeedViewModel.swift */; };
 		F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892BE62C7C237700C5FF16 /* AppDelegate.swift */; };
 		F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */; };
 		F4892BF02C7C237900C5FF16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4892BEF2C7C237900C5FF16 /* Assets.xcassets */; };
@@ -108,6 +110,7 @@
 		43A79AE12C85BD3B00B960A2 /* SettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingModel.swift; sourceTree = "<group>"; };
 		43A79AE32C85C3B800B960A2 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
 		43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNameSpace.swift; sourceTree = "<group>"; };
+		43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCellModel.swift; sourceTree = "<group>"; };
 		6B2815452C8572A800BE1D40 /* ClimbingGym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGym.swift; sourceTree = "<group>"; };
 		6B6B376D2C85807800C9C87A /* GymHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymHeaderView.swift; sourceTree = "<group>"; };
 		6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymInfoView.swift; sourceTree = "<group>"; };
@@ -126,6 +129,7 @@
 		C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedTabelCell.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C45DC9D42C80519100FC4C1D /* FeedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedModel.swift; sourceTree = "<group>"; };
 		C4E29C162C806F170076BCA6 /* MainFeedVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFeedVM.swift; sourceTree = "<group>"; };
+		EFBC78D12C8AFA4900B6ED83 /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
 		F4892BE32C7C237700C5FF16 /* WeClimb.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeClimb.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4892BE62C7C237700C5FF16 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -301,6 +305,7 @@
 				43A79AD52C853EC100B960A2 /* EditModel.swift */,
 				43A79AE12C85BD3B00B960A2 /* SettingModel.swift */,
 				6B2815452C8572A800BE1D40 /* ClimbingGym.swift */,
+				43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -318,6 +323,7 @@
 				43A79ACB2C819CB200B960A2 /* EditPageVM.swift */,
 				43A79AD72C85481300B960A2 /* DetailEditVM.swift */,
 				43A79ADF2C85BB7E00B960A2 /* SettingVM.swift */,
+				EFBC78D12C8AFA4900B6ED83 /* FeedViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -459,6 +465,7 @@
 				F4892C1E2C7C98A100C5FF16 /* MyPageVC.swift in Sources */,
 				435B7E422C8024AB00EB9816 /* EditPageVC.swift in Sources */,
 				6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */,
+				EFBC78D22C8AFA4900B6ED83 /* FeedViewModel.swift in Sources */,
 				F4892C122C7C27F500C5FF16 /* ExampleVM.swift in Sources */,
 				43A79AD22C83ADCD00B960A2 /* DetailEditCell.swift in Sources */,
 				F4892C2F2C7D9EA700C5FF16 /* UploadNameSpace.swift in Sources */,
@@ -504,6 +511,7 @@
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
 				F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */,
 				F4892C0E2C7C27BE00C5FF16 /* ExampleCommon.swift in Sources */,
+				43EC6ACB2C8B5026004A2E2F /* FeedCellModel.swift in Sources */,
 				6B8467BC2C85DDE9006B062D /* ClimbingGymInfoView.swift in Sources */,
 				436AEAEC2C7DCE3C00E0D85A /* MyPageVM.swift in Sources */,
 				6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */,
