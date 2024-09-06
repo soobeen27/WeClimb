@@ -10,7 +10,7 @@ import Foundation
 import RxCocoa
 import RxSwift
 
-class PersonalDetailsVM {
+class CreateNickNameVM {
     // Input: 닉네임 텍스트 (외부에서 접근할 수 있도록 public)
     let nicknameInput = PublishSubject<String>()
     

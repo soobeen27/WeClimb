@@ -28,7 +28,7 @@ class PrivacyPolicyVC: UIViewController {
         let button = UIButton()
         button.setImage(UIImage(systemName: "checkmark.circle"), for: .selected)
         button.setImage(UIImage(systemName: "circle"), for: .normal)
-        button.setTitle(" 필수 약관 모두 동의", for: .normal)
+        button.setTitle(" 약관 모두 동의", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.layer.borderWidth = 2
         button.layer.borderColor = UIColor.systemGray.cgColor
@@ -112,7 +112,9 @@ class PrivacyPolicyVC: UIViewController {
         self.navigationController?.navigationBar.prefersLargeTitles = true
         
         let appearance = UINavigationBarAppearance()
-        appearance.shadowColor = .clear
+        appearance.configureWithOpaqueBackground() // 투명도 없는 배경 설정
+        appearance.backgroundColor = .white // 원하는 배경 색상 설정
+        appearance.shadowColor = nil
         
         appearance.largeTitleTextAttributes = [
             NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 32),

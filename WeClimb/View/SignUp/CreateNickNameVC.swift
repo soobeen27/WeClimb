@@ -13,7 +13,7 @@ import RxSwift
 class CreateNickNameVC: UIViewController {
     
     private let disposeBag = DisposeBag()
-    private let viewModel = PersonalDetailsVM()
+    private let viewModel = CreateNickNameVM()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -44,6 +44,7 @@ class CreateNickNameVC: UIViewController {
         textField.placeholder = "닉네임을 입력하세요"
         textField.borderStyle = .roundedRect
         textField.font = UIFont.systemFont(ofSize: 15)
+        textField.backgroundColor = .white
         return textField
     }()
     
@@ -61,7 +62,6 @@ class CreateNickNameVC: UIViewController {
         button.backgroundColor = .lightGray
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 8
-        button.isEnabled = false
         return button
     }()
     
@@ -105,7 +105,7 @@ class CreateNickNameVC: UIViewController {
     @objc private func keyboardWillShow(notification: NSNotification) {
         guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
         if self.view.frame.origin.y == 0 {
-            self.view.frame.origin.y -= keyboardSize.height / 20// 뷰를 키보드 크기의 절반만큼 위로 이동
+            self.view.frame.origin.y -= keyboardSize.height / 10// 뷰를 키보드 크기의 절반만큼 위로 이동
         }
     }
     
@@ -130,7 +130,7 @@ class CreateNickNameVC: UIViewController {
         ].forEach { view.addSubview($0) }
         
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(8)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(52)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.width.height.equalTo(40)
@@ -191,10 +191,12 @@ class CreateNickNameVC: UIViewController {
         // 네비게이션
         confirmButton.rx.tap
             .subscribe(onNext: { [weak self] in
-                let tabBarController = TabBarController()
-                self?.navigationController?.pushViewController(tabBarController, animated: true)
-                //탭바로 넘어갈 때 네비게이션바 가리기
-                self?.navigationController?.setNavigationBarHidden(true, animated: true)
+//                let tabBarController = TabBarController()
+//                self?.navigationController?.pushViewController(tabBarController, animated: true)
+//                //탭바로 넘어갈 때 네비게이션바 가리기
+//                self?.navigationController?.setNavigationBarHidden(true, animated: true)
+                let personalDetailVC = PersonalDetailsVC()
+                self?.navigationController?.pushViewController(personalDetailVC, animated: true)
             })
             .disposed(by: disposeBag)
         
