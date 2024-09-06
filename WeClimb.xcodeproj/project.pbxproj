@@ -152,7 +152,7 @@
 		F4892C1D2C7C98A100C5FF16 /* MyPageVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MyPageVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C212C7C9DC700C5FF16 /* CodingConvention.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CodingConvention.md; sourceTree = "<group>"; };
 		F4892C232C7CBC8700C5FF16 /* UploadVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadVM.swift; sourceTree = "<group>"; };
-		F4892C2A2C7CCDF200C5FF16 /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
+		F4892C2A2C7CCDF200C5FF16 /* Identifiers.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C2E2C7D9EA700C5FF16 /* UploadNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadNameSpace.swift; sourceTree = "<group>"; };
 		F4892C362C7E26D900C5FF16 /* UploadOptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadOptionView.swift; sourceTree = "<group>"; };
 		F4892C3D2C7EFD4700C5FF16 /* UploadVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadVC.swift; sourceTree = "<group>"; };

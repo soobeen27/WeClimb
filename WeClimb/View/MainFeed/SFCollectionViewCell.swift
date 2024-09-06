@@ -11,13 +11,15 @@ import SnapKit
 
 class SFCollectionViewCell: UICollectionViewCell {
     
+    
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal //가로 스크롤
+        layout.itemSize = CGSize(width: self.frame.width, height: self.frame.width * (16.0/9.0))
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.yourCollectionViewCellIdentifier)
-        collectionView.backgroundColor = .gray
+        collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        collectionView.frame = self.bounds
         //        collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
         return collectionView
     }()
@@ -25,9 +27,10 @@ class SFCollectionViewCell: UICollectionViewCell {
     private let feedCaptionLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
+        label.textColor = .white
         label.textAlignment = .left
         label.numberOfLines = 1  //1줄까지만 표시
-        label.lineBreakMode = .byTruncatingTail  //1줄 이상 시 ... 표기
+        label.lineBreakMode = .byTruncatingTail  //1줄 이상 ... 표기
         return label
     }()
     
@@ -42,7 +45,8 @@ class SFCollectionViewCell: UICollectionViewCell {
     private let feedUserNameLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
-        label.font = UIFont.systemFont(ofSize: 15)
+        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 15, weight: .bold)
         return label
     }()
     
@@ -52,6 +56,16 @@ class SFCollectionViewCell: UICollectionViewCell {
         label.textColor = .systemGray2
         label.font = UIFont.systemFont(ofSize: 13)
         return label
+    }()
+    
+    private let followButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Follow", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 13)
+        button.layer.cornerRadius = 5
+        button.layer.borderWidth = 0.5
+        button.layer.borderColor = UIColor.systemGray3.cgColor
+        return button
     }()
     
     private let levelLabel: UILabel = {
@@ -70,28 +84,30 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     private let likeButtonCounter: UILabel = {
         let label = UILabel()
-        label.font = .boldSystemFont(ofSize: 15)
+        label.font = .systemFont(ofSize: 15)
+        label.textColor = .white
+        label.textAlignment = .center
         return label
     }()
     
     private let feedProfileStackView: UIStackView = {
         let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 6
+        stackView.axis = .horizontal
+        stackView.spacing = 10
         return stackView
     }()
     
     private let gymInfoStackView: UIStackView = {
         let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 7
+        stackView.axis = .vertical
+        stackView.spacing = 15
         return stackView
     }()
     
     private let likeStackView: UIStackView = {
         let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 4
+        stackView.axis = .vertical
+        stackView.spacing = 3
         return stackView
     }()
     
@@ -99,6 +115,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         
         likeButton.configureHeartButton()
+        setCollectionView()
         setLayout()
     }
     
@@ -106,12 +123,38 @@ class SFCollectionViewCell: UICollectionViewCell {
         fatalError("*T_T*")
     }
     
-    private func setLayout() {
-        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        //셀의 내용을 초기화하여 이전 데이터 제거
+        feedUserNameLabel.text = nil
+        feedProfileAddressLabel.text = nil
+        feedCaptionLabel.text = nil
+        likeButtonCounter.text = nil
+        feedUserProfileImage.image = nil
+    }
+    
+    private func setCollectionView() {
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.collectionViewCell)
         
-        [feedUserProfileImage, feedProfileStackView, collectionView, gymInfoStackView, likeStackView, feedCaptionLabel]
+        collectionView.isPagingEnabled = true
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)  //컬렉션뷰 상단좌우 여백 삭제
+//        collectionView.contentInsetAdjustmentBehavior = .always  //네비게이션바 아래에서 컬렉션뷰 시작하기(효과없음)
+//        collectionView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)  //스크롤 인디케이터 위치(효과없음)
+    }
+    
+    private func setLayout() {
+//        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        self.backgroundColor = UIColor(hex: "#0C1014")
+        self.addSubview(collectionView)
+        [feedProfileStackView, followButton, likeStackView, gymInfoStackView, feedCaptionLabel]
             .forEach {
-                contentView.addSubview($0)
+                self.addSubview($0)
+            }
+        [feedUserProfileImage, feedUserNameLabel]
+            .forEach {
+                feedProfileStackView.addArrangedSubview($0)
             }
         [likeButton, likeButtonCounter]
             .forEach {
@@ -121,62 +164,58 @@ class SFCollectionViewCell: UICollectionViewCell {
             .forEach {
                 gymInfoStackView.addArrangedSubview($0)
                 $0.font = .systemFont(ofSize: 15)
+                $0.textColor = .white
                 $0.textAlignment = .center
-                $0.layer.cornerRadius = 11
+                $0.layer.cornerRadius = 10
                 $0.layer.borderWidth = 0.5
                 $0.layer.borderColor = UIColor.systemGray3.cgColor
             }
-        [feedUserNameLabel, feedProfileAddressLabel]
-            .forEach {
-                feedProfileStackView.addArrangedSubview($0)
-            }
         
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(feedUserProfileImage.snp.bottom).offset(7)
             $0.width.equalToSuperview()
-            $0.height.equalTo(collectionView.snp.width)
-        }
-        gymInfoStackView.snp.makeConstraints {
-            $0.top.equalTo(collectionView.snp.bottom).offset(7)
-            $0.leading.equalToSuperview().inset(16)
-        }
-        feedCaptionLabel.snp.makeConstraints {
-            $0.top.equalTo(gymInfoStackView.snp.bottom).offset(15)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(collectionView.snp.width).multipliedBy(16.0/9.0) //아이폰 평균 동영상 촬영 비율(16:9)
         }
         feedProfileStackView.snp.makeConstraints {
-            $0.leading.equalTo(feedUserProfileImage.snp.trailing).offset(10)
-            $0.centerY.equalTo(feedUserProfileImage.snp.centerY)
-        }
-        likeStackView.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16)
-            $0.top.equalTo(collectionView.snp.bottom).offset(7)
-        }
-        likeButton.imageView?.snp.makeConstraints {
-            $0.width.height.equalTo(25)
-        }
-        likeButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 25, height: 25))
-            $0.trailing.equalToSuperview().inset(35)
-        }
-        levelLabel.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 50, height: 22))
-        }
-        sectorLabel.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 50, height: 22))
-        }
-        dDayLabel.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 50, height: 22))
-        }
-        feedUserNameLabel.snp.makeConstraints {
-            $0.height.equalTo(13)
-        }
-        feedProfileAddressLabel.snp.makeConstraints {
-            $0.height.equalTo(11)
-        }
+            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.77)
+            $0.leading.equalToSuperview().inset(16)
+        }        
         feedUserProfileImage.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 40, height: 40))
-            $0.leading.equalToSuperview().inset(16)
+        }
+        feedUserNameLabel.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 100, height: 40))
+        }
+        followButton.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 45, height: 20))
+            $0.centerY.equalTo(feedProfileStackView.snp.centerY)
+            $0.leading.equalTo(feedProfileStackView.snp.trailing).offset(7)
+        }
+        feedCaptionLabel.snp.makeConstraints {
+            $0.top.equalTo(feedProfileStackView.snp.bottom).offset(15)
+            $0.leading.trailing.equalToSuperview().inset(16)
+        }
+        likeStackView.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.5)
+            $0.trailing.equalToSuperview().inset(16)
+        }
+        likeButton.imageView?.snp.makeConstraints {
+            $0.width.height.equalTo(40)
+        }
+        likeButton.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 40, height: 40))
+        }
+        gymInfoStackView.snp.makeConstraints {
+            $0.top.equalTo(likeStackView.snp.bottom).offset(15)
+            $0.trailing.equalToSuperview().inset(16)
+        }
+        levelLabel.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 40, height: 40))
+        }
+        sectorLabel.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 40, height: 40))
+        }
+        dDayLabel.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 40, height: 40))
         }
     }
     
@@ -193,3 +232,19 @@ class SFCollectionViewCell: UICollectionViewCell {
 }
 
 
+extension SFCollectionViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Identifiers.collectionViewCell, for: indexPath)
+        cell.backgroundColor = .systemPink
+        print("내부 컬렉션뷰셀의 cellForItemAt 호출됨: \(indexPath)")
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
+    }
+}

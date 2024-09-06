@@ -16,7 +16,7 @@ class MyPageDetailFeedVC: UIViewController {
         layout.scrollDirection = .horizontal //가로 스크롤
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.yourCollectionViewCellIdentifier)
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.mainCollectionViewCell)
         collectionView.backgroundColor = .gray
         return collectionView
     }()
