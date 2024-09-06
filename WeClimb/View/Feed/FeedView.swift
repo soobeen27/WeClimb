@@ -15,6 +15,8 @@ import RxSwift
 class FeedView : UIView {
     private var disposeBag = DisposeBag()
     
+    private let viewModel: FeedViewModel
+    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -38,8 +40,6 @@ class FeedView : UIView {
         
         return pageControl
     }()
-    
-    private let viewModel: FeedViewModel
     
     init(frame: CGRect, viewModel: FeedViewModel) {
         self.viewModel = viewModel

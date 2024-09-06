@@ -33,7 +33,7 @@ class UploadVC: UIViewController {
     private lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [selectedMediaView, callPHPickerButton, textView, gymView, levelView]
+        [selectedMediaView, callPHPickerButton, levelButton, textView, gymView, levelView]
             .forEach {
                 view.addSubview($0)
             }
@@ -63,6 +63,16 @@ class UploadVC: UIViewController {
         return button
     }()
     
+    private let levelButton: UIButton = {
+        let button = UIButton(primaryAction: nil)
+        button.setTitle("레벨 선택", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 13)
+        button.setTitleColor(.systemBlue, for: .normal)
+        button.backgroundColor = .systemGray3
+        button.layer.cornerRadius = 15
+        return button
+    }()
+    
     private let textView: UITextView = {
         let textView = UITextView()
         textView.font = .systemFont(ofSize: 15)
@@ -89,7 +99,8 @@ class UploadVC: UIViewController {
         mediaItemsBind()
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
         setGymView()
-        setlevelView()
+        setSectorView()
+        setLevelButton()
     }
     
     @objc
@@ -157,8 +168,8 @@ class UploadVC: UIViewController {
             }
             .disposed(by: disposeBag)
     }
-
-    private func setlevelView() {
+    
+    private func setSectorView() {
         let button = UIButton(primaryAction: nil)
         
         let menuItems: [UIAction] = ["섹터 1", "섹터 2", "섹터 3"].map { sector in
@@ -166,13 +177,13 @@ class UploadVC: UIViewController {
                 self?.viewModel.optionSelected(optionText: sector)
             }
         }
-    
+        
         let menu = UIMenu(title: "", options: .displayInline, children: menuItems)
         
         button.menu = menu
         button.showsMenuAsPrimaryAction = true  // 버튼을 탭하면 메뉴 노출
         button.backgroundColor = .clear
-
+        
         levelView.addSubview(button)
         
         button.snp.makeConstraints {
@@ -186,6 +197,21 @@ class UploadVC: UIViewController {
         view.subviews.forEach { subview in
             subview.removeFromSuperview()
         }
+    }
+    
+    private func setLevelButton() {
+        let menuItems: [UIAction] = ["레벨 1", "레벨 2", "레벨 3"].map { sector in
+            UIAction(title: sector) { [weak self] _ in
+                self?.viewModel.optionSelected(optionText: sector)
+            }
+        }
+        
+        let menu = UIMenu(title: "", options: .displayInline, children: menuItems)
+        
+        levelButton.menu = menu
+        levelButton.showsMenuAsPrimaryAction = true
+        levelButton.changesSelectionAsPrimaryAction = true
+        
     }
     
     private func setLayout() {
@@ -217,6 +243,12 @@ class UploadVC: UIViewController {
         callPHPickerButton.snp.makeConstraints {
             $0.center.equalTo(selectedMediaView.snp.center)
             $0.size.equalTo(CGSize(width: 100, height: 50))
+        }
+        
+        levelButton.snp.makeConstraints {
+            $0.leading.equalTo(selectedMediaView.snp.leading).offset(16)
+            $0.bottom.equalTo(selectedMediaView.snp.bottom).offset(-16)
+            $0.size.equalTo(CGSize(width: 60, height: 30))
         }
         
         textView.snp.makeConstraints {

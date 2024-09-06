@@ -31,20 +31,24 @@ extension FeedViewModel {
             group.enter()   // 비동기 작업 시작 알려줌
             
             if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
-                mediaItem.itemProvider.loadItem(forTypeIdentifier: UTType.movie.identifier, options: nil) { [weak self] (item, error) in
-                    guard let self else { return }
-                    if let videoURL = item as? URL {
-                        print("\(videoURL)")
-
-                        self.compressVideoTo720p(url: videoURL) {compressedURL in
-                            guard let compressedURL = compressedURL else {
-                                print("비디오 압축 오류.")
-                                group.leave()   // 비동기 작업이 끝난걸 알려줌
-                                return
+                mediaItem.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { [weak self] (url, error) in
+                    guard let self = self, let url = url, error == nil else { return }
+                    
+                    mediaItem.itemProvider.loadItem(forTypeIdentifier: UTType.movie.identifier, options: nil) { [weak self] (item, error) in
+                        guard let self else { return }
+                        if let videoURL = item as? URL {
+                            print("\(videoURL)")
+                            
+                            self.compressVideoTo720p(url: videoURL) {compressedURL in
+                                guard let compressedURL = compressedURL else {
+                                    print("비디오 압축 오류.")
+                                    group.leave()   // 비동기 작업이 끝난걸 알려줌
+                                    return
+                                }
+                                let newItem = FeedCellModel(image: nil, videoURL: compressedURL)
+                                models.append(newItem)
+                                group.leave()
                             }
-                            let newItem = FeedCellModel(image: nil, videoURL: compressedURL)
-                            models.append(newItem)
-                            group.leave()
                         }
                     }
                 }
