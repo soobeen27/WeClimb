@@ -21,7 +21,7 @@ final class FirebaseManager {
     static let shared = FirebaseManager()
     private init() {}
     
-    func updateAccount(with data: String, for field: UserUpdate, completion:  @escaping () -> Void) {
+    func updateAccount(with data: String, for field: UserUpdate, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
         
@@ -40,7 +40,7 @@ final class FirebaseManager {
         
         userRef.getDocument(as: User.self) { result in
             switch result {
-            case.success(let user):
+            case .success(let user):
                 completion(.success(user))
             case .failure(let error):
                 print("현재 유저 가져오기 에러: \(error)")

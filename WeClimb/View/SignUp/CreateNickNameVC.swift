@@ -190,24 +190,15 @@ class CreateNickNameVC: UIViewController {
         
         // 네비게이션
         confirmButton.rx.tap
-            .subscribe(onNext: { [weak self] in
+            .withLatestFrom(viewModel.nicknameInput) // nicknameInput의 최신 값 가져오기
+            .subscribe(onNext: { [weak self] newName in
                 guard let self else { return }
-//                let tabBarController = TabBarController()
-//                self?.navigationController?.pushViewController(tabBarController, animated: true)
-//                //탭바로 넘어갈 때 네비게이션바 가리기
-//                self?.navigationController?.setNavigationBarHidden(true, animated: true)
-                self.viewModel.nicknameInput.subscribe(onNext: { [weak self] newName in
-                    guard let self else { return }
-                    FirebaseManager.shared.updateAccount(with: newName, for: .userName, completion: {
-                        let personalDetailVC = PersonalDetailsVC()
-                        self.navigationController?.pushViewController(personalDetailVC, animated: true)
-                    })
+                FirebaseManager.shared.updateAccount(with: newName, for: .userName, completion: {
+                    let personalDetailVC = PersonalDetailsVC()
+                    self.navigationController?.pushViewController(personalDetailVC, animated: true)
                 })
-                .disposed(by: self.disposeBag)
             })
             .disposed(by: disposeBag)
-        
-        
     }
 }
 
