@@ -7,8 +7,9 @@
 
 import UIKit
 
-import FirebaseCore
 import FirebaseAuth
+import FirebaseCore
+import FirebaseFirestore
 import GoogleSignIn
 import KakaoSDKCommon
 import KakaoSDKAuth
@@ -24,6 +25,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // 파이어베이스 설정
         FirebaseApp.configure()
         // Override point for customization after application launch.
+        
+        // 파이어스토어 디비
+        let db = Firestore.firestore()
         
         if let nativeAppKey =
             Bundle.main.infoDictionary?["KAKAO_NATIVE_APP_KEY"] as? String {

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		043942932C86BCF000AA0D9D /* FirebaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043942922C86BCF000AA0D9D /* FirebaseModel.swift */; };
 		435B7E422C8024AB00EB9816 /* EditPageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435B7E412C8024AB00EB9816 /* EditPageVC.swift */; };
 		436AEAE02C7D69CB00E0D85A /* SearchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEADF2C7D69CB00E0D85A /* SearchTableViewCell.swift */; };
 		436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAE12C7D69F000E0D85A /* SearchVM.swift */; };
@@ -59,6 +60,10 @@
 		6BC91FB32C7F016A00B34083 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */; };
 		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
+		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
+		91F71CDF2C88A3C400405778 /* LoginVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CDE2C88A3C400405778 /* LoginVM.swift */; };
+		91F71CE12C89835700405778 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CE02C89835700405778 /* FirebaseManager.swift */; };
+		91F71CE32C89844900405778 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CE22C89844900405778 /* User.swift */; };
 		C40397B72C7CB4CC00923777 /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B62C7CB4CC00923777 /* Extension.swift */; };
 		C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */; };
 		C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C45DC9D42C80519100FC4C1D /* FeedModel.swift */; };
@@ -96,6 +101,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		043942922C86BCF000AA0D9D /* FirebaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseModel.swift; sourceTree = "<group>"; };
 		435B7E412C8024AB00EB9816 /* EditPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPageVC.swift; sourceTree = "<group>"; };
 		436AEADF2C7D69CB00E0D85A /* SearchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableViewCell.swift; sourceTree = "<group>"; };
 		436AEAE12C7D69F000E0D85A /* SearchVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVM.swift; sourceTree = "<group>"; };
@@ -138,6 +144,10 @@
 		6BC91FB52C7F16D800B34083 /* WeClimb.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeClimb.entitlements; sourceTree = "<group>"; };
 		916D64CF2C848A540064B766 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		916D64D22C848BE00064B766 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
+		91AF25602C8C15FC002283BD /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
+		91F71CDE2C88A3C400405778 /* LoginVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVM.swift; sourceTree = "<group>"; };
+		91F71CE02C89835700405778 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
+		91F71CE22C89844900405778 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		C40397B62C7CB4CC00923777 /* Extension.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedTabelCell.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C45DC9D42C80519100FC4C1D /* FeedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedModel.swift; sourceTree = "<group>"; };
@@ -352,9 +362,11 @@
 				F4892C0F2C7C27D800C5FF16 /* ExampleModel.swift */,
 				C45DC9D42C80519100FC4C1D /* FeedModel.swift */,
 				436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */,
+				043942922C86BCF000AA0D9D /* FirebaseModel.swift */,
 				43A79AD52C853EC100B960A2 /* EditModel.swift */,
 				43A79AE12C85BD3B00B960A2 /* SettingModel.swift */,
 				6B2815452C8572A800BE1D40 /* ClimbingGym.swift */,
+				91F71CE22C89844900405778 /* User.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -372,6 +384,7 @@
 				43A79ACB2C819CB200B960A2 /* EditPageVM.swift */,
 				43A79AD72C85481300B960A2 /* DetailEditVM.swift */,
 				43A79ADF2C85BB7E00B960A2 /* SettingVM.swift */,
+				91F71CDE2C88A3C400405778 /* LoginVM.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -387,6 +400,8 @@
 				436AEAEF2C7EE63C00E0D85A /* SearchNameSpace.swift */,
 				436AEAF52C7EEF0A00E0D85A /* UserPageNameSpace.swift */,
 				43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */,
+				91F71CE02C89835700405778 /* FirebaseManager.swift */,
+				91AF25602C8C15FC002283BD /* Enumeration.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -508,6 +523,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				043942932C86BCF000AA0D9D /* FirebaseModel.swift in Sources */,
 				436AEAEE2C7EC1F500E0D85A /* MypageNameSpace.swift in Sources */,
 				6B8F38CB2C8955350018C40D /* PrivacyPolicyVM.swift in Sources */,
 				6B8467BE2C86129B006B062D /* ClimbingGymNameSpace.swift in Sources */,
@@ -550,6 +566,7 @@
 				916D64D32C848BE00064B766 /* FeedCell.swift in Sources */,
 				6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */,
 				C4E29C1B2C8874780076BCA6 /* MyPageDetailFeedVC.swift in Sources */,
+				91F71CDF2C88A3C400405778 /* LoginVM.swift in Sources */,
 				6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */,
 				6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */,
 				F4892C1C2C7C988B00C5FF16 /* ClimbingGymVC.swift in Sources */,
@@ -559,7 +576,9 @@
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */,
 				43A79AD82C85481300B960A2 /* DetailEditVM.swift in Sources */,
+				91F71CE12C89835700405778 /* FirebaseManager.swift in Sources */,
 				F4892C142C7C973800C5FF16 /* TabBarController.swift in Sources */,
+				91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */,
 				F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */,
 				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
 				6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */,
@@ -571,6 +590,7 @@
 				6B8467BC2C85DDE9006B062D /* ClimbingGymInfoView.swift in Sources */,
 				436AEAEC2C7DCE3C00E0D85A /* MyPageVM.swift in Sources */,
 				6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */,
+				91F71CE32C89844900405778 /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -736,6 +756,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -773,6 +794,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
