@@ -47,7 +47,6 @@ enum LoginType {
     }
 }
 
-
 //MARK: 유저 관련 에러
 enum UserError: Error {
     case none

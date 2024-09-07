@@ -33,7 +33,24 @@ final class FirebaseManager {
             completion()
         }
     }
+    // 이름 중복 체크 중복일 시 true 리턴 중복값 아니면 false 리턴
+    func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
+        let ref = db.collection("users").whereField("userName", isEqualTo: name)
+        
+        ref.getDocuments() { snapshot, error in
+            if let error = error {
+                print("중복체크에러: \(error)")
+                completion(false)
+            }
+            if let documents = snapshot?.documents, !documents.isEmpty {
+                completion(true)
+            } else {
+                completion(false)
+            }
+        }
+    }
     
+    // 현재 유저 정보 가져오기
     func currentUserInfo(completion: @escaping (Result<User, Error>) -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
@@ -48,7 +65,8 @@ final class FirebaseManager {
             }
         }
     }
-    
+
+    // 이름으로 다른 유저 정보 가져오기
     func getUserInfoFrom(name: String, completion: @escaping (Result<User, Error>) -> Void) {
         let userRef = db.collection("users").whereField("userName", isEqualTo: name)
         
