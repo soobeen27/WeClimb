@@ -30,13 +30,10 @@ class LoginVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     
-    private let loginTitleLabel = {
-        let label = UILabel()
-        label.text = "We climb, 위클"
-        label.font = .systemFont(ofSize: 30, weight: .bold)
-        label.textColor = .mainPurple
-        
-        return label
+    private let loginTitleImage: UIImageView = {
+        let image = UIImageView()
+        image.image = UIImage(named: "testLogo")
+        return image
     }()
     
     private let kakaoLoginButton: UIButton = {
@@ -165,7 +162,7 @@ class LoginVC: UIViewController {
     
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [loginTitleLabel, buttonStackView]
+        [loginTitleImage, buttonStackView]
             .forEach {
                 view.addSubview($0)
             }
@@ -173,7 +170,8 @@ class LoginVC: UIViewController {
             .forEach {
                 buttonStackView.addArrangedSubview($0)
             }
-        loginTitleLabel.snp.makeConstraints {
+        loginTitleImage.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 200, height: 200))
             $0.centerX.equalToSuperview()
             $0.top.equalTo(view.safeAreaLayoutGuide).inset(100)
         }

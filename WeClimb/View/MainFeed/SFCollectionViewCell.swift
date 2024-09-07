@@ -22,7 +22,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         collectionView.frame = self.bounds
-        //        collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
+        collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
         return collectionView
     }()
     
@@ -37,11 +37,11 @@ class SFCollectionViewCell: UICollectionViewCell {
     }()
     
     private let feedUserProfileImage: UIImageView = {
-        let Image = UIImageView()
-        Image.layer.cornerRadius = 20
-        Image.clipsToBounds = true
-        Image.layer.borderColor = UIColor.systemGray3.cgColor
-        return Image
+        let image = UIImageView()
+        image.layer.cornerRadius = 20
+        image.clipsToBounds = true
+        image.layer.borderColor = UIColor.systemGray3.cgColor
+        return image
     }()
     
     private let feedUserNameLabel: UILabel = {
@@ -91,10 +91,10 @@ class SFCollectionViewCell: UICollectionViewCell {
     }()
     
     private let likeButton = UIButton()
-
+    
     private let likeButtonCounter: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 15, weight: .light)
+        label.font = .systemFont(ofSize: 13, weight: .medium)
         label.textColor = .white
         label.textAlignment = .center
         return label
@@ -110,7 +110,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     private let commentButtonCounter: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 15, weight: .light)
+        label.font = .systemFont(ofSize: 13, weight: .medium)
         label.textColor = .white
         label.textAlignment = .center
         return label
@@ -141,18 +141,18 @@ class SFCollectionViewCell: UICollectionViewCell {
     private let likeStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 3
+        stackView.spacing = 1
         return stackView
     }()
     
     private let commentStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 3
+        stackView.spacing = 1
         return stackView
     }()
     
-
+    
     //MARK: - 코드 시작
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -189,6 +189,11 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     //MARK: - 레이아웃 설정
     private func setLayout() {
+        [feedUserNameLabel, likeButton, commentButton, followButton, likeButtonCounter, commentButtonCounter, ellipsisButton]
+            .forEach { view in
+            addShadow(to: view)
+        }
+        
         self.backgroundColor = UIColor(hex: "#0C1014")
         self.addSubview(collectionView)
         [feedProfileStackView, followButton, likeStackView, commentStackView, gymInfoStackView, feedCaptionLabel, ellipsisButton]
@@ -202,7 +207,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         [likeButton, likeButtonCounter]
             .forEach {
                 likeStackView.addArrangedSubview($0)
-            }        
+            }
         [commentButton, commentButtonCounter]
             .forEach {
                 commentStackView.addArrangedSubview($0)
@@ -215,8 +220,9 @@ class SFCollectionViewCell: UICollectionViewCell {
                 $0.textAlignment = .center
                 $0.layer.cornerRadius = 5
                 $0.layer.borderWidth = 0.5
-                $0.layer.borderColor = UIColor.systemGray3.cgColor
-                $0.layer.masksToBounds = true // 코너를 넘지 않도록 설정
+                $0.layer.borderColor = UIColor.systemGray5.cgColor
+                $0.layer.opacity = 0.8  //투명도
+                $0.layer.masksToBounds = true  //코너를 넘지 않도록 설정
             }
         
         collectionView.snp.makeConstraints {
@@ -224,9 +230,9 @@ class SFCollectionViewCell: UICollectionViewCell {
             $0.height.equalTo(collectionView.snp.width).multipliedBy(16.0/9.0) //아이폰 평균 동영상 촬영 비율(16:9)
         }
         feedProfileStackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.77)
+            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.76)
             $0.leading.equalToSuperview().inset(16)
-        }        
+        }
         feedUserProfileImage.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 40, height: 40))
         }
@@ -239,9 +245,9 @@ class SFCollectionViewCell: UICollectionViewCell {
             $0.leading.equalTo(feedProfileStackView.snp.trailing)
         }
         feedCaptionLabel.snp.makeConstraints {
-            $0.top.equalTo(feedProfileStackView.snp.bottom).offset(12)
+            $0.top.equalTo(feedProfileStackView.snp.bottom).offset(15)
             $0.leading.trailing.equalToSuperview().inset(16)
-        }        
+        }
         gymInfoStackView.snp.makeConstraints {
             $0.top.equalTo(feedCaptionLabel.snp.bottom).offset(12)
             $0.leading.equalToSuperview().inset(16)
@@ -256,21 +262,22 @@ class SFCollectionViewCell: UICollectionViewCell {
             $0.size.equalTo(CGSize(width: 45, height: 20))
         }
         likeStackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.5)  //기기화면 절반
-            $0.trailing.equalToSuperview().inset(16)
+            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.57)  //기기화면 비율
+            $0.trailing.equalToSuperview().inset(10)
         }
         likeButton.imageView?.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 40, height: 35))
+            $0.size.equalTo(CGSize(width: 35, height: 30))
         }
         likeButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 40, height: 35))
+            $0.size.equalTo(CGSize(width: 35, height: 35))
         }
         commentStackView.snp.makeConstraints {
             $0.top.equalTo(likeStackView.snp.bottom).offset(20)
-            $0.trailing.equalToSuperview().inset(16)
+            //            $0.centerY.equalTo(likeStackView.snp.centerY)
+            $0.trailing.equalToSuperview().inset(10)
         }
         commentButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 40, height: 40))
+            $0.size.equalTo(CGSize(width: 35, height: 35))
             $0.top.equalTo(likeStackView.snp.bottom).offset(20)
         }
         commentButton.imageView?.snp.makeConstraints {
@@ -278,14 +285,14 @@ class SFCollectionViewCell: UICollectionViewCell {
         }
         ellipsisButton.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 40, height: 22))
-            $0.top.equalTo(self.safeAreaLayoutGuide).offset(15)
+            $0.top.equalTo(self.safeAreaLayoutGuide).offset(5)
             $0.trailing.equalToSuperview().inset(16)
         }
         ellipsisButton.imageView?.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 40, height: 22))     
+            $0.size.equalTo(CGSize(width: 40, height: 22))
         }
     }
-  
+    
     
     //MARK: - configure
     func configure(userProfileImage: UIImage, userName: String, address: String, caption: String, level: String, sector: String, dDay: String, likeCounter: String, commentCounter: String) {
@@ -302,7 +309,17 @@ class SFCollectionViewCell: UICollectionViewCell {
 }
 
 
-    //MARK: - 컬렉션뷰 프로토콜 설정
+//MARK: - 버튼 그림자 모드
+    func addShadow(to view: UIView) {
+        view.layer.shadowColor = UIColor.black.cgColor //그림자 색상
+        view.layer.shadowOffset = CGSize(width: 1, height: 1) //그림자 위치
+        view.layer.shadowOpacity = 0.5 //그림자 투명도
+        view.layer.shadowRadius = 2 //그림자의 흐림(퍼짐) 정도
+        view.layer.masksToBounds = false //테두리에 그림자가 잘리지 않도록 설정
+}
+
+
+//MARK: - 컬렉션뷰 프로토콜 설정
 extension SFCollectionViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 1
@@ -311,6 +328,23 @@ extension SFCollectionViewCell: UICollectionViewDelegate, UICollectionViewDataSo
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Identifiers.collectionViewCell, for: indexPath)
         cell.backgroundColor = UIColor(hex: "#0C1014")
+        
+        //샘플 이미지 삽입
+        let testImage: UIImageView = {
+            let image = UIImageView()
+            image.image = UIImage(named: "feedTestImage")
+            image.contentMode = .scaleAspectFill
+            image.translatesAutoresizingMaskIntoConstraints = false
+            return image
+        }()
+        
+        cell.contentView.addSubview(testImage)
+        
+        testImage.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        
         print("내부 컬렉션뷰셀의 cellForItemAt 호출됨: \(indexPath)")
         return cell
     }
@@ -319,3 +353,4 @@ extension SFCollectionViewCell: UICollectionViewDelegate, UICollectionViewDataSo
         return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
     }
 }
+
