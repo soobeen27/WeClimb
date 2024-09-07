@@ -13,8 +13,14 @@ enum Identifiers {
     static let captionCell = "CaptionCell"
     static let uploadOptionCell = "UploadOptionCell"
     
-    //MainFeed CollectionView Cell
-    static let yourCollectionViewCellIdentifier = "YourCollectionViewCellIdentifier"
+//    //MainFeed CollectionView Cell
+//    static let yourCollectionViewCellIdentifier = "YourCollectionViewCellIdentifier"
+    
+    //SFMainfeedVC 식별자
+    static let mainCollectionViewCell = "MainCollectionViewCell"
+    
+    //SFCollectionViewCell 식별자
+    static let collectionViewCell = "CollectionViewCell"
     
     // SectionTableViewCell
     static let sectionTableViewCell = "SectionTableViewCell"
