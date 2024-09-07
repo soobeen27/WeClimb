@@ -190,17 +190,23 @@ class CreateNickNameVC: UIViewController {
         
         // 네비게이션
         confirmButton.rx.tap
+            .subscribe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] in
                 guard let self else { return }
-//                let tabBarController = TabBarController()
-//                self?.navigationController?.pushViewController(tabBarController, animated: true)
-//                //탭바로 넘어갈 때 네비게이션바 가리기
-//                self?.navigationController?.setNavigationBarHidden(true, animated: true)
+                //                let tabBarController = TabBarController()
+                //                self?.navigationController?.pushViewController(tabBarController, animated: true)
+                //                //탭바로 넘어갈 때 네비게이션바 가리기
+                //                self?.navigationController?.setNavigationBarHidden(true, animated: true)
                 self.viewModel.nicknameInput.subscribe(onNext: { [weak self] newName in
                     guard let self else { return }
                     FirebaseManager.shared.updateAccount(with: newName, for: .userName, completion: {
-                        let personalDetailVC = PersonalDetailsVC()
-                        self.navigationController?.pushViewController(personalDetailVC, animated: true)
+                        //                        let personalDetailVC = PersonalDetailsVC()
+                        //                        self.navigationController?.pushViewController(personalDetailVC, animated: true)
+                        let tabBarController = TabBarController()
+                        self.navigationController?.pushViewController(tabBarController, animated: true)
+                        //탭바로 넘어갈 때 네비게이션바 가리기
+                        self.navigationController?.setNavigationBarHidden(true, animated: true)
+                        
                     })
                 })
                 .disposed(by: self.disposeBag)
@@ -221,5 +227,4 @@ extension CreateNickNameVC: UITextFieldDelegate {
         // 글자 수가 12자 이하면 true, 초과하면 false로 입력을 막음
         return newText.count <= 12
     }
-    
 }
