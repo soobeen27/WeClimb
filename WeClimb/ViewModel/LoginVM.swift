@@ -17,55 +17,12 @@ import KakaoSDKCommon
 import KakaoSDKAuth
 import KakaoSDKUser
 
-enum LoginError: Error {
-    case noUser
-    case userExist
-    case fromSetData
-}
-
-enum LoginResult {
-    case login
-    case createAccount
-}
-
-enum UserUpdate {
-    case userName
-    case height
-    case armReach
-    
-    var key: String {
-        switch self {
-        case .userName:
-            return "userName"
-        case .height:
-            return "height"
-        case .armReach:
-            return "armReach"
-        }
-    }
-}
-
-enum LoginType {
-    case google
-    case apple
-    case kakao
-    
-    var string: String {
-        switch self {
-        case .google:
-            return "google"
-        case .apple:
-            return "apple"
-        case .kakao:
-            return "kakao"
-        }
-    }
-}
-
 class LoginVM {
-
+    
     private let db = Firestore.firestore()
-        
+    
+    var currentNonce: String?
+    
     func updateAccount(with data: String, for field: UserUpdate, completion:  @escaping () -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
@@ -78,7 +35,7 @@ class LoginVM {
             completion()
         }
     }
-
+    
     func logIn(with credential: AuthCredential, loginType: LoginType ,completion: @escaping (LoginResult) -> Void) {
         Auth.auth().signIn(with: credential) { authResult, error in
             if let error = error {
@@ -129,7 +86,7 @@ class LoginVM {
     }
     
     //MARK: 카카오 로그인
-    func kakaoLogin() {
+    func kakaoLogin(completion: @escaping (AuthCredential) -> Void) {
         fetchKakaoOpenIDToken() { idToken in
             guard let idToken = idToken else { return }
             
@@ -139,6 +96,7 @@ class LoginVM {
                 // 파이어베이스 문서에서 rawNonce: nil로 써있지만 rawNonce가 String이라 nil이 안된다고 오류가 떠서 ""로 임시 조치함
                 rawNonce: ""
             )
+            completion(credential)
         }
     }
     
@@ -168,6 +126,49 @@ class LoginVM {
             }
         }
     }
+    
+    //MARK: apple 로그인
+    func appleLogin(delegate: ASAuthorizationControllerDelegate, provider: ASAuthorizationControllerPresentationContextProviding) {
+        let nonce = randomNonceString()
+        currentNonce = nonce
+        let appleIDProvider = ASAuthorizationAppleIDProvider()
+        let request = appleIDProvider.createRequest()
+        request.requestedScopes = [.fullName, .email]
+        request.nonce = sha256(nonce)
+        
+        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        authorizationController.delegate = delegate
+        authorizationController.presentationContextProvider = provider
+        authorizationController.performRequests()
+    }
+    
+    private func randomNonceString(length: Int = 32) -> String {
+        precondition(length > 0)
+        var randomBytes = [UInt8](repeating: 0, count: length)
+        let errorCode = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
+        if errorCode != errSecSuccess {
+            fatalError(
+                "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
+            )
+        }
+        
+        let charset: [Character] =
+        Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+        
+        let nonce = randomBytes.map { byte in
+            // Pick a random character from the set, wrapping around if needed.
+            charset[Int(byte) % charset.count]
+        }
+        
+        return String(nonce)
+    }
+    private func sha256(_ input: String) -> String {
+        let inputData = Data(input.utf8)
+        let hashedData = SHA256.hash(data: inputData)
+        let hashString = hashedData.compactMap {
+            String(format: "%02x", $0)
+        }.joined()
+        
+        return hashString
+    }
 }
-
-
