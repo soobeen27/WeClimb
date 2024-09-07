@@ -30,7 +30,7 @@ class CreateNickNameVM {
     var isNicknameValid: Observable<Bool> {
         return nicknameInput
             .map { [weak self] nickname in
-                guard let self = self else { return false }
+                guard let self else { return false }
                 let normalizedNickname = self.normalizeNickname(nickname)
                 return normalizedNickname.count >= 2 && normalizedNickname.count <= 12
             }
@@ -41,7 +41,7 @@ class CreateNickNameVM {
     var nicknameCharacterCount: Observable<String> {
         return nicknameInput
             .map { [weak self] nickname in
-                guard let self = self else { return "0/12" }
+                guard let self else { return "0/12" }
                 let normalizedNickname = self.normalizeNickname(nickname)
                 return "\(normalizedNickname.count)/12"
             }

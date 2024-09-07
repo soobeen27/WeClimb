@@ -21,7 +21,7 @@ final class FirebaseManager {
     static let shared = FirebaseManager()
     private init() {}
     
-    func updateAccount(with data: String, for field: UserUpdate, completion:  @escaping () -> Void) {
+    func updateAccount(with data: String, for field: UserUpdate, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
         
