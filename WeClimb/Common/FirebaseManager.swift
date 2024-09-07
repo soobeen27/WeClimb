@@ -33,7 +33,7 @@ final class FirebaseManager {
             completion()
         }
     }
-    // 이름 중복 체크 중복일 시 true 리턴 중복값 아니면 false 리턴
+    // 이름 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
     func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
         let ref = db.collection("users").whereField("userName", isEqualTo: name)
         
@@ -81,6 +81,29 @@ final class FirebaseManager {
                 } else {
                     completion(.failure(UserError.none))
                 }
+            }
+        }
+    }
+    
+    // 로그인된 계정 삭제
+    func userDelete() {
+        guard let user = Auth.auth().currentUser else { return }
+        
+        user.delete() { error in
+            if let error = error {
+                print("authentication 유저 삭제 오류: \(error)")
+            }
+            else {
+                print("authentication 성공적으로 계정 삭제")
+            }
+        }
+        
+        let userRef = db.collection("users").document(user.uid)
+        userRef.delete() { error in
+            if let error = error {
+                print("firestore 유저 삭제 오류: \(error)")
+            } else {
+                print("firestore 성공적으로 계정 삭제")
             }
         }
     }
