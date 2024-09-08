@@ -140,7 +140,7 @@ class LoginVC: UIViewController {
         super.viewDidLoad()
         print("loaded")
         
-        autoLoginCheck()
+//        autoLoginCheck()
         loginButtonBind()
         setLayout()
         buttonTapped()
@@ -197,19 +197,19 @@ class LoginVC: UIViewController {
     }
     
     // 자동 로그인 체크
-    private func autoLoginCheck() {
-        // Firebase Auth의 현재 사용자 확인
-        if let currentUser = Auth.auth().currentUser {
-            // 사용자가 로그인되어 있는 경우 메인 화면으로 이동
-            print("User already logged in with UID: \(currentUser.uid), navigating to main feed.")
-            self.navigateToMainFeedVC()
-        } else {
-            print("No user is currently logged in, displaying login screen.")
-        }
-    }
+//    private func autoLoginCheck() {
+//        // Firebase Auth의 현재 사용자 확인
+//        if let currentUser = Auth.auth().currentUser {
+//            // 사용자가 로그인되어 있는 경우 메인 화면으로 이동
+//            print("User already logged in with UID: \(currentUser.uid), navigating to main feed.")
+//            navigateToMainFeedVC()
+//        } else {
+//            print("No user is currently logged in, displaying login screen.")
+//        }
+//    }
     func navigateToMainFeedVC() {
-        let TabBarController = TabBarController()
-        navigationController?.pushViewController(TabBarController, animated: true)
+        let tabBarController = TabBarController()
+        navigationController?.pushViewController(tabBarController, animated: true)
         self.navigationController?.setNavigationBarHidden(true, animated: true)
     }
 }
