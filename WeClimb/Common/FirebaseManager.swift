@@ -162,7 +162,13 @@ final class FirebaseManager {
                 additionalInfo.removeValue(forKey: "sector")
                 additionalInfo.removeValue(forKey: "profileImage")
                 
-                completion(Gym(address: address, grade: grade, gymName: gymName, sector: sector, profileImage: profileImage, additionalInfo: additionalInfo))
+                completion(Gym(address: address, grade: grade, 
+                               gymName: gymName, sector: sector,
+                               profileImage: profileImage, additionalInfo: additionalInfo))
             }
+    }
+    
+    func uploadImage() {
+        
     }
 }
