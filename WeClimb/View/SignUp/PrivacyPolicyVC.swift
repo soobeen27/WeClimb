@@ -127,6 +127,7 @@ class PrivacyPolicyVC: UIViewController {
     
     private func setLayout() {
         view.backgroundColor = .white
+        self.overrideUserInterfaceStyle = .light
         
         [
             titleLabel,
