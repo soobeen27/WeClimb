@@ -107,4 +107,23 @@ final class FirebaseManager {
             }
         }
     }
+    
+    func allGymName(completion: @escaping ([String]) -> Void) {
+        db.collection("climbingGyms").getDocuments { snapshot, error in
+            if let error = error {
+                print("모든 클라이밍장 이름 가져오기 에러: \(error)")
+                completion([])
+                return
+            }
+            guard let documents = snapshot?.documents else {
+                print("아무런 문서가 없음")
+                completion([])
+                return
+            }
+            let documentNames = documents.map {
+                $0.documentID
+            }
+            completion(documentNames)
+        }
+    }
 }
