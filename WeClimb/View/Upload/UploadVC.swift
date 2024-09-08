@@ -8,15 +8,17 @@ import AVKit
 import PhotosUI
 import UIKit
 
-import SnapKit
 import RxCocoa
+import RxRelay
 import RxSwift
+import SnapKit
 
 class UploadVC: UIViewController {
     
     private lazy var viewModel: UploadVM = {
-        return UploadVM()
+        return UploadVM(mediaItems: [])
     }()
+//    private var viewModel: UploadVM = UploadVM(mediaItems: [])
     
     private let disposeBag = DisposeBag()
     
@@ -33,7 +35,7 @@ class UploadVC: UIViewController {
     private lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [selectedMediaView, callPHPickerButton, levelButton, textView, gymView, levelView]
+        [selectedMediaView, callPHPickerButton, levelButton, textView, gymView, levelView, /*loadingIndicator*/]
             .forEach {
                 view.addSubview($0)
             }
@@ -65,7 +67,6 @@ class UploadVC: UIViewController {
     
     private let levelButton: UIButton = {
         let button = UIButton(primaryAction: nil)
-        button.setTitle("레벨 선택", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 13)
         button.setTitleColor(.systemBlue, for: .normal)
         button.backgroundColor = .systemGray3
@@ -92,6 +93,12 @@ class UploadVC: UIViewController {
         return button
     }()
     
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         textView.delegate = self
@@ -101,6 +108,8 @@ class UploadVC: UIViewController {
         setGymView()
         setSectorView()
         setLevelButton()
+        setAlert()
+//        setLoading()
     }
     
     @objc
@@ -131,14 +140,22 @@ class UploadVC: UIViewController {
         viewModel.mediaItems
             .subscribe(onNext: { [weak self] items in
                 guard let self else { return }
+                
                 if self.viewModel.mediaItems.value == [] {
                     self.callPHPickerButton.isHidden = false
                 } else {
-                    let feedViewModel = FeedViewModel(mediaItems: items)
+                    let uploadVM = UploadVM(mediaItems: items)
+                    print("아이템: \(items)")
                     let feed = FeedView(frame: CGRect(origin: CGPoint(),
                                                       size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
-                                        viewModel: feedViewModel
+                                        viewModel: uploadVM
                     )
+                    //                     기존의 viewModel을 업데이트
+                    //                    self.viewModel.mediaItems.accept(items)
+                    
+                    //                    let feed = FeedView(frame: CGRect(origin: CGPoint(),
+                    //                                                      size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
+                    //                                        viewModel: self.viewModel) // 기존 viewModel 사용
                     self.callPHPickerButton.isHidden = true
                     self.selectedMediaView.addSubview(feed)
                     
@@ -193,12 +210,6 @@ class UploadVC: UIViewController {
         }
     }
     
-    func removeAllSubview(view: UIView) {
-        view.subviews.forEach { subview in
-            subview.removeFromSuperview()
-        }
-    }
-    
     private func setLevelButton() {
         let menuItems: [UIAction] = ["레벨 1", "레벨 2", "레벨 3"].map { sector in
             UIAction(title: sector) { [weak self] _ in
@@ -211,8 +222,52 @@ class UploadVC: UIViewController {
         levelButton.menu = menu
         levelButton.showsMenuAsPrimaryAction = true
         levelButton.changesSelectionAsPrimaryAction = true
+        levelButton.setTitle("선택", for: .normal)
         
     }
+    
+    private func setAlert() {
+        viewModel.showAlert
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                print("알림 이벤트 발생")
+                
+                let alertController = UIAlertController(
+                    title: "알림",
+                    message: "1분 미만 비디오를 업로드해주세요.",
+                    preferredStyle: .alert
+                )
+                let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
+                alertController.addAction(okAction)
+                
+                self.present(alertController, animated: true, completion: {
+                    print("설공적으로 알림 노출.")
+                })
+            })
+            .disposed(by: disposeBag)
+    }
+    
+//    private func setLoading() {
+//        viewModel.isLoading
+//            .observe(on: MainScheduler.instance)
+//            .bind(to: loadingIndicator.rx.isAnimating)
+//            .disposed(by: disposeBag)
+//        
+//        // 그냥 프린트문 찍어보려고 명시적으로 해본거...
+//        viewModel.isLoading
+//            .observe(on: MainScheduler.instance)
+//            .subscribe(onNext: { isLoading in
+//                if isLoading {
+//                    print("로딩 중입니다.")
+//                    self.loadingIndicator.startAnimating()
+//                } else {
+//                    print("로딩이 완료되었습니다.")
+//                    self.loadingIndicator.stopAnimating()
+//                }
+//            })
+//            .disposed(by: disposeBag)
+//    }
     
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
@@ -248,7 +303,7 @@ class UploadVC: UIViewController {
         levelButton.snp.makeConstraints {
             $0.leading.equalTo(selectedMediaView.snp.leading).offset(16)
             $0.bottom.equalTo(selectedMediaView.snp.bottom).offset(-16)
-            $0.size.equalTo(CGSize(width: 60, height: 30))
+            $0.size.equalTo(CGSize(width: 50, height: 30))
         }
         
         textView.snp.makeConstraints {
@@ -272,6 +327,10 @@ class UploadVC: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-16)
             $0.height.equalTo(50)
         }
+        
+//        loadingIndicator.snp.makeConstraints {
+//            $0.center.equalTo(selectedMediaView.snp.center)
+//        }
     }
 }
 

@@ -15,7 +15,7 @@ import RxSwift
 class FeedView : UIView {
     private var disposeBag = DisposeBag()
     
-    private let viewModel: FeedViewModel
+    private let viewModel: UploadVM
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -33,7 +33,7 @@ class FeedView : UIView {
     
     private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
-        pageControl.numberOfPages = viewModel.mediaItems.count
+        pageControl.numberOfPages = viewModel.mediaItems.value.count
         pageControl.currentPage = 0
         pageControl.pageIndicatorTintColor = .lightGray
         pageControl.currentPageIndicatorTintColor = .black
@@ -41,11 +41,19 @@ class FeedView : UIView {
         return pageControl
     }()
     
-    init(frame: CGRect, viewModel: FeedViewModel) {
+    
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+    
+    init(frame: CGRect, viewModel: UploadVM) {
         self.viewModel = viewModel
         super.init(frame: frame)
         setLayout()
         bind()
+        setLoading()
     }
     
     required init?(coder: NSCoder) {
@@ -53,7 +61,7 @@ class FeedView : UIView {
     }
     
     func setLayout() {
-        [collectionView, pageControl]
+        [collectionView, pageControl, loadingIndicator]
             .forEach {
                 self.addSubview($0)
             }
@@ -65,9 +73,14 @@ class FeedView : UIView {
             $0.bottom.equalToSuperview().offset(-20)
             $0.centerX.equalToSuperview()
         }
+        
+        loadingIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
     }
     
     private func bind() {
+        setLoading()
         viewModel.feedRelay
             .bind(to: collectionView.rx.items(
                 cellIdentifier: FeedCell.className, cellType: FeedCell.self)
@@ -83,6 +96,28 @@ class FeedView : UIView {
         
         // 델리게이트 self 설정
         collectionView.rx.setDelegate(self).disposed(by: disposeBag)
+    }
+    
+    private func setLoading() {
+//        viewModel.isLoading
+//            .observe(on: MainScheduler.instance)
+//            .bind(to: loadingIndicator.rx.isAnimating)
+//            .disposed(by: disposeBag)
+        
+        // 그냥 프린트문 찍어보려고 명시적으로 해본거...
+        viewModel.isLoading
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { isLoading in
+                print("isLoading 값: \(isLoading)") // 값 확인용 로그 추가
+                if isLoading {
+                    print("로딩 중입니다.")
+                    self.loadingIndicator.startAnimating()
+                } else {
+                    print("로딩이 완료되었습니다.")
+                    self.loadingIndicator.stopAnimating()
+                }
+            })
+            .disposed(by: disposeBag)
     }
 }
 
