@@ -39,6 +39,7 @@ class RangePickerVC: UIViewController {
     
     private func setLayout() {
         view.backgroundColor = .white
+        self.overrideUserInterfaceStyle = .light
         
         [
             pickerView,
