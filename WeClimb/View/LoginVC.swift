@@ -35,7 +35,6 @@ class LoginVC: UIViewController {
         label.text = "We climb, 위클"
         label.font = .systemFont(ofSize: 30, weight: .bold)
         label.textColor = .mainPurple
-        
         return label
     }()
     
@@ -89,10 +88,12 @@ class LoginVC: UIViewController {
                         print("success")
                         let tabBarVC = TabBarController()
                         self.navigationController?.pushViewController(tabBarVC, animated: true)
+                        self.navigationController?.setNavigationBarHidden(true, animated: true)
                     case .createAccount:
                         // 회원가입 페이지 푸시
                         let signUpVC = PrivacyPolicyVC()
                         self.navigationController?.pushViewController(signUpVC, animated: true)
+                        self.navigationController?.setNavigationBarHidden(true, animated: true)
                     }
                 }
             }
@@ -110,10 +111,12 @@ class LoginVC: UIViewController {
                         print("success")
                         let tabBarVC = TabBarController()
                         self.navigationController?.pushViewController(tabBarVC, animated: true)
+                        self.navigationController?.setNavigationBarHidden(true, animated: true)
                     case .createAccount:
                         //회원가입 페이지 ㄱㄱ
                         let signUpVC = PrivacyPolicyVC()
                         self.navigationController?.pushViewController(signUpVC, animated: true)
+                        self.navigationController?.setNavigationBarHidden(true, animated: true)
                     }
                 }
             }
@@ -140,7 +143,7 @@ class LoginVC: UIViewController {
         super.viewDidLoad()
         print("loaded")
         
-        autoLoginCheck()
+//        autoLoginCheck()
         loginButtonBind()
         setLayout()
         buttonTapped()
@@ -155,10 +158,12 @@ class LoginVC: UIViewController {
     private func buttonTapped() {
         guestLoginButton.rx.tap
             .bind { [weak self] in
-                self?.navigationController?.pushViewController(TabBarController(), animated: true)
+                guard let self else { return }
                 print("비회원 로그인 성공")
                 //탭바로 넘어갈 때 네비게이션바 가리기
-                self?.navigationController?.setNavigationBarHidden(true, animated: true)
+                let tabBarVC = TabBarController()
+                self.navigationController?.pushViewController(tabBarVC, animated: true)
+                self.navigationController?.setNavigationBarHidden(true, animated: true)
             }
             .disposed(by: disposeBag)
     }
@@ -197,19 +202,19 @@ class LoginVC: UIViewController {
     }
     
     // 자동 로그인 체크
-    private func autoLoginCheck() {
-        // Firebase Auth의 현재 사용자 확인
-        if let currentUser = Auth.auth().currentUser {
-            // 사용자가 로그인되어 있는 경우 메인 화면으로 이동
-            print("User already logged in with UID: \(currentUser.uid), navigating to main feed.")
-            self.navigateToMainFeedVC()
-        } else {
-            print("No user is currently logged in, displaying login screen.")
-        }
-    }
+//    private func autoLoginCheck() {
+//        // Firebase Auth의 현재 사용자 확인
+//        if let currentUser = Auth.auth().currentUser {
+//            // 사용자가 로그인되어 있는 경우 메인 화면으로 이동
+//            print("User already logged in with UID: \(currentUser.uid), navigating to main feed.")
+//            navigateToMainFeedVC()
+//        } else {
+//            print("No user is currently logged in, displaying login screen.")
+//        }
+//    }
     func navigateToMainFeedVC() {
-        let TabBarController = TabBarController()
-        navigationController?.pushViewController(TabBarController, animated: true)
+        let tabBarController = TabBarController()
+        navigationController?.pushViewController(tabBarController, animated: true)
         self.navigationController?.setNavigationBarHidden(true, animated: true)
     }
 }
@@ -246,10 +251,12 @@ extension LoginVC: ASAuthorizationControllerDelegate {
                     print("success")
                     let tabBarVC = TabBarController()
                     self.navigationController?.pushViewController(tabBarVC, animated: true)
+                    self.navigationController?.setNavigationBarHidden(true, animated: true)
                 case .createAccount:
                     //회원가입 페이지 ㄱㄱ
                     let signUpVC = PrivacyPolicyVC()
                     self.navigationController?.pushViewController(signUpVC, animated: true)
+                    self.navigationController?.setNavigationBarHidden(true, animated: true)
                 }
             }
         }

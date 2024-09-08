@@ -107,4 +107,68 @@ final class FirebaseManager {
             }
         }
     }
+    
+    // 모든 암장이름 가져오기 (검색용)
+    func allGymName(completion: @escaping ([String]) -> Void) {
+        db.collection("climbingGyms").getDocuments { snapshot, error in
+            if let error = error {
+                print("모든 클라이밍장 이름 가져오기 에러: \(error)")
+                completion([])
+                return
+            }
+            guard let documents = snapshot?.documents else {
+                print("아무런 문서가 없음")
+                completion([])
+                return
+            }
+            let documentNames = documents.map {
+                $0.documentID
+            }
+            completion(documentNames)
+        }
+    }
+    
+    // 특정 암장정보 from 이름
+    func gymInfo(from name: String, completion: @escaping (Gym?) -> Void) {
+        db.collection("climbingGyms")
+            .document(name)
+            .getDocument { document, error in
+                if let error = error {
+                    print("암장 정보 가져오기 에러: \(error)")
+                    completion(nil)
+                    return
+                }
+                guard let document = document, document.exists,
+                      let data = document.data() 
+                else {
+                    print("정보없음")
+                    completion(nil)
+                    return
+                }
+                guard let address = data["address"] as? String,
+                      let grade = data["grade"] as? String,
+                      let gymName = data["gymName"] as? String,
+                      let sector = data["sector"] as? String,
+                      let profileImage = data["profileImage"] as? String
+                else {
+                    print("필수 정보 없음")
+                    completion(nil)
+                    return
+                }
+                var additionalInfo = data
+                additionalInfo.removeValue(forKey: "address")
+                additionalInfo.removeValue(forKey: "grade")
+                additionalInfo.removeValue(forKey: "gymName")
+                additionalInfo.removeValue(forKey: "sector")
+                additionalInfo.removeValue(forKey: "profileImage")
+                
+                completion(Gym(address: address, grade: grade, 
+                               gymName: gymName, sector: sector,
+                               profileImage: profileImage, additionalInfo: additionalInfo))
+            }
+    }
+    
+    func uploadImage() {
+        
+    }
 }
