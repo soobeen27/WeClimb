@@ -85,6 +85,7 @@ class PersonalDetailsVC: UIViewController {
     
     private func setLayout() {
         view.backgroundColor = .white
+        self.overrideUserInterfaceStyle = .light
         
         [
             titleLabel,

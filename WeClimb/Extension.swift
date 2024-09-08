@@ -56,7 +56,7 @@ extension UIButton {
     //비활성화 상태
     private var normalImage: UIImage? {
         return UIImage(systemName: "heart")?
-            .withTintColor(UIColor(hex: "#CDCDCD"))
+            .withTintColor(UIColor(hex: "#FFFFFF"))  //"#CDCDCD"
             .withRenderingMode(.alwaysOriginal)
     }
     

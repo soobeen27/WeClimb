@@ -69,9 +69,7 @@ class SFMainFeedVC: UIViewController {
         collectionView.frame = view.bounds  //컬렉션뷰 셀 프레임을 화면 전체에 맞춤
         collectionView.isPagingEnabled = true  //스크롤 시 한 화면씩 넘기기(페이징 모드 활성화)
         collectionView.contentInsetAdjustmentBehavior = .never  //네비게이션바 자동 여백 삭제
-//        collectionView.contentInsetAdjustmentBehavior = .always  //네비게이션바 아래에서 컬렉션뷰 시작하기(효과없음)
-//        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)  //컬렉션뷰 상단좌우 여백 삭제(효과없음)
-//        collectionView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)  //스크롤 인디케이터 위치 조정(효과없음)
+        collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
     }
     
     
@@ -94,12 +92,12 @@ extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlow
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Identifiers.mainCollectionViewCell, for: indexPath) as? SFCollectionViewCell else {
             return UICollectionViewCell()
         }
-        
+
         if let image = UIImage(named: "testImage") {
             cell.configure(userProfileImage: image,
                            userName: "더 클라임 신림",
                            address: "서울시 관악구 신림동",
-                           caption: "클라이밍 재밌다아아아아아아아아아아아아아아아아아아아아아아아아아",
+                           caption: "나 최우림, 더클 신림에서 V6 난이도 부셔버림👊🏻",
                            level: "V6",
                            sector: "1섹터",
                            dDay: "D-14",

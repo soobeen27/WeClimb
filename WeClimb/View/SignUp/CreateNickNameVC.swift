@@ -119,6 +119,7 @@ class CreateNickNameVC: UIViewController {
     private func setLayout() {
         view.backgroundColor = .white
         navigationItem.largeTitleDisplayMode = .never
+        self.overrideUserInterfaceStyle = .light
         
         [
             titleLabel,
