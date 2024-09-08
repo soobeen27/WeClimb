@@ -100,6 +100,7 @@ class UploadVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.title = UploadNameSpace.title
         textView.delegate = self
         setLayout()
         mediaItemsBind()

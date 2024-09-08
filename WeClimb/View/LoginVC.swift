@@ -13,6 +13,7 @@ import RxSwift
 
 import FirebaseCore
 import FirebaseAuth
+import FirebaseFirestore
 import GoogleSignIn
 import CryptoKit
 import AuthenticationServices
@@ -23,8 +24,11 @@ import KakaoSDKUser
 
 class LoginVC: UIViewController {
     
+    private lazy var viewModel: LoginVM = {
+        return LoginVM()
+    }()
+    
     private let disposeBag = DisposeBag()
-    fileprivate var currentNonce: String?
     
     private let loginTitleLabel = {
         let label = UILabel()
@@ -35,34 +39,31 @@ class LoginVC: UIViewController {
         return label
     }()
     
-    private let kakaoLoginButton = {
+    private let kakaoLoginButton: UIButton = {
         let button = UIButton(type: .system)
         if let buttonImage = UIImage(named: "Kakao_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
-            button.addTarget(self, action: #selector(kakaoLoginTapped), for: .touchUpInside)
         }
         return button
     }()
     
-    private let appleLoginButton = {
+    private let appleLoginButton: UIButton = {
         let button = UIButton(type: .system)
         if let buttonImage = UIImage(named: "Apple_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
-            button.addTarget(self, action: #selector(appleLoginTapped), for: .touchUpInside)
         }
         return button
     }()
     
-    private let googleLoginButton = {
+    private let googleLoginButton: UIButton = {
         let button = UIButton(type: .system)
         if let buttonImage = UIImage(named: "Google_Login_Button") {
             button.setBackgroundImage(buttonImage, for: .normal)
-            button.addTarget(self, action: #selector(googleLoginTapped), for: .touchUpInside)
         }
         return button
     }()
     
-    private let guestLoginButton = {
+    private let guestLoginButton: UIButton = {
         let button = UIButton()
         button.setTitle("비회원으로 둘러보기", for: .normal)
         button.setTitleColor(.darkGray, for: .normal)
@@ -70,7 +71,7 @@ class LoginVC: UIViewController {
         return button
     }()
     
-    private let buttonStackView = {
+    private let buttonStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 15
@@ -78,26 +79,73 @@ class LoginVC: UIViewController {
     }()
     
     // MARK: - 버튼 이벤트
-    @objc func googleLoginTapped() {
-        startGoogleLoginFlow()
+    func googleLoginButtonBind() {
+        googleLoginButton.rx.tap.bind { [weak self] in
+            guard let self else { return }
+            self.viewModel.googleLogin(presenter: self) { credential in
+                self.viewModel.logIn(with: credential, loginType: .google) { result in
+                    switch result {
+                    case .login:
+                        print("success")
+                        let tabBarVC = TabBarController()
+                        self.navigationController?.pushViewController(tabBarVC, animated: true)
+                    case .createAccount:
+                        // 회원가입 페이지 푸시
+                        let signUpVC = PrivacyPolicyVC()
+                        self.navigationController?.pushViewController(signUpVC, animated: true)
+                    }
+                }
+            }
+        }
+        .disposed(by: disposeBag)
     }
     
-    @objc func kakaoLoginTapped() {
-        startKakaoFirebaseLoginFlow()
+    func kakaoLoginButtonBind() {
+        kakaoLoginButton.rx.tap.bind { [weak self] in
+            guard let self else { return }
+            self.viewModel.kakaoLogin { credential in
+                self.viewModel.logIn(with: credential, loginType: .kakao) { result in
+                    switch result {
+                    case .login:
+                        print("success")
+                        let tabBarVC = TabBarController()
+                        self.navigationController?.pushViewController(tabBarVC, animated: true)
+                    case .createAccount:
+                        //회원가입 페이지 ㄱㄱ
+                        let signUpVC = PrivacyPolicyVC()
+                        self.navigationController?.pushViewController(signUpVC, animated: true)
+                    }
+                }
+            }
+            
+        }
+        .disposed(by: disposeBag)
     }
     
-    @objc func appleLoginTapped() {
-        startSignInWithAppleFlow()
+    func appleLoginButtonBind() {
+        appleLoginButton.rx.tap.bind { [weak self] in
+            guard let self else { return }
+            self.viewModel.appleLogin(delegate: self, provider: self)
+        }
+        .disposed(by: disposeBag)
+    }
+    
+    func loginButtonBind() {
+        googleLoginButtonBind()
+        kakaoLoginButtonBind()
+        appleLoginButtonBind()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         print("loaded")
         
+        autoLoginCheck()
+        loginButtonBind()
         setLayout()
         buttonTapped()
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         //로그인 창으로 돌아왔을때 네비게이션 바 보이기
@@ -108,6 +156,7 @@ class LoginVC: UIViewController {
         guestLoginButton.rx.tap
             .bind { [weak self] in
                 self?.navigationController?.pushViewController(TabBarController(), animated: true)
+                print("비회원 로그인 성공")
                 //탭바로 넘어갈 때 네비게이션바 가리기
                 self?.navigationController?.setNavigationBarHidden(true, animated: true)
             }
@@ -146,91 +195,22 @@ class LoginVC: UIViewController {
             $0.width.equalTo(300)
         }
     }
-}
-
-//MARK: - 구글 로그인
-extension LoginVC {
-    func startGoogleLoginFlow(){
-        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
-        
-        // Create Google Sign In configuration object.
-        let config = GIDConfiguration(clientID: clientID)
-        GIDSignIn.sharedInstance.configuration = config
-        
-        // Start the sign in flow!
-        GIDSignIn.sharedInstance.signIn(withPresenting: self) { [unowned self] result, error in
-            guard error == nil else {
-                // ...
-                print(#fileID, #function, #line, "- comment")
-                return
-            }
-            
-            guard let user = result?.user,
-                  let idToken = user.idToken?.tokenString
-            else {
-                // ...
-                print(#fileID, #function, #line, "- comment")
-                return
-            }
-            
-            let credential = GoogleAuthProvider.credential(withIDToken: idToken,
-                                                           accessToken: user.accessToken.tokenString)
-            
-            // ...
-            
-            Auth.auth().signIn(with: credential) { result, error in
-                
-                // At this point, our user is signed in
-            }
-        }
-    }
-}
-
-//MARK: - 애플 로그인
-extension LoginVC {
-    private func randomNonceString(length: Int = 32) -> String {
-        precondition(length > 0)
-        var randomBytes = [UInt8](repeating: 0, count: length)
-        let errorCode = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
-        if errorCode != errSecSuccess {
-            fatalError(
-                "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
-            )
-        }
-        
-        let charset: [Character] =
-        Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-        
-        let nonce = randomBytes.map { byte in
-            // Pick a random character from the set, wrapping around if needed.
-            charset[Int(byte) % charset.count]
-        }
-        
-        return String(nonce)
-    }
     
-    private func sha256(_ input: String) -> String {
-        let inputData = Data(input.utf8)
-        let hashedData = SHA256.hash(data: inputData)
-        let hashString = hashedData.compactMap {
-            String(format: "%02x", $0)
-        }.joined()
-        
-        return hashString
+    // 자동 로그인 체크
+    private func autoLoginCheck() {
+        // Firebase Auth의 현재 사용자 확인
+        if let currentUser = Auth.auth().currentUser {
+            // 사용자가 로그인되어 있는 경우 메인 화면으로 이동
+            print("User already logged in with UID: \(currentUser.uid), navigating to main feed.")
+            self.navigateToMainFeedVC()
+        } else {
+            print("No user is currently logged in, displaying login screen.")
+        }
     }
-    
-    func startSignInWithAppleFlow() {
-        let nonce = randomNonceString()
-        currentNonce = nonce
-        let appleIDProvider = ASAuthorizationAppleIDProvider()
-        let request = appleIDProvider.createRequest()
-        request.requestedScopes = [.fullName, .email]
-        request.nonce = sha256(nonce)
-        
-        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-        authorizationController.delegate = self
-        authorizationController.presentationContextProvider = self
-        authorizationController.performRequests()
+    func navigateToMainFeedVC() {
+        let TabBarController = TabBarController()
+        navigationController?.pushViewController(TabBarController, animated: true)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
     }
 }
 
@@ -240,12 +220,11 @@ extension LoginVC: ASAuthorizationControllerPresentationContextProviding {
     }
 }
 
-
 extension LoginVC: ASAuthorizationControllerDelegate {
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
-            guard let nonce = currentNonce else {
+            guard let nonce = viewModel.currentNonce else {
                 fatalError("Invalid state: A login callback was received, but no login request was sent.")
             }
             guard let appleIDToken = appleIDCredential.identityToken else {
@@ -261,17 +240,17 @@ extension LoginVC: ASAuthorizationControllerDelegate {
                                                            rawNonce: nonce,
                                                            fullName: appleIDCredential.fullName)
             // Sign in with Firebase.
-            Auth.auth().signIn(with: credential) { (authResult, error) in
-                if error != nil {
-                    // Error. If error.code == .MissingOrInvalidNonce, make sure
-                    // you're sending the SHA256-hashed nonce as a hex string with
-                    // your request to Apple.
-                    print(error?.localizedDescription)
-                    return
+            viewModel.logIn(with: credential, loginType: .apple) { result in
+                switch result {
+                case .login:
+                    print("success")
+                    let tabBarVC = TabBarController()
+                    self.navigationController?.pushViewController(tabBarVC, animated: true)
+                case .createAccount:
+                    //회원가입 페이지 ㄱㄱ
+                    let signUpVC = PrivacyPolicyVC()
+                    self.navigationController?.pushViewController(signUpVC, animated: true)
                 }
-                // User is signed in to Firebase with Apple.
-                // ...
-                print(#fileID, #function, #line, "- 애플 로그인 성공")
             }
         }
     }
@@ -340,7 +319,7 @@ extension LoginVC {
                     completion(oauthToken?.idToken)
                 }
             }
-            
         }
     }
+    
 }
