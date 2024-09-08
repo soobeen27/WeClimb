@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         if let currentUser = Auth.auth().currentUser {
             print("User already logged in with UID: \(currentUser.uid), navigating to main feed.")
-            window.rootViewController = UINavigationController(rootViewController: TabBarController())
+            window.rootViewController = TabBarController()
         } else {
             window.rootViewController = UINavigationController(rootViewController: LoginVC())
         }
