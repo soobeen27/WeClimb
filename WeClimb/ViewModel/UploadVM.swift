@@ -17,10 +17,13 @@ class UploadVM {
     let showAlert = PublishRelay<Void>()
     let isLoading = BehaviorRelay<Bool>(value: false)
     
-    init(mediaItems: [PHPickerResult]) {
-        self.mediaItems.accept(mediaItems) // BehaviorRelay의 값을 업데이트
-        self.setMedia()
-    }
+    // 피커뷰에서 선택한 항목을 저장
+    private var selectedFeedItems = [FeedCellModel]()
+    
+//    init(mediaItems: [PHPickerResult]) {
+//        self.mediaItems.accept(mediaItems) // BehaviorRelay의 값을 업데이트
+//        self.setMedia()
+//    }
     
     func optionSelected(optionText: String) {
         print("선택된 옵션: \(optionText)")
@@ -84,7 +87,11 @@ extension UploadVM {
         group.notify(queue: .main) { [weak self] in
             guard let self else { return }
             self.isLoading.accept(false) // 로딩 종료
-            self.feedRelay.accept(models)
+            self.selectedFeedItems = models
+            
+            if !models.isEmpty {
+                self.feedRelay.accept(models)
+            }
         }
     }
 }
