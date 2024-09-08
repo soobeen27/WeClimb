@@ -73,7 +73,7 @@ class PersonalDetailsVC: UIViewController {
         button.backgroundColor = UIColor.mainPurple
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 8
-        button.isEnabled = false
+//        button.isEnabled = false
         return button
     }()
     
@@ -142,7 +142,7 @@ class PersonalDetailsVC: UIViewController {
     private func setupBindings() {
         heightButton.rx.tap
             .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 let rangePickerVC = RangePickerVC()
                 
                 rangePickerVC.modalPresentationStyle = .pageSheet
@@ -165,7 +165,7 @@ class PersonalDetailsVC: UIViewController {
         
         armLengthButton.rx.tap
             .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 let rangePickerVC = RangePickerVC()
                 
                 rangePickerVC.modalPresentationStyle = .pageSheet

@@ -21,7 +21,7 @@ final class FirebaseManager {
     static let shared = FirebaseManager()
     private init() {}
     
-    func updateAccount(with data: String, for field: UserUpdate, completion:  @escaping () -> Void) {
+    func updateAccount(with data: String, for field: UserUpdate, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
         
@@ -33,14 +33,31 @@ final class FirebaseManager {
             completion()
         }
     }
+    // 이름 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
+    func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
+        let ref = db.collection("users").whereField("userName", isEqualTo: name)
+        
+        ref.getDocuments() { snapshot, error in
+            if let error = error {
+                print("중복체크에러: \(error)")
+                completion(false)
+            }
+            if let documents = snapshot?.documents, !documents.isEmpty {
+                completion(true)
+            } else {
+                completion(false)
+            }
+        }
+    }
     
+    // 현재 유저 정보 가져오기
     func currentUserInfo(completion: @escaping (Result<User, Error>) -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
         
         userRef.getDocument(as: User.self) { result in
             switch result {
-            case.success(let user):
+            case .success(let user):
                 completion(.success(user))
             case .failure(let error):
                 print("현재 유저 가져오기 에러: \(error)")
@@ -48,7 +65,8 @@ final class FirebaseManager {
             }
         }
     }
-    
+
+    // 이름으로 다른 유저 정보 가져오기
     func getUserInfoFrom(name: String, completion: @escaping (Result<User, Error>) -> Void) {
         let userRef = db.collection("users").whereField("userName", isEqualTo: name)
         
@@ -63,6 +81,29 @@ final class FirebaseManager {
                 } else {
                     completion(.failure(UserError.none))
                 }
+            }
+        }
+    }
+    
+    // 로그인된 계정 삭제
+    func userDelete() {
+        guard let user = Auth.auth().currentUser else { return }
+        
+        user.delete() { error in
+            if let error = error {
+                print("authentication 유저 삭제 오류: \(error)")
+            }
+            else {
+                print("authentication 성공적으로 계정 삭제")
+            }
+        }
+        
+        let userRef = db.collection("users").document(user.uid)
+        userRef.delete() { error in
+            if let error = error {
+                print("firestore 유저 삭제 오류: \(error)")
+            } else {
+                print("firestore 성공적으로 계정 삭제")
             }
         }
     }
