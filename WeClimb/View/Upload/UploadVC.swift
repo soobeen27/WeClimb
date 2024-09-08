@@ -16,7 +16,7 @@ import SnapKit
 class UploadVC: UIViewController {
     
     private lazy var viewModel: UploadVM = {
-        return UploadVM(mediaItems: [])
+        return UploadVM()
     }()
     
     private let disposeBag = DisposeBag()
@@ -34,7 +34,7 @@ class UploadVC: UIViewController {
     private lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [selectedMediaView, callPHPickerButton, levelButton, textView, gymView, levelView, /*loadingIndicator*/]
+        [selectedMediaView, callPHPickerButton, levelButton, textView, gymView, levelView, loadingIndicator]
             .forEach {
                 view.addSubview($0)
             }
@@ -109,6 +109,14 @@ class UploadVC: UIViewController {
         setSectorView()
         setLevelButton()
         setAlert()
+        setLoading()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        callPHPickerButton.isHidden = false
+        removeAllSubview(view: selectedMediaView)
     }
     
     @objc
@@ -136,18 +144,18 @@ class UploadVC: UIViewController {
     }
     
     func mediaItemsBind() {
-        viewModel.mediaItems
+        viewModel.feedRelay
             .subscribe(onNext: { [weak self] items in
                 guard let self else { return }
                 
-                if self.viewModel.mediaItems.value == [] {
+                // 기존 피드를 제거
+                self.removeAllSubview(view: self.selectedMediaView)
+                
+                if items.isEmpty {
                     self.callPHPickerButton.isHidden = false
                 } else {
-                    let uploadVM = UploadVM(mediaItems: items)
-                    let feed = FeedView(frame: CGRect(origin: CGPoint(),
-                                                      size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
-                                        viewModel: uploadVM
-                    )
+                    let feed = FeedView(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
+                                        viewModel: self.viewModel)
                     self.callPHPickerButton.isHidden = true
                     self.selectedMediaView.addSubview(feed)
                     
@@ -158,6 +166,13 @@ class UploadVC: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - UIView의 서브뷰 제거 YJ
+    func removeAllSubview(view: UIView) {
+        view.subviews.forEach { subview in
+            subview.removeFromSuperview()
+        }
     }
     
     private func setGymView() {
@@ -230,8 +245,16 @@ class UploadVC: UIViewController {
                     message: "1분 미만 비디오를 업로드해주세요.",
                     preferredStyle: .alert
                 )
-                let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
+                let okAction = UIAlertAction(title: "확인", style: .default) { _ in
+                    self.phpickerVCPresent()
+                }
+                let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: { _ in
+                    self.removeAllSubview(view: self.selectedMediaView) // 피드 뷰 제거
+                    self.callPHPickerButton.isHidden = false
+                })
+                
                 alertController.addAction(okAction)
+                alertController.addAction(cancelAction) // 취소 버튼 추가
                 
                 self.present(alertController, animated: true, completion: {
                     print("설공적으로 알림 노출.")
@@ -239,6 +262,24 @@ class UploadVC: UIViewController {
             })
             .disposed(by: disposeBag)
     }
+    
+    
+    private func setLoading() {
+        viewModel.isLoading
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] isLoading in
+                guard let self = self else { return }
+                if isLoading {
+                    self.callPHPickerButton.isHidden = true
+                    self.loadingIndicator.startAnimating()
+                } else {
+                    self.callPHPickerButton.isHidden = false
+                    self.loadingIndicator.stopAnimating()
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
     
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
@@ -297,6 +338,10 @@ class UploadVC: UIViewController {
             $0.left.right.equalToSuperview().inset(16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-16)
             $0.height.equalTo(50)
+        }
+        
+        loadingIndicator.snp.makeConstraints {
+            $0.center.equalTo(selectedMediaView.snp.center)
         }
     }
 }
