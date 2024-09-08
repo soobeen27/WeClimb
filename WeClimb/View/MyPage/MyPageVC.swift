@@ -156,6 +156,7 @@ class MyPageVC: UIViewController {
         setLayout()
         bind()
         setNavigation()
+//        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     }
     
     // MARK: - 설정 버튼 YJ
@@ -215,11 +216,19 @@ class MyPageVC: UIViewController {
         present(actionSheet, animated: true)
     }
     
+    //프로필 편집뷰 이동
     private func editButtonTapped() {
         let editPageVC = EditPageVC()
         navigationController?.pushViewController(editPageVC, animated: true)
     }
     
+    //상세 피드뷰 이동
+    private func navigateDetailFeedView(at indexPath: IndexPath) {
+        let myPageDetailFeedVC = MyPageDetailFeedVC()
+        navigationController?.pushViewController(myPageDetailFeedVC, animated: true)
+    }
+
+    //MARK: - 레이아웃
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
@@ -270,6 +279,7 @@ class MyPageVC: UIViewController {
         }
     }
     
+    //MARK: - 바인드
     private func bind() {
         viewModel.profileImages
             .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { _, image, cell in
@@ -284,6 +294,29 @@ class MyPageVC: UIViewController {
                 self?.editButtonTapped()
             }
             .disposed(by: disposeBag)
+        
+        collectionView.rx.itemSelected
+            .bind { [weak self ] indexPath in
+                self?.navigateDetailFeedView(at: indexPath)
+            }
+            .disposed(by: disposeBag)
     }
 }
+//extension MyPageVC: UICollectionViewDelegate {
+//    
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        let modalVC = MyPageModalVC()
+//        modalVC.modalPresentationStyle = .pageSheet
+//        
+//        if let sheet = modalVC.sheetPresentationController {
+//            let customDetent = UISheetPresentationController.Detent.custom { context in
+//                return context.maximumDetentValue * 0.9
+//            }
+//            sheet.detents = [customDetent]
+//            sheet.preferredCornerRadius = 20
+//        }
+//
+//        present(modalVC, animated: true, completion: nil)
+//    }
+//}
 

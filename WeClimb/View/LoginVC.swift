@@ -156,6 +156,7 @@ class LoginVC: UIViewController {
         guestLoginButton.rx.tap
             .bind { [weak self] in
                 self?.navigationController?.pushViewController(TabBarController(), animated: true)
+                print("비회원 로그인 성공")
                 //탭바로 넘어갈 때 네비게이션바 가리기
                 self?.navigationController?.setNavigationBarHidden(true, animated: true)
             }
@@ -257,6 +258,68 @@ extension LoginVC: ASAuthorizationControllerDelegate {
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         // Handle error.
         print("Sign in with Apple errored: \(error)")
+    }
+    
+}
+
+//MARK: - 카카오 로그인
+extension LoginVC {
+    func startKakaoFirebaseLoginFlow(){
+        print(#fileID, #function, #line, "-")
+        fetchKakaoOpenIDToken(completion: { idToken in
+            guard let idToken = idToken else { return }
+            
+            let credential = OAuthProvider.credential(
+                withProviderID: "oidc.kakao",  // As registered in Firebase console.
+                idToken: idToken,  // ID token from OpenID Connect flow.
+                // 파이어베이스 문서에서 rawNonce: nil로 써있지만 rawNonce가 String이라 nil이 안된다고 오류가 떠서 ""로 임시 조치함
+                rawNonce: ""
+            )
+            Auth.auth().signIn(with: credential) { authResult, error in
+                if error != nil {
+                    // Handle error.
+                    print(#fileID, #function, #line, "- 에러 \(error)")
+                    return
+                }
+                // User is signed in.
+                // IdP data available in authResult?.additionalUserInfo?.profile
+                print(#fileID, #function, #line, "- 카카오 로그인 성공")
+            }
+        })
+    }
+    
+    // 카카오 로그인 하고 OpenID 토큰 가져오기
+    func fetchKakaoOpenIDToken(completion: @escaping (String?) -> Void){
+        // 카카오톡이 설치되어 있다면
+        if (UserApi.isKakaoTalkLoginAvailable()) {
+            // 카카오톡으로 로그인
+            UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
+                if let error = error {
+                    print(error)
+                }
+                else {
+                    print("loginWithKakaoTalk() success.")
+                    
+                    //do something
+                    _ = oauthToken
+                    completion(oauthToken?.idToken)
+                }
+            }
+        } else {
+            // 웹 브라우저로 로그인 시도
+            UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
+                if let error = error {
+                    print(error)
+                }
+                else {
+                    print("loginWithKakaoAccount() success.")
+                    
+                    //do something
+                    _ = oauthToken
+                    completion(oauthToken?.idToken)
+                }
+            }
+        }
     }
     
 }

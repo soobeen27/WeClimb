@@ -8,14 +8,15 @@ import AVKit
 import PhotosUI
 import UIKit
 
-import SnapKit
 import RxCocoa
+import RxRelay
 import RxSwift
+import SnapKit
 
 class UploadVC: UIViewController {
     
     private lazy var viewModel: UploadVM = {
-        return UploadVM()
+        return UploadVM(mediaItems: [])
     }()
     
     private let disposeBag = DisposeBag()
@@ -27,14 +28,13 @@ class UploadVC: UIViewController {
         return scroll
     }()
     
-    private let gymView = UploadOptionView()
-    
-    private let levelView = UploadOptionView()
+    private let gymView = UploadOptionView(symbolImage: UIImage(systemName: "figure.climbing") ?? UIImage(), optionText: UploadNameSpace.selectGym)
+    private let levelView = UploadOptionView(symbolImage: UIImage(systemName: "flag") ?? UIImage(), optionText: UploadNameSpace.selectSector)
     
     private lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [selectedMediaView, callPHPickerButton, textView, gymView, levelView]
+        [selectedMediaView, callPHPickerButton, levelButton, textView, gymView, levelView, /*loadingIndicator*/]
             .forEach {
                 view.addSubview($0)
             }
@@ -64,6 +64,15 @@ class UploadVC: UIViewController {
         return button
     }()
     
+    private let levelButton: UIButton = {
+        let button = UIButton(primaryAction: nil)
+        button.titleLabel?.font = .systemFont(ofSize: 13)
+        button.setTitleColor(.systemBlue, for: .normal)
+        button.backgroundColor = .systemGray3
+        button.layer.cornerRadius = 15
+        return button
+    }()
+    
     private let textView: UITextView = {
         let textView = UITextView()
         textView.font = .systemFont(ofSize: 15)
@@ -83,6 +92,12 @@ class UploadVC: UIViewController {
         return button
     }()
     
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = UploadNameSpace.title
@@ -90,6 +105,10 @@ class UploadVC: UIViewController {
         setLayout()
         mediaItemsBind()
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
+        setGymView()
+        setSectorView()
+        setLevelButton()
+        setAlert()
     }
     
     @objc
@@ -120,12 +139,15 @@ class UploadVC: UIViewController {
         viewModel.mediaItems
             .subscribe(onNext: { [weak self] items in
                 guard let self else { return }
+                
                 if self.viewModel.mediaItems.value == [] {
                     self.callPHPickerButton.isHidden = false
                 } else {
-                    let feed = FeedView(frame: CGRect(origin: CGPoint(), 
+                    let uploadVM = UploadVM(mediaItems: items)
+                    let feed = FeedView(frame: CGRect(origin: CGPoint(),
                                                       size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
-                                        mediaItems: items)
+                                        viewModel: uploadVM
+                    )
                     self.callPHPickerButton.isHidden = true
                     self.selectedMediaView.addSubview(feed)
                     
@@ -138,14 +160,89 @@ class UploadVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
-    func removeAllSubview(view: UIView) {
-        view.subviews.forEach { subview in
-            subview.removeFromSuperview()
+    private func setGymView() {
+        let gymTapGesture = UITapGestureRecognizer()
+        gymView.isUserInteractionEnabled = true
+        gymView.addGestureRecognizer(gymTapGesture)
+        
+        gymTapGesture.rx.event
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] _ in
+                guard let self = self else { return }
+                // 화면 전환
+                let searchVC = SearchVC()
+                let navigationController = UINavigationController(rootViewController: searchVC)
+                navigationController.modalPresentationStyle = .pageSheet
+                self.present(navigationController, animated: true, completion: nil)
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func setSectorView() {
+        let button = UIButton(primaryAction: nil)
+        
+        let menuItems: [UIAction] = ["섹터 1", "섹터 2", "섹터 3"].map { sector in
+            UIAction(title: sector) { [weak self] _ in
+                self?.viewModel.optionSelected(optionText: sector)
+            }
         }
+        
+        let menu = UIMenu(title: "", options: .displayInline, children: menuItems)
+        
+        button.menu = menu
+        button.showsMenuAsPrimaryAction = true  // 버튼을 탭하면 메뉴 노출
+        button.backgroundColor = .clear
+        
+        levelView.addSubview(button)
+        
+        button.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview()
+            $0.trailing.equalToSuperview()
+            $0.width.equalTo(levelView).multipliedBy(2.0 / 3.0) // levelView의 2/3
+        }
+    }
+    
+    private func setLevelButton() {
+        let menuItems: [UIAction] = ["레벨 1", "레벨 2", "레벨 3"].map { sector in
+            UIAction(title: sector) { [weak self] _ in
+                self?.viewModel.optionSelected(optionText: sector)
+            }
+        }
+        
+        let menu = UIMenu(title: "", options: .displayInline, children: menuItems)
+        
+        levelButton.menu = menu
+        levelButton.showsMenuAsPrimaryAction = true
+        levelButton.changesSelectionAsPrimaryAction = true
+        levelButton.setTitle("선택", for: .normal)
+        
+    }
+    
+    private func setAlert() {
+        viewModel.showAlert
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                print("알림 이벤트 발생")
+                
+                let alertController = UIAlertController(
+                    title: "알림",
+                    message: "1분 미만 비디오를 업로드해주세요.",
+                    preferredStyle: .alert
+                )
+                let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
+                alertController.addAction(okAction)
+                
+                self.present(alertController, animated: true, completion: {
+                    print("설공적으로 알림 노출.")
+                })
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        
         [scrollView, postButton]
             .forEach {
                 view.addSubview($0)
@@ -172,6 +269,12 @@ class UploadVC: UIViewController {
         callPHPickerButton.snp.makeConstraints {
             $0.center.equalTo(selectedMediaView.snp.center)
             $0.size.equalTo(CGSize(width: 100, height: 50))
+        }
+        
+        levelButton.snp.makeConstraints {
+            $0.leading.equalTo(selectedMediaView.snp.leading).offset(16)
+            $0.bottom.equalTo(selectedMediaView.snp.bottom).offset(-16)
+            $0.size.equalTo(CGSize(width: 50, height: 30))
         }
         
         textView.snp.makeConstraints {
@@ -231,6 +334,7 @@ extension UploadVC : UITextViewDelegate {
 extension UploadVC : PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         viewModel.mediaItems.accept(results)
+        viewModel.setMedia()
         picker.dismiss(animated: true)
     }
 }

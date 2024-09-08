@@ -67,11 +67,23 @@ class ClimbingGymVC: UIViewController {
     private func actions() {
         headerView.followButton.addAction(UIAction { [weak self] _ in
             guard let self else { return }
+            
             if self.headerView.followButton.title(for: .normal) == ClimbingGymNameSpace.follow {
                 self.headerView.followButton.setTitle(ClimbingGymNameSpace.unFollow, for: .normal)
+                self.headerView.followButton.backgroundColor = .lightGray
+                self.headerView.followButton.setTitleColor(.black, for: .normal)
+                
+                ClimbingGymNameSpace.totalFollow += 1
             } else {
                 self.headerView.followButton.setTitle(ClimbingGymNameSpace.follow, for: .normal)
+                self.headerView.followButton.backgroundColor = .mainPurple
+                self.headerView.followButton.setTitleColor(.white, for: .normal)
+                
+                if ClimbingGymNameSpace.totalFollow > 0 {
+                    ClimbingGymNameSpace.totalFollow -= 1
+                }
             }
+            self.headerView.updateFollowersCount(ClimbingGymNameSpace.follower)
         }, for: .touchUpInside)
         
         headerView.segmentControl.addAction(UIAction { [weak self] _ in
