@@ -13,17 +13,12 @@ import RxSwift
 
 class UploadVM {
     let mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
-    
-//    let mediaItems: BehaviorRelay<[PHPickerResult]>
-    
-    
     let feedRelay = BehaviorRelay(value: [FeedCellModel]())
     let showAlert = PublishRelay<Void>()
-    let isLoading = PublishRelay<Bool>()
+    let isLoading = BehaviorRelay<Bool>(value: false)
     
     init(mediaItems: [PHPickerResult]) {
         self.mediaItems.accept(mediaItems) // BehaviorRelay의 값을 업데이트
-//        self.mediaItems = BehaviorRelay(value: mediaItems)
         self.setMedia()
     }
     

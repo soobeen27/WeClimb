@@ -18,7 +18,6 @@ class UploadVC: UIViewController {
     private lazy var viewModel: UploadVM = {
         return UploadVM(mediaItems: [])
     }()
-//    private var viewModel: UploadVM = UploadVM(mediaItems: [])
     
     private let disposeBag = DisposeBag()
     
@@ -109,7 +108,6 @@ class UploadVC: UIViewController {
         setSectorView()
         setLevelButton()
         setAlert()
-//        setLoading()
     }
     
     @objc
@@ -145,17 +143,10 @@ class UploadVC: UIViewController {
                     self.callPHPickerButton.isHidden = false
                 } else {
                     let uploadVM = UploadVM(mediaItems: items)
-                    print("아이템: \(items)")
                     let feed = FeedView(frame: CGRect(origin: CGPoint(),
                                                       size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
                                         viewModel: uploadVM
                     )
-                    //                     기존의 viewModel을 업데이트
-                    //                    self.viewModel.mediaItems.accept(items)
-                    
-                    //                    let feed = FeedView(frame: CGRect(origin: CGPoint(),
-                    //                                                      size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
-                    //                                        viewModel: self.viewModel) // 기존 viewModel 사용
                     self.callPHPickerButton.isHidden = true
                     self.selectedMediaView.addSubview(feed)
                     
@@ -248,27 +239,6 @@ class UploadVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
-//    private func setLoading() {
-//        viewModel.isLoading
-//            .observe(on: MainScheduler.instance)
-//            .bind(to: loadingIndicator.rx.isAnimating)
-//            .disposed(by: disposeBag)
-//        
-//        // 그냥 프린트문 찍어보려고 명시적으로 해본거...
-//        viewModel.isLoading
-//            .observe(on: MainScheduler.instance)
-//            .subscribe(onNext: { isLoading in
-//                if isLoading {
-//                    print("로딩 중입니다.")
-//                    self.loadingIndicator.startAnimating()
-//                } else {
-//                    print("로딩이 완료되었습니다.")
-//                    self.loadingIndicator.stopAnimating()
-//                }
-//            })
-//            .disposed(by: disposeBag)
-//    }
-    
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
@@ -327,10 +297,6 @@ class UploadVC: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-16)
             $0.height.equalTo(50)
         }
-        
-//        loadingIndicator.snp.makeConstraints {
-//            $0.center.equalTo(selectedMediaView.snp.center)
-//        }
     }
 }
 
@@ -367,6 +333,7 @@ extension UploadVC : UITextViewDelegate {
 extension UploadVC : PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         viewModel.mediaItems.accept(results)
+        viewModel.setMedia()
         picker.dismiss(animated: true)
     }
 }
