@@ -42,7 +42,7 @@ class ClimbingGymVC: UIViewController {
         setLayout()
         bindSectionData()
         actions()
-        navigation()
+//        navigation()
         
         tableView.register(SectionTableViewCell.self, forCellReuseIdentifier: Identifiers.sectionTableViewCell)
         
@@ -53,7 +53,7 @@ class ClimbingGymVC: UIViewController {
     }
     
     // MARK: - 네비게이션 - DS
-    private func navigation() {
+    func navigation() {
         viewModel.onItemSelected = { [weak self] (detailItems: [DetailItem]) in
             guard let self else { return }
             
