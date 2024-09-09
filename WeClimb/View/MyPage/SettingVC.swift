@@ -49,24 +49,24 @@ class SettingVC: UIViewController {
         }
     }
     
-     private func bind() {
-         viewModel.items
-             .observe(on: MainScheduler.instance)
-             .subscribe(onNext: { [weak self] sections in
-                 guard let self = self else { return }
-                 
-                 // 섹션 업데이트
-                 self.sections = sections
-                 
-                 // 데이터 소스 및 셀 업데이트
-                 self.tableView.reloadData()
-             })
-             .disposed(by: disposeBag)
-         
-         tableView.delegate = self
-         tableView.dataSource = self
-     }
- }
+    private func bind() {
+        viewModel.items
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] sections in
+                guard let self = self else { return }
+                
+                // 섹션 업데이트
+                self.sections = sections
+                
+                // 데이터 소스 및 셀 업데이트
+                self.tableView.reloadData()
+            })
+            .disposed(by: disposeBag)
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+    }
+}
 
 // 헤더 바인딩
 extension SettingVC: UITableViewDataSource, UITableViewDelegate {

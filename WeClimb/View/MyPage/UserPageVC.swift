@@ -169,7 +169,7 @@ class UserPageVC: UIViewController {
         
         setLayout()
         bind()
-        setNavigation()
+//        setNavigation()
     }
     
     // MARK: - 로그아웃 버튼 YJ
@@ -186,6 +186,8 @@ class UserPageVC: UIViewController {
     }
     
     @objc private func rightBarButtonTapped() {
+        let settingsVC = SettingVC()
+        navigationController?.pushViewController(settingsVC, animated: true)
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let logout = UIAlertAction(title: UserPageNameSpace.logout, style: .default) { _ in
