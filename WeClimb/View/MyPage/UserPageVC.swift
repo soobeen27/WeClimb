@@ -188,19 +188,19 @@ class UserPageVC: UIViewController {
     @objc private func rightBarButtonTapped() {
         let settingsVC = SettingVC()
         navigationController?.pushViewController(settingsVC, animated: true)
-//        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-//        
-//        let logout = UIAlertAction(title: UserPageNameSpace.logout, style: .default) { _ in
-//            guard let navigationController = self.tabBarController?.navigationController else { return }
-//            navigationController.popToRootViewController(animated: true)
-//        }
-//        
-//        let close = UIAlertAction(title: UserPageNameSpace.close, style: .cancel)
-//        
-//        [logout, close]
-//            .forEach { actionSheet.addAction($0) }
-//        
-//        present(actionSheet, animated: true)
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let logout = UIAlertAction(title: UserPageNameSpace.logout, style: .default) { _ in
+            guard let navigationController = self.tabBarController?.navigationController else { return }
+            navigationController.popToRootViewController(animated: true)
+        }
+        
+        let close = UIAlertAction(title: UserPageNameSpace.close, style: .cancel)
+        
+        [logout, close]
+            .forEach { actionSheet.addAction($0) }
+        
+        present(actionSheet, animated: true)
     }
     
     private func buttonTapped() {
