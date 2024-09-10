@@ -171,4 +171,21 @@ final class FirebaseManager {
     func uploadImage() {
         
     }
+    
+    // 유저 신고내역
+    func userReport(content: String, userName: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        let reportData: [String: Any] = [
+            "content": content,
+            "userName": userName,
+            "time": Timestamp()
+        ]
+        
+        db.collection("userReport").addDocument(data: reportData) { error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(()))
+            }
+        }
+    }
 }
