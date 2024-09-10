@@ -13,11 +13,13 @@ import RxCocoa
 class SearchViewModel {
     
     let data = BehaviorRelay<[SearchModel]>(value: [])
+    let filteredData = BehaviorRelay<[SearchModel]>(value: [])
+    let searchText = BehaviorRelay<String>(value: "")
     let disposeBag = DisposeBag()
     
     init() {
-        
         fetchAllGyms()
+        bindSearchText()
     }
     
     func fetchAllGyms() {
@@ -34,6 +36,7 @@ class SearchViewModel {
                         return SearchModel(image: UIImage(named: "defaultImage"), title: gym.gymName, address: gym.address)
                     }
                     self?.data.accept(searchModels) // 테이블 뷰에 전달할 데이터
+                    self?.filteredData.accept(searchModels) // 필터링 되지 않은 초기 데이터
 //                    print("테이블 뷰에 전달할 데이터: \(searchModels)")
                 })
                 .disposed(by: self?.disposeBag ?? DisposeBag())
@@ -48,5 +51,19 @@ class SearchViewModel {
             }
             return Disposables.create()
         }
+    }
+    
+    private func bindSearchText() {
+        searchText
+            .subscribe(onNext: { [weak self] text in
+                guard let self = self else { return }
+                if text.isEmpty {
+                    self.filteredData.accept(self.data.value) // 검색어가 없으면 전체 데이터 표시
+                } else {
+                    let filtered = self.data.value.filter { $0.title.contains(text) }
+                    self.filteredData.accept(filtered) // 검색어로 필터링된 데이터 표시
+                }
+            })
+            .disposed(by: disposeBag)
     }
 }
