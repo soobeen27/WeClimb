@@ -43,18 +43,20 @@ class UploadVC: UIViewController {
     
     private lazy var selectedMediaView: UIView = {
         let view = UIView()
-        view.backgroundColor = .secondarySystemBackground
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         view.addSubview(callPHPickerButton)
         return view
     }()
     
     private lazy var callPHPickerButton: UIButton = {
         let button = UIButton()
-        button.setTitle(UploadNameSpace.add, for: .normal)
+        button.setImage(UIImage(systemName: "photo.badge.plus")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        button.tintColor = .secondarySystemBackground
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
-        button.backgroundColor = .mainPurple // 앱 틴트 컬러
         button.layer.cornerRadius = 10
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentHorizontalAlignment = .fill
+        button.contentVerticalAlignment = .fill
         button.rx.tap
             .bind { [weak self] in
                 print("tapped")
@@ -229,7 +231,7 @@ class UploadVC: UIViewController {
         levelButton.menu = menu
         levelButton.showsMenuAsPrimaryAction = true
         levelButton.changesSelectionAsPrimaryAction = true
-        levelButton.setTitle("선택", for: .normal)
+        levelButton.setTitle("난이도", for: .normal)
         
     }
     
@@ -308,8 +310,9 @@ class UploadVC: UIViewController {
         }
         
         callPHPickerButton.snp.makeConstraints {
-            $0.center.equalTo(selectedMediaView.snp.center)
-            $0.size.equalTo(CGSize(width: 100, height: 50))
+            $0.centerX.equalTo(selectedMediaView.snp.centerX)
+            $0.centerY.equalTo(selectedMediaView.snp.centerY).offset(-8)
+            $0.size.equalTo(CGSize(width: 150, height: 150))
         }
         
         levelButton.snp.makeConstraints {
