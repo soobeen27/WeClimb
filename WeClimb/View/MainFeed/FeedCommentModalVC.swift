@@ -15,17 +15,17 @@ class FeedCommentModalVC: UIViewController {
   
   
   private let titleLabel: UILabel = {
-      let label = UILabel()
-      label.text = "댓 글"
-      label.font = UIFont.systemFont(ofSize: 15, weight: .bold)
-      label.textAlignment = .center
-//      label.textColor = .white
-      return label
+    let label = UILabel()
+    label.text = "댓 글"
+    label.font = UIFont.systemFont(ofSize: 15, weight: .bold)
+    label.textAlignment = .center
+    //      label.textColor = .white
+    return label
   }()
   
   override func viewDidLoad() {
     super.viewDidLoad()
-        
+    
     setTableView()
     setLayout()
   }
@@ -66,17 +66,19 @@ extension FeedCommentModalVC: UITableViewDelegate, UITableViewDataSource {
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.commentTableViewCell, for: indexPath) as! FeedCommentCell
-    
+    guard let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.commentTableViewCell, for: indexPath) as? FeedCommentCell else {
+      return UITableViewCell()
+    }
     
     cell.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
     cell.selectionStyle = .none
     
-    cell.commentProfileImage.image = UIImage(named: "testImage")
-    cell.commentUser.text = "iOSClimber"
-    cell.commentLabel.text = FeedNameSpace.commentList[indexPath.row]
-    cell.likeButtonCounter.text = "10"
-    
+    if let image = UIImage(named: "testImage") {
+      cell.configure(userImage: image,
+                     userName: "iOSClimber",
+                     userComment: FeedNameSpace.commentList[indexPath.row],
+                     likeCounter: "10")
+    }
     return cell
   }
 }

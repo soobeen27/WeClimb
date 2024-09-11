@@ -11,7 +11,7 @@ import SnapKit
 
 class FeedCommentCell: UITableViewCell {
     
-    let commentProfileImage: UIImageView = {
+    private let commentProfileImage: UIImageView = {
         let image = UIImageView()
         image.layer.cornerRadius = 19
         image.clipsToBounds = true
@@ -19,7 +19,7 @@ class FeedCommentCell: UITableViewCell {
         return image
     }()
     
-    let commentUser: UILabel = {
+    private let commentUser: UILabel = {
         let label = UILabel()
 //        label.textColor = .white
         label.textAlignment = .left
@@ -27,7 +27,7 @@ class FeedCommentCell: UITableViewCell {
         return label
     }()
     
-    let commentLabel: UILabel = {
+    private let commentLabel: UILabel = {
         let label = UILabel()
 //        label.textColor = .white
         label.textAlignment = .left
@@ -36,9 +36,9 @@ class FeedCommentCell: UITableViewCell {
         return label
     }()
     
-    let likeButton = UIButton()
+    private let likeButton = UIButton()
     
-    let likeButtonCounter: UILabel = {
+    private let likeButtonCounter: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 11, weight: .medium)
 //        label.textColor = .white
@@ -46,14 +46,14 @@ class FeedCommentCell: UITableViewCell {
         return label
     }()
     
-    let commentStackView: UIStackView = {
+    private let commentStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 3
         return stackView
     }()
     
-    let likeStackView: UIStackView = {
+    private let likeStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 0
@@ -106,5 +106,12 @@ class FeedCommentCell: UITableViewCell {
         likeButton.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 20, height: 20))
         }
+    }
+    //MARK: - configure
+    func configure(userImage: UIImage, userName: String, userComment: String, likeCounter: String) {
+        commentProfileImage.image = userImage
+        commentUser.text = userName
+        commentLabel.text = userComment
+        likeButtonCounter.text = likeCounter
     }
 }

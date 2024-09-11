@@ -97,7 +97,7 @@ extension UIButton {
 //MARK: - 높이 조절 가능한 모달
 extension UIViewController {
     
-    func presentReportModal(modalVC: UIViewController) {
+    func presentModal(modalVC: UIViewController) {
         modalVC.modalPresentationStyle = .pageSheet
         modalVC.isModalInPresentation = false  // 모달 외부 클릭 시 모달 닫기
         

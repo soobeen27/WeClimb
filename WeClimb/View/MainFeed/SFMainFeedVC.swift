@@ -89,8 +89,12 @@ class SFMainFeedVC: UIViewController {
         }
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
-        actionSheet.addAction(reportAction)
-        actionSheet.addAction(cancelAction)
+        
+        [reportAction, cancelAction]
+            .forEach {
+                actionSheet.addAction($0)
+            }
+
         self.present(actionSheet, animated: true, completion: nil)
     }
     
@@ -98,16 +102,17 @@ class SFMainFeedVC: UIViewController {
     //MARK: - 신고하기 모달 시트
     private func reportModal() {
         let modalVC = FeedReportModalVC()
-        presentReportModal(modalVC: modalVC)
+        presentModal(modalVC: modalVC)
     }
     
     
     //MARK: - 댓글 모달 시트
     private func commentModal() {
         let modalVC = FeedCommentModalVC()
-        presentReportModal(modalVC: modalVC)
+        presentModal(modalVC: modalVC)
     }
 }
+
 
 //MARK: - 컬렉션뷰 프로토콜 설정
 extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
