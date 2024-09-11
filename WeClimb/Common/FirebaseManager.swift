@@ -37,7 +37,7 @@ final class FirebaseManager {
             completion()
         }
     }
-    // 이름 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
+    // 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
     func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
         let ref = db.collection("users").whereField("userName", isEqualTo: name)
         
