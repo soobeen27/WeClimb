@@ -86,25 +86,25 @@ class FeedCommentCell: UITableViewCell {
             likeStackView.addArrangedSubview($0)
         }
         commentProfileImage.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(5)
+            $0.top.equalToSuperview().inset(10)
             $0.leading.equalToSuperview().inset(16)
             $0.width.height.equalTo(38)
         }
         commentStackView.snp.makeConstraints {
             $0.top.equalTo(commentProfileImage.snp.top)
-            $0.bottom.equalToSuperview().inset(5)
+            $0.bottom.equalToSuperview().inset(10)
             $0.leading.equalTo(commentProfileImage.snp.trailing).offset(10)
             $0.trailing.equalTo(likeStackView.snp.leading).offset(-10)
         }
         likeStackView.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(5)
+            $0.top.equalToSuperview().inset(10)
             $0.trailing.equalToSuperview().inset(16)
         }
         likeButton.imageView?.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 20, height: 18))
+            $0.size.equalTo(CGSize(width: 25, height: 23))
         }
         likeButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 20, height: 20))
+            $0.size.equalTo(CGSize(width: 25, height: 23))
         }
     }
     //MARK: - configure
