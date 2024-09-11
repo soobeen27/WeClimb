@@ -19,7 +19,7 @@ class SFMainFeedVC: UIViewController {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0  //셀간 여백 조정(효과없음)
-//        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0) //플로우 레이아웃 인셋 조정(효과없음)
+        //        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0) //플로우 레이아웃 인셋 조정(효과없음)
         return UICollectionView(frame: .zero, collectionViewLayout: layout) //레이아웃을 반환
     }()
     
@@ -38,7 +38,7 @@ class SFMainFeedVC: UIViewController {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: animated)
     }
-
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
@@ -53,13 +53,13 @@ class SFMainFeedVC: UIViewController {
     private func setTabBar(){
         if let tabBar = self.tabBarController?.tabBar {
             tabBar.backgroundImage = UIImage()  //탭바 배경 투명하게 설정
-//            tabBar.shadowImage = UIImage()  //탭바 하단 그림자 제거
+            //            tabBar.shadowImage = UIImage()  //탭바 하단 그림자 제거
             tabBar.isTranslucent = true  //탭바 반투명
             tabBar.backgroundColor = .clear  //탭바 배경투명
         }
     }
     
-
+    
     //MARK: - 컬렉션뷰 & 레이아웃 설정
     private func setCollectionView() {
         collectionView.register(SFCollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.mainCollectionViewCell)
@@ -79,6 +79,52 @@ class SFMainFeedVC: UIViewController {
             $0.edges.equalToSuperview()
         }
     }
+    
+    
+    //MARK: - 더보기 액션 시트
+    private func actionSheet() {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
+            self?.reportModal()
+        }
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+        
+        actionSheet.addAction(reportAction)
+        actionSheet.addAction(cancelAction)
+        self.present(actionSheet, animated: true, completion: nil)
+    }
+    
+    
+    //MARK: - 신고하기 모달 시트
+    private func reportModal() {
+        let modalVC = FeedReportModalVC()
+        modalVC.modalPresentationStyle = .pageSheet
+        modalVC.isModalInPresentation = false  //모달 외부 클릭 시 모달 닫기
+        
+        if let sheet = modalVC.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]  //미디움과 라지 크기 조절
+            sheet.preferredCornerRadius = 20
+            sheet.largestUndimmedDetentIdentifier = .medium
+            sheet.prefersGrabberVisible = true  //상단 그랩바
+        }
+        present(modalVC, animated: true, completion: nil)
+    }
+
+
+    //MARK: - 댓글 모달 시트
+    private func commentModal() {
+        let modalVC = FeedCommentModalVC()
+        modalVC.modalPresentationStyle = .pageSheet
+        modalVC.isModalInPresentation = false  //모달 외부 클릭 시 모달 닫기
+        
+        if let sheet = modalVC.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]  //미디움과 라지 크기 조절
+            sheet.preferredCornerRadius = 20
+            sheet.largestUndimmedDetentIdentifier = .medium
+            sheet.prefersGrabberVisible = true  //상단 그랩바
+        }
+        present(modalVC, animated: true, completion: nil)
+    }
 }
 
 
@@ -92,7 +138,7 @@ extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlow
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Identifiers.mainCollectionViewCell, for: indexPath) as? SFCollectionViewCell else {
             return UICollectionViewCell()
         }
-
+        
         if let image = UIImage(named: "testImage") {
             cell.configure(userProfileImage: image,
                            userName: "더 클라임 신림",
@@ -104,6 +150,20 @@ extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlow
                            likeCounter: "330",
                            commentCounter: "17")
         }
+        
+        cell.ellipsisButton.rx.tap
+            .bind { [weak self] in
+                self?.actionSheet()
+            }
+            .disposed(by: disposeBag)
+        
+        
+        cell.commentButton.rx.tap
+            .bind { [weak self] in
+                self?.commentModal()
+            }
+            .disposed(by: disposeBag)
+        
         return cell
     }
     
