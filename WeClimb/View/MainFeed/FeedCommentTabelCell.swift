@@ -21,7 +21,7 @@ class FeedCommentCell: UITableViewCell {
     
     let commentUser: UILabel = {
         let label = UILabel()
-        label.textColor = .white
+//        label.textColor = .white
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 13, weight: .medium)
         return label
@@ -29,7 +29,7 @@ class FeedCommentCell: UITableViewCell {
     
     let commentLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .white
+//        label.textColor = .white
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 13, weight: .light)
         label.numberOfLines = 0
@@ -41,7 +41,7 @@ class FeedCommentCell: UITableViewCell {
     let likeButtonCounter: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 11, weight: .medium)
-        label.textColor = .white
+//        label.textColor = .white
         label.textAlignment = .center
         return label
     }()

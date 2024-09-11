@@ -19,15 +19,13 @@ class FeedCommentModalVC: UIViewController {
       label.text = "댓 글"
       label.font = UIFont.systemFont(ofSize: 15, weight: .bold)
       label.textAlignment = .center
-      label.textColor = .white
+//      label.textColor = .white
       return label
   }()
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
-    self.title = "댓글"
-    
+        
     setTableView()
     setLayout()
   }
@@ -39,14 +37,14 @@ class FeedCommentModalVC: UIViewController {
     tableView.dataSource = self
     
     tableView.separatorStyle  = .none
-    tableView.backgroundColor = UIColor(hex: "#0C1014")
+    tableView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
     
     tableView.rowHeight = UITableView.automaticDimension  //셀 height 유동적으로 설정
-    tableView.estimatedRowHeight = 70  //셀 height 기본값 설정
+    tableView.estimatedRowHeight = 70  //셀 height 기본값 설정(지금 안먹히는 듯..)
   }
   
   private func setLayout() {
-    view.backgroundColor = UIColor(hex: "#0C1014")
+    view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
     [titleLabel, tableView]
       .forEach {
         view.addSubview($0)
@@ -71,7 +69,7 @@ extension FeedCommentModalVC: UITableViewDelegate, UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.commentTableViewCell, for: indexPath) as! FeedCommentCell
     
     
-    cell.backgroundColor = UIColor(hex: "#0C1014")
+    cell.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
     cell.selectionStyle = .none
     
     cell.commentProfileImage.image = UIImage(named: "testImage")
