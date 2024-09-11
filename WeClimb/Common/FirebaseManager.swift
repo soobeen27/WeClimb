@@ -180,13 +180,13 @@ final class FirebaseManager {
     // MARK: - DS 작업 (유저 신고, HTTP 변환)
 //     유저 신고내역
     func userReport(content: String, userName: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        let reportData: [String: Any] = [
+        let userReport: [String: Any] = [
             "content": content,
             "userName": userName,
             "time": Timestamp()
         ]
 
-        db.collection("userReport").addDocument(data: reportData) { error in
+        db.collection("report").addDocument(data: userReport) { error in
             if let error = error {
                 print("Firestore 오류 발생: \(error.localizedDescription)")
                 completion(.failure(error))
