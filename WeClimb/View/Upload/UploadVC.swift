@@ -20,6 +20,7 @@ class UploadVC: UIViewController {
     }()
     
     private let disposeBag = DisposeBag()
+    private var feedView: FeedView?
     
     private lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
@@ -114,11 +115,16 @@ class UploadVC: UIViewController {
         setLoading()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         
-        callPHPickerButton.isHidden = false
-        removeAllSubview(view: selectedMediaView)
+        feedView?.pauseAllVideo()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        feedView?.playAllVideos()
     }
     
     @objc
@@ -158,6 +164,7 @@ class UploadVC: UIViewController {
                 } else {
                     let feed = FeedView(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
                                         viewModel: self.viewModel)
+                    self.feedView = feed
                     self.callPHPickerButton.isHidden = true
                     self.selectedMediaView.addSubview(feed)
                     
@@ -281,7 +288,6 @@ class UploadVC: UIViewController {
             })
             .disposed(by: disposeBag)
     }
-    
     
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black

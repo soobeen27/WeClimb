@@ -60,7 +60,7 @@ class FeedView : UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setLayout() {
+    private func setLayout() {
         [collectionView, pageControl]
             .forEach {
                 self.addSubview($0)
@@ -73,6 +73,28 @@ class FeedView : UIView {
             $0.bottom.equalToSuperview().offset(-20)
             $0.centerX.equalToSuperview()
         }
+    }
+    
+    // MARK: - 모든 셀의 비디오를 멈추는 메서드 YJ
+    func pauseAllVideo() {
+        
+        collectionView.visibleCells     // 현재 화면에 표시되고 있는 셀들 가져오기
+            .forEach { cell in          // 각 셀 순회해서 비디오 멈추기
+                if let feedCell = cell as? FeedCell {
+                    feedCell.stopVideo()
+                }
+            }
+    }
+    
+    // MARK: - 현재 셀의 비디오를 실행시키는 메서드 YJ
+    func playAllVideos() {
+        
+        collectionView.visibleCells
+            .forEach { cell in
+                if let feedCell = cell as? FeedCell {
+                    feedCell.playVideo()
+                }
+            }
     }
     
     private func bind() {
