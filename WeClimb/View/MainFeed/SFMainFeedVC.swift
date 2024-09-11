@@ -98,35 +98,16 @@ class SFMainFeedVC: UIViewController {
     //MARK: - 신고하기 모달 시트
     private func reportModal() {
         let modalVC = FeedReportModalVC()
-        modalVC.modalPresentationStyle = .pageSheet
-        modalVC.isModalInPresentation = false  //모달 외부 클릭 시 모달 닫기
-        
-        if let sheet = modalVC.sheetPresentationController {
-            sheet.detents = [.medium(), .large()]  //미디움과 라지 크기 조절
-            sheet.preferredCornerRadius = 20
-            sheet.largestUndimmedDetentIdentifier = .medium
-            sheet.prefersGrabberVisible = true  //상단 그랩바
-        }
-        present(modalVC, animated: true, completion: nil)
+        presentReportModal(modalVC: modalVC)
     }
-
-
+    
+    
     //MARK: - 댓글 모달 시트
     private func commentModal() {
         let modalVC = FeedCommentModalVC()
-        modalVC.modalPresentationStyle = .pageSheet
-        modalVC.isModalInPresentation = false  //모달 외부 클릭 시 모달 닫기
-        
-        if let sheet = modalVC.sheetPresentationController {
-            sheet.detents = [.medium(), .large()]  //미디움과 라지 크기 조절
-            sheet.preferredCornerRadius = 20
-            sheet.largestUndimmedDetentIdentifier = .medium
-            sheet.prefersGrabberVisible = true  //상단 그랩바
-        }
-        present(modalVC, animated: true, completion: nil)
+        presentReportModal(modalVC: modalVC)
     }
 }
-
 
 //MARK: - 컬렉션뷰 프로토콜 설정
 extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {

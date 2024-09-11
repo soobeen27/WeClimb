@@ -92,3 +92,21 @@ extension UIButton {
         })
     }
 }
+
+
+//MARK: - 높이 조절 가능한 모달
+extension UIViewController {
+    
+    func presentReportModal(modalVC: UIViewController) {
+        modalVC.modalPresentationStyle = .pageSheet
+        modalVC.isModalInPresentation = false  // 모달 외부 클릭 시 모달 닫기
+        
+        if let sheet = modalVC.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]  // 미디움과 라지 크기 조절
+            sheet.preferredCornerRadius = 20
+            sheet.largestUndimmedDetentIdentifier = .medium
+            sheet.prefersGrabberVisible = true  // 상단 그랩바
+        }
+        present(modalVC, animated: true, completion: nil)
+    }
+}
