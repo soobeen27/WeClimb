@@ -8,6 +8,7 @@
 import AVKit
 import PhotosUI
 
+import LightCompressor
 import RxRelay
 import RxSwift
 
@@ -19,11 +20,6 @@ class UploadVM {
     
     // 피커뷰에서 선택한 항목을 저장
     private var selectedFeedItems = [FeedCellModel]()
-    
-//    init(mediaItems: [PHPickerResult]) {
-//        self.mediaItems.accept(mediaItems) // BehaviorRelay의 값을 업데이트
-//        self.setMedia()
-//    }
     
     func optionSelected(optionText: String) {
         print("선택된 옵션: \(optionText)")
@@ -49,6 +45,7 @@ extension UploadVM {
                         guard let self else { return }
                         if let videoURL = item as? URL {
                             print("\(videoURL)")
+//                            self.printVideoFileSize(url: videoURL) // 원본 비디오 파일 크기 출력
                             
                             self.checkVideoDuration(url: videoURL) { durationInSeconds in
                                 if durationInSeconds > 60 {
@@ -58,17 +55,18 @@ extension UploadVM {
                                     return
                                     
                                 } else {
-                                    
-                                    self.compressVideoTo720p(url: videoURL) {compressedURL in
-                                        guard let compressedURL = compressedURL else {
-                                            print("비디오 압축 오류.")
-                                            group.leave()   // 비동기 작업이 끝난걸 알려줌
-                                            return
-                                        }
-                                        let newItem = FeedCellModel(image: nil, videoURL: compressedURL)
+//
+//                                    self.compressVideo(inputURL: videoURL) {compressedURL in
+//                                        guard let compressedURL = compressedURL else {
+//                                            print("비디오 압축 오류.")
+//                                            group.leave()   // 비동기 작업이 끝난걸 알려줌
+//                                            return
+//                                        }
+//                                        self.printVideoFileSize(url: compressedURL) // 압축 후 비디오 파일 크기 출력
+                                        let newItem = FeedCellModel(image: nil, videoURL: videoURL)
                                         models.append(newItem)
                                         group.leave()
-                                    }
+//                                    }
                                 }
                             }
                         }
@@ -97,36 +95,49 @@ extension UploadVM {
 }
 
 extension UploadVM {
-    // MARK: - 비디오를 압축하는 메서드 YJ
-    func compressVideoTo720p(url: URL, completion: @escaping (URL?) -> Void) {
-        let asset = AVAsset(url: url)
-        let presetName = AVAssetExportPresetMediumQuality // 720p에 가까운 중간 품질 프리셋
-        guard let exportSession = AVAssetExportSession(asset: asset, presetName: presetName) else {
-            print("압축 세션 생성 오류.")
-            completion(nil)
-            return
-        }
+    // MARK: - 비디오를 압축하는 메서드
+    func compressVideo(inputURL: URL, completion: @escaping (URL?) -> Void) {
+        let videoCompressor = LightCompressor()
         
-        // 압축된 비디오 파일을 저장할 URL 생성
-        let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("mp4")
-        
-        exportSession.outputURL = outputURL // 출력 URL 설정
-        exportSession.outputFileType = .mp4 // 파일 형식 설정
-        exportSession.shouldOptimizeForNetworkUse = true    // 네트워크 사용 최적화
-        
-        exportSession.exportAsynchronously {
-            switch exportSession.status {
-            case .completed:
-                print("비디오 압축 완료: \(outputURL)")
-                completion(outputURL)
-            case .failed, .cancelled:
-                print("비디오 압축 실패: \(exportSession.error?.localizedDescription ?? "알 수 없는 오류")")
+        // 압축 작업 설정
+        let compression = videoCompressor.compressVideo(videos: [
+            .init(
+                source: inputURL,
+                destination: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("mp4"),
+                configuration: .init(
+                    quality: VideoQuality.very_high, // 비디오 품질
+                    videoBitrateInMbps: 2, // 비트레이트
+                    disableAudio: false, // 오디오
+                    keepOriginalResolution: false, // 원본 해상도 변경
+                    videoSize: nil
+                )
+            )
+        ],
+        progressQueue: .main,
+        progressHandler: { progress in
+            DispatchQueue.main.async { [unowned self] in
+                // Handle progress- "\(String(format: "%.0f", progress.fractionCompleted * 100))%"
+            }},
+                                                        
+            completion: {[weak self] result in
+            guard let `self` = self else { return }
+            
+            switch result {
+                
+            case .onSuccess(_, let path):
+                print("비디오 압축 완료: \(path)")
+                completion(path)
+            case .onStart:
+                print("압축 시작")
+            case .onFailure(_, let error):
+                print("비디오 압축 실패: \(error.localizedDescription)")
                 completion(nil)
-            default:
-                print("비디오 압축 상태: \(exportSession.status.rawValue)")
+            case .onCancelled:
+                print("비디오 압축 취소됨")
                 completion(nil)
             }
-        }
+        })
+        // compression.cancel = true
     }
 }
 

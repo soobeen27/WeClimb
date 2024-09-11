@@ -27,6 +27,7 @@ class FeedView : UIView {
         collectionView.isPagingEnabled = true
         collectionView.register(FeedCell.self, forCellWithReuseIdentifier: FeedCell.className)
         collectionView.showsHorizontalScrollIndicator = false
+        collectionView.delegate = self
         
         return collectionView
     }()
@@ -78,18 +79,16 @@ class FeedView : UIView {
         viewModel.feedRelay
             .bind(to: collectionView.rx.items(
                 cellIdentifier: FeedCell.className, cellType: FeedCell.self)
-            ) { row, element, cell in
+            ) { row, data, cell in
                 // 셀에 데이터 설정
-                cell.configure(with: element)
-                // 첫 번째 셀에 비디오 URL이 있다면 비디오 재생
-                if row == 0, element.videoURL != nil {
+                cell.configure(with: data)
+                
+                if self.pageControl.currentPage == row,
+                self.pageControl.currentPage == 0 {
                     cell.playVideo()
                 }
             }
             .disposed(by: disposeBag)
-        
-        // 델리게이트 self 설정
-        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     }
 }
 
@@ -98,13 +97,17 @@ extension FeedView : UICollectionViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         // 현재 페이지 인덱스 계산
         let pageIndex = Int(round(scrollView.contentOffset.x / self.frame.width))
+        guard pageControl.currentPage != pageIndex else { return } // 페이지가 정확하게 넘어간것만 걸러내기
         pageControl.currentPage = pageIndex
+        
+        let changedItem = viewModel.feedRelay.value[pageIndex]
         
         collectionView.visibleCells // 현재 화면에 표시되고 있는 셀들 반환
             .enumerated()
             .forEach { index, cell in
                 guard let feedCell = cell as? FeedCell else { return }
-                if index == pageIndex {
+
+                if feedCell.data?.videoURL == changedItem.videoURL {
                     feedCell.playVideo()
                 } else {
                     feedCell.stopVideo()

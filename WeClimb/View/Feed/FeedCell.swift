@@ -13,6 +13,7 @@ import SnapKit
 class FeedCell : UICollectionViewCell {
     
     var isDisplayed: Bool = false
+    var data: FeedCellModel? // 셀에 대한 데이터를 저장하는 속성
     
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
@@ -42,16 +43,19 @@ class FeedCell : UICollectionViewCell {
     }
     
     // MARK: - 비디오 재생 메서드 YJ
-    func playVideo() {
+    func readyVideo() {
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.videoGravity = .resizeAspect
         playerLayer?.frame = contentView.bounds
         if let playerLayer = playerLayer {
             contentView.layer.addSublayer(playerLayer)
         }
-        
-        player?.play()
     }
+    
+    // 비디오 재생
+     func playVideo() {
+         player?.play()
+     }
     
     // MARK: - 비디오 정지 메서드 YJ
     func stopVideo() {
@@ -59,6 +63,8 @@ class FeedCell : UICollectionViewCell {
     }
     
     private func setLayout() {
+        contentView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        
         [imageView]
             .forEach {
                 contentView.addSubview($0)
@@ -70,10 +76,12 @@ class FeedCell : UICollectionViewCell {
     
     // MARK: - 셀을 구성하는 메서드 YJ
     func configure(with model: FeedCellModel) {
+        self.data = model // 데이터 저장
         if let image = model.image {
             imageView.image = image
         } else if let videoURL = model.videoURL {
-            player = .init(url: videoURL)
+            player = AVPlayer(url: videoURL)
+            readyVideo()
         }
     }
 }
