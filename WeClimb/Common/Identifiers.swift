@@ -22,6 +22,12 @@ enum Identifiers {
     //SFCollectionViewCell 식별자
     static let collectionViewCell = "CollectionViewCell"
     
+    //FeedReportMadalVC 식별자
+    static let reportTableViewCell = "ReportTableViewCell"
+    
+    //FeedCommentMadalVC 식별자
+    static let commentTableViewCell = "CommentTableViewCell"
+    
     // SectionTableViewCell
     static let sectionTableViewCell = "SectionTableViewCell"
     
