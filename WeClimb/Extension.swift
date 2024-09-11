@@ -53,10 +53,14 @@ extension UIButton {
             .withRenderingMode(.alwaysOriginal)
     }
     
-    //비활성화 상태
+    // 비활성화 상태
     private var normalImage: UIImage? {
+        let isDarkMode = (traitCollection.userInterfaceStyle == .dark) || (backgroundColor == UIColor(hex: "#0C1014"))
+
+        let tintColor = isDarkMode ? UIColor(hex: "#FFFFFF") : UIColor(hex: "#CDCDCD")
+
         return UIImage(systemName: "heart")?
-            .withTintColor(UIColor(hex: "#FFFFFF"))  //"#CDCDCD"
+            .withTintColor(tintColor)
             .withRenderingMode(.alwaysOriginal)
     }
     
