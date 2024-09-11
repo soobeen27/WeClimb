@@ -116,7 +116,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    private let ellipsisButton: UIButton = {
+    let ellipsisButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "ellipsis"), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
@@ -191,8 +191,8 @@ class SFCollectionViewCell: UICollectionViewCell {
     private func setLayout() {
         [feedUserNameLabel, likeButton, commentButton, followButton, likeButtonCounter, commentButtonCounter, ellipsisButton]
             .forEach { view in
-            addShadow(to: view)
-        }
+                addShadow(to: view)
+            }
         
         self.backgroundColor = UIColor(hex: "#0C1014")
         self.addSubview(collectionView)
@@ -306,18 +306,18 @@ class SFCollectionViewCell: UICollectionViewCell {
         likeButtonCounter.text = likeCounter
         commentButtonCounter.text = commentCounter
     }
-}
-
-
-//MARK: - 버튼 그림자 모드
+    
+    
+    //MARK: - 버튼 그림자 모드
     func addShadow(to view: UIView) {
         view.layer.shadowColor = UIColor.black.cgColor //그림자 색상
         view.layer.shadowOffset = CGSize(width: 1, height: 1) //그림자 위치
         view.layer.shadowOpacity = 0.5 //그림자 투명도
         view.layer.shadowRadius = 2 //그림자의 흐림(퍼짐) 정도
         view.layer.masksToBounds = false //테두리에 그림자가 잘리지 않도록 설정
+    }
 }
-
+    
 
 //MARK: - 컬렉션뷰 프로토콜 설정
 extension SFCollectionViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
