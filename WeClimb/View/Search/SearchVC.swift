@@ -17,7 +17,6 @@ class SearchVC: UIViewController {
     
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: nil)
-//        searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = SearchNameSpace.placeholder
         return searchController
@@ -171,11 +170,3 @@ class SearchVC: UIViewController {
             .disposed(by: disposeBag)
     }
 }
-
-//extension SearchVC : UISearchResultsUpdating {
-//    // MARK: - 검색 텍스트에 따라 검색 결과를 업데이트하는 메서드 - YJ
-//    func updateSearchResults(for searchController: UISearchController) {
-//        let searchText = searchController.searchBar.text ?? ""
-//        print("검색 텍스트: \(searchText)")
-//    }
-//}

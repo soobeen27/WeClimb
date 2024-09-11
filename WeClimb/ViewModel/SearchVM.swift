@@ -33,7 +33,7 @@ class SearchViewModel {
                 .subscribe(onSuccess: { gyms in
                     let searchModels = gyms.compactMap { gym -> SearchModel? in
                         guard let gym = gym else { return nil }
-                        return SearchModel(image: UIImage(named: "defaultImage"), title: gym.gymName, address: gym.address)
+                        return SearchModel(imageUrl: gym.profileImage, title: gym.gymName, address: gym.address)
                     }
                     self?.data.accept(searchModels) // 테이블 뷰에 전달할 데이터
                     self?.filteredData.accept(searchModels) // 필터링 되지 않은 초기 데이터
