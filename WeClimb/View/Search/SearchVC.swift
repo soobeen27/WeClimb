@@ -15,6 +15,8 @@ class SearchVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let searchViewModel = SearchViewModel()
     
+    var onSelectedGym: ((Gym) -> Void)?
+    
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.obscuresBackgroundDuringPresentation = false
@@ -123,6 +125,8 @@ class SearchVC: UIViewController {
         tableView.rx.modelSelected(Gym.self)
             .subscribe(onNext: { [weak self] selectedItem in
                 guard let self = self else { return }
+                
+                self.onSelectedGym?(selectedItem)
                 
                 if self.nextPush {
                     let segmentIndex = self.segmentedControl.selectedSegmentIndex
