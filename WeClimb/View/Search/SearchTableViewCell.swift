@@ -71,12 +71,12 @@ class SearchTableViewCell: UITableViewCell {
         }
     }
     
-    func configure(with model: SearchModel) {
-        titleLabel.text = model.title
+    func configure(with model: Gym) {
+        titleLabel.text = model.gymName
         addressLabel.text = model.address
         
         // Kingfisher로 이미지 로드
-        if let imageUrl = model.imageUrl {
+        if let imageUrl = model.profileImage {
             FirebaseManager.shared.loadImage(from: imageUrl, into: gymImage)
         } else {
             gymImage.image = UIImage(named: "defaultImage")
