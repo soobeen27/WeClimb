@@ -13,7 +13,9 @@ import FirebaseAuth
 import FirebaseCore
 import FirebaseStorage
 import FirebaseFirestore
+import FirebaseStorage
 import GoogleSignIn
+import RxSwift
 import Kingfisher
 
 
@@ -21,6 +23,7 @@ final class FirebaseManager {
     
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
+    private let disposeBag = DisposeBag()
     
     static let shared = FirebaseManager()
     private init() {}
@@ -171,9 +174,109 @@ final class FirebaseManager {
                                profileImage: profileImage, additionalInfo: additionalInfo))
             }
     }
-    
-    func uploadImage() {
+    //포스트 업로드
+    func uploadPost(media: [URL], caption: String) {
+        guard let user = Auth.auth().currentUser else {
+            print("로그인이 되지않음")
+            return
+        }
         
+        let storageRef = storage.reference()
+        
+        let uploadedMedia = media.enumerated().map { index, url -> Observable<(Int, String)> in
+            let fileName = url.lastPathComponent
+            let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
+
+            return Observable<(Int, String)>.create { observer in
+                mediaRef.putFile(from: url, metadata: nil) { metaData, error in
+                    if let error = error {
+                        observer.onError(error)
+                        return
+                    }
+                    mediaRef.downloadURL { url, error in
+                        if let error = error {
+                            observer.onError(error)
+                            return
+                        }
+                        guard let url = url else { return }
+                        observer.onNext((index, url.absoluteString))
+                        observer.onCompleted()
+                    }
+                }
+                return Disposables.create()
+            }
+        }
+        Observable.zip(uploadedMedia)
+            .subscribe(onNext: { [weak self] userMedia in
+                guard let self else { return }
+                let sortedUserMedia = userMedia.sorted(by: { $0.0 < $1.0}).map { $0.1 }
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyMMddHHmmss"
+                let stringDate = formatter.string(from: Date())
+                let userRef = self.db.collection("users").document(user.uid).collection("posts").document(stringDate)
+                
+                do {
+                    try userRef.setData(from: Post(uid: UUID().uuidString, creationDate: Date(), caption: caption, medias: sortedUserMedia, like: 0))
+                    print("게시글 올리기 성공!")
+                } catch {
+                    print("게시글 올리기 오류")
+                }
+                
+            }, onError: { error in
+                print("업로드중 오류 발생: \(error)")
+            }).disposed(by: disposeBag)
+    }
+    //댓글달기
+    func addComment(fromPostUid postUid: String, postOwnerUid: String, text: String) {
+        guard let user = Auth.auth().currentUser else {
+            print("로그인이 되지않음")
+            return
+        }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyMMddHHmmss"
+        let stringDate = formatter.string(from: Date())
+        
+        let postRef = db.collection("users").document(postOwnerUid).collection("posts").document(postUid).collection("comments").document(stringDate)
+        do {
+            try postRef.setData(from: Comment(text: text, from: user.uid, creationDate: Date(), like: 0))
+        } catch {
+            print("댓글 작성중 에러")
+        }
+    }
+    
+    //내 포스트 가져오기 최신순
+    func allMyPost(completion: @escaping (Result<[Post], Error>) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            print("로그인 되지 않았음")
+            return
+        }
+        let postsRef = db.collection("users").document(user.uid).collection("posts")
+        
+        postsRef.getDocuments { snapshot, error in
+            if let error = error {
+                print("내 포스트 가져오는중 에러: \(error)")
+                return
+            }
+            guard let documents = snapshot?.documents else {
+                completion(.failure(PostError.none))
+                return
+            }
+            
+            var posts: [Post] = documents.compactMap { document in
+                do {
+                    return try document.data(as: Post.self)
+                } catch {
+                    print("포스트 매핑중 오류")
+                    return nil
+                }
+            }
+            if posts.isEmpty {
+                completion(.failure(PostError.none))
+            } else {
+                let sortedPosts = posts.sorted(by: { $0.creationDate > $1.creationDate})
+                completion(.success(sortedPosts))
+            }
+        }
     }
     
     

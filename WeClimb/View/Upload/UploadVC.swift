@@ -20,6 +20,7 @@ class UploadVC: UIViewController {
     }()
     
     private let disposeBag = DisposeBag()
+    private var feedView: FeedView?
     
     private lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
@@ -43,18 +44,20 @@ class UploadVC: UIViewController {
     
     private lazy var selectedMediaView: UIView = {
         let view = UIView()
-        view.backgroundColor = .secondarySystemBackground
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         view.addSubview(callPHPickerButton)
         return view
     }()
     
     private lazy var callPHPickerButton: UIButton = {
         let button = UIButton()
-        button.setTitle(UploadNameSpace.add, for: .normal)
+        button.setImage(UIImage(systemName: "photo.badge.plus")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        button.tintColor = .secondarySystemBackground
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
-        button.backgroundColor = .mainPurple // 앱 틴트 컬러
         button.layer.cornerRadius = 10
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentHorizontalAlignment = .fill
+        button.contentVerticalAlignment = .fill
         button.rx.tap
             .bind { [weak self] in
                 print("tapped")
@@ -110,13 +113,34 @@ class UploadVC: UIViewController {
         setLevelButton()
         setAlert()
         setLoading()
+        setNotifications()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         
-        callPHPickerButton.isHidden = false
-        removeAllSubview(view: selectedMediaView)
+        feedView?.pauseAllVideo()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        feedView?.playAllVideo()
+    }
+    
+    private func setNotifications() {
+        // 포그라운드로 돌아올때
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterForeground), name: UIApplication.didBecomeActiveNotification, object: nil)
+        // 백그라운드로 전환될때
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+    }
+    
+    @objc private func didEnterForeground() {
+        feedView?.playAllVideo()
+    }
+    
+    @objc private func didEnterBackground() {
+        feedView?.pauseAllVideo()
     }
     
     @objc
@@ -156,6 +180,7 @@ class UploadVC: UIViewController {
                 } else {
                     let feed = FeedView(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
                                         viewModel: self.viewModel)
+                    self.feedView = feed
                     self.callPHPickerButton.isHidden = true
                     self.selectedMediaView.addSubview(feed)
                     
@@ -229,7 +254,7 @@ class UploadVC: UIViewController {
         levelButton.menu = menu
         levelButton.showsMenuAsPrimaryAction = true
         levelButton.changesSelectionAsPrimaryAction = true
-        levelButton.setTitle("선택", for: .normal)
+        levelButton.setTitle("난이도", for: .normal)
         
     }
     
@@ -280,7 +305,6 @@ class UploadVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
-    
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
@@ -308,8 +332,9 @@ class UploadVC: UIViewController {
         }
         
         callPHPickerButton.snp.makeConstraints {
-            $0.center.equalTo(selectedMediaView.snp.center)
-            $0.size.equalTo(CGSize(width: 100, height: 50))
+            $0.centerX.equalTo(selectedMediaView.snp.centerX)
+            $0.centerY.equalTo(selectedMediaView.snp.centerY).offset(-8)
+            $0.size.equalTo(CGSize(width: 150, height: 150))
         }
         
         levelButton.snp.makeConstraints {
