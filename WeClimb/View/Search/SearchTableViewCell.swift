@@ -7,6 +7,7 @@
 
 import UIKit
 
+import Kingfisher
 import SnapKit
 
 class SearchTableViewCell: UITableViewCell {
@@ -45,8 +46,8 @@ class SearchTableViewCell: UITableViewCell {
     }
     
     private func setLayout() {
-      self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-      
+        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        
         [gymImage, titleLabel, addressLabel]
             .forEach { contentView.addSubview($0) }
         
@@ -71,8 +72,14 @@ class SearchTableViewCell: UITableViewCell {
     }
     
     func configure(with model: SearchModel) {
-        gymImage.image = model.image
         titleLabel.text = model.title
         addressLabel.text = model.address
+        
+        // Kingfisher로 이미지 로드
+        if let imageUrl = model.imageUrl {
+            FirebaseManager.shared.loadImage(from: imageUrl, into: gymImage)
+        } else {
+            gymImage.image = UIImage(named: "defaultImage")
+        }
     }
 }
