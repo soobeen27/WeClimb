@@ -31,6 +31,7 @@
 		43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE32C85C3B800B960A2 /* SettingCell.swift */; };
 		43A79AE62C86CEFE00B960A2 /* SettingNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */; };
 		43EC6ACB2C8B5026004A2E2F /* FeedCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */; };
+		43EC6AD72C9171AA004A2E2F /* LightCompressor in Frameworks */ = {isa = PBXBuildFile; productRef = 43EC6AD62C9171AA004A2E2F /* LightCompressor */; };
 		6B2815462C8572A800BE1D40 /* ClimbingGym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2815452C8572A800BE1D40 /* ClimbingGym.swift */; };
 		6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6B376D2C85807800C9C87A /* GymHeaderView.swift */; };
 		6B8467BC2C85DDE9006B062D /* ClimbingGymInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */; };
@@ -199,6 +200,7 @@
 			files = (
 				6BC91FA12C7EEACF00B34083 /* KakaoSDKCommon in Frameworks */,
 				6BC91FAE2C7EEB4E00B34083 /* FirebaseFunctions in Frameworks */,
+				43EC6AD72C9171AA004A2E2F /* LightCompressor in Frameworks */,
 				6BC91FAC2C7EEB4E00B34083 /* FirebaseFirestore in Frameworks */,
 				6BC91F9F2C7EEACF00B34083 /* KakaoSDKAuth in Frameworks */,
 				6BC91F9A2C7EEA5A00B34083 /* GoogleSignInSwift in Frameworks */,
@@ -478,6 +480,7 @@
 				6BC91FAD2C7EEB4E00B34083 /* FirebaseFunctions */,
 				6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */,
 				F4892C412C8038B500C5FF16 /* RxSwift */,
+				43EC6AD62C9171AA004A2E2F /* LightCompressor */,
 			);
 			productName = WeClimb;
 			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
@@ -514,6 +517,7 @@
 				6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
 				6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				43EC6AD52C9171AA004A2E2F /* XCRemoteSwiftPackageReference "LightCompressor_iOS" */,
 			);
 			productRefGroup = F4892BE42C7C237700C5FF16 /* Products */;
 			projectDirPath = "";
@@ -857,6 +861,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		43EC6AD52C9171AA004A2E2F /* XCRemoteSwiftPackageReference "LightCompressor_iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AbedElazizShe/LightCompressor_iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
@@ -908,6 +920,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		43EC6AD62C9171AA004A2E2F /* LightCompressor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 43EC6AD52C9171AA004A2E2F /* XCRemoteSwiftPackageReference "LightCompressor_iOS" */;
+			productName = LightCompressor;
+		};
 		6BC91F972C7EEA3F00B34083 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
