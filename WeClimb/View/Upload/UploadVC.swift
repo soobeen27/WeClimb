@@ -213,6 +213,8 @@ class UploadVC: UIViewController {
                 let searchVC = SearchVC()
                 let navigationController = UINavigationController(rootViewController: searchVC)
                 navigationController.modalPresentationStyle = .pageSheet
+                searchVC.ShowSegment = false // 세그먼트 컨트롤 숨기기
+                searchVC.nextPush = false
                 self.present(navigationController, animated: true, completion: nil)
             }
             .disposed(by: disposeBag)
@@ -254,7 +256,7 @@ class UploadVC: UIViewController {
         levelButton.menu = menu
         levelButton.showsMenuAsPrimaryAction = true
         levelButton.changesSelectionAsPrimaryAction = true
-        levelButton.setTitle("난이도", for: .normal)
+        levelButton.setTitle("선택", for: .normal)
         
     }
     
