@@ -7,16 +7,20 @@
 
 import UIKit
 
-import FirebaseCore
+import AuthenticationServices
+import CryptoKit
 import FirebaseAuth
+import FirebaseCore
+import FirebaseStorage
 import FirebaseFirestore
 import GoogleSignIn
-import CryptoKit
-import AuthenticationServices
+import Kingfisher
+
 
 final class FirebaseManager {
     
     private let db = Firestore.firestore()
+    private let storage = Storage.storage()
     
     static let shared = FirebaseManager()
     private init() {}
@@ -33,7 +37,7 @@ final class FirebaseManager {
             completion()
         }
     }
-    // 이름 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
+    // 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
     func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
         let ref = db.collection("users").whereField("userName", isEqualTo: name)
         
@@ -171,4 +175,81 @@ final class FirebaseManager {
     func uploadImage() {
         
     }
+    
+    
+    // MARK: - DS 작업 (유저 신고, HTTP 변환)
+//     유저 신고내역
+    func userReport(content: String, userName: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        let userReport: [String: Any] = [
+            "content": content,
+            "userName": userName,
+            "time": Timestamp()
+        ]
+
+        db.collection("report").addDocument(data: userReport) { error in
+            if let error = error {
+                print("Firestore 오류 발생: \(error.localizedDescription)")
+                completion(.failure(error))
+            } else {
+                print("Firestore에 데이터가 성공적으로 추가되었습니다.")
+                completion(.success(())) // Void 반환
+            }
+        }
+    }
+    
+    // gs:// URL을 HTTP/HTTPS로 변환하는 함수
+    func fetchImageURL(from gsURL: String, completion: @escaping (URL?) -> Void) {
+        let storageReference = storage.reference(forURL: gsURL)
+        
+        storageReference.downloadURL { url, error in
+            if let error = error {
+                print("Error converting gsURL to httpsURL: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            completion(url)
+        }
+    }
+    
+    // Kingfisher를 사용하여 이미지 로드하는 함수 (gs:// 및 http/https URL 모두 처리)
+    func loadImage(from imageUrl: String?, into imageView: UIImageView) {
+        guard let imageUrl = imageUrl else {
+            imageView.image = UIImage(named: "defaultImage")
+            return
+        }
+
+        if imageUrl.hasPrefix("gs://") {
+            // gs:// URL을 HTTPS로 변환 후 이미지 로드
+            fetchImageURL(from: imageUrl) { httpsURL in
+                self.setImage(with: httpsURL, into: imageView)
+            }
+        } else {
+            // HTTP/HTTPS URL 처리
+            let url = URL(string: imageUrl)
+            setImage(with: url, into: imageView)
+        }
+    }
+    
+    // Kingfisher로 이미지를 설정하는 함수
+    private func setImage(with url: URL?, into imageView: UIImageView) {
+        imageView.kf.setImage(with: url, placeholder: UIImage(named: "defaultImage"))
+    }
+    
+    /*
+     HTTP 변환 사용 예시
+     1. UIImageView 인스턴스 생성
+     let gymImageView = UIImageView()
+
+     2. 이미지 URL을 가져옴 (gs:// 또는 http/https 형식 가능)
+     let imageUrl = model.imageUrl // 예: "gs://your-bucket-name/path-to-image" 또는 "https://example.com/image.jpg"
+
+     3. ImageConversion을 사용하여 이미지 로드
+     if let imageUrl = imageUrl {
+         // ImageConversion 클래스를 사용하여 이미지 로드 (gs:// URL 변환 포함)
+         ImageConversion.shared.loadImage(from: imageUrl, into: gymImageView)
+     } else {
+         이미지 URL이 없을 때 기본 이미지 설정
+         gymImageView.image = UIImage(named: "defaultImage")
+     }
+     */
 }
