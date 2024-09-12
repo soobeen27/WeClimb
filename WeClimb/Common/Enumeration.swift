@@ -58,3 +58,18 @@ enum UserError: Error {
         }
     }
 }
+
+//MARK: Post 관련에러
+enum PostError: Error {
+    case none
+    case mapping
+    
+    var description: String {
+        switch self {
+        case .none:
+            "아무런 포스트가 없음"
+        case .mapping:
+            "매핑중 오류"
+        }
+    }
+}
