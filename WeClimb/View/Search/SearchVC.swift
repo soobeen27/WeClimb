@@ -102,7 +102,7 @@ class SearchVC: UIViewController {
             .disposed(by: disposeBag)
         
         // 셀 선택 이벤트 처리
-        tableView.rx.modelSelected(SearchModel.self)
+        tableView.rx.modelSelected(Gym.self)
             .subscribe(onNext: { [weak self] selectedItem in
                 guard let self = self else { return }
                 
@@ -129,13 +129,24 @@ class SearchVC: UIViewController {
 //        // 세그먼트 컨트롤 선택 이벤트 처리
 //        segmentedControl.rx.selectedSegmentIndex
 //            .subscribe(onNext: { [weak self] index in
+//                guard let self else { return }
 //                // 선택된 세그먼트에 따라 다른 데이터를 처리하거나 UI 업데이트
 //                if index == 0 {
 //                    print("암장 탭 선택됨")
 //                    // 암장 관련 데이터 처리
+//                    self.searchViewModel.filteredData
+//                        .bind(to: self.tableView.rx.items(cellIdentifier: SearchTableViewCell.className, cellType: SearchTableViewCell.self)) { index, model, cell in
+//                            cell.configure(with: model)
+//                        }
+//                        .disposed(by: self.disposeBag)
 //                } else {
 //                    print("유저검색 탭 선택됨")
 //                    // 유저검색 관련 데이터 처리
+//                    self.searchViewModel.userFilteredData
+//                        .bind(to: self.tableView.rx.items(cellIdentifier: SearchTableViewCell.className, cellType: SearchTableViewCell.self)) { index, model, cell in
+//                            cell.configure(with: model)
+//                        }
+//                        .disposed(by: self.disposeBag)
 //                }
 //            })
 //            .disposed(by: disposeBag)
