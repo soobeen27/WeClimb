@@ -12,6 +12,6 @@ struct Gym {
     let grade: String
     let gymName: String
     let sector: String
-    let profileImage: String
+    let profileImage: String?
     let additionalInfo: [String: Any]
 }
