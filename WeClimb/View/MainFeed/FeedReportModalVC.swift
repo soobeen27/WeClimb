@@ -12,6 +12,7 @@ import SnapKit
 class FeedReportModalVC: UIViewController {
     
     private let tableView = UITableView()
+    private var userName: String?
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -34,7 +35,8 @@ class FeedReportModalVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        fetchUserInfo()
+       
         setTableView()
         setLayout()
     }
@@ -48,6 +50,19 @@ class FeedReportModalVC: UIViewController {
         tableView.separatorInset.left = 0
         tableView.separatorColor = UIColor.systemGray3.withAlphaComponent(0.5)
         tableView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+    }
+    
+    //현재 유저 정보를 가져와 닉네임 설정 - DS
+    func fetchUserInfo() {
+        FirebaseManager.shared.currentUserInfo { [weak self] result in
+            switch result {
+            case .success(let user):
+                self?.userName = user.userName
+//                print("\(user.userName)")
+            case .failure(let error):
+                print("현재 유저 정보 가져오기 에러: \(error.localizedDescription)")
+            }
+        }
     }
     
     private func setLayout() {
@@ -90,8 +105,27 @@ extension FeedReportModalVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    //셀 이벤트 클릭 이벤트 - DS
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let userName = userName else {
+            print("유저 네임을 가지고 오지 못했습니다..")
+            return
+        }
+        
+        let selectedReport = FeedNameSpace.reportReasons[indexPath.row]
+        
+        FirebaseManager.shared.userReport(content: selectedReport, userName: userName) { result in
+            switch result {
+            case .success():
+                print("신고가 성공적으로 전송되었습니다.")
+            case .failure(let error):
+                print("신고 전송 중 오류 발생: \(error.localizedDescription)")
+            }
+        }
+    }
+}
+    
     //셀 높이 설정
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
     }
-}
