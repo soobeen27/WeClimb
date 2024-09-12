@@ -8,7 +8,7 @@
 import UIKit
 
 struct SearchModel {
-    let image: UIImage?
+    let imageUrl: String?
     let title: String
     let address: String
 }
