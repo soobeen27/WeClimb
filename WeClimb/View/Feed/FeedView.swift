@@ -87,7 +87,7 @@ class FeedView : UIView {
     }
     
     // MARK: - 현재 셀의 비디오를 실행시키는 메서드 YJ
-    func playAllVideos() {
+    func playAllVideo() {
         
         collectionView.visibleCells
             .forEach { cell in

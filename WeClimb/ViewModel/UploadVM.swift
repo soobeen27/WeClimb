@@ -100,7 +100,7 @@ extension UploadVM {
         let videoCompressor = LightCompressor()
         
         // 압축 작업 설정
-        let compression = videoCompressor.compressVideo(videos: [
+        _ = videoCompressor.compressVideo(videos: [
             .init(
                 source: inputURL,
                 destination: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("mp4"),
@@ -120,7 +120,7 @@ extension UploadVM {
             }},
                                                         
             completion: {[weak self] result in
-            guard let `self` = self else { return }
+            guard self != nil else { return }
             
             switch result {
                 

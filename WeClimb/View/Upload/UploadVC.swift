@@ -113,6 +113,7 @@ class UploadVC: UIViewController {
         setLevelButton()
         setAlert()
         setLoading()
+        setNotifications()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -124,7 +125,22 @@ class UploadVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        feedView?.playAllVideos()
+        feedView?.playAllVideo()
+    }
+    
+    private func setNotifications() {
+        // 포그라운드로 돌아올때
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterForeground), name: UIApplication.didBecomeActiveNotification, object: nil)
+        // 백그라운드로 전환될때
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+    }
+    
+    @objc private func didEnterForeground() {
+        feedView?.playAllVideo()
+    }
+    
+    @objc private func didEnterBackground() {
+        feedView?.pauseAllVideo()
     }
     
     @objc
