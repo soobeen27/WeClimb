@@ -47,7 +47,10 @@ class UploadOptionView : UIView {
         return label
     }()
     
-    init(symbolImage: UIImage, optionText: String) {
+    private var showSelectedLabel: Bool
+    
+    init(symbolImage: UIImage, optionText: String, showSelectedLabel: Bool = true) {
+        self.showSelectedLabel = showSelectedLabel
         super.init(frame: .zero)
         symbolImageView.image = symbolImage
         optionLabel.text = optionText
@@ -65,10 +68,8 @@ class UploadOptionView : UIView {
     private func setLayout() {
         self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
-        [symbolImageView, separatorLine, optionLabel, nextImageView, selectedLabel]
-            .forEach {
-                self.addSubview($0)
-            }
+        [symbolImageView, separatorLine, optionLabel]
+            .forEach { self.addSubview($0) }
         
         separatorLine.snp.makeConstraints {
             $0.height.equalTo(1)
@@ -87,15 +88,20 @@ class UploadOptionView : UIView {
             $0.leading.equalTo(symbolImageView.snp.trailing).offset(8)
         }
         
-        nextImageView.snp.makeConstraints {
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.centerY.equalToSuperview()
-        }
-        
-        selectedLabel.snp.makeConstraints {
-            $0.trailing.equalTo(nextImageView.snp.leading).offset(-8)
-            $0.centerY.equalToSuperview()
-            $0.size.equalTo(30)
+        if showSelectedLabel {
+            [selectedLabel, nextImageView]
+                .forEach { self.addSubview($0) }
+            
+            selectedLabel.snp.makeConstraints {
+                $0.trailing.equalTo(nextImageView.snp.leading).offset(-8)
+                $0.centerY.equalToSuperview()
+                $0.size.equalTo(30)
+            }
+            
+            nextImageView.snp.makeConstraints {
+                $0.trailing.equalToSuperview().offset(-16)
+                $0.centerY.equalToSuperview()
+            }
         }
     }
 }

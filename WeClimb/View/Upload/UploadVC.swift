@@ -29,13 +29,13 @@ class UploadVC: UIViewController {
         return scroll
     }()
     
-    private let gymView = UploadOptionView(symbolImage: UIImage(systemName: "figure.climbing") ?? UIImage(), optionText: UploadNameSpace.selectGym)
-    private let levelView = UploadOptionView(symbolImage: UIImage(systemName: "flag") ?? UIImage(), optionText: UploadNameSpace.selectSector)
+    private let gymView = UploadOptionView(symbolImage: UIImage(systemName: "figure.climbing") ?? UIImage(), optionText: UploadNameSpace.selectGym, showSelectedLabel: true)
+    private let sectorView = UploadOptionView(symbolImage: UIImage(systemName: "flag") ?? UIImage(), optionText: UploadNameSpace.selectSector, showSelectedLabel: false)
     
     private lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [selectedMediaView, callPHPickerButton, gradeButton, textView, gymView, levelView, loadingIndicator]
+        [selectedMediaView, callPHPickerButton, gradeButton, textView, gymView, sectorView, loadingIndicator]
             .forEach {
                 view.addSubview($0)
             }
@@ -79,7 +79,9 @@ class UploadVC: UIViewController {
     
     private let sectorButton: UIButton = {
         let button = UIButton(primaryAction: nil)
+        button.setTitle("선택", for: .normal)
         button.backgroundColor = .clear
+        button.tintColor = .secondaryLabel
         return button
     }()
     
@@ -258,21 +260,55 @@ class UploadVC: UIViewController {
         }
 
         let menu = UIMenu(title: "선택", options: .displayInline, children: menuItems)
+        
+        let symbolImage = UIImage(systemName: "chevron.right")
+        sectorButton.setImage(symbolImage, for: .normal)
+        sectorButton.tintColor = .secondaryLabel
+        sectorButton.setTitleColor(.secondaryLabel, for: .normal)
+        sectorButton.imageView?.tintColor = .secondaryLabel
 
         // 버튼에 메뉴 설정
         sectorButton.menu = menu
         sectorButton.showsMenuAsPrimaryAction = true  // 버튼을 탭하면 메뉴 노출
-        sectorButton.backgroundColor = .clear
-
-        levelView.addSubview(sectorButton)
-
+        sectorButton.changesSelectionAsPrimaryAction = true
+        sectorButton.titleLabel?.textAlignment = .right
+        sectorButton.setTitle("선택", for: .normal)
+    
+        sectorView.addSubview(sectorButton)
+        
         sectorButton.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
             $0.trailing.equalToSuperview()
-            $0.width.equalTo(levelView).multipliedBy(2.0 / 3.0) // levelView의 2/3
+            $0.width.equalTo(sectorView).multipliedBy(2.0 / 3.0) // levelView의 2/3
         }
     }
-    
+// 잠깐 주석 처리할께요
+//    // MARK: - 선택한 암장 기준으로 섹터 버튼 세팅 YJ
+//    private func setSectorButton(with gymInfo: Gym) {
+//        let sectors = gymInfo.sector.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+//        
+//        let menuItems: [UIAction] = sectors.map { sector in
+//            UIAction(title: sector) { [weak self] _ in
+//                self?.viewModel.optionSelected(optionText: sector)
+//            }
+//        }
+//
+//        let menu = UIMenu(title: "선택", options: .displayInline, children: menuItems)
+//
+//        // 버튼에 메뉴 설정
+//        sectorButton.menu = menu
+//        sectorButton.showsMenuAsPrimaryAction = true  // 버튼을 탭하면 메뉴 노출
+//        sectorButton.backgroundColor = .clear
+//
+//        levelView.addSubview(sectorButton)
+//
+//        sectorButton.snp.makeConstraints {
+//            $0.top.bottom.equalToSuperview()
+//            $0.trailing.equalToSuperview()
+//            $0.width.equalTo(levelView).multipliedBy(2.0 / 3.0) // levelView의 2/3
+//        }
+//    }
+//    
     private func setAlert() {
         viewModel.showAlert
             .observe(on: MainScheduler.instance)
@@ -342,7 +378,7 @@ class UploadVC: UIViewController {
         
         selectedMediaView.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.left.right.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(view.frame.width)
         }
         
@@ -359,23 +395,23 @@ class UploadVC: UIViewController {
         }
         
         textView.snp.makeConstraints {
-            $0.left.right.equalToSuperview().inset(16)
+            $0.leading.trailing.equalToSuperview().inset(16)
             $0.top.equalTo(selectedMediaView.snp.bottom).offset(8)
             $0.height.equalTo(80)
         }
         
         gymView.snp.makeConstraints {
             $0.top.equalTo(textView.snp.bottom)
-            $0.left.right.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
         }
         
-        levelView.snp.makeConstraints {
+        sectorView.snp.makeConstraints {
             $0.top.equalTo(gymView.snp.bottom)
-            $0.left.right.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
         }
         
         postButton.snp.makeConstraints {
-            $0.left.right.equalToSuperview().inset(16)
+            $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-16)
             $0.height.equalTo(50)
         }
