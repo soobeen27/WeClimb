@@ -29,13 +29,13 @@ class UploadVC: UIViewController {
         return scroll
     }()
     
-    private let gymView = UploadOptionView(symbolImage: UIImage(systemName: "figure.climbing") ?? UIImage(), optionText: UploadNameSpace.selectGym)
-    private let levelView = UploadOptionView(symbolImage: UIImage(systemName: "flag") ?? UIImage(), optionText: UploadNameSpace.selectSector)
+    private let gymView = UploadOptionView(symbolImage: UIImage(systemName: "figure.climbing") ?? UIImage(), optionText: UploadNameSpace.selectGym, showSelectedLabel: true)
+    private let sectorView = UploadOptionView(symbolImage: UIImage(systemName: "flag") ?? UIImage(), optionText: UploadNameSpace.selectSector, showSelectedLabel: false)
     
     private lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [selectedMediaView, callPHPickerButton, levelButton, textView, gymView, levelView, loadingIndicator]
+        [selectedMediaView, callPHPickerButton, gradeButton, textView, gymView, sectorView, loadingIndicator]
             .forEach {
                 view.addSubview($0)
             }
@@ -67,12 +67,21 @@ class UploadVC: UIViewController {
         return button
     }()
     
-    private let levelButton: UIButton = {
+    private let gradeButton: UIButton = {
         let button = UIButton(primaryAction: nil)
+        button.setTitle("선택", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 13)
         button.setTitleColor(.systemBlue, for: .normal)
         button.backgroundColor = .systemGray3
         button.layer.cornerRadius = 15
+        return button
+    }()
+    
+    private let sectorButton: UIButton = {
+        let button = UIButton(primaryAction: nil)
+        button.setTitle("선택", for: .normal)
+        button.backgroundColor = .clear
+        button.tintColor = .secondaryLabel
         return button
     }()
     
@@ -109,8 +118,6 @@ class UploadVC: UIViewController {
         mediaItemsBind()
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
         setGymView()
-        setSectorView()
-        setLevelButton()
         setAlert()
         setLoading()
         setNotifications()
@@ -213,51 +220,95 @@ class UploadVC: UIViewController {
                 let searchVC = SearchVC()
                 let navigationController = UINavigationController(rootViewController: searchVC)
                 navigationController.modalPresentationStyle = .pageSheet
+                searchVC.ShowSegment = false // 세그먼트 컨트롤 숨기기
+                searchVC.nextPush = false
+                searchVC.onSelectedGym = { gymInfo in
+                    self.setgradeButton(with: gymInfo)
+                    self.setSectorButton(with: gymInfo)
+                }
                 self.present(navigationController, animated: true, completion: nil)
             }
             .disposed(by: disposeBag)
     }
     
-    private func setSectorView() {
-        let button = UIButton(primaryAction: nil)
+    // MARK: - 선택한 암장 기준으로 난이도 버튼 세팅 YJ
+    private func setgradeButton(with gymInfo: Gym) {
+        let grade = gymInfo.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+
+        let menuItems: [UIAction] = grade.map { level in
+            UIAction(title: level) { [weak self] _ in
+                self?.viewModel.optionSelected(optionText: level)
+            }
+        }
+
+        let menu = UIMenu(title: "선택", options: .displayInline, children: menuItems)
+
+        gradeButton.menu = menu
+        gradeButton.showsMenuAsPrimaryAction = true
+        gradeButton.changesSelectionAsPrimaryAction = true
+        gradeButton.setTitle("선택", for: .normal)
+    }
+    
+    // MARK: - 선택한 암장 기준으로 섹터 버튼 세팅 YJ
+    private func setSectorButton(with gymInfo: Gym) {
+        let sectors = gymInfo.sector.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
         
-        let menuItems: [UIAction] = ["섹터 1", "섹터 2", "섹터 3"].map { sector in
+        let menuItems: [UIAction] = sectors.map { sector in
             UIAction(title: sector) { [weak self] _ in
                 self?.viewModel.optionSelected(optionText: sector)
             }
         }
+
+        let menu = UIMenu(title: "선택", options: .displayInline, children: menuItems)
         
-        let menu = UIMenu(title: "", options: .displayInline, children: menuItems)
+        let symbolImage = UIImage(systemName: "chevron.right")
+        sectorButton.setImage(symbolImage, for: .normal)
+        sectorButton.tintColor = .secondaryLabel
+        sectorButton.setTitleColor(.secondaryLabel, for: .normal)
+        sectorButton.imageView?.tintColor = .secondaryLabel
+
+        // 버튼에 메뉴 설정
+        sectorButton.menu = menu
+        sectorButton.showsMenuAsPrimaryAction = true  // 버튼을 탭하면 메뉴 노출
+        sectorButton.changesSelectionAsPrimaryAction = true
+        sectorButton.titleLabel?.textAlignment = .right
+        sectorButton.setTitle("선택", for: .normal)
+    
+        sectorView.addSubview(sectorButton)
         
-        button.menu = menu
-        button.showsMenuAsPrimaryAction = true  // 버튼을 탭하면 메뉴 노출
-        button.backgroundColor = .clear
-        
-        levelView.addSubview(button)
-        
-        button.snp.makeConstraints {
+        sectorButton.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
             $0.trailing.equalToSuperview()
-            $0.width.equalTo(levelView).multipliedBy(2.0 / 3.0) // levelView의 2/3
+            $0.width.equalTo(sectorView).multipliedBy(2.0 / 3.0) // levelView의 2/3
         }
     }
-    
-    private func setLevelButton() {
-        let menuItems: [UIAction] = ["레벨 1", "레벨 2", "레벨 3"].map { sector in
-            UIAction(title: sector) { [weak self] _ in
-                self?.viewModel.optionSelected(optionText: sector)
-            }
-        }
-        
-        let menu = UIMenu(title: "", options: .displayInline, children: menuItems)
-        
-        levelButton.menu = menu
-        levelButton.showsMenuAsPrimaryAction = true
-        levelButton.changesSelectionAsPrimaryAction = true
-        levelButton.setTitle("난이도", for: .normal)
-        
-    }
-    
+// 잠깐 주석 처리할께요
+//    // MARK: - 선택한 암장 기준으로 섹터 버튼 세팅 YJ
+//    private func setSectorButton(with gymInfo: Gym) {
+//        let sectors = gymInfo.sector.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+//        
+//        let menuItems: [UIAction] = sectors.map { sector in
+//            UIAction(title: sector) { [weak self] _ in
+//                self?.viewModel.optionSelected(optionText: sector)
+//            }
+//        }
+//
+//        let menu = UIMenu(title: "선택", options: .displayInline, children: menuItems)
+//
+//        // 버튼에 메뉴 설정
+//        sectorButton.menu = menu
+//        sectorButton.showsMenuAsPrimaryAction = true  // 버튼을 탭하면 메뉴 노출
+//        sectorButton.backgroundColor = .clear
+//
+//        levelView.addSubview(sectorButton)
+//
+//        sectorButton.snp.makeConstraints {
+//            $0.top.bottom.equalToSuperview()
+//            $0.trailing.equalToSuperview()
+//            $0.width.equalTo(levelView).multipliedBy(2.0 / 3.0) // levelView의 2/3
+//        }
+//    }
+//    
     private func setAlert() {
         viewModel.showAlert
             .observe(on: MainScheduler.instance)
@@ -327,7 +378,7 @@ class UploadVC: UIViewController {
         
         selectedMediaView.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.left.right.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(view.frame.width)
         }
         
@@ -337,30 +388,30 @@ class UploadVC: UIViewController {
             $0.size.equalTo(CGSize(width: 150, height: 150))
         }
         
-        levelButton.snp.makeConstraints {
+        gradeButton.snp.makeConstraints {
             $0.leading.equalTo(selectedMediaView.snp.leading).offset(16)
             $0.bottom.equalTo(selectedMediaView.snp.bottom).offset(-16)
             $0.size.equalTo(CGSize(width: 50, height: 30))
         }
         
         textView.snp.makeConstraints {
-            $0.left.right.equalToSuperview().inset(16)
+            $0.leading.trailing.equalToSuperview().inset(16)
             $0.top.equalTo(selectedMediaView.snp.bottom).offset(8)
             $0.height.equalTo(80)
         }
         
         gymView.snp.makeConstraints {
             $0.top.equalTo(textView.snp.bottom)
-            $0.left.right.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
         }
         
-        levelView.snp.makeConstraints {
+        sectorView.snp.makeConstraints {
             $0.top.equalTo(gymView.snp.bottom)
-            $0.left.right.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
         }
         
         postButton.snp.makeConstraints {
-            $0.left.right.equalToSuperview().inset(16)
+            $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-16)
             $0.height.equalTo(50)
         }
