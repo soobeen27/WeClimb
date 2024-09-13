@@ -40,6 +40,7 @@ class FeedCell : UICollectionViewCell {
         super.prepareForReuse()
         
         stopVideo()
+        playerLayer?.removeFromSuperlayer()
     }
     
     // MARK: - 비디오 재생 메서드 YJ
@@ -79,6 +80,7 @@ class FeedCell : UICollectionViewCell {
         self.data = model // 데이터 저장
         if let image = model.image {
             imageView.image = image
+            stopVideo()
         } else if let videoURL = model.videoURL {
             player = AVPlayer(url: videoURL)
             readyVideo()

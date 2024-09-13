@@ -15,6 +15,7 @@ import RxSwift
 class UploadVM {
     let mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
     let feedRelay = BehaviorRelay(value: [FeedCellModel]())
+    
     let showAlert = PublishRelay<Void>()
     let isLoading = BehaviorRelay<Bool>(value: false)
     
@@ -32,9 +33,9 @@ extension UploadVM {
         isLoading.accept(true) // 로딩 시작
         
         let group = DispatchGroup() // 비동기 작업을 추적하기 위한 그룹
-        var models = [FeedCellModel]()
+        var models = [FeedCellModel?](repeating: nil, count: mediaItems.value.count)
         
-        mediaItems.value.forEach { mediaItem in
+        mediaItems.value.enumerated().forEach { (index, mediaItem) in
             group.enter()   // 비동기 작업 시작 알려줌
             
             if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
@@ -64,8 +65,8 @@ extension UploadVM {
 //                                        }
 //                                        self.printVideoFileSize(url: compressedURL) // 압축 후 비디오 파일 크기 출력
                                         let newItem = FeedCellModel(image: nil, videoURL: videoURL)
-                                        models.append(newItem)
-                                        group.leave()
+                                    models[index] = newItem
+                                    group.leave()
 //                                    }
                                 }
                             }
@@ -75,7 +76,7 @@ extension UploadVM {
             } else if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
                 mediaItem.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
                     let newItem = FeedCellModel(image: image as? UIImage, videoURL: nil)
-                    models.append(newItem)
+                    models[index] = newItem
                     group.leave()
                 }
             }
@@ -85,10 +86,9 @@ extension UploadVM {
         group.notify(queue: .main) { [weak self] in
             guard let self else { return }
             self.isLoading.accept(false) // 로딩 종료
-            self.selectedFeedItems = models
             
             if !models.isEmpty {
-                self.feedRelay.accept(models)
+                self.feedRelay.accept(models.compactMap { $0 })
             }
         }
     }

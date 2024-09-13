@@ -244,6 +244,7 @@ class UploadVC: UIViewController {
         gradeButton.menu = menu
         gradeButton.showsMenuAsPrimaryAction = true
         gradeButton.changesSelectionAsPrimaryAction = true
+        gradeButton.setTitle("선택", for: .normal)
     }
     
     // MARK: - 선택한 암장 기준으로 섹터 버튼 세팅 YJ
