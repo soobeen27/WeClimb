@@ -107,6 +107,8 @@ class FeedCommentCell: UITableViewCell {
             $0.size.equalTo(CGSize(width: 25, height: 23))
         }
     }
+    
+    
     //MARK: - configure
     func configure(userImage: UIImage, userName: String, userComment: String, likeCounter: String) {
         commentProfileImage.image = userImage

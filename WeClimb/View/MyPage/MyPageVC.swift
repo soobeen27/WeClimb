@@ -28,7 +28,7 @@ class MyPageVC: UIViewController {
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.text = "iOSClimber"
-        label.font = UIFont.systemFont(ofSize: 17)
+        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
         label.numberOfLines = 1
         return label
     }()

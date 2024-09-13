@@ -23,7 +23,7 @@ class EditPageVC: UIViewController {
         let imageView = UIImageView()
         imageView.backgroundColor = .gray
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 50
+        imageView.layer.cornerRadius = 60
         imageView.clipsToBounds = true
         return imageView
     }()
@@ -34,6 +34,9 @@ class EditPageVC: UIViewController {
         tableView.isScrollEnabled = false // 스크롤 되지 않도록
         tableView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         tableView.register(EditPageCell.self, forCellReuseIdentifier: EditPageCell.className)
+        tableView.separatorInset.left = 0
+//        tableView.separatorStyle = .none
+        tableView.rowHeight = 60
         return tableView
     }()
     
@@ -43,6 +46,14 @@ class EditPageVC: UIViewController {
         setLayout()
         bind()
         setProfileImageTap()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.navigationController?.navigationBar.prefersLargeTitles = false
+        //화면 전환 후 뒤로가기 시 테이블뷰 리로드
+        tableView.reloadData()
     }
     
     func setNavigation() {
@@ -56,13 +67,13 @@ class EditPageVC: UIViewController {
         profileImage.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).inset(20)
             $0.centerX.equalToSuperview()
-            $0.width.height.equalTo(100)
+            $0.width.height.equalTo(120)
         }
-        
+         
         tableView.snp.makeConstraints {
             $0.top.equalTo(profileImage.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(336)
+            $0.height.equalTo(119)
         }
     }
     
@@ -82,25 +93,33 @@ class EditPageVC: UIViewController {
         editPageViewModel.items
             .bind(to: tableView.rx.items(cellIdentifier: EditPageCell.className, cellType: EditPageCell.self)) { row, item, cell in
                 cell.configure(with: item)
-              
-              //셀 선택 스타일을 없애서 라인이 사라지지 않도록 설정(SB)
-              cell.selectionStyle = .none
             }
             .disposed(by: disposeBag)
         
         tableView.rx.itemSelected   // 셀을 선택했을 때 발생하는 이벤트를 방출
             .withLatestFrom(editPageViewModel.items) { indexPath, items in
-                items[indexPath.row]
+                (indexPath, items[indexPath.row])
             }
         // 구독
-            .subscribe(onNext: { [weak self] item in
+            .subscribe(onNext: { [weak self] (indexPath, item) in
                 guard let self = self else { return }
                 // 선택된 항목을 DetailEditVM에 전달
-                self.detailEditVM.selectItem(item)
                 
-                // 화면 전환
-                let detailVC = DetailEditVC(viewModel: detailEditVM)
-                self.navigationController?.pushViewController(detailVC, animated: true)
+                // 클릭된 항목에 따라 분기 처리
+                if indexPath.row == 0 {
+                    // 첫 번째 항목 클릭 시 CreateNickNameVC로 이동
+                    let createNickNameVC = CreateNickNameVC()
+                    self.navigationController?.pushViewController(createNickNameVC, animated: true)
+                } else if indexPath.row == 1 {
+                    // 두 번째 항목 클릭 시 PersonalDetailsVC로 이동
+                    let personalDetailsVC = PersonalDetailsVC()
+                    self.navigationController?.pushViewController(personalDetailsVC, animated: true)
+                }
+//                self.detailEditVM.selectItem(item)
+//                
+//                // 화면 전환
+//                let detailVC = DetailEditVC(viewModel: detailEditVM)
+//                self.navigationController?.pushViewController(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
     }
