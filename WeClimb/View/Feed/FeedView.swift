@@ -102,11 +102,12 @@ class FeedView : UIView {
             .bind(to: collectionView.rx.items(
                 cellIdentifier: FeedCell.className, cellType: FeedCell.self)
             ) { row, data, cell in
+                print("data: \(data)")
                 // 셀에 데이터 설정
                 cell.configure(with: data)
                 
                 if self.pageControl.currentPage == row,
-                self.pageControl.currentPage == 0 {
+                   self.pageControl.currentPage == 0 {
                     cell.playVideo()
                 }
             }
@@ -124,11 +125,16 @@ extension FeedView : UICollectionViewDelegate {
         
         let changedItem = viewModel.feedRelay.value[pageIndex]
         
+        if changedItem.image != nil {
+            pauseAllVideo()
+            return
+        }
+        
         collectionView.visibleCells // 현재 화면에 표시되고 있는 셀들 반환
             .enumerated()
             .forEach { index, cell in
                 guard let feedCell = cell as? FeedCell else { return }
-
+                
                 if feedCell.data?.videoURL == changedItem.videoURL {
                     feedCell.playVideo()
                 } else {

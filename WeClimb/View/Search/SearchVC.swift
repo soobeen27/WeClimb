@@ -15,6 +15,8 @@ class SearchVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let searchViewModel = SearchViewModel()
     
+    var onSelectedGym: ((Gym) -> Void)?
+    
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.obscuresBackgroundDuringPresentation = false
@@ -55,6 +57,13 @@ class SearchVC: UIViewController {
         return segmentedControl
     }()
     
+    var ShowSegment: Bool = true {
+        didSet {
+            segmentedControl.isHidden = !ShowSegment
+        }
+    }
+    var nextPush: Bool = true
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -67,8 +76,13 @@ class SearchVC: UIViewController {
     }
     
     private func setNavigationBar() {
-        navigationItem.title = SearchNameSpace.title
-//        self.title = SearchNameSpace.title
+//        navigationItem.title = SearchNameSpace.title
+        self.title = SearchNameSpace.title
+        
+        // 탭바 빈 문자열로 설정
+        if let tabBarItem = self.tabBarItem {
+            tabBarItem.title = ""
+        }
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
     }
@@ -83,10 +97,16 @@ class SearchVC: UIViewController {
         [segmentedControl, nearbyLabel, gymTableView, userTableView]
             .forEach { view.addSubview($0) }
         
-        // 세그먼트 컨트롤의 위치 설정
-        segmentedControl.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(8)
-            $0.leading.trailing.equalToSuperview().inset(16)
+        // 상황에 따라 세그먼트 컨트롤의 위치 변경
+        segmentedControl.snp.remakeConstraints {
+            if ShowSegment {
+                $0.top.equalTo(view.safeAreaLayoutGuide).offset(8)
+                $0.leading.trailing.equalToSuperview().inset(16)
+            } else {
+                $0.top.equalTo(view.safeAreaLayoutGuide)
+                $0.leading.trailing.equalToSuperview().inset(16)
+                $0.height.equalTo(0) 
+            }
         }
         
         nearbyLabel.snp.makeConstraints {
@@ -110,12 +130,18 @@ class SearchVC: UIViewController {
         gymTableView.rx.modelSelected(Gym.self)
             .subscribe(onNext: { [weak self] selectedItem in
                 guard let self else { return }
+                    
+                self.onSelectedGym?(selectedItem)
+                
+                if self.nextPush {
                     let climbingGymVC = ClimbingGymVC()
                     climbingGymVC.configure(with: selectedItem)
                     
                     navigationController?.navigationBar.prefersLargeTitles = false
                     climbingGymVC.navigation()
                     self.navigationController?.pushViewController(climbingGymVC, animated: true)
+                }
+                self.dismiss(animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
         
