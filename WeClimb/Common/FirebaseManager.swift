@@ -10,7 +10,6 @@ import AuthenticationServices
 import CryptoKit
 import FirebaseAuth
 import FirebaseCore
-import FirebaseStorage
 import FirebaseFirestore
 import FirebaseStorage
 import GoogleSignIn
@@ -23,6 +22,7 @@ final class FirebaseManager {
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     private let disposeBag = DisposeBag()
+    private var lastFeed: QueryDocumentSnapshot?
     
     static let shared = FirebaseManager()
     private init() {}
@@ -327,6 +327,73 @@ final class FirebaseManager {
             let sortedComments = comments.sorted { $0.creationDate > $1.creationDate }
             
             completion(sortedComments)
+        }
+    }
+    
+    // MARK: 피드가져오기 (처음 실행되어야할 메소드)
+    func feedFirst(completion: @escaping ([Post]?) -> Void) {
+        let postRef = db.collectionGroup("posts")
+            .order(by: "creationDate", descending: true)
+            .limit(to: 10)
+        
+        postRef.getDocuments { [weak self] snapshot, error in
+            guard let self else { return }
+            
+            if let error = error {
+                print("피드 가져오는중 에러: \(error)")
+                completion(nil)
+                return
+            }
+            guard let documents = snapshot?.documents else {
+                print("현재 피드가 없음")
+                completion(nil)
+                return
+            }
+            if let lastDocument = documents.last {
+                self.lastFeed = lastDocument
+            }
+            
+            let posts = documents.compactMap {
+                do {
+                    return try $0.data(as: Post.self)
+                } catch {
+                    return nil
+                }
+            }
+            completion(posts)
+        }
+    }
+    
+    // MARK: feedFirst 이후에 피드를 더 가져오기
+    func feedLoding(completion: @escaping ([Post]?) -> Void) {
+        guard let lastFeed = lastFeed else { 
+            print("초기 피드가 존재하지 않음")
+            return
+        }
+        let postRef = db.collectionGroup("posts")
+            .order(by: "creationDate", descending: true)
+            .limit(to: 10)
+            .start(afterDocument: lastFeed)
+        
+        postRef.getDocuments { snapshot, error in
+            if let error = error {
+                print("피드 가져오는중 에러: \(error)")
+                completion(nil)
+                return
+            }
+            guard let documents = snapshot?.documents else {
+                print("현재 피드가 없음")
+                completion(nil)
+                return
+            }
+            let posts = documents.compactMap {
+                do {
+                    return try $0.data(as: Post.self)
+                } catch {
+                    return nil
+                }
+            }
+            completion(posts)
         }
     }
     
