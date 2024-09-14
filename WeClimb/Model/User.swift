@@ -8,7 +8,7 @@
 import Foundation
 
 struct User: Codable {
-    let idToken: String
+    let userUID: String // 유저 유아이디
     let lastModified: Date
     let loginType: String
     let registrationDate: Date
