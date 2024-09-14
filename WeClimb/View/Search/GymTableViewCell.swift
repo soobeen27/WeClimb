@@ -10,7 +10,7 @@ import UIKit
 import Kingfisher
 import SnapKit
 
-class SearchTableViewCell: UITableViewCell {
+class GymTableViewCell: UITableViewCell {
     
     private let gymImage: UIImageView = {
         let imageView = UIImageView()
