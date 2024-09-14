@@ -68,7 +68,7 @@ class UploadVC: UIViewController {
     }()
     
     private let gradeButton: UIButton = {
-        let button = UIButton(primaryAction: nil)
+        let button = UIButton()
         button.setTitle("선택", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 13)
         button.setTitleColor(.systemBlue, for: .normal)
@@ -78,10 +78,33 @@ class UploadVC: UIViewController {
     }()
     
     private let sectorButton: UIButton = {
-        let button = UIButton(primaryAction: nil)
-        button.setTitle("선택", for: .normal)
-        button.backgroundColor = .clear
+        // UIButtonConfiguration 생성 및 설정
+//        var configuration = UIButton.Configuration.plain()
+//        configuration.title = "선택"
+//        configuration.image = UIImage(systemName: "chevron.right")
+//        configuration.imagePadding = 8
+//        configuration.imagePlacement = .leading
+//        configuration.titleAlignment = .trailing
+//        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+//        
+        // 버튼 생성 및 설정
+        let button = CustomButton()
         button.tintColor = .secondaryLabel
+        button.titleLabel?.font = .systemFont(ofSize: 15)
+        button.setTitleColor(.secondaryLabel, for: .normal)
+//        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+//        button.setTitle("선택", for: .normal)
+//        button.setImage(UIImage(systemName: "chevron.right"), for: .normal)
+        button.semanticContentAttribute = .forceRightToLeft
+//        // 이미지와 텍스트 위치 조정
+//         // 이미지의 오른쪽 여백을 8포인트로 설정
+//         let imageWidth = button.imageView?.intrinsicContentSize.width ?? 0
+//         button.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -8)
+//         
+//         // 텍스트의 왼쪽 여백을 이미지의 너비 + 8포인트로 설정
+//         let titleWidth = button.titleLabel?.intrinsicContentSize.width ?? 0
+//         button.titleEdgeInsets = UIEdgeInsets(top: 0, left: -imageWidth - 8, bottom: 0, right: 0)
+        
         return button
     }()
     
@@ -234,22 +257,21 @@ class UploadVC: UIViewController {
     // MARK: - 선택한 암장 기준으로 난이도 버튼 세팅 YJ
     private func setgradeButton(with gymInfo: Gym) {
         let grade = gymInfo.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
-
+        
         let menuItems: [UIAction] = grade.map { level in
             UIAction(title: level) { [weak self] _ in
                 self?.viewModel.optionSelected(optionText: level)
             }
         }
-
+        
         let menu = UIMenu(title: "선택", options: .displayInline, children: menuItems)
-
+        
         gradeButton.menu = menu
         gradeButton.showsMenuAsPrimaryAction = true
         gradeButton.changesSelectionAsPrimaryAction = true
         gradeButton.setTitle("선택", for: .normal)
     }
     
-    // MARK: - 선택한 암장 기준으로 섹터 버튼 세팅 YJ
     private func setSectorButton(with gymInfo: Gym) {
         let sectors = gymInfo.sector.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
         
@@ -258,57 +280,27 @@ class UploadVC: UIViewController {
                 self?.viewModel.optionSelected(optionText: sector)
             }
         }
-
-        let menu = UIMenu(title: "선택", options: .displayInline, children: menuItems)
         
-        let symbolImage = UIImage(systemName: "chevron.right")
-        sectorButton.setImage(symbolImage, for: .normal)
-        sectorButton.tintColor = .secondaryLabel
-        sectorButton.setTitleColor(.secondaryLabel, for: .normal)
+        let menu = UIMenu(title: "선택", options: .displayInline, children: menuItems)
+
+        sectorButton.menu = menu
+        sectorButton.showsMenuAsPrimaryAction = true // 버튼을 탭하면 메뉴 노출
+        sectorButton.changesSelectionAsPrimaryAction = true
+        sectorButton.setTitle("선택", for: .normal)
+        sectorButton.setImage(UIImage(systemName: "chevron.right"), for: .normal)
         sectorButton.imageView?.tintColor = .secondaryLabel
 
-        // 버튼에 메뉴 설정
-        sectorButton.menu = menu
-        sectorButton.showsMenuAsPrimaryAction = true  // 버튼을 탭하면 메뉴 노출
-        sectorButton.changesSelectionAsPrimaryAction = true
-        sectorButton.titleLabel?.textAlignment = .right
-        sectorButton.setTitle("선택", for: .normal)
-    
         sectorView.addSubview(sectorButton)
         
         sectorButton.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
-            $0.trailing.equalToSuperview()
-            $0.width.equalTo(sectorView).multipliedBy(2.0 / 3.0) // levelView의 2/3
+            $0.center.equalToSuperview()
+//            $0.width.equalTo(sectorView).multipliedBy(2.0 / 3.0) // sectorView의 2/3
+            $0.width.equalTo(sectorView)
+            
         }
     }
-// 잠깐 주석 처리할께요
-//    // MARK: - 선택한 암장 기준으로 섹터 버튼 세팅 YJ
-//    private func setSectorButton(with gymInfo: Gym) {
-//        let sectors = gymInfo.sector.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
-//        
-//        let menuItems: [UIAction] = sectors.map { sector in
-//            UIAction(title: sector) { [weak self] _ in
-//                self?.viewModel.optionSelected(optionText: sector)
-//            }
-//        }
-//
-//        let menu = UIMenu(title: "선택", options: .displayInline, children: menuItems)
-//
-//        // 버튼에 메뉴 설정
-//        sectorButton.menu = menu
-//        sectorButton.showsMenuAsPrimaryAction = true  // 버튼을 탭하면 메뉴 노출
-//        sectorButton.backgroundColor = .clear
-//
-//        levelView.addSubview(sectorButton)
-//
-//        sectorButton.snp.makeConstraints {
-//            $0.top.bottom.equalToSuperview()
-//            $0.trailing.equalToSuperview()
-//            $0.width.equalTo(levelView).multipliedBy(2.0 / 3.0) // levelView의 2/3
-//        }
-//    }
-//    
+ 
     private func setAlert() {
         viewModel.showAlert
             .observe(on: MainScheduler.instance)
@@ -457,5 +449,23 @@ extension UploadVC : PHPickerViewControllerDelegate {
         viewModel.mediaItems.accept(results)
         viewModel.setMedia()
         picker.dismiss(animated: true)
+    }
+}
+
+class CustomButton: UIButton {
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        // 버튼의 텍스트와 이미지 위치 조정
+        guard let imageView = imageView, let titleLabel = titleLabel else { return }
+        
+        let imageWidth = imageView.frame.width
+        let titleWidth = titleLabel.frame.width
+        let spacing: CGFloat = 8 // 이미지와 텍스트 간의 간격
+        
+        // 이미지와 텍스트의 위치 조정
+        imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -spacing)
+        titleEdgeInsets = UIEdgeInsets(top: 0, left: -imageWidth - spacing, bottom: 0, right: 0)
     }
 }
