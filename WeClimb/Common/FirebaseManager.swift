@@ -4,7 +4,6 @@
 //
 //  Created by Soobeen Jang on 9/5/24.
 //
-
 import UIKit
 
 import AuthenticationServices
@@ -18,9 +17,9 @@ import GoogleSignIn
 import RxSwift
 import Kingfisher
 
-
+                
 final class FirebaseManager {
-    
+ 
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     private let disposeBag = DisposeBag()
@@ -28,6 +27,7 @@ final class FirebaseManager {
     static let shared = FirebaseManager()
     private init() {}
     
+    // MARK: 유저 정보 업데이트
     func updateAccount(with data: String, for field: UserUpdate, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
@@ -40,7 +40,7 @@ final class FirebaseManager {
             completion()
         }
     }
-    // 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
+    //  MARK: 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
     func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
         let ref = db.collection("users").whereField("userName", isEqualTo: name)
         
@@ -57,7 +57,7 @@ final class FirebaseManager {
         }
     }
     
-    // 현재 유저 정보 가져오기
+    // MARK: 현재 유저 정보 가져오기
     func currentUserInfo(completion: @escaping (Result<User, Error>) -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
@@ -73,7 +73,7 @@ final class FirebaseManager {
         }
     }
 
-    // 이름으로 다른 유저 정보 가져오기
+    // MARK: 이름으로 다른 유저 정보 가져오기
     func getUserInfoFrom(name: String, completion: @escaping (Result<User, Error>) -> Void) {
         let userRef = db.collection("users").whereField("userName", isEqualTo: name)
         
@@ -92,7 +92,7 @@ final class FirebaseManager {
         }
     }
     
-    // 로그인된 계정 삭제
+    // MARK: 로그인된 계정 삭제
     func userDelete() {
         guard let user = Auth.auth().currentUser else { return }
         
@@ -115,7 +115,7 @@ final class FirebaseManager {
         }
     }
     
-    // 모든 암장이름 가져오기 (검색용)
+    // MARK: 모든 암장이름 가져오기 (검색용)
     func allGymName(completion: @escaping ([String]) -> Void) {
         db.collection("climbingGyms").getDocuments { snapshot, error in
             if let error = error {
@@ -135,7 +135,7 @@ final class FirebaseManager {
         }
     }
     
-    // 특정 암장정보 from 이름
+    // MARK: 특정 암장정보 from 이름
     func gymInfo(from name: String, completion: @escaping (Gym?) -> Void) {
         db.collection("climbingGyms")
             .document(name)
@@ -174,7 +174,7 @@ final class FirebaseManager {
                                profileImage: profileImage, additionalInfo: additionalInfo))
             }
     }
-    //포스트 업로드
+    // MARK: 포스트 업로드
     func uploadPost(media: [URL], caption: String) {
         guard let user = Auth.auth().currentUser else {
             print("로그인이 되지않음")
@@ -216,7 +216,7 @@ final class FirebaseManager {
                 let userRef = self.db.collection("users").document(user.uid).collection("posts").document(stringDate)
                 
                 do {
-                    try userRef.setData(from: Post(uid: UUID().uuidString, creationDate: Date(), caption: caption, medias: sortedUserMedia, like: 0))
+                    try userRef.setData(from: Post(postUID: UUID().uuidString, creationDate: Date(), caption: caption, medias: sortedUserMedia, like: 0))
                     print("게시글 올리기 성공!")
                 } catch {
                     print("게시글 올리기 오류")
@@ -226,25 +226,22 @@ final class FirebaseManager {
                 print("업로드중 오류 발생: \(error)")
             }).disposed(by: disposeBag)
     }
-    //댓글달기
+    // MARK: 댓글달기
     func addComment(fromPostUid postUid: String, postOwnerUid: String, text: String) {
         guard let user = Auth.auth().currentUser else {
             print("로그인이 되지않음")
             return
         }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyMMddHHmmss"
-        let stringDate = formatter.string(from: Date())
-        
-        let postRef = db.collection("users").document(postOwnerUid).collection("posts").document(postUid).collection("comments").document(stringDate)
+        let commentUID = UUID().uuidString
+        let postRef = db.collection("users").document(postOwnerUid).collection("posts").document(postUid).collection("comments").document(commentUID)
         do {
-            try postRef.setData(from: Comment(text: text, from: user.uid, creationDate: Date(), like: 0))
+            try postRef.setData(from: Comment(commentUID: commentUID,text: text, from: user.uid, creationDate: Date(), like: 0))
         } catch {
             print("댓글 작성중 에러")
         }
     }
     
-    //내 포스트 가져오기 최신순
+    // MARK: 내 포스트 가져오기 최신순
     func allMyPost(completion: @escaping (Result<[Post], Error>) -> Void) {
         guard let user = Auth.auth().currentUser else {
             print("로그인 되지 않았음")
@@ -276,6 +273,33 @@ final class FirebaseManager {
                 let sortedPosts = posts.sorted(by: { $0.creationDate > $1.creationDate})
                 completion(.success(sortedPosts))
             }
+        }
+    }
+    
+    // MARK: 특정 포스트의 댓글 가져오기
+    func comments(postUID: String, postOwner: String, completion: @escaping ([Comment]?) -> Void) {
+        let postRef = db.collection("users").document(postOwner).collection("posts").document(postUID).collection("comments")
+        
+        postRef.getDocuments { snapshot, error in
+            if let error = error {
+                print("댓글 가져오기 오류: \(error)")
+                completion(nil)
+                return
+            }
+            guard let documents = snapshot?.documents else {
+                completion(nil)
+                return
+            }
+            let comments: [Comment] = documents.compactMap { document in
+                do {
+                    return try document.data(as: Comment.self)
+                } catch {
+                    return nil
+                }
+            }
+            let sortedComments = comments.sorted { $0.creationDate > $1.creationDate }
+            
+            completion(sortedComments)
         }
     }
     
