@@ -16,7 +16,7 @@ class ClimbingGymVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = ClimbingGymVM()
     private let climbingGymInfoView = ClimbingGymInfoView()
-    private var gymData: SearchModel?
+    private var gymData: Gym?
     
     // MARK: - 공통 헤더 뷰 - DS
     private let headerView = GymHeaderView()
@@ -42,18 +42,18 @@ class ClimbingGymVC: UIViewController {
         setLayout()
         bindSectionData()
         actions()
-        navigation()
+//        navigation()
         
         tableView.register(SectionTableViewCell.self, forCellReuseIdentifier: Identifiers.sectionTableViewCell)
         
     }
     
-    func configure(with data: SearchModel) {
+    func configure(with data: Gym) {
         self.gymData = data
     }
     
     // MARK: - 네비게이션 - DS
-    private func navigation() {
+    func navigation() {
         viewModel.onItemSelected = { [weak self] (detailItems: [DetailItem]) in
             guard let self else { return }
             
@@ -67,11 +67,23 @@ class ClimbingGymVC: UIViewController {
     private func actions() {
         headerView.followButton.addAction(UIAction { [weak self] _ in
             guard let self else { return }
+            
             if self.headerView.followButton.title(for: .normal) == ClimbingGymNameSpace.follow {
                 self.headerView.followButton.setTitle(ClimbingGymNameSpace.unFollow, for: .normal)
+                self.headerView.followButton.backgroundColor = .lightGray
+                self.headerView.followButton.setTitleColor(.black, for: .normal)
+                
+                ClimbingGymNameSpace.totalFollow += 1
             } else {
                 self.headerView.followButton.setTitle(ClimbingGymNameSpace.follow, for: .normal)
+                self.headerView.followButton.backgroundColor = .mainPurple
+                self.headerView.followButton.setTitleColor(.white, for: .normal)
+                
+                if ClimbingGymNameSpace.totalFollow > 0 {
+                    ClimbingGymNameSpace.totalFollow -= 1
+                }
             }
+            self.headerView.updateFollowersCount(ClimbingGymNameSpace.follower)
         }, for: .touchUpInside)
         
         headerView.segmentControl.addAction(UIAction { [weak self] _ in

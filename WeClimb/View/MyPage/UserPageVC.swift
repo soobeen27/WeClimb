@@ -16,6 +16,7 @@ class UserPageVC: UIViewController {
     private let viewModel = MyPageVM()
     
     private var isFollowing = false
+//    private let userData = User?
     
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
@@ -169,8 +170,12 @@ class UserPageVC: UIViewController {
         
         setLayout()
         bind()
-        setNavigation()
+//        setNavigation()
     }
+    
+//    func configure(with data: Gym) {
+//        self.userData = data
+//    }
     
     // MARK: - 로그아웃 버튼 YJ
     // 이 기능은 아직 보류지만 로그아웃을 위해 우선 여기에..
@@ -186,6 +191,8 @@ class UserPageVC: UIViewController {
     }
     
     @objc private func rightBarButtonTapped() {
+        let settingsVC = SettingVC()
+        navigationController?.pushViewController(settingsVC, animated: true)
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let logout = UIAlertAction(title: UserPageNameSpace.logout, style: .default) { _ in

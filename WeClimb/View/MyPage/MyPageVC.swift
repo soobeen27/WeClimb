@@ -9,6 +9,7 @@ import UIKit
 
 import RxSwift
 import SnapKit
+import FirebaseAuth
 
 class MyPageVC: UIViewController {
     
@@ -155,6 +156,7 @@ class MyPageVC: UIViewController {
         setLayout()
         bind()
         setNavigation()
+//        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     }
     
     // MARK: - 설정 버튼 YJ
@@ -169,16 +171,64 @@ class MyPageVC: UIViewController {
         navigationItem.rightBarButtonItem = rightBarButton
     }
     
+//    @objc private func rightBarButtonTapped() {
+//        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//        
+//        let logout = UIAlertAction(title: MypageNameSpace.logout, style: .default) { _ in
+//            guard let navigationController = self.tabBarController?.navigationController else { return }
+//            navigationController.popToRootViewController(animated: true)
+//        }
+//        
+//        let close = UIAlertAction(title: MypageNameSpace.close, style: .cancel)
+//        
+//        [logout, close]
+//            .forEach { actionSheet.addAction($0) }
+//        
+//        present(actionSheet, animated: true)
+//    }
+    
+    // WL 파이어베이스 로그아웃 로직 추가
     @objc private func rightBarButtonTapped() {
-        let settingVC = SettingVC()
-        navigationController?.pushViewController(settingVC, animated: true)
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        // 로그아웃 액션
+        let logout = UIAlertAction(title: MypageNameSpace.logout, style: .default) { _ in
+            do {
+                // Firebase Auth에서 로그아웃 수행
+                try Auth.auth().signOut()
+                print("User logged out successfully.")
+                
+                // 네비게이션 스택을 초기화하고 루트 뷰 컨트롤러로 이동
+                guard let navigationController = self.tabBarController?.navigationController else { return }
+                navigationController.popToRootViewController(animated: true)
+                
+            } catch let signOutError as NSError {
+                print("Error signing out: %@", signOutError)
+            }
+        }
+        
+        // 닫기 액션
+        let close = UIAlertAction(title: MypageNameSpace.close, style: .cancel)
+        
+        [logout, close]
+            .forEach { actionSheet.addAction($0) }
+        
+        present(actionSheet, animated: true)
     }
     
+    //프로필 편집뷰 이동
     private func editButtonTapped() {
         let editPageVC = EditPageVC()
         navigationController?.pushViewController(editPageVC, animated: true)
     }
     
+    //상세 피드뷰 이동
+    private func navigateDetailFeedView(at indexPath: IndexPath) {
+        let myPageDetailFeedVC = MyPageDetailFeedVC()
+        navigationController?.pushViewController(myPageDetailFeedVC, animated: true)
+    }
+
+    //MARK: - 레이아웃
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
@@ -229,6 +279,7 @@ class MyPageVC: UIViewController {
         }
     }
     
+    //MARK: - 바인드
     private func bind() {
         viewModel.profileImages
             .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { _, image, cell in
@@ -243,5 +294,29 @@ class MyPageVC: UIViewController {
                 self?.editButtonTapped()
             }
             .disposed(by: disposeBag)
+        
+        collectionView.rx.itemSelected
+            .bind { [weak self ] indexPath in
+                self?.navigateDetailFeedView(at: indexPath)
+            }
+            .disposed(by: disposeBag)
     }
 }
+//extension MyPageVC: UICollectionViewDelegate {
+//    
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        let modalVC = MyPageModalVC()
+//        modalVC.modalPresentationStyle = .pageSheet
+//        
+//        if let sheet = modalVC.sheetPresentationController {
+//            let customDetent = UISheetPresentationController.Detent.custom { context in
+//                return context.maximumDetentValue * 0.9
+//            }
+//            sheet.detents = [customDetent]
+//            sheet.preferredCornerRadius = 20
+//        }
+//
+//        present(modalVC, animated: true, completion: nil)
+//    }
+//}
+
