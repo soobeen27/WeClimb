@@ -20,10 +20,55 @@ class UploadVM {
     let isLoading = BehaviorRelay<Bool>(value: false)
     
     // 피커뷰에서 선택한 항목을 저장
-    private var selectedFeedItems = [FeedCellModel]()
+    var selectedFeedItems = [FeedCellModel]()
     
-    func optionSelected(optionText: String) {
-        print("선택된 옵션: \(optionText)")
+    let pageChanged = PublishRelay<Int>()
+    private var currentPageIndex = 0
+    
+    var shouldUpdateUI: Bool = true
+}
+
+extension UploadVM {
+    // MARK: - 각 미디어마다 선택한 옵션 저장 YJ
+    func optionSelected(optionText: String, buttonType: String) {
+        print("옵션 선택됨: \(optionText), 현재 페이지 인덱스: \(currentPageIndex)")
+        
+        var currentFeedItems = feedRelay.value
+        var feedItem = currentFeedItems[currentPageIndex]
+        print("currentFeedItems: \(currentFeedItems)")
+
+        if buttonType == "grade" {
+            feedItem.grade = optionText
+        } else if buttonType == "sector" {
+            feedItem.sector = optionText
+        }
+
+        currentFeedItems[currentPageIndex] = feedItem
+        shouldUpdateUI = false  // UI업데이트 X
+        feedRelay.accept(currentFeedItems)
+        
+    }
+    
+    // MARK: - 페이지 변경 이벤트 방출 YJ
+    func pageChanged(to pageIndex: Int) {
+        pageChanged.accept(pageIndex)
+    
+        currentPageIndex = pageIndex
+    }
+    
+    // MARK: - 선택한 암장 정보 저장 YJ
+    func optionSelectedGym(_ gymInfo: Gym) {
+        let gymName = gymInfo.gymName
+        
+        var feedItem = feedRelay.value
+        
+        // feedRelay의 모든 항목의 gym 속성을 업데이트
+        for index in feedItem.indices {
+            feedItem[index].gym = gymName
+        }
+        shouldUpdateUI = false
+        feedRelay.accept(feedItem)
+        print("feedRelay/gym: \(feedRelay)")
     }
 }
 

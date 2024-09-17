@@ -8,6 +8,9 @@
 import UIKit
 
 struct FeedCellModel {
-  let image: UIImage?
-  let videoURL: URL?
+    let image: UIImage?
+    let videoURL: URL?
+    var grade: String?
+    var sector: String?
+    var gym: String?
 }

@@ -31,6 +31,7 @@ class UploadOptionView : UIView {
         label.font = .systemFont(ofSize: 15, weight: .regular)
         label.text = UploadNameSpace.select
         label.textColor = .secondaryLabel
+        label.textAlignment = .right
         return label
     }()
     
@@ -95,13 +96,23 @@ class UploadOptionView : UIView {
             selectedLabel.snp.makeConstraints {
                 $0.trailing.equalTo(nextImageView.snp.leading).offset(-8)
                 $0.centerY.equalToSuperview()
-                $0.size.equalTo(30)
             }
             
             nextImageView.snp.makeConstraints {
                 $0.trailing.equalToSuperview().offset(-16)
                 $0.centerY.equalToSuperview()
             }
+        }
+    }
+    
+    // MARK: - 암장 선택시 버튼 업데이트 YJ
+    func updateText(with gymName: String) {
+        selectedLabel.text = gymName
+        selectedLabel.textColor = .label
+        
+        nextImageView.isHidden = true
+        nextImageView.snp.makeConstraints {
+            $0.width.equalTo(0)
         }
     }
 }
