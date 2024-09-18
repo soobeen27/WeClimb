@@ -73,6 +73,34 @@ final class FirebaseManager {
         }
     }
     
+    // MARK: 내 포스트 가져오기 최신순
+    func allMyPost(postRefs: [DocumentReference]) -> Observable<[Post]> {
+        let posts = postRefs.map { ref in
+            return Observable<Post>.create { observer in
+                ref.getDocument { document, error in
+                    if let error = error {
+                        observer.onError(error)
+                        return
+                    }
+                    guard let document, document.exists else { return }
+                    do {
+                        let post = try document.data(as: Post.self)
+                        observer.onNext(post)
+                    } catch {
+                        observer.onError(error)
+                    }
+                }
+                return Disposables.create()
+            }
+        }
+        return Observable.zip(posts).map {
+            $0.sorted {
+                $0.creationDate > $1.creationDate
+            }
+        }
+    }
+    
+    
     //MARK: 사용자 검색 함수 (User 모델에 맞게 업데이트)
     func searchUsers(with searchText: String, completion: @escaping ([User]?, Error?) -> Void) {
         db.collection("users")
@@ -285,41 +313,6 @@ final class FirebaseManager {
         }
     }
     
-    // MARK: 내 포스트 가져오기 최신순
-    func allMyPost(completion: @escaping (Result<[Post], Error>) -> Void) {
-        guard let user = Auth.auth().currentUser else {
-            print("로그인 되지 않았음")
-            return
-        }
-        let postsRef = db.collection("users").document(user.uid).collection("posts")
-        
-        postsRef.getDocuments { snapshot, error in
-            if let error = error {
-                print("내 포스트 가져오는중 에러: \(error)")
-                return
-            }
-            guard let documents = snapshot?.documents else {
-                completion(.failure(PostError.none))
-                return
-            }
-            
-            var posts: [Post] = documents.compactMap { document in
-                do {
-                    return try document.data(as: Post.self)
-                } catch {
-                    print("포스트 매핑중 오류")
-                    return nil
-                }
-            }
-            if posts.isEmpty {
-                completion(.failure(PostError.none))
-            } else {
-                let sortedPosts = posts.sorted(by: { $0.creationDate > $1.creationDate})
-                completion(.success(sortedPosts))
-            }
-        }
-    }
-    
     // MARK: 특정 포스트의 댓글 가져오기
     func comments(postUID: String, postOwner: String, completion: @escaping ([Comment]?) -> Void) {
         let postRef = db.collection("users").document(postOwner).collection("posts").document(postUID).collection("comments")
@@ -349,7 +342,7 @@ final class FirebaseManager {
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
     func feedFirst(completion: @escaping ([Post]?) -> Void) {
-        let postRef = db.collectionGroup("posts")
+        let postRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
             .limit(to: 10)
         
@@ -387,7 +380,7 @@ final class FirebaseManager {
             print("초기 피드가 존재하지 않음")
             return
         }
-        let postRef = db.collectionGroup("posts")
+        let postRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
             .limit(to: 10)
             .start(afterDocument: lastFeed)
