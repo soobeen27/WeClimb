@@ -146,16 +146,16 @@ class SearchVC: UIViewController {
             .disposed(by: disposeBag)
         
         // MARK: - User TableView 선택 이벤트 처리 (미완성) - DS
-//        userTableView.rx.modelSelected(Gym.self)
-//            .subscribe(onNext: { [weak self] selectedItem in
-//                guard let self else { return }
-//                let userPageVC = UserPageVC()
-//                userPageVC.configure(with: selectedItem)
-//                navigationController?.navigationBar.prefersLargeTitles = false
-//                userPageVC.setNavigation()
-//                self.navigationController?.pushViewController(userPageVC, animated: true)
-//            })
-//            .disposed(by: disposeBag)
+        userTableView.rx.modelSelected(User.self)
+            .subscribe(onNext: { [weak self] selectedItem in
+                guard let self else { return }
+                let userPageVC = UserPageVC()
+                userPageVC.configure(with: selectedItem)
+                navigationController?.navigationBar.prefersLargeTitles = false
+                userPageVC.setNavigation()
+                self.navigationController?.pushViewController(userPageVC, animated: true)
+            })
+            .disposed(by: disposeBag)
         
         // MARK: - Gym Data 바인딩 - DS
         searchViewModel.filteredData
