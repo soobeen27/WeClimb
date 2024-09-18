@@ -73,7 +73,7 @@ final class FirebaseManager {
         }
     }
     
-    // 사용자 검색 함수 (User 모델에 맞게 업데이트)
+    //MARK: 사용자 검색 함수 (User 모델에 맞게 업데이트)
     func searchUsers(with searchText: String, completion: @escaping ([User]?, Error?) -> Void) {
         db.collection("users")
             .whereField("userName", isGreaterThanOrEqualTo: searchText)
@@ -202,7 +202,7 @@ final class FirebaseManager {
             }
     }
     // MARK: 포스트 업로드
-    func uploadPost(media: [URL], caption: String) {
+    func uploadPost(media: [(url: URL, sector: String, grade: String)], caption: String?, gym: String?) {
         guard let user = Auth.auth().currentUser else {
             print("로그인이 되지않음")
             return
@@ -210,12 +210,13 @@ final class FirebaseManager {
         
         let storageRef = storage.reference()
         
-        let uploadedMedia = media.enumerated().map { index, url -> Observable<(Int, String)> in
-            let fileName = url.lastPathComponent
+        let uploadedMedia = media.enumerated().map { index, media -> Observable<(Int, Media)> in
+            let fileName = media.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.url.lastPathComponent
+//            let fileName = UUID().uuidString
             let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
 
-            return Observable<(Int, String)>.create { observer in
-                mediaRef.putFile(from: url, metadata: nil) { metaData, error in
+            return Observable<(Int, Media)>.create { observer in
+                mediaRef.putFile(from: media.url, metadata: nil) { metaData, error in
                     if let error = error {
                         observer.onError(error)
                         return
@@ -226,7 +227,8 @@ final class FirebaseManager {
                             return
                         }
                         guard let url = url else { return }
-                        observer.onNext((index, url.absoluteString))
+                        let medias = Media(url: url.absoluteString, sector: media.sector, grade: media.grade)
+                        observer.onNext((index, medias))
                         observer.onCompleted()
                     }
                 }
@@ -237,32 +239,47 @@ final class FirebaseManager {
             .subscribe(onNext: { [weak self] userMedia in
                 guard let self else { return }
                 let sortedUserMedia = userMedia.sorted(by: { $0.0 < $1.0}).map { $0.1 }
-                let formatter = DateFormatter()
-                formatter.dateFormat = "yyMMddHHmmss"
-                let stringDate = formatter.string(from: Date())
-                let userRef = self.db.collection("users").document(user.uid).collection("posts").document(stringDate)
+                let postUID = UUID().uuidString
+                let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: 0, gym: gym, medias: sortedUserMedia)
                 
+                let userRef = self.db.collection("users").document(user.uid)
+                let postRef = self.db.collection("posts").document(postUID)
                 do {
-                    try userRef.setData(from: Post(postUID: UUID().uuidString, creationDate: Date(), caption: caption, medias: sortedUserMedia, like: 0))
-                    print("게시글 올리기 성공!")
+                    try postRef.setData(from: post) { error in
+                        if let error = error {
+                            print("포스트 셋데이터 오류: \(error)")
+                            return
+                        }
+                        userRef.updateData(["posts" : FieldValue.arrayUnion([postRef])])
+                    }
                 } catch {
-                    print("게시글 올리기 오류")
+                    print("업로드중 오류 셋데이터")
                 }
-                
+
             }, onError: { error in
                 print("업로드중 오류 발생: \(error)")
             }).disposed(by: disposeBag)
     }
+    
     // MARK: 댓글달기
-    func addComment(fromPostUid postUid: String, postOwnerUid: String, text: String) {
+    func addComment(fromPostUid postUid: String, content: String) {
         guard let user = Auth.auth().currentUser else {
             print("로그인이 되지않음")
             return
         }
         let commentUID = UUID().uuidString
-        let postRef = db.collection("users").document(postOwnerUid).collection("posts").document(postUid).collection("comments").document(commentUID)
+        let postRef = db.collection("posts").document(postUid)
+        let userRef = self.db.collection("users").document(user.uid)
+        let commentRef = db.collection("posts").document(postUid).collection("comments").document(commentUID)
+        let comment = Comment(commentUID: commentUID, authorUID: user.uid, content: content, creationDate: Date(), like: 0, postRef: postRef)
         do {
-            try postRef.setData(from: Comment(commentUID: commentUID,text: text, from: user.uid, creationDate: Date(), like: 0))
+            try commentRef.setData(from: comment) { error in
+                if let error = error {
+                    print("댓글 다는중 오류\(error)")
+                    return
+                }
+                userRef.updateData(["comments" : FieldValue.arrayUnion([commentRef])])
+            }
         } catch {
             print("댓글 작성중 에러")
         }
@@ -474,3 +491,4 @@ final class FirebaseManager {
      }
      */
 }
+

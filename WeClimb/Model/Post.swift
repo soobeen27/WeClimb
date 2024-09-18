@@ -6,21 +6,32 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
-// 게시글
+struct Media: Codable {
+    let url: String
+    let sector: String
+    let grade: String
+}
+
+//게시글
 struct Post: Codable {
-    let postUID: String // 글 유아이디
-    let creationDate: Date // 생성날짜
+    let postUID: String
+    let authorUID: String
+    let creationDate: Date
     let caption: String?
-    let medias: [String]
     let like: Int
+    let gym: String?
+    let medias: [Media]?
 }
 
 // 댓글
 struct Comment: Codable {
-    let commentUID: String // 댓글 유아이디
-    let text: String
-    let from: String //댓글 쓴 사람 uid
-    let creationDate: Date
+    let commentUID: String
+    let authorUID: String
+    let content: String
+    let creationDate: Date;
     let like: Int
+    let postRef: DocumentReference
 }
+
