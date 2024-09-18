@@ -49,7 +49,7 @@ class LoginVM {
                         completion(.login)
                     } else {
                         do {
-                            try tokenRef.setData(from: User(idToken: user.uid, lastModified: Date(), loginType: loginType.string,
+                            try tokenRef.setData(from: User(userUID: user.uid, lastModified: Date(), loginType: loginType.string,
                                                             registrationDate: Date(), userName: nil, userRole: "user", armReach: nil,
                                                             height: nil, followers: nil, following: nil, profileImage: nil))
                             completion(.createAccount)
