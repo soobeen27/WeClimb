@@ -36,7 +36,7 @@ class SettingCell: UITableViewCell {
         }
     }
     
-    func configure(with item: SettingItem) {
-        titleLabel.text = item.title
-    }
+    func configure(with title: String) {
+         titleLabel.text = title
+     }
 }
