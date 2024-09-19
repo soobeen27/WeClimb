@@ -5,25 +5,31 @@
 //  Created by 강유정 on 9/2/24.
 //
 
+import FirebaseAuth
 import RxSwift
 
 class SettingVM {
-    lazy var items: Observable<[SectionModel]> = {
-        return configureItems()
-    }()
+    // MARK: - 파이어베이스 로그아웃 YJ
+    func LogoutUser() -> Observable<Void> {
+        return Observable.create { observer in
+            do {
+                try Auth.auth().signOut()
+                observer.onNext(())
+                observer.onCompleted()
+            } catch {
+                observer.onError(error)
+            }
+            return Disposables.create()
+        }
+    }
     
-    // 섹션과 항목을 정의하고 Observable로 반환 YJ
-    private func configureItems() -> Observable<[SectionModel]> {
-        let notifications = [SettingItem(title: SettingNameSpace.notifications)]
-        let policy = [SettingItem(title: SettingNameSpace.termsOfService), SettingItem(title: SettingNameSpace.privacyPolic)]
-        let account = [SettingItem(title: SettingNameSpace.logout), SettingItem(title: SettingNameSpace.accountRemove)]
-        
-        let sections: [SectionModel] = [
-            SectionModel(section: .notifications, items: notifications),
-            SectionModel(section: .policy, items: policy),
-            SectionModel(section: .account, items: account)
-        ]
-        
-        return Observable.just(sections)
+    // MARK: - 파이어베이스 회원탈퇴 YJ
+    func deleteUser() -> Observable<Void> {
+        return Observable.create { observer in
+            FirebaseManager.shared.userDelete()
+            observer.onNext(())
+            observer.onCompleted()
+            return Disposables.create()
+        }
     }
 }

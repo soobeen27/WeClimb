@@ -50,8 +50,8 @@ class DetailEditCell: UITableViewCell {
     }
     
     private func setLayout() {
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(infoTextField)
+        [titleLabel, infoTextField]
+            .forEach { contentView.addSubview($0) }
         
         titleLabel.snp.makeConstraints {
             $0.leading.equalTo(contentView.snp.leading).inset(16)

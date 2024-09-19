@@ -5,6 +5,7 @@
 //  Created by 강유정 on 9/2/24.
 //
 
+import SafariServices
 import UIKit
 
 import RxSwift
@@ -14,8 +15,12 @@ class SettingVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = SettingVM()
     
-    private var sections: [SectionModel] = []
-
+    private var datas: [SettingItem] = [
+//        SettingItem(section: .notifications, titles: [SettingNameSpace.notifications]),
+        SettingItem(section: .policy, titles: [SettingNameSpace.termsOfService, SettingNameSpace.privacyPolic]),
+        SettingItem(section: .account, titles: [SettingNameSpace.logout, SettingNameSpace.accountRemove])
+    ]
+    
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.layer.cornerRadius = 20
@@ -24,14 +29,14 @@ class SettingVC: UIViewController {
         tableView.register(SettingCell.self, forCellReuseIdentifier: SettingCell.className)
         return tableView
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         setNavigation()
         setLayout()
-        bind()
+        bindCell()
     }
     
     func setNavigation() {
@@ -47,47 +52,117 @@ class SettingVC: UIViewController {
             $0.leading.trailing.equalTo(view.safeAreaLayoutGuide)
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(8)
         }
+        tableView.dataSource = self
+        tableView.delegate = self
     }
     
-    private func bind() {
-        viewModel.items
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] sections in
+    // MARK: - 셀 클릭 이벤트 처리 YJ
+    private func bindCell() {
+        tableView.rx.itemSelected
+            .subscribe(onNext: { [weak self] indexPath in
                 guard let self = self else { return }
+                let selectedTitle = self.datas[indexPath.section].titles[indexPath.row]
                 
-                // 섹션 업데이트
-                self.sections = sections
-                
-                // 데이터 소스 및 셀 업데이트
-                self.tableView.reloadData()
+                switch selectedTitle {
+                case SettingNameSpace.termsOfService:
+                    self.openWeb(urlString: "https://www.notion.so/iosclimber/104292bf48c947b2b3b7a8cacdf1d130")
+                case SettingNameSpace.privacyPolic:
+                    self.openWeb(urlString: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928")
+                case SettingNameSpace.logout:
+                    self.setLogout()
+                case SettingNameSpace.accountRemove:
+                    self.setDeleteUser()
+                default:
+                    break
+                }
             })
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - 웹 페이지 열기 YJ
+    private func openWeb(urlString: String) {
+        guard let url = URL(string: urlString) else { return }
+        let safariVC = SFSafariViewController(url: url)
+        present(safariVC, animated: true, completion: nil)
+    }
+    
+    // MARK: - 로그아웃 및 화면전환 YJ
+    private func setLogout() {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        tableView.delegate = self
-        tableView.dataSource = self
+        let logoutAction = UIAlertAction(title: SettingNameSpace.logout, style: .default) { [weak self] _ in
+            self?.viewModel.LogoutUser()
+                .observe(on: MainScheduler.instance)
+                .subscribe(onNext: {
+                    print("로그아웃 성공")
+                    self?.navigateToLoginVC() // 로그인 화면으로 전환
+                }, onError: { error in
+                    print("로그아웃 실패: \(error)")
+                })
+                .disposed(by: self?.disposeBag ?? DisposeBag())
+        }
+        let closeAction = UIAlertAction(title: "Close", style: .cancel)
+        [logoutAction, closeAction].forEach { actionSheet.addAction($0) }
+        present(actionSheet, animated: true)
+    }
+    
+    // MARK: - 회원탈퇴 및 화면전환 YJ
+    private func setDeleteUser() {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let deleteAction = UIAlertAction(title: SettingNameSpace.accountRemove, style: .destructive) { [weak self] _ in
+            self?.viewModel.deleteUser()
+                .observe(on: MainScheduler.instance)
+                .subscribe(onNext: {
+                    print("회원탈퇴 성공")
+                    self?.navigateToLoginVC() // 로그인 화면으로 전환
+                }, onError: { error in
+                    print("회원탈퇴 실패: \(error.localizedDescription)")
+                })
+                .disposed(by: self?.disposeBag ?? DisposeBag())
+        }
+        let closeAction = UIAlertAction(title: "Close", style: .cancel)
+        [deleteAction, closeAction].forEach { actionSheet.addAction($0) }
+        present(actionSheet, animated: true)
+    }
+    
+    // MARK: - 로그인 화면으로 전환 YJ
+    private func navigateToLoginVC() {
+        let loginVC = LoginVC()
+        let navigationController = UINavigationController(rootViewController: loginVC)
+        
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            if let window = scene.windows.first(where: \.isKeyWindow) {
+                window.rootViewController = navigationController
+                window.makeKeyAndVisible()
+            }
+        }
     }
 }
 
 // 헤더 바인딩
-extension SettingVC: UITableViewDataSource, UITableViewDelegate {
+extension SettingVC: UITableViewDelegate, UITableViewDataSource{
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return sections.count
+        return datas.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return sections[section].items.count
+        return datas[section].titles.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: SettingCell.className, for: indexPath) as! SettingCell
-        let item = sections[indexPath.section].items[indexPath.row]
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingCell.className, for: indexPath) as? SettingCell else {
+            fatalError("SettingCell을 가져올 수 없음.")
+        }
+        
+        let item = datas[indexPath.section].titles[indexPath.row]
         cell.configure(with: item)
         return cell
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switch sections[section].section {
+        switch datas[section].section {
         case .notifications:
             return "알림"
         case .policy:
@@ -102,5 +177,3 @@ extension SettingVC: UITableViewDataSource, UITableViewDelegate {
         return 40
     }
 }
-    
-
