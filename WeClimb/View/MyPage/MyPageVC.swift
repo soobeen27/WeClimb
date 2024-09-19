@@ -191,6 +191,8 @@ class MyPageVC: UIViewController {
     //MARK: - 레이아웃
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+            
         
         [profileImage, profileStackView, totalStackView, collectionView]
             .forEach{ view.addSubview($0) }

@@ -5,12 +5,12 @@
 //  Created by 강유정 on 9/2/24.
 //
 
-import RxSwift
 import FirebaseAuth
+import RxSwift
 
-// MARK: - 파이어베이스 로그아웃 YJ
 class SettingVM {
-    func performLogout() -> Observable<Void> {
+    // MARK: - 파이어베이스 로그아웃 YJ
+    func LogoutUser() -> Observable<Void> {
         return Observable.create { observer in
             do {
                 try Auth.auth().signOut()
@@ -19,6 +19,16 @@ class SettingVM {
             } catch {
                 observer.onError(error)
             }
+            return Disposables.create()
+        }
+    }
+    
+    // MARK: - 파이어베이스 회원탈퇴 YJ
+    func deleteUser() -> Observable<Void> {
+        return Observable.create { observer in
+            FirebaseManager.shared.userDelete()
+            observer.onNext(())
+            observer.onCompleted()
             return Disposables.create()
         }
     }

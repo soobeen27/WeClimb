@@ -5,6 +5,7 @@
 //  Created by 강유정 on 9/2/24.
 //
 
+import SafariServices
 import UIKit
 
 import RxSwift
@@ -15,7 +16,7 @@ class SettingVC: UIViewController {
     private let viewModel = SettingVM()
     
     private var datas: [SettingItem] = [
-        SettingItem(section: .notifications, titles: [SettingNameSpace.notifications]),
+//        SettingItem(section: .notifications, titles: [SettingNameSpace.notifications]),
         SettingItem(section: .policy, titles: [SettingNameSpace.termsOfService, SettingNameSpace.privacyPolic]),
         SettingItem(section: .account, titles: [SettingNameSpace.logout, SettingNameSpace.accountRemove])
     ]
@@ -63,9 +64,14 @@ class SettingVC: UIViewController {
                 let selectedTitle = self.datas[indexPath.section].titles[indexPath.row]
                 
                 switch selectedTitle {
-                    
+                case SettingNameSpace.termsOfService:
+                    self.openWeb(urlString: "https://www.notion.so/iosclimber/104292bf48c947b2b3b7a8cacdf1d130")
+                case SettingNameSpace.privacyPolic:
+                    self.openWeb(urlString: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928")
                 case SettingNameSpace.logout:
                     self.setLogout()
+                case SettingNameSpace.accountRemove:
+                    self.setDeleteUser()
                 default:
                     break
                 }
@@ -73,38 +79,64 @@ class SettingVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    // MARK: - 웹 페이지 열기 YJ
+    private func openWeb(urlString: String) {
+        guard let url = URL(string: urlString) else { return }
+        let safariVC = SFSafariViewController(url: url)
+        present(safariVC, animated: true, completion: nil)
+    }
+    
     // MARK: - 로그아웃 및 화면전환 YJ
     private func setLogout() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        let logoutAction = UIAlertAction(title: UserPageNameSpace.logout, style: .default) { [weak self] _ in
-            
-            self?.viewModel.performLogout()
+        
+        let logoutAction = UIAlertAction(title: SettingNameSpace.logout, style: .default) { [weak self] _ in
+            self?.viewModel.LogoutUser()
                 .observe(on: MainScheduler.instance)
                 .subscribe(onNext: {
                     print("로그아웃 성공")
-                    
-                    // 로그인 화면으로 전환
-                    let loginVC = LoginVC()
-                    let navigationController = UINavigationController(rootViewController: loginVC)
-                    
-                    // 현재 활성화된 씬에서 화면 전환
-                    if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-                        if let window = scene.windows.first(where: \.isKeyWindow) {
-                            window.rootViewController = navigationController
-                            window.makeKeyAndVisible()
-                        }
-                    }
+                    self?.navigateToLoginVC() // 로그인 화면으로 전환
                 }, onError: { error in
                     print("로그아웃 실패: \(error)")
-                    
                 })
                 .disposed(by: self?.disposeBag ?? DisposeBag())
         }
-        
         let closeAction = UIAlertAction(title: "Close", style: .cancel)
         [logoutAction, closeAction].forEach { actionSheet.addAction($0) }
         present(actionSheet, animated: true)
+    }
+    
+    // MARK: - 회원탈퇴 및 화면전환 YJ
+    private func setDeleteUser() {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
+        let deleteAction = UIAlertAction(title: SettingNameSpace.accountRemove, style: .destructive) { [weak self] _ in
+            self?.viewModel.deleteUser()
+                .observe(on: MainScheduler.instance)
+                .subscribe(onNext: {
+                    print("회원탈퇴 성공")
+                    self?.navigateToLoginVC() // 로그인 화면으로 전환
+                }, onError: { error in
+                    print("회원탈퇴 실패: \(error.localizedDescription)")
+                })
+                .disposed(by: self?.disposeBag ?? DisposeBag())
+        }
+        let closeAction = UIAlertAction(title: "Close", style: .cancel)
+        [deleteAction, closeAction].forEach { actionSheet.addAction($0) }
+        present(actionSheet, animated: true)
+    }
+    
+    // MARK: - 로그인 화면으로 전환 YJ
+    private func navigateToLoginVC() {
+        let loginVC = LoginVC()
+        let navigationController = UINavigationController(rootViewController: loginVC)
+        
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            if let window = scene.windows.first(where: \.isKeyWindow) {
+                window.rootViewController = navigationController
+                window.makeKeyAndVisible()
+            }
+        }
     }
 }
 
