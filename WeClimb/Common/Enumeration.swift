@@ -17,6 +17,7 @@ enum UserUpdate {
     case userName
     case height
     case armReach
+    case profileImage
     
     var key: String {
         switch self {
@@ -26,6 +27,8 @@ enum UserUpdate {
             return "height"
         case .armReach:
             return "armReach"
+        case .profileImage:
+            return "profileImage"
         }
     }
 }
@@ -43,6 +46,20 @@ enum LoginType {
             return "apple"
         case .kakao:
             return "kakao"
+        }
+    }
+}
+
+enum Like {
+    case post
+    case comment
+    
+    var string: String {
+        switch self {
+        case .post:
+            return "posts"
+        case .comment:
+            return "comments"
         }
     }
 }
