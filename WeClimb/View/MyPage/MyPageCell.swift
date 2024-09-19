@@ -22,6 +22,7 @@ class MyPageCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        contentView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         setLayout()
     }
     
