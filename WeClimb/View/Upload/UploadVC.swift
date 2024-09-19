@@ -76,33 +76,17 @@ class UploadVC: UIViewController {
     }()
     
     private let sectorButton: UIButton = {
-        // UIButtonConfiguration 생성 및 설정
-//        var configuration = UIButton.Configuration.plain()
-//        configuration.title = "선택"
-//        configuration.image = UIImage(systemName: "chevron.right")
-//        configuration.imagePadding = 8
-//        configuration.imagePlacement = .leading
-//        configuration.titleAlignment = .trailing
-//        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//        
+        var configuration = UIButton.Configuration.plain()
+        configuration.imagePadding = 8
+        configuration.imagePlacement = .trailing
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 16)
+        
         // 버튼 생성 및 설정
-        let button = UIButton()
+        let button = UIButton(configuration: configuration)
         button.tintColor = .secondaryLabel
         button.titleLabel?.font = .systemFont(ofSize: 15)
         button.setTitleColor(.secondaryLabel, for: .normal)
-//        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-//        button.setTitle("선택", for: .normal)
-//        button.setImage(UIImage(systemName: "chevron.right"), for: .normal)
-        button.semanticContentAttribute = .forceRightToLeft
-//        // 이미지와 텍스트 위치 조정
-//         // 이미지의 오른쪽 여백을 8포인트로 설정
-//         let imageWidth = button.imageView?.intrinsicContentSize.width ?? 0
-//         button.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -8)
-//         
-//         // 텍스트의 왼쪽 여백을 이미지의 너비 + 8포인트로 설정
-//         let titleWidth = button.titleLabel?.intrinsicContentSize.width ?? 0
-//         button.titleEdgeInsets = UIEdgeInsets(top: 0, left: -imageWidth - 8, bottom: 0, right: 0)
-        
+        button.contentHorizontalAlignment = .trailing
         return button
     }()
     
@@ -269,7 +253,7 @@ class UploadVC: UIViewController {
             }
         }
         
-        let menu = UIMenu(title: "선택", options: .displayInline, children: menuItems)
+        let menu = UIMenu(title: "난이도 선택", options: .displayInline, children: menuItems)
         
         gradeButton.menu = menu
         gradeButton.showsMenuAsPrimaryAction = true
@@ -284,16 +268,17 @@ class UploadVC: UIViewController {
         let menuItems: [UIAction] = sectors.map { sector in
             UIAction(title: sector) { [weak self] _ in
                 self?.viewModel.optionSelected(optionText: sector, buttonType: "sector")
-           
-                self?.sectorButton.setImage(nil, for: .normal)  // 이미지 제거
+                self?.viewModel.optionSelectedGym(gymInfo)
+                self?.sectorButton.setTitle(sector, for: .normal) // 선택된 섹터 제목으로 업데이트
+                self?.sectorButton.setTitleColor(.label, for: .normal)
+//                self?.sectorButton.configuration?.image = nil
             }
         }
         
-        let menu = UIMenu(title: "선택", options: .displayInline, children: menuItems)
+        let menu = UIMenu(title: "섹터 선택", options: .displayInline, children: menuItems)
 
         sectorButton.menu = menu
         sectorButton.showsMenuAsPrimaryAction = true // 버튼을 탭하면 메뉴 노출
-        sectorButton.changesSelectionAsPrimaryAction = true
         sectorButton.setTitle("선택", for: .normal)
         sectorButton.setImage(UIImage(systemName: "chevron.right"), for: .normal)
         sectorButton.imageView?.tintColor = .secondaryLabel
@@ -303,7 +288,6 @@ class UploadVC: UIViewController {
         sectorButton.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
             $0.center.equalToSuperview()
-//            $0.width.equalTo(sectorView).multipliedBy(2.0 / 3.0) // sectorView의 2/3
             $0.width.equalTo(sectorView)
             
         }
@@ -358,10 +342,7 @@ class UploadVC: UIViewController {
     
     // MARK: - 페이지 변경 이벤트 구독 및 버튼 초기화 YJ
     private func setUIMenu() {
-        Observable.combineLatest(
-            viewModel.pageChanged,
-            viewModel.feedRelay
-        )
+        Observable.combineLatest(viewModel.pageChanged, viewModel.feedRelay)
         .observe(on: MainScheduler.instance)
         .subscribe(onNext: { [weak self] pageIndex, feedItems in
             guard let self = self else { return }
@@ -400,8 +381,6 @@ class UploadVC: UIViewController {
         })
         .disposed(by: disposeBag)
     }
-    
- 
     
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
@@ -504,23 +483,8 @@ extension UploadVC : PHPickerViewControllerDelegate {
         viewModel.mediaItems.accept(results)
         viewModel.setMedia()
         picker.dismiss(animated: true)
+        
+        gymView.selectedLabel.isHidden = false
+        gymView.nextImageView.isHidden = false
     }
 }
-
-//class CustomButton: UIButton {
-//
-//    override func layoutSubviews() {
-//        super.layoutSubviews()
-//        
-//        // 버튼의 텍스트와 이미지 위치 조정
-//        guard let imageView = imageView, let titleLabel = titleLabel else { return }
-//        
-//        let imageWidth = imageView.frame.width
-//        let titleWidth = titleLabel.frame.width
-//        let spacing: CGFloat = 8 // 이미지와 텍스트 간의 간격
-//        
-//        // 이미지와 텍스트의 위치 조정
-//        imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -spacing)
-//        titleEdgeInsets = UIEdgeInsets(top: 0, left: -imageWidth - spacing, bottom: 0, right: 0)
-//    }
-//}

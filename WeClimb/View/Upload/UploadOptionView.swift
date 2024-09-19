@@ -26,19 +26,21 @@ class UploadOptionView : UIView {
         return label
     }()
     
-    private let selectedLabel: UILabel = {
+    let selectedLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 15, weight: .regular)
         label.text = UploadNameSpace.select
         label.textColor = .secondaryLabel
         label.textAlignment = .right
+        label.isHidden = true
         return label
     }()
     
-    private let nextImageView: UIImageView = {
+    let nextImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "chevron.right"))
         imageView.tintColor = .systemGray
         imageView.contentMode = .scaleAspectFit
+        imageView.isHidden = true
         return imageView
     }()
     
