@@ -116,12 +116,14 @@ class SearchVC: UIViewController {
         
         gymTableView.snp.makeConstraints {
             $0.top.equalTo(nearbyLabel.snp.bottom).offset(8)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
         
         userTableView.snp.makeConstraints {
             $0.top.equalTo(nearbyLabel.snp.bottom).offset(8)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
     }
     
@@ -145,7 +147,7 @@ class SearchVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        // MARK: - User TableView 선택 이벤트 처리 (미완성) - DS
+        // MARK: - User TableView 선택 이벤트 처리 - DS
         userTableView.rx.modelSelected(User.self)
             .subscribe(onNext: { [weak self] selectedItem in
                 guard let self else { return }
