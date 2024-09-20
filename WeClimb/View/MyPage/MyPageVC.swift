@@ -16,6 +16,7 @@ class MyPageVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = MyPageVM()
     
+    
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .gray
@@ -156,7 +157,23 @@ class MyPageVC: UIViewController {
         setLayout()
         bind()
         setNavigation()
+        updateUserInfo()
 //        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
+    }
+    
+    
+    // MARK: - 파이어베이스에 저장된 유저 닉네임 마이페이지 업데이트
+    private func updateUserInfo() {
+        FirebaseManager.shared.currentUserInfo { [weak self] (result: Result<User, Error>) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let user):
+                    self?.nameLabel.text = user.userName
+                case .failure(let error):
+                    print("현재 유저 정보 가져오기 실패: \(error)")
+                }
+            }
+        }
     }
     
     // MARK: - 설정 버튼 YJ

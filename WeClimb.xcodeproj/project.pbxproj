@@ -373,14 +373,14 @@
 		F4892C092C7C278500C5FF16 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				F4892C152C7C981000C5FF16 /* LoginVC.swift */,
+				F4892C132C7C973800C5FF16 /* TabBarController.swift */,
 				6B8F38B72C888F4E0018C40D /* SignUp */,
 				916D64D12C848BA70064B766 /* Feed */,
-				F4892C152C7C981000C5FF16 /* LoginVC.swift */,
 				C45DC9D32C80502E00FC4C1D /* MainFeed */,
 				436AEAF22C7EECA300E0D85A /* Search */,
 				436AEAF12C7EEC7900E0D85A /* MyPage */,
 				6BC91F912C7CC79300B34083 /* ClimbingGym */,
-				F4892C132C7C973800C5FF16 /* TabBarController.swift */,
 				F4892C272C7CC18700C5FF16 /* Upload */,
 			);
 			path = View;
