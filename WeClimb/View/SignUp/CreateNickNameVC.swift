@@ -14,6 +14,7 @@ class CreateNickNameVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private let viewModel = CreateNickNameVM()
+    private let profileImagePicker = ProfileImagePickerVC()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -70,6 +71,7 @@ class CreateNickNameVC: UIViewController {
         setLayout()
         bindViewModel()
         setNavigationBar()
+        addProfileImageButtonTap()
         
         nicknameTextField.delegate = self
         registerForKeyboardNotifications()
@@ -169,6 +171,24 @@ class CreateNickNameVC: UIViewController {
         }
     }
     
+    //MARK: - 탭 제스처를 추가하고, 이미지 피커 띄우기
+    private func addProfileImageButtonTap() {
+        let tapGesture = UITapGestureRecognizer()
+        addProfileImageButton.isUserInteractionEnabled = true
+        addProfileImageButton.addGestureRecognizer(tapGesture)
+        
+        tapGesture.rx.event
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                // 현재 인스턴스 메서드에 넣어주기
+                self.profileImagePicker.presentImagePicker(from: self)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    
+    //MARK: - bind
     private func bindViewModel() {
         // TextField 입력을 ViewModel에 바인딩
         nicknameTextField.rx.text.orEmpty
