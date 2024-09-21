@@ -98,7 +98,7 @@ class FeedView : UIView {
     }
     
     private func bind() {
-        viewModel.feedRelay
+        viewModel.cellData
             .bind(to: collectionView.rx.items(
                 cellIdentifier: FeedCell.className, cellType: FeedCell.self)
             ) { row, data, cell in
@@ -128,7 +128,7 @@ extension FeedView : UICollectionViewDelegate {
         
         let changedItem = viewModel.feedRelay.value[pageIndex]
         
-        if changedItem.image != nil {
+        if changedItem.imageURL != nil {
             pauseAllVideo()
             return
         }

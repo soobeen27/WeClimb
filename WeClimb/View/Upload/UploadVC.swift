@@ -127,6 +127,7 @@ class UploadVC: UIViewController {
         setLoading()
         setNotifications()
         setUIMenu()
+        bindPostButton()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -481,10 +482,59 @@ extension UploadVC : UITextViewDelegate {
 extension UploadVC : PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         viewModel.mediaItems.accept(results)
-        viewModel.setMedia()
-        picker.dismiss(animated: true)
         
-        gymView.selectedLabel.isHidden = false
-        gymView.nextImageView.isHidden = false
+        picker.dismiss(animated: true) {
+            self.viewModel.setMedia()
+            
+            self.gymView.selectedLabel.isHidden = false
+            self.gymView.nextImageView.isHidden = false
+        }
+    }
+}
+
+extension UploadVC {
+    private func bindPostButton() {
+        postButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                print("버튼 클릭.")
+                DispatchQueue.main.async {
+                    self.navigateToMyPage()
+                }
+                
+                let media = self.viewModel.feedRelay.value.compactMap { feedItem -> (url: URL, sector: String?, grade: String?)? in
+                    // 비디오가 있는 경우
+                    if let videoURL = feedItem.videoURL {
+                        print("비디오 URL: \(videoURL)")
+                        return (url: videoURL, sector: feedItem.sector, grade: feedItem.grade)
+                    }
+                    // 이미지가 있는 경우
+                    if let imageURL = feedItem.imageURL {
+                        print("이미지 URL: \(imageURL)")
+                        return (url: imageURL, sector: feedItem.sector, grade: feedItem.grade)
+                    }
+                    return nil
+                }.compactMap { $0 } // nil 제거
+                
+                let caption = self.textView.text ?? ""
+                let gym = self.gymView.selectedLabel.text ?? ""
+                
+                // 업로드 메서드 호출
+                self.viewModel.upload(media: media, caption: caption, gym: gym)
+                    .subscribe(onNext: {
+                        print("업로드 성공")
+                    }, onError: { error in
+                        print("업로드 실패: \(error.localizedDescription)")
+                    })
+                    .disposed(by: self.disposeBag)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - 마이페이지 화면으로 전환 YJ
+    private func navigateToMyPage() {
+        if let tabBarController = tabBarController {
+            tabBarController.selectedIndex = 3
+        }
     }
 }
