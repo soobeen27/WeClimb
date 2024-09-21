@@ -91,20 +91,21 @@ extension UploadVM {
                             guard let self else { return }
                             if let videoURL = item as? URL {
                                 print("\(videoURL)")
-    
-                                self.checkVideoDuration(url: videoURL) { durationInSeconds in
+                                
+                                Task {
+                                    let durationInSeconds = await self.checkVideoDuration(url: videoURL)
                                     if durationInSeconds > 60 {
                                         self.showAlert.accept(())
                                         print("알람 알럿 이벤트 방출")
                                         group.leave()
                                         return
-                                        
                                     } else {
-                                        let newItem = FeedCellModel(imageURL: nil, videoURL: videoURL)
-                                        models[index] = newItem
+                                        models[index] = FeedCellModel(imageURL: nil, videoURL: videoURL)
                                     }
                                     group.leave()
                                 }
+                            } else {
+                                group.leave()
                             }
                         }
                     }
@@ -122,8 +123,7 @@ extension UploadVM {
                         if let data = uiImage.jpegData(compressionQuality: 1) {
                             do {
                                 try data.write(to: tempImageURL)
-                                let newItem = FeedCellModel(imageURL: tempImageURL, videoURL: nil)
-                                models[index] = newItem
+                                models[index] = FeedCellModel(imageURL: tempImageURL, videoURL: nil)
                             } catch {
                                 print("이미지 저장 실패: \(error.localizedDescription)")
                             }
@@ -148,24 +148,19 @@ extension UploadVM {
     
 extension UploadVM {
     // MARK: - 비디오 길이를 체크하는 메서드
-    func checkVideoDuration(url: URL, completion: @escaping (Double) -> Void) {
+    func checkVideoDuration(url: URL) async -> Double {
         let asset = AVAsset(url: url)
         
-        Task {
-            do {
-                // duration 속성을 비동기적으로 로드
-                try await asset.load(.duration)
-                
-                // CMTime 객체를 초 단위로 변환
-                let duration = asset.duration
-                let durationInSeconds = CMTimeGetSeconds(duration)
-                print("비디오 길이: \(durationInSeconds)초")
-                
-                completion(durationInSeconds)
-            } catch {
-                print("비디오 길이 로드 실패: \(error.localizedDescription)")
-                completion(0) // 실패 시 0초 반환
-            }
+        do {
+            // duration 속성을 await으로 로드
+            let duration: CMTime = try await asset.load(.duration)
+            // CMTime 객체를 초 단위로 변환
+            let durationInSeconds = CMTimeGetSeconds(duration)
+            print("비디오 길이: \(durationInSeconds)초")
+            return durationInSeconds
+        } catch {
+            print("비디오 길이 로드 실패: \(error.localizedDescription)")
+            return 0 // 실패 시 0초 반환
         }
     }
 }
