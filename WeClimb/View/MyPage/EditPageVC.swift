@@ -108,8 +108,8 @@ class EditPageVC: UIViewController {
                 // 클릭된 항목에 따라 분기 처리
                 if indexPath.row == 0 {
                     // 첫 번째 항목 클릭 시 CreateNickNameVC로 이동
-                    let createNickNameVC = CreateNickNameVC()
-                    self.navigationController?.pushViewController(createNickNameVC, animated: true)
+                    let editNickNameVC = EditNickNameVC()
+                    self.navigationController?.pushViewController(editNickNameVC, animated: true)
                 } else if indexPath.row == 1 {
                     // 두 번째 항목 클릭 시 PersonalDetailsVC로 이동
                     let personalDetailsVC = PersonalDetailsVC()

@@ -1,8 +1,8 @@
 //
-//  UserInformationVC.swift
+//  EditNickNameVC.swift
 //  WeClimb
 //
-//  Created by 머성이 on 9/5/24.
+//  Created by 김솔비 on 9/22/24.
 //
 
 import UIKit
@@ -10,34 +10,17 @@ import UIKit
 import SnapKit
 import RxSwift
 
-class CreateNickNameVC: UIViewController {
+class EditNickNameVC: UIViewController, UITextFieldDelegate {
     
     private let disposeBag = DisposeBag()
     private let viewModel = CreateNickNameVM()
-    private let profileImagePicker = ProfileImagePickerVC()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "어떤 프로필로 참여할까요?"
+        label.text = "수정할 닉네임을 입력해주세요"
         label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
         label.textColor = .black
         return label
-    }()
-    
-    private let profileImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "testStone") // 기본 프로필 이미지
-        imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 55
-        imageView.clipsToBounds = true
-        return imageView
-    }()
-    
-    private let addProfileImageButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "plus.circle"), for: .normal)
-        button.tintColor = .blue
-        return button
     }()
     
     private let nicknameTextField: UITextField = {
@@ -59,7 +42,7 @@ class CreateNickNameVC: UIViewController {
     
     private let confirmButton: UIButton = {
         let button = UIButton()
-        button.setTitle("확인", for: .normal)
+        button.setTitle("저장", for: .normal)
         button.backgroundColor = .lightGray
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 8
@@ -71,10 +54,9 @@ class CreateNickNameVC: UIViewController {
         setLayout()
         bindViewModel()
         setNavigationBar()
-        addProfileImageButtonTap()
         
         nicknameTextField.delegate = self
-        registerForKeyboardNotifications()
+        addKeyboardObservers()
     }
     
     private func setNavigationBar() {
@@ -92,32 +74,59 @@ class CreateNickNameVC: UIViewController {
         navigationController?.navigationBar.standardAppearance = appearance
     }
     
-    // 키보드 알림 등록
-    private func registerForKeyboardNotifications() {
+    
+    //MARK: - 키보드 on&off에 따른 버튼 애니메이션
+    private func addKeyboardObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
-    // 키보드 알림 해제
-    deinit {
+    private func removeKeyboardObservers() {
         NotificationCenter.default.removeObserver(self)
     }
     
-    // 키보드가 나타났을 때
-    @objc private func keyboardWillShow(notification: NSNotification) {
-        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
-        if self.view.frame.origin.y == 0 {
-            self.view.frame.origin.y -= keyboardSize.height / 10// 뷰를 키보드 크기의 절반만큼 위로 이동
+    @objc
+    private func keyboardWillShow(notification: NSNotification) {
+        if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRectangle = keyboardFrame.cgRectValue
+            let keyboardHeight = keyboardRectangle.height
+            UIView.animate(withDuration: 0.3) {
+                self.confirmButton.transform = CGAffineTransform(translationX: 0, y: -keyboardHeight + self.view.safeAreaInsets.bottom)
+            }
         }
     }
     
-    // 키보드가 사라졌을 때
-    @objc private func keyboardWillHide(notification: NSNotification) {
-        if self.view.frame.origin.y != 0 {
-            self.view.frame.origin.y = 0  // 뷰를 원래 위치로 복귀
+    @objc 
+    private func keyboardWillHide(notification: NSNotification) {
+        UIView.animate(withDuration: 0.3) {
+            self.confirmButton.transform = .identity
         }
     }
     
+    deinit {
+        removeKeyboardObservers()
+    }
+    
+    
+    //MARK: - 빈공간 터치 시 키보드 내리기
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+        super.touchesBegan(touches, with: event)
+    }
+    
+    
+    //MARK: - 글자수 제한
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if string.contains(" ") {
+            return false
+        }
+        guard let currentText = textField.text as NSString? else { return true }
+        let newText = currentText.replacingCharacters(in: range, with: string)
+        return newText.count <= 12
+    }
+    
+    
+    //MARK: - 레이아웃
     private func setLayout() {
         view.backgroundColor = .white
         navigationItem.largeTitleDisplayMode = .never
@@ -125,8 +134,6 @@ class CreateNickNameVC: UIViewController {
         
         [
             titleLabel,
-            profileImageView,
-            addProfileImageButton,
             nicknameTextField,
             characterCountLabel,
             confirmButton
@@ -139,20 +146,8 @@ class CreateNickNameVC: UIViewController {
             $0.width.height.equalTo(40)
         }
         
-        profileImageView.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.top.equalTo(titleLabel.snp.bottom).offset(16)
-            $0.width.height.equalTo(110)
-        }
-        
-        addProfileImageButton.snp.makeConstraints {
-            $0.centerX.equalTo(profileImageView.snp.centerX)
-            $0.top.equalTo(profileImageView.snp.bottom).offset(8)
-            $0.width.height.equalTo(24)
-        }
-        
         nicknameTextField.snp.makeConstraints {
-            $0.top.equalTo(addProfileImageButton.snp.bottom).offset(40)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(20)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.height.equalTo(40)
@@ -164,27 +159,11 @@ class CreateNickNameVC: UIViewController {
         }
         
         confirmButton.snp.makeConstraints {
-            $0.top.equalTo(characterCountLabel.snp.bottom).offset(40)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(50)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.height.equalTo(48)
         }
-    }
-    
-    //MARK: - 탭 제스처를 추가하고, 이미지 피커 띄우기
-    private func addProfileImageButtonTap() {
-        let tapGesture = UITapGestureRecognizer()
-        addProfileImageButton.isUserInteractionEnabled = true
-        addProfileImageButton.addGestureRecognizer(tapGesture)
-        
-        tapGesture.rx.event
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                guard let self = self else { return }
-                // 현재 인스턴스 메서드에 넣어주기
-                self.profileImagePicker.presentImagePicker(from: self)
-            })
-            .disposed(by: disposeBag)
     }
     
     
@@ -209,31 +188,20 @@ class CreateNickNameVC: UIViewController {
             .bind(to: characterCountLabel.rx.text)
             .disposed(by: disposeBag)
         
-        // 네비게이션
         confirmButton.rx.tap
             .withLatestFrom(viewModel.nicknameInput) // nicknameInput의 최신 값 가져오기
             .subscribe(onNext: { [weak self] newName in
                 guard let self else { return }
                 FirebaseManager.shared.updateAccount(with: newName, for: .userName, completion: {
-                    let personalDetailVC = PersonalDetailsVC()
-                    self.navigationController?.pushViewController(personalDetailVC, animated: true)
+                    DispatchQueue.main.async {
+                        let alert = UIAlertController(title: "닉네임 수정이 완료되었습니다", message: nil, preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
+                            self.navigationController?.popViewController(animated: true)
+                        }))
+                        self.present(alert, animated: true, completion: nil)
+                    }
                 })
             })
             .disposed(by: disposeBag)
-    }
-}
-
-extension CreateNickNameVC: UITextFieldDelegate {
-    // UITextFieldDelegate 메서드: 텍스트 입력 시 글자 수를 제한하는 로직
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        if string.contains(" ") {
-            return false
-        }
-        // 현재 텍스트 필드에 있는 텍스트와 새로 입력된 문자열을 합쳐서 미리 계산
-        guard let currentText = textField.text else { return true }
-        let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        
-        // 글자 수가 12자 이하면 true, 초과하면 false로 입력을 막음
-        return newText.count <= 12
     }
 }
