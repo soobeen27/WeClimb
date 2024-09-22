@@ -249,7 +249,7 @@ final class FirebaseManager {
             }
     }
     // MARK: 포스트 업로드
-    func uploadPost(media: [(url: URL, sector: String, grade: String)], caption: String?, gym: String?) {
+    func uploadPost(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?) {
         guard let user = Auth.auth().currentUser else {
             print("로그인이 되지않음")
             return
@@ -274,7 +274,7 @@ final class FirebaseManager {
                             return
                         }
                         guard let url = url else { return }
-                        let medias = Media(url: url.absoluteString, sector: media.sector, grade: media.grade)
+                        let medias = Media(url: url.absoluteString, sector: media.sector ?? "", grade: media.grade ?? "")
                         observer.onNext((index, medias))
                         observer.onCompleted()
                     }
