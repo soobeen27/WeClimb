@@ -42,14 +42,33 @@ final class FirebaseManager {
         }
     }
     
-    func uploadProfileImage(image: URL) -> Observable<UIImage> {
+    func uploadProfileImage(image: URL) -> Observable<URL> {
         guard let user = Auth.auth().currentUser else { return Observable.error(UserError.none) }
         let storageRef = self.storage.reference()
-//        let profileImageRef = storageRef.child(<#T##path: String##String#>)
+        let profileImageRef = storageRef.child("users/\(user.uid)/profileImage.jpg")
         
-        return Observable<UIImage>.create { [weak self] observer in
+        return Observable<URL>.create { [weak self] observer in
             guard let self else { return Disposables.create() }
-            
+            profileImageRef.putFile(from: image, metadata: nil) { metaData, error in
+                if let error = error {
+                    observer.onError(error)
+                    return
+                }
+                profileImageRef.downloadURL { url, error in
+                    if let error = error {
+                        observer.onError(error)
+                        return
+                    }
+                    guard let url else {
+                        print("url 없음")
+                        return
+                    }
+                    self.updateAccount(with: url.absoluteString, for: .profileImage) {
+                        observer.onNext(url)
+                        observer.onCompleted()
+                    }
+                }
+            }
             
             return Disposables.create()
         }
@@ -274,7 +293,6 @@ final class FirebaseManager {
         
         let uploadedMedia = media.enumerated().map { index, media -> Observable<(Int, Media)> in
             let fileName = media.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.url.lastPathComponent
-//            let fileName = UUID().uuidString
             let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
 
             return Observable<(Int, Media)>.create { observer in
