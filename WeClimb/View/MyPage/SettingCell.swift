@@ -6,6 +6,7 @@
 //
 
 import UIKit
+
 import SnapKit
 
 class SettingCell: UITableViewCell {
@@ -20,6 +21,7 @@ class SettingCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
+        contentView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         setLayout()
     }
 
@@ -36,7 +38,7 @@ class SettingCell: UITableViewCell {
         }
     }
     
-    func configure(with item: SettingItem) {
-        titleLabel.text = item.title
-    }
+    func configure(with title: String) {
+         titleLabel.text = title
+     }
 }

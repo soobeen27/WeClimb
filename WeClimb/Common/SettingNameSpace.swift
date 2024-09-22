@@ -10,8 +10,8 @@ import Foundation
 enum SettingNameSpace {
     static let setting = "설정"
     static let notifications = "알림 설정"
-    static let termsOfService = "이용약관"
-    static let privacyPolic = "개인정보 보호 정책"
+    static let termsOfService = "이용 약관"
+    static let privacyPolic = "개인정보 처리방침"
     static let logout = "로그아웃"
     static let accountRemove = "회원탈퇴"
 }
