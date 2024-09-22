@@ -149,3 +149,7 @@ firebase.json
 functions/
 
 .firebaserc
+
+Config.xcconfig
+
+GoogleService-Info.plist
