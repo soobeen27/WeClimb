@@ -63,6 +63,7 @@ final class FirebaseManager {
                         print("url 없음")
                         return
                     }
+                    
                     self.updateAccount(with: url.absoluteString, for: .profileImage) {
                         observer.onNext(url)
                         observer.onCompleted()
