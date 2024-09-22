@@ -11,6 +11,7 @@ import CryptoKit
 import FirebaseAuth
 import FirebaseCore
 import FirebaseFirestore
+import FirebaseFunctions
 import FirebaseStorage
 import GoogleSignIn
 import RxSwift
@@ -39,6 +40,20 @@ final class FirebaseManager {
             }
             completion()
         }
+    }
+    
+    func uploadProfileImage(image: URL) -> Observable<UIImage> {
+        guard let user = Auth.auth().currentUser else { return Observable.error(UserError.none) }
+        let storageRef = self.storage.reference()
+//        let profileImageRef = storageRef.child(<#T##path: String##String#>)
+        
+        return Observable<UIImage>.create { [weak self] observer in
+            guard let self else { return Disposables.create() }
+            
+            
+            return Disposables.create()
+        }
+        
     }
     //  MARK: 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
     func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {

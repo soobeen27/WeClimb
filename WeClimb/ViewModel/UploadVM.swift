@@ -34,7 +34,7 @@ extension UploadVM {
         
         let group = DispatchGroup() // 비동기 작업을 추적하기 위한 그룹
         var models = [FeedCellModel?](repeating: nil, count: mediaItems.value.count)
-        
+        var urls = [URL?](repeating: nil, count: mediaItems.value.count)
         mediaItems.value.enumerated().forEach { (index, mediaItem) in
             group.enter()   // 비동기 작업 시작 알려줌
             
@@ -57,16 +57,21 @@ extension UploadVM {
                                     
                                 } else {
 //
-//                                    self.compressVideo(inputURL: videoURL) {compressedURL in
-//                                        guard let compressedURL = compressedURL else {
-//                                            print("비디오 압축 오류.")
-//                                            group.leave()   // 비동기 작업이 끝난걸 알려줌
-//                                            return
-//                                        }
-//                                        self.printVideoFileSize(url: compressedURL) // 압축 후 비디오 파일 크기 출력
+                                    self.compressVideo(inputURL: videoURL) {compressedURL in
+                                        guard let compressedURL = compressedURL else {
+                                            print("비디오 압축 오류.")
+                                            return
+                                        }
                                         let newItem = FeedCellModel(image: nil, videoURL: videoURL)
-                                    models[index] = newItem
-                                    group.leave()
+                                        models[index] = newItem
+                                        urls[index] = compressedURL
+                                        group.leave()
+                                    }
+//                                        self.printVideoFileSize(url: compressedURL) // 압축 후 비디오 파일 크기 출력
+//                                    let newItem = FeedCellModel(image: nil, videoURL: videoURL)
+//                                    models[index] = newItem
+//                                    urls[index] = videoURL
+//                                    group.leave()
 //                                    }
                                 }
                             }
@@ -90,6 +95,14 @@ extension UploadVM {
             if !models.isEmpty {
                 self.feedRelay.accept(models.compactMap { $0 })
             }
+            let media = urls.compactMap {
+                if let url = $0 {
+                    return (url, "someSector", "someGrade")
+                }
+                return nil
+            }
+            print("그룹 끝: \(media)")
+            FirebaseManager.shared.uploadPost(media: media, caption: "someCaption", gym: "someGym")
         }
     }
 }
