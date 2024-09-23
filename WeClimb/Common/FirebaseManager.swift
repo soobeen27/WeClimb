@@ -11,6 +11,7 @@ import CryptoKit
 import FirebaseAuth
 import FirebaseCore
 import FirebaseFirestore
+import FirebaseFunctions
 import FirebaseStorage
 import GoogleSignIn
 import RxSwift
@@ -39,6 +40,40 @@ final class FirebaseManager {
             }
             completion()
         }
+    }
+    
+    func uploadProfileImage(image: URL) -> Observable<URL> {
+        guard let user = Auth.auth().currentUser else { return Observable.error(UserError.none) }
+        let storageRef = self.storage.reference()
+        let profileImageRef = storageRef.child("users/\(user.uid)/profileImage.jpg")
+        
+        return Observable<URL>.create { [weak self] observer in
+            guard let self else { return Disposables.create() }
+            profileImageRef.putFile(from: image, metadata: nil) { metaData, error in
+                if let error = error {
+                    observer.onError(error)
+                    return
+                }
+                profileImageRef.downloadURL { url, error in
+                    if let error = error {
+                        observer.onError(error)
+                        return
+                    }
+                    guard let url else {
+                        print("url 없음")
+                        return
+                    }
+                    
+                    self.updateAccount(with: url.absoluteString, for: .profileImage) {
+                        observer.onNext(url)
+                        observer.onCompleted()
+                    }
+                }
+            }
+            
+            return Disposables.create()
+        }
+        
     }
     //  MARK: 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
     func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
@@ -259,7 +294,6 @@ final class FirebaseManager {
         
         let uploadedMedia = media.enumerated().map { index, media -> Observable<(Int, Media)> in
             let fileName = media.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.url.lastPathComponent
-//            let fileName = UUID().uuidString
             let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
 
             return Observable<(Int, Media)>.create { observer in
