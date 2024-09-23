@@ -112,8 +112,8 @@ class EditPageVC: UIViewController {
                     self.navigationController?.pushViewController(editNickNameVC, animated: true)
                 } else if indexPath.row == 1 {
                     // 두 번째 항목 클릭 시 PersonalDetailsVC로 이동
-                    let personalDetailsVC = PersonalDetailsVC()
-                    self.navigationController?.pushViewController(personalDetailsVC, animated: true)
+                    let editPersonalDetailsVC = EditPersonalDetailsVC()
+                    self.navigationController?.pushViewController(editPersonalDetailsVC, animated: true)
                 }
 //                self.detailEditVM.selectItem(item)
 //                

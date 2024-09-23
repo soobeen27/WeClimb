@@ -14,7 +14,7 @@ class EditPageVM {
     // 샘플 데이터 YJ
     private let sampleData: [EditModel] = [
         EditModel(title: "이름(닉네임)", info: "홍길동"),
-        EditModel(title: "키 | 암리치", info: "170cm | 180cm")
+        EditModel(title: "키 | 팔길이", info: "170cm | 180cm")
     ]
     
     init() {
