@@ -247,10 +247,19 @@ class UploadVC: UIViewController {
         self.viewModel.optionSelectedGym(gymInfo)
         
         let grade = gymInfo.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
-        let menuItems: [UIAction] = grade.map { level in
-            UIAction(title: level) { [weak self] _ in
-                self?.viewModel.optionSelected(optionText: level, buttonType: "grade")
-                self?.viewModel.optionSelectedGym(gymInfo)
+        // 미리 이미지 배열 생성
+        let coloredImages = grade.compactMap { level -> UIImage? in
+            return UIImage(systemName: "rectangle.fill")?
+                .withTintColor(level.colorInfo.color, renderingMode: .alwaysOriginal)
+        }
+        
+        let menuItems: [UIAction] = grade.enumerated().map { index, level in
+            return UIAction(title: level.colorInfo.text, image: coloredImages[index]) { [weak self] _ in
+                guard let self = self else { return }
+                self.viewModel.optionSelected(optionText: level, buttonType: "grade")
+                self.gradeButton.setImage(coloredImages[index], for: .normal)
+                self.gradeButton.setTitle(nil, for: .normal)
+                self.gradeButton.tintColor = level.colorInfo.color
             }
         }
         
@@ -258,27 +267,24 @@ class UploadVC: UIViewController {
         
         gradeButton.menu = menu
         gradeButton.showsMenuAsPrimaryAction = true
-        gradeButton.changesSelectionAsPrimaryAction = true
+//        gradeButton.changesSelectionAsPrimaryAction = true
         gradeButton.setTitle("선택", for: .normal)
-        gradeButton.backgroundColor = .systemGray4
-        
-        // 이미지 설정
-        gradeButton.imageEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        // 버튼 크기 조정 (내용에 맞게 조정 가능)
- 
-
+        gradeButton.setImage(nil, for: .normal)
+        gradeButton.backgroundColor = .systemGray4.withAlphaComponent(0.6)
     }
     
     // MARK: - 선택한 암장 기준으로 섹터 버튼 세팅 YJ
     private func setSectorButton(with gymInfo: Gym) {
+        self.viewModel.optionSelectedGym(gymInfo)
+        
         let sectors = gymInfo.sector.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
         let menuItems: [UIAction] = sectors.map { sector in
             UIAction(title: sector) { [weak self] _ in
-                self?.viewModel.optionSelected(optionText: sector, buttonType: "sector")
-                self?.viewModel.optionSelectedGym(gymInfo)
-                self?.sectorButton.setTitle(sector, for: .normal) // 선택된 섹터 제목으로 업데이트
-                self?.sectorButton.setTitleColor(.label, for: .normal)
-//                self?.sectorButton.configuration?.image = nil
+                guard let self = self else { return }
+                self.viewModel.optionSelected(optionText: sector, buttonType: "sector")
+                self.sectorButton.setTitle(sector, for: .normal)
+                self.sectorButton.setTitleColor(.label, for: .normal)
+                    //                self?.sectorButton.configuration?.image = nil
             }
         }
         
@@ -369,10 +375,14 @@ class UploadVC: UIViewController {
                 // 버튼의 이전 정보가 없는 경우에는 버튼 초기화
                 if feedItem.grade == nil || feedItem.grade?.isEmpty == true {
                     self.gradeButton.setTitle("선택", for: .normal)
-                    self.gradeButton.backgroundColor = .systemGray4
+                    self.gradeButton.backgroundColor = .systemGray4.withAlphaComponent(0.6)
+                    self.gradeButton.setImage(nil, for: .normal)
                 } else {
-                    self.gradeButton.setTitle(feedItem.grade, for: .normal)
-                    self.gradeButton.backgroundColor = .systemGray4
+                    self.gradeButton.setTitle(nil, for: .normal)
+                    self.gradeButton.backgroundColor = .systemGray4.withAlphaComponent(0.6)
+                    
+                    self.gradeButton.setImage(UIImage(systemName: "rectangle.fill")?
+                        .withTintColor(feedItem.grade?.colorInfo.color ?? UIColor.clear , renderingMode: .alwaysOriginal), for: .normal)
                 }
                 
                 if feedItem.sector == nil || feedItem.sector?.isEmpty == true {
