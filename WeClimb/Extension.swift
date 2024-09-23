@@ -110,3 +110,38 @@ extension UIViewController {
         present(modalVC, animated: true, completion: nil)
     }
 }
+
+extension String {
+    var colorInfo: (text: String, color: UIColor) {
+        switch self {
+        case "빨":
+            return ("빨강", UIColor(red: 224/255, green: 53/255, blue: 53/255, alpha: 1))
+        case "주":
+            return ("주황", UIColor(red: 253/255, green: 150/255, blue: 68/255, alpha: 1))
+        case "노":
+            return ("노랑", UIColor(red: 255/255, green: 235/255, blue: 26/255, alpha: 1))
+        case "초":
+            return ("초록", UIColor(red: 30/255, green: 212/255, blue: 90/255, alpha: 1))
+        case "파":
+            return ("파랑", UIColor(red: 0/255, green: 189/255, blue: 222/255, alpha: 1))
+        case "남":
+            return ("남색", UIColor(red: 40/255, green: 100/255, blue: 240/255, alpha: 1))
+        case "보":
+            return ("보라", UIColor(red: 160/255, green: 83/255, blue: 233/255, alpha: 1))
+        case "검":
+            return ("검정", UIColor(red: 11/255, green: 16/255, blue: 19/255, alpha: 1))
+        case "흰":
+            return ("흰색", UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1))
+        case "회":
+            return ("회색", UIColor(red: 171/255, green: 171/255, blue: 171/255, alpha: 1))
+        case "핑":
+            return ("핑크", UIColor(red: 255/255, green: 88/255, blue: 188/255, alpha: 1))
+        case "갈":
+            return ("갈색", UIColor(red: 187/255, green: 120/255, blue: 58/255, alpha: 1))
+        case "하":
+            return ("하늘", UIColor(red: 0/255, green: 189/255, blue: 222/255, alpha: 1)) // "파"랑 같은 색
+        default:
+            return ("그 외", UIColor.clear)
+        }
+    }
+}
