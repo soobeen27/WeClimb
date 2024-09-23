@@ -11,6 +11,7 @@ import CryptoKit
 import FirebaseAuth
 import FirebaseCore
 import FirebaseFirestore
+import FirebaseFunctions
 import FirebaseStorage
 import GoogleSignIn
 import RxSwift
@@ -39,6 +40,40 @@ final class FirebaseManager {
             }
             completion()
         }
+    }
+    
+    func uploadProfileImage(image: URL) -> Observable<URL> {
+        guard let user = Auth.auth().currentUser else { return Observable.error(UserError.none) }
+        let storageRef = self.storage.reference()
+        let profileImageRef = storageRef.child("users/\(user.uid)/profileImage.jpg")
+        
+        return Observable<URL>.create { [weak self] observer in
+            guard let self else { return Disposables.create() }
+            profileImageRef.putFile(from: image, metadata: nil) { metaData, error in
+                if let error = error {
+                    observer.onError(error)
+                    return
+                }
+                profileImageRef.downloadURL { url, error in
+                    if let error = error {
+                        observer.onError(error)
+                        return
+                    }
+                    guard let url else {
+                        print("url 없음")
+                        return
+                    }
+                    
+                    self.updateAccount(with: url.absoluteString, for: .profileImage) {
+                        observer.onNext(url)
+                        observer.onCompleted()
+                    }
+                }
+            }
+            
+            return Disposables.create()
+        }
+        
     }
     //  MARK: 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
     func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
@@ -74,6 +109,25 @@ final class FirebaseManager {
     }
     
     // MARK: 내 포스트 가져오기 최신순
+    // 사용 예시 현재 유저를 가져오고 user.posts 를 인자로 넣는다
+    //        FirebaseManager.shared.currentUserInfo { [weak self] result in
+    //            guard let self else { return }
+    //            switch result {
+    //            case.success(let user):
+    //                guard let postRefs = user.posts else { return }
+    //                FirebaseManager.shared.allMyPost(postRefs: postRefs)
+    //                    .subscribe { posts in
+    //                        posts.map {
+    //                            $0.forEach {
+    //                                print($0.creationDate)
+    //                            }
+    //                        }
+    //                    }
+    //                    .disposed(by: self.disposeBag)
+    //            case.failure(let error):
+    //                print("테스트에러 \(error)")
+    //            }
+    //        }
     func allMyPost(postRefs: [DocumentReference]) -> Observable<[Post]> {
         let posts = postRefs.map { ref in
             return Observable<Post>.create { observer in
@@ -240,7 +294,6 @@ final class FirebaseManager {
         
         let uploadedMedia = media.enumerated().map { index, media -> Observable<(Int, Media)> in
             let fileName = media.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.url.lastPathComponent
-//            let fileName = UUID().uuidString
             let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
 
             return Observable<(Int, Media)>.create { observer in
@@ -268,7 +321,7 @@ final class FirebaseManager {
                 guard let self else { return }
                 let sortedUserMedia = userMedia.sorted(by: { $0.0 < $1.0}).map { $0.1 }
                 let postUID = UUID().uuidString
-                let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: 0, gym: gym, medias: sortedUserMedia)
+                let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: sortedUserMedia)
                 
                 let userRef = self.db.collection("users").document(user.uid)
                 let postRef = self.db.collection("posts").document(postUID)
@@ -299,7 +352,7 @@ final class FirebaseManager {
         let postRef = db.collection("posts").document(postUid)
         let userRef = self.db.collection("users").document(user.uid)
         let commentRef = db.collection("posts").document(postUid).collection("comments").document(commentUID)
-        let comment = Comment(commentUID: commentUID, authorUID: user.uid, content: content, creationDate: Date(), like: 0, postRef: postRef)
+        let comment = Comment(commentUID: commentUID, authorUID: user.uid, content: content, creationDate: Date(), like: nil, postRef: postRef)
         do {
             try commentRef.setData(from: comment) { error in
                 if let error = error {
@@ -337,6 +390,40 @@ final class FirebaseManager {
             let sortedComments = comments.sorted { $0.creationDate > $1.creationDate }
             
             completion(sortedComments)
+        }
+    }
+    
+    //MARK: 좋아요
+    // uid로 부터
+    func like(from uid: String, type: Like) -> Observable<[String]> {
+        return Observable<[String]>.create { [weak self] observer in
+            guard let user = Auth.auth().currentUser, let self else {
+                observer.onError(UserError.none)
+                return Disposables.create()
+            }
+            let contentRef = self.db.collection(type.string).document(uid)
+            contentRef.updateData(["like" : FieldValue.arrayUnion([user.uid])]) { error in
+                if let error = error {
+                    print("좋아요 실행중 오류: \(error)")
+                    observer.onError(error)
+                }
+                contentRef.getDocument { document, error in
+                    if let error = error {
+                        print("좋아요 목록 가져오는 중 에러: \(error)")
+                        observer.onError(error)
+                    }
+                    guard let document, document.exists else {
+                        observer.onError(UserError.none)
+                        return
+                    }
+                    guard let likeList = document.get("like") as? [String] else {
+                        print("라이크 없음")
+                        return
+                    }
+                    observer.onNext(likeList)
+                }
+            }
+            return Disposables.create()
         }
     }
     
