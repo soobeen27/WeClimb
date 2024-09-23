@@ -261,6 +261,12 @@ class UploadVC: UIViewController {
         gradeButton.changesSelectionAsPrimaryAction = true
         gradeButton.setTitle("선택", for: .normal)
         gradeButton.backgroundColor = .systemGray4
+        
+        // 이미지 설정
+        gradeButton.imageEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        // 버튼 크기 조정 (내용에 맞게 조정 가능)
+ 
+
     }
     
     // MARK: - 선택한 암장 기준으로 섹터 버튼 세팅 YJ
