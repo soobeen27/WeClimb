@@ -144,3 +144,12 @@ iOSInjectionProject/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,swift,xcode,cocoapods
 
+firebase.json
+
+functions/
+
+.firebaserc
+
+Config.xcconfig
+
+GoogleService-Info.plist

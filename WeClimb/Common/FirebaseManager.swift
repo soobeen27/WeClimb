@@ -4,31 +4,32 @@
 //
 //  Created by Soobeen Jang on 9/5/24.
 //
-
 import UIKit
 
 import AuthenticationServices
 import CryptoKit
 import FirebaseAuth
 import FirebaseCore
-import FirebaseStorage
 import FirebaseFirestore
+import FirebaseFunctions
 import FirebaseStorage
 import GoogleSignIn
 import RxSwift
 import Kingfisher
 
-
+                
 final class FirebaseManager {
-    
+ 
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     private let disposeBag = DisposeBag()
     private var ongoingRequests = [String: Bool]()
+    private var lastFeed: QueryDocumentSnapshot?
     
     static let shared = FirebaseManager()
     private init() {}
     
+    // MARK: 유저 정보 업데이트
     func updateAccount(with data: String, for field: UserUpdate, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
@@ -41,7 +42,41 @@ final class FirebaseManager {
             completion()
         }
     }
-    // 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
+    
+    func uploadProfileImage(image: URL) -> Observable<URL> {
+        guard let user = Auth.auth().currentUser else { return Observable.error(UserError.none) }
+        let storageRef = self.storage.reference()
+        let profileImageRef = storageRef.child("users/\(user.uid)/profileImage.jpg")
+        
+        return Observable<URL>.create { [weak self] observer in
+            guard let self else { return Disposables.create() }
+            profileImageRef.putFile(from: image, metadata: nil) { metaData, error in
+                if let error = error {
+                    observer.onError(error)
+                    return
+                }
+                profileImageRef.downloadURL { url, error in
+                    if let error = error {
+                        observer.onError(error)
+                        return
+                    }
+                    guard let url else {
+                        print("url 없음")
+                        return
+                    }
+                    
+                    self.updateAccount(with: url.absoluteString, for: .profileImage) {
+                        observer.onNext(url)
+                        observer.onCompleted()
+                    }
+                }
+            }
+            
+            return Disposables.create()
+        }
+        
+    }
+    //  MARK: 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
     func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
         let ref = db.collection("users").whereField("userName", isEqualTo: name)
         
@@ -58,7 +93,7 @@ final class FirebaseManager {
         }
     }
     
-    // 현재 유저 정보 가져오기
+    // MARK: 현재 유저 정보 가져오기
     func currentUserInfo(completion: @escaping (Result<User, Error>) -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
@@ -74,7 +109,54 @@ final class FirebaseManager {
         }
     }
     
-    // 사용자 검색 함수 (User 모델에 맞게 업데이트)
+    // MARK: 내 포스트 가져오기 최신순
+    // 사용 예시 현재 유저를 가져오고 user.posts 를 인자로 넣는다
+    //        FirebaseManager.shared.currentUserInfo { [weak self] result in
+    //            guard let self else { return }
+    //            switch result {
+    //            case.success(let user):
+    //                guard let postRefs = user.posts else { return }
+    //                FirebaseManager.shared.allMyPost(postRefs: postRefs)
+    //                    .subscribe { posts in
+    //                        posts.map {
+    //                            $0.forEach {
+    //                                print($0.creationDate)
+    //                            }
+    //                        }
+    //                    }
+    //                    .disposed(by: self.disposeBag)
+    //            case.failure(let error):
+    //                print("테스트에러 \(error)")
+    //            }
+    //        }
+    func allMyPost(postRefs: [DocumentReference]) -> Observable<[Post]> {
+        let posts = postRefs.map { ref in
+            return Observable<Post>.create { observer in
+                ref.getDocument { document, error in
+                    if let error = error {
+                        observer.onError(error)
+                        return
+                    }
+                    guard let document, document.exists else { return }
+                    do {
+                        let post = try document.data(as: Post.self)
+                        observer.onNext(post)
+                    } catch {
+                        observer.onError(error)
+                    }
+                }
+                return Disposables.create()
+            }
+        }
+        return Observable.zip(posts).map {
+            $0.sorted {
+                $0.creationDate > $1.creationDate
+            }
+        }
+    }
+    
+    
+    //MARK: 사용자 검색 함수 (User 모델에 맞게 업데이트)
     func searchUsers(with searchText: String, completion: @escaping ([User]?, Error?) -> Void) {
         db.collection("users")
             .whereField("userName", isGreaterThanOrEqualTo: searchText)
@@ -100,8 +182,8 @@ final class FirebaseManager {
                 }
             }
     }
-    
-    // 이름으로 다른 유저 정보 가져오기
+
+    // MARK: 이름으로 다른 유저 정보 가져오기
     func getUserInfoFrom(name: String, completion: @escaping (Result<User, Error>) -> Void) {
         let userRef = db.collection("users").whereField("userName", isEqualTo: name)
         
@@ -120,7 +202,7 @@ final class FirebaseManager {
         }
     }
     
-    // 로그인된 계정 삭제
+    // MARK: 로그인된 계정 삭제
     func userDelete() {
         guard let user = Auth.auth().currentUser else { return }
         
@@ -143,7 +225,7 @@ final class FirebaseManager {
         }
     }
     
-    // 모든 암장이름 가져오기 (검색용)
+    // MARK: 모든 암장이름 가져오기 (검색용)
     func allGymName(completion: @escaping ([String]) -> Void) {
         db.collection("climbingGyms").getDocuments { snapshot, error in
             if let error = error {
@@ -163,7 +245,7 @@ final class FirebaseManager {
         }
     }
     
-    // 특정 암장정보 from 이름
+    // MARK: 특정 암장정보 from 이름
     func gymInfo(from name: String, completion: @escaping (Gym?) -> Void) {
         db.collection("climbingGyms")
             .document(name)
@@ -202,8 +284,8 @@ final class FirebaseManager {
                                profileImage: profileImage, additionalInfo: additionalInfo))
             }
     }
-    //포스트 업로드
-    func uploadPost(media: [URL], caption: String) {
+    // MARK: 포스트 업로드
+    func uploadPost(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?) {
         guard let user = Auth.auth().currentUser else {
             print("로그인이 되지않음")
             return
@@ -211,12 +293,12 @@ final class FirebaseManager {
         
         let storageRef = storage.reference()
         
-        let uploadedMedia = media.enumerated().map { index, url -> Observable<(Int, String)> in
-            let fileName = url.lastPathComponent
+        let uploadedMedia = media.enumerated().map { index, media -> Observable<(Int, Media)> in
+            let fileName = media.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.url.lastPathComponent
             let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
-            
-            return Observable<(Int, String)>.create { observer in
-                mediaRef.putFile(from: url, metadata: nil) { metaData, error in
+
+            return Observable<(Int, Media)>.create { observer in
+                mediaRef.putFile(from: media.url, metadata: nil) { metaData, error in
                     if let error = error {
                         observer.onError(error)
                         return
@@ -227,7 +309,8 @@ final class FirebaseManager {
                             return
                         }
                         guard let url = url else { return }
-                        observer.onNext((index, url.absoluteString))
+                        let medias = Media(url: url.absoluteString, sector: media.sector ?? "", grade: media.grade ?? "")
+                        observer.onNext((index, medias))
                         observer.onCompleted()
                     }
                 }
@@ -238,72 +321,177 @@ final class FirebaseManager {
             .subscribe(onNext: { [weak self] userMedia in
                 guard let self else { return }
                 let sortedUserMedia = userMedia.sorted(by: { $0.0 < $1.0}).map { $0.1 }
-                let formatter = DateFormatter()
-                formatter.dateFormat = "yyMMddHHmmss"
-                let stringDate = formatter.string(from: Date())
-                let userRef = self.db.collection("users").document(user.uid).collection("posts").document(stringDate)
+                let postUID = UUID().uuidString
+                let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: sortedUserMedia)
                 
+                let userRef = self.db.collection("users").document(user.uid)
+                let postRef = self.db.collection("posts").document(postUID)
                 do {
-                    try userRef.setData(from: Post(uid: UUID().uuidString, creationDate: Date(), caption: caption, medias: sortedUserMedia, like: 0))
-                    print("게시글 올리기 성공!")
+                    try postRef.setData(from: post) { error in
+                        if let error = error {
+                            print("포스트 셋데이터 오류: \(error)")
+                            return
+                        }
+                        userRef.updateData(["posts" : FieldValue.arrayUnion([postRef])])
+                    }
                 } catch {
-                    print("게시글 올리기 오류")
+                    print("업로드중 오류 셋데이터")
                 }
-                
+
             }, onError: { error in
                 print("업로드중 오류 발생: \(error)")
             }).disposed(by: disposeBag)
     }
-    //댓글달기
-    func addComment(fromPostUid postUid: String, postOwnerUid: String, text: String) {
+    
+    // MARK: 댓글달기
+    func addComment(fromPostUid postUid: String, content: String) {
         guard let user = Auth.auth().currentUser else {
             print("로그인이 되지않음")
             return
         }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyMMddHHmmss"
-        let stringDate = formatter.string(from: Date())
-        
-        let postRef = db.collection("users").document(postOwnerUid).collection("posts").document(postUid).collection("comments").document(stringDate)
+        let commentUID = UUID().uuidString
+        let postRef = db.collection("posts").document(postUid)
+        let userRef = self.db.collection("users").document(user.uid)
+        let commentRef = db.collection("posts").document(postUid).collection("comments").document(commentUID)
+        let comment = Comment(commentUID: commentUID, authorUID: user.uid, content: content, creationDate: Date(), like: nil, postRef: postRef)
         do {
-            try postRef.setData(from: Comment(text: text, from: user.uid, creationDate: Date(), like: 0))
+            try commentRef.setData(from: comment) { error in
+                if let error = error {
+                    print("댓글 다는중 오류\(error)")
+                    return
+                }
+                userRef.updateData(["comments" : FieldValue.arrayUnion([commentRef])])
+            }
         } catch {
             print("댓글 작성중 에러")
         }
     }
     
-    //내 포스트 가져오기 최신순
-    func allMyPost(completion: @escaping (Result<[Post], Error>) -> Void) {
-        guard let user = Auth.auth().currentUser else {
-            print("로그인 되지 않았음")
-            return
-        }
-        let postsRef = db.collection("users").document(user.uid).collection("posts")
+    // MARK: 특정 포스트의 댓글 가져오기
+    func comments(postUID: String, postOwner: String, completion: @escaping ([Comment]?) -> Void) {
+        let postRef = db.collection("users").document(postOwner).collection("posts").document(postUID).collection("comments")
         
-        postsRef.getDocuments { snapshot, error in
+        postRef.getDocuments { snapshot, error in
             if let error = error {
-                print("내 포스트 가져오는중 에러: \(error)")
+                print("댓글 가져오기 오류: \(error)")
+                completion(nil)
                 return
             }
             guard let documents = snapshot?.documents else {
-                completion(.failure(PostError.none))
+                completion(nil)
                 return
             }
-            
-            var posts: [Post] = documents.compactMap { document in
+            let comments: [Comment] = documents.compactMap { document in
                 do {
-                    return try document.data(as: Post.self)
+                    return try document.data(as: Comment.self)
                 } catch {
-                    print("포스트 매핑중 오류")
                     return nil
                 }
             }
-            if posts.isEmpty {
-                completion(.failure(PostError.none))
-            } else {
-                let sortedPosts = posts.sorted(by: { $0.creationDate > $1.creationDate})
-                completion(.success(sortedPosts))
+            let sortedComments = comments.sorted { $0.creationDate > $1.creationDate }
+            
+            completion(sortedComments)
+        }
+    }
+    
+    //MARK: 좋아요
+    // uid로 부터
+    func like(from uid: String, type: Like) -> Observable<[String]> {
+        return Observable<[String]>.create { [weak self] observer in
+            guard let user = Auth.auth().currentUser, let self else {
+                observer.onError(UserError.none)
+                return Disposables.create()
             }
+            let contentRef = self.db.collection(type.string).document(uid)
+            contentRef.updateData(["like" : FieldValue.arrayUnion([user.uid])]) { error in
+                if let error = error {
+                    print("좋아요 실행중 오류: \(error)")
+                    observer.onError(error)
+                }
+                contentRef.getDocument { document, error in
+                    if let error = error {
+                        print("좋아요 목록 가져오는 중 에러: \(error)")
+                        observer.onError(error)
+                    }
+                    guard let document, document.exists else {
+                        observer.onError(UserError.none)
+                        return
+                    }
+                    guard let likeList = document.get("like") as? [String] else {
+                        print("라이크 없음")
+                        return
+                    }
+                    observer.onNext(likeList)
+                }
+            }
+            return Disposables.create()
+        }
+    }
+    
+    // MARK: 피드가져오기 (처음 실행되어야할 메소드)
+    func feedFirst(completion: @escaping ([Post]?) -> Void) {
+        let postRef = db.collection("posts")
+            .order(by: "creationDate", descending: true)
+            .limit(to: 10)
+        
+        postRef.getDocuments { [weak self] snapshot, error in
+            guard let self else { return }
+            
+            if let error = error {
+                print("피드 가져오는중 에러: \(error)")
+                completion(nil)
+                return
+            }
+            guard let documents = snapshot?.documents else {
+                print("현재 피드가 없음")
+                completion(nil)
+                return
+            }
+            if let lastDocument = documents.last {
+                self.lastFeed = lastDocument
+            }
+            
+            let posts = documents.compactMap {
+                do {
+                    return try $0.data(as: Post.self)
+                } catch {
+                    return nil
+                }
+            }
+            completion(posts)
+        }
+    }
+    
+    // MARK: feedFirst 이후에 피드를 더 가져오기
+    func feedLoding(completion: @escaping ([Post]?) -> Void) {
+        guard let lastFeed = lastFeed else { 
+            print("초기 피드가 존재하지 않음")
+            return
+        }
+        let postRef = db.collection("posts")
+            .order(by: "creationDate", descending: true)
+            .limit(to: 10)
+            .start(afterDocument: lastFeed)
+        
+        postRef.getDocuments { snapshot, error in
+            if let error = error {
+                print("피드 가져오는중 에러: \(error)")
+                completion(nil)
+                return
+            }
+            guard let documents = snapshot?.documents else {
+                print("현재 피드가 없음")
+                completion(nil)
+                return
+            }
+            let posts = documents.compactMap {
+                do {
+                    return try $0.data(as: Post.self)
+                } catch {
+                    return nil
+                }
+            }
+            completion(posts)
         }
     }
     
@@ -411,4 +599,5 @@ final class FirebaseManager {
      gymImageView.image = UIImage(named: "defaultImage")
      }
      */
+}
 

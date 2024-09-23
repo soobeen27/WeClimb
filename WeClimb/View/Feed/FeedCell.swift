@@ -78,8 +78,11 @@ class FeedCell : UICollectionViewCell {
     // MARK: - 셀을 구성하는 메서드 YJ
     func configure(with model: FeedCellModel) {
         self.data = model // 데이터 저장
-        if let image = model.image {
-            imageView.image = image
+        if let image = model.imageURL {
+            // URL에서 이미지 데이터를 가져와서 UIImage 객체로 변환
+            if let imageData = try? Data(contentsOf: image), let image = UIImage(data: imageData) {
+                imageView.image = image
+            }
             stopVideo()
         } else if let videoURL = model.videoURL {
             player = AVPlayer(url: videoURL)

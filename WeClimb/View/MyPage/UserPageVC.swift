@@ -190,14 +190,14 @@ class UserPageVC: UIViewController {
     
     // MARK: - 로그아웃 버튼 YJ
     // 이 기능은 아직 보류지만 로그아웃을 위해 우선 여기에..
-    func setNavigation() {
+    private func setNavigation() {
         let rightBarButton = UIBarButtonItem(
             image: UIImage(systemName: "ellipsis"),
             style: .plain,
             target: self,
-            action: #selector(rightBarButtonTapped)
+            action: #selector(self.rightBarButtonTapped)
         )
-        navigationController?.navigationBar.tintColor = .black
+        navigationController?.navigationBar.tintColor = .label
         navigationItem.rightBarButtonItem = rightBarButton
     }
     
