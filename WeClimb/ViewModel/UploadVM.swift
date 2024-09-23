@@ -162,14 +162,6 @@ extension UploadVM {
             print("비디오 길이 로드 실패: \(error.localizedDescription)")
             return 0 // 실패 시 0초 반환
         }
-        let media = urls.compactMap {
-            if let url = $0 {
-                return (url, "someSector", "someGrade")
-            }
-            return nil
-        }
-        print("그룹 끝: \(media)")
-        FirebaseManager.shared.uploadPost(media: media, caption: "someCaption", gym: "someGym")
     }
 }
 
