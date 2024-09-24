@@ -25,6 +25,7 @@ class EditPageVC: UIViewController {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 60
         imageView.clipsToBounds = true
+        imageView.image = UIImage(named: "testStone") // 기본 프로필 이미지
         return imageView
     }()
     
@@ -35,7 +36,7 @@ class EditPageVC: UIViewController {
         tableView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         tableView.register(EditPageCell.self, forCellReuseIdentifier: EditPageCell.className)
         tableView.separatorInset.left = 0
-//        tableView.separatorStyle = .none
+        //        tableView.separatorStyle = .none
         tableView.rowHeight = 60
         return tableView
     }()
@@ -69,7 +70,7 @@ class EditPageVC: UIViewController {
             $0.centerX.equalToSuperview()
             $0.width.height.equalTo(120)
         }
-         
+        
         tableView.snp.makeConstraints {
             $0.top.equalTo(profileImage.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(16)
@@ -115,11 +116,11 @@ class EditPageVC: UIViewController {
                     let editPersonalDetailsVC = EditPersonalDetailsVC()
                     self.navigationController?.pushViewController(editPersonalDetailsVC, animated: true)
                 }
-//                self.detailEditVM.selectItem(item)
-//                
-//                // 화면 전환
-//                let detailVC = DetailEditVC(viewModel: detailEditVM)
-//                self.navigationController?.pushViewController(detailVC, animated: true)
+                //                self.detailEditVM.selectItem(item)
+                //
+                //                // 화면 전환
+                //                let detailVC = DetailEditVC(viewModel: detailEditVM)
+                //                self.navigationController?.pushViewController(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
     }

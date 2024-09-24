@@ -23,6 +23,7 @@ class MyPageVC: UIViewController {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 40
         imageView.clipsToBounds = true
+        imageView.image = UIImage(named: "testStone") // 기본 프로필 이미지
         return imageView
     }()
     
@@ -214,7 +215,7 @@ class MyPageVC: UIViewController {
         [profileImage, profileStackView, totalStackView, collectionView]
             .forEach{ view.addSubview($0) }
         
-        [nameStackView, infoLabel, editButton]
+        [nameStackView, /*infoLabel, */editButton]
             .forEach{ profileStackView.addArrangedSubview($0) }
         
         [nameLabel, levelLabel]

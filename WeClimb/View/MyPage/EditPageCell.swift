@@ -69,7 +69,7 @@ class EditPageCell: UITableViewCell {
     private func setLayout() {
         leftStackView.addArrangedSubview(titleLabel)
         
-        [infoLabel, nextImagView]
+        [/*infoLabel, */nextImagView]
             .forEach { rightStackView.addArrangedSubview($0) }
         
         [leftStackView, rightStackView]
@@ -108,7 +108,7 @@ class EditPageCell: UITableViewCell {
     
     func configure(with model: EditModel) {
         titleLabel.text = model.title
-        infoLabel.text = model.info
+//        infoLabel.text = model.info
     }
     
 }

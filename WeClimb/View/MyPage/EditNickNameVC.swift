@@ -25,7 +25,7 @@ class EditNickNameVC: UIViewController, UITextFieldDelegate {
     
     private let nicknameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "닉네임을 입력하세요"
+//        textField.placeholder = "닉네임을 입력하세요"
         textField.borderStyle = .roundedRect
         textField.font = UIFont.systemFont(ofSize: 15)
         textField.backgroundColor = .white
@@ -54,6 +54,7 @@ class EditNickNameVC: UIViewController, UITextFieldDelegate {
         setLayout()
         bindViewModel()
         setNavigationBar()
+        updateUserInfo()
         
         nicknameTextField.delegate = self
         addKeyboardObservers()
@@ -72,6 +73,26 @@ class EditNickNameVC: UIViewController, UITextFieldDelegate {
         ]
         
         navigationController?.navigationBar.standardAppearance = appearance
+    }
+    
+    
+    // MARK: - 파이어베이스에 저장된 유저 닉네임 마이페이지 업데이트
+    private func updateUserInfo() {
+        FirebaseManager.shared.currentUserInfo { [weak self] (result: Result<User, Error>) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let user):
+                    if let userName = user.userName {
+                        self?.nicknameTextField.placeholder = "\(userName)"
+                    } else {
+                        self?.nicknameTextField.placeholder = "닉네임을 입력하세요"
+                    }
+                case .failure(let error):
+                    print("현재 유저 정보 가져오기 실패: \(error)")
+                    self?.nicknameTextField.placeholder = "닉네임을 입력하세요"
+                }
+            }
+        }
     }
     
     

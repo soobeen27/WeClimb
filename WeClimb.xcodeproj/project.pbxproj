@@ -113,7 +113,7 @@
 
 /* Begin PBXFileReference section */
 		043942922C86BCF000AA0D9D /* FirebaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseModel.swift; sourceTree = "<group>"; };
-		435B7E412C8024AB00EB9816 /* EditPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPageVC.swift; sourceTree = "<group>"; };
+		435B7E412C8024AB00EB9816 /* EditPageVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = EditPageVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		436AEADF2C7D69CB00E0D85A /* GymTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymTableViewCell.swift; sourceTree = "<group>"; };
 		436AEAE12C7D69F000E0D85A /* SearchVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVM.swift; sourceTree = "<group>"; };
 		436AEAE92C7DCD1100E0D85A /* MyPageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageCell.swift; sourceTree = "<group>"; };
