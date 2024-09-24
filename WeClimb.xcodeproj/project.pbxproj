@@ -78,6 +78,7 @@
 		C47A0B012C9115760068173A /* FeedCommentTabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0B002C9115760068173A /* FeedCommentTabelCell.swift */; };
 		C49FC7092C9F1B0E00CD66D9 /* EditNickNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49FC7082C9F1B0E00CD66D9 /* EditNickNameVC.swift */; };
 		C49FC70B2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49FC70A2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift */; };
+		C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49FC70C2CA265B300CD66D9 /* PersonalDetailsVM.swift */; };
 		C4E29C172C806F170076BCA6 /* MainFeedVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E29C162C806F170076BCA6 /* MainFeedVM.swift */; };
 		C4E29C1B2C8874780076BCA6 /* MyPageDetailFeedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E29C1A2C8874780076BCA6 /* MyPageDetailFeedVC.swift */; };
 		C4E29C1D2C898AFB0076BCA6 /* SFMainFeedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E29C1C2C898AFB0076BCA6 /* SFMainFeedVC.swift */; };
@@ -141,9 +142,9 @@
 		6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ClimbingGymNameSpace.swift; sourceTree = "<group>"; tabWidth = 4; };
 		6B8F38B82C888F6A0018C40D /* PrivacyPolicyVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyVC.swift; sourceTree = "<group>"; };
 		6B8F38C62C894BC50018C40D /* CreateNickNameVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = CreateNickNameVC.swift; sourceTree = "<group>"; tabWidth = 4; };
-		6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyVM.swift; sourceTree = "<group>"; };
+		6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyVM.swift; sourceTree = "<group>"; tabWidth = 4; };
 		6B8F38CC2C8989D10018C40D /* CreateNickNameVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNickNameVM.swift; sourceTree = "<group>"; };
-		6B90333F2C89DB1B0012D955 /* PersonalDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalDetailsVC.swift; sourceTree = "<group>"; };
+		6B90333F2C89DB1B0012D955 /* PersonalDetailsVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = PersonalDetailsVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		6B9033412C8AAA5E0012D955 /* RangePickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangePickerVC.swift; sourceTree = "<group>"; };
 		6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionDetailTableViewCell.swift; sourceTree = "<group>"; };
 		6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDeatilGymVC.swift; sourceTree = "<group>"; };
@@ -171,6 +172,7 @@
 		C47A0B002C9115760068173A /* FeedCommentTabelCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = FeedCommentTabelCell.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C49FC7082C9F1B0E00CD66D9 /* EditNickNameVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = EditNickNameVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C49FC70A2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPersonalDetailsVC.swift; sourceTree = "<group>"; };
+		C49FC70C2CA265B300CD66D9 /* PersonalDetailsVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = PersonalDetailsVM.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C4E29C162C806F170076BCA6 /* MainFeedVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFeedVM.swift; sourceTree = "<group>"; };
 		C4E29C1A2C8874780076BCA6 /* MyPageDetailFeedVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MyPageDetailFeedVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C4E29C1C2C898AFB0076BCA6 /* SFMainFeedVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = SFMainFeedVC.swift; sourceTree = "<group>"; tabWidth = 4; };
@@ -284,6 +286,7 @@
 			children = (
 				6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */,
 				6B8F38CC2C8989D10018C40D /* CreateNickNameVM.swift */,
+				C49FC70C2CA265B300CD66D9 /* PersonalDetailsVM.swift */,
 			);
 			path = SignUpVM;
 			sourceTree = "<group>";
@@ -631,6 +634,7 @@
 				6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
 				F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */,
+				C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */,
 				C47A0B012C9115760068173A /* FeedCommentTabelCell.swift in Sources */,
 				F4892C0E2C7C27BE00C5FF16 /* ExampleCommon.swift in Sources */,
 				43EC6ACB2C8B5026004A2E2F /* FeedCellModel.swift in Sources */,
