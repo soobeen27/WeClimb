@@ -23,6 +23,7 @@ final class FirebaseManager {
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     private let disposeBag = DisposeBag()
+    private var ongoingRequests = [String: Bool]()
     private var lastFeed: QueryDocumentSnapshot?
     
     static let shared = FirebaseManager()
@@ -615,42 +616,70 @@ final class FirebaseManager {
     
     // gs:// URL을 HTTP/HTTPS로 변환하는 함수
     func fetchImageURL(from gsURL: String, completion: @escaping (URL?) -> Void) {
-        let storageReference = storage.reference(forURL: gsURL)
-        
-        storageReference.downloadURL { url, error in
-            if let error = error {
-                print("Error converting gsURL to httpsURL: \(error.localizedDescription)")
+            // 이미 요청 중인지 확인
+            guard ongoingRequests[gsURL] == nil else {
+                print("Request for \(gsURL) is already in progress.")
                 completion(nil)
                 return
             }
-            completion(url)
+
+            // 요청 중 상태로 설정
+            ongoingRequests[gsURL] = true
+
+            let storageReference = storage.reference(forURL: gsURL)
+            
+            storageReference.downloadURL { [weak self] url, error in
+                guard let self = self else { return }
+                
+                // 요청이 완료되었으므로 상태 제거
+                self.ongoingRequests[gsURL] = nil
+
+                if let error = error {
+                    print("Error converting gsURL to httpsURL: \(error.localizedDescription)")
+                    completion(nil)
+                    return
+                }
+                
+                // 완료된 URL 반환
+                completion(url)
+            }
         }
-    }
-    
-    // Kingfisher를 사용하여 이미지 로드하는 함수 (gs:// 및 http/https URL 모두 처리)
-    func loadImage(from imageUrl: String?, into imageView: UIImageView) {
-        guard let imageUrl = imageUrl else {
-            imageView.image = UIImage(named: "defaultImage")
-            return
+
+        // Kingfisher를 사용하여 이미지 로드하는 함수 (gs:// 및 http/https URL 모두 처리)
+        func loadImage(from imageUrl: String?, into imageView: UIImageView) {
+            guard let imageUrl = imageUrl else {
+                imageView.image = UIImage(named: "defaultImage")
+                return
+            }
+
+            if imageUrl.hasPrefix("gs://") {
+                // gs:// URL을 HTTPS로 변환 후 이미지 로드
+                fetchImageURL(from: imageUrl) { httpsURL in
+                    guard let httpsURL = httpsURL else {
+                        imageView.image = UIImage(named: "defaultImage")
+                        return
+                    }
+                    self.setImage(with: httpsURL, into: imageView)
+                }
+            } else {
+                // HTTP/HTTPS URL 처리
+                guard let url = URL(string: imageUrl) else {
+                    imageView.image = UIImage(named: "defaultImage")
+                    return
+                }
+                setImage(with: url, into: imageView)
+            }
         }
         
-        if imageUrl.hasPrefix("gs://") {
-            // gs:// URL을 HTTPS로 변환 후 이미지 로드
-            fetchImageURL(from: imageUrl) { httpsURL in
-                self.setImage(with: httpsURL, into: imageView)
-            }
-        } else {
-            // HTTP/HTTPS URL 처리
-            let url = URL(string: imageUrl)
-            setImage(with: url, into: imageView)
+        // Kingfisher로 이미지를 설정하는 함수
+        private func setImage(with url: URL?, into imageView: UIImageView) {
+            let options: KingfisherOptionsInfo = [
+                .transition(.fade(0.2)), // 부드러운 페이드 애니메이션
+                .cacheOriginalImage // 원본 이미지를 캐시
+            ]
+            imageView.kf.setImage(with: url, placeholder: UIImage(named: "defaultImage"), options: options)
         }
     }
-    
-    // Kingfisher로 이미지를 설정하는 함수
-    private func setImage(with url: URL?, into imageView: UIImageView) {
-        imageView.kf.setImage(with: url, placeholder: UIImage(named: "defaultImage"))
-    }
-    
     /*
      HTTP 변환 사용 예시
      1. UIImageView 인스턴스 생성

@@ -74,6 +74,30 @@ class GymHeaderView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func updateFollowersCount(_ newFollwerCount: String) {
+        self.followerLabel.text = newFollwerCount
+    }
+    
+    func configure(with gym: Gym) {
+           // 암장 이름 설정
+           profileNameLabel.text = gym.gymName
+           
+           // 팔로워 수 설정
+//           if let followersCount = gym.additionalInfo["followersCount"] as? Int {
+//               followerLabel.text = "\(followersCount) followers"
+//           } else {
+//               followerLabel.text = "0 followers"
+//           }
+           
+           // 프로필 이미지 설정
+           if let profileImageURL = gym.profileImage, let url = URL(string: profileImageURL) {
+               
+               FirebaseManager.shared.loadImage(from: profileImageURL, into: profileImageView)
+           } else {
+               profileImageView.image = UIImage(named: "default_profile")
+           }
+       }
+    
     private func setLayout() {
         [
             profileImageView,
@@ -120,8 +144,8 @@ class GymHeaderView: UIView {
     }
 }
 
-extension GymHeaderView {
-    func updateFollowersCount(_ newFollwerCount: String) {
-        self.followerLabel.text = newFollwerCount
-    }
-}
+//extension GymHeaderView {
+//    func updateFollowersCount(_ newFollwerCount: String) {
+//        self.followerLabel.text = newFollwerCount
+//    }
+//}
