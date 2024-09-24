@@ -117,7 +117,7 @@ class UploadVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = UploadNameSpace.title
+        setNavigation()
         textView.delegate = self
         setLayout()
         mediaItemsBind()
@@ -140,6 +140,17 @@ class UploadVC: UIViewController {
         super.viewDidAppear(animated)
         
         feedView?.playAllVideo()
+    }
+    
+    private func setNavigation() {
+        navigationItem.title = UploadNameSpace.title
+        
+        let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelButtonTapped))
+        navigationItem.leftBarButtonItem = cancelButton
+    }
+    
+    @objc private func cancelButtonTapped() {
+        initUploadVC()
     }
     
     private func setNotifications() {
@@ -313,25 +324,10 @@ class UploadVC: UIViewController {
                 guard let self = self else { return }
                 print("알림 이벤트 발생")
                 
-                let alertController = UIAlertController(
-                    title: "알림",
-                    message: "1분 미만 비디오를 업로드해주세요.",
-                    preferredStyle: .alert
-                )
-                let okAction = UIAlertAction(title: "확인", style: .default) { _ in
-                    self.phpickerVCPresent()
-                }
-                let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: { _ in
-                    self.removeAllSubview(view: self.selectedMediaView) // 피드 뷰 제거
-                    self.callPHPickerButton.isHidden = false
-                })
-                
-                alertController.addAction(okAction)
-                alertController.addAction(cancelAction) // 취소 버튼 추가
-                
-                self.present(alertController, animated: true, completion: {
-                    print("설공적으로 알림 노출.")
-                })
+                CommonManager.shared.showAlert(from: self,
+                                               title: "알림",
+                                               message: "1분 미만 비디오를 업로드해주세요.",
+                                               includeCancel: true)
             })
             .disposed(by: disposeBag)
     }
@@ -515,7 +511,10 @@ extension UploadVC {
                 guard let self = self else { return }
                 print("버튼 클릭.")
                 DispatchQueue.main.async {
-                    self.navigateToMyPage()
+                    CommonManager.shared.showToast(message: "업로드 중입니다.",
+                                                   font: UIFont.systemFont(ofSize: 13),
+                                                   position: CGPoint(x: UIScreen.main.bounds.width / 2 - 75,    // (전체 / 2 - 토스트의 넓이의 반)
+                                                                     y: UIScreen.main.bounds.height / 2 - 17.5))    // (전체 / 2 -토스트 높이의 반)
                 }
                 
                 let media = self.viewModel.feedRelay.value.compactMap { feedItem -> (url: URL, sector: String?, grade: String?)? in
@@ -539,6 +538,9 @@ extension UploadVC {
                 self.viewModel.upload(media: media, caption: caption, gym: gym)
                     .subscribe(onNext: {
                         print("업로드 성공")
+                        CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
+                        
+                        self.initUploadVC()
                     }, onError: { error in
                         print("업로드 실패: \(error.localizedDescription)")
                     })
@@ -547,10 +549,36 @@ extension UploadVC {
             .disposed(by: disposeBag)
     }
     
-    // MARK: - 마이페이지 화면으로 전환 YJ
-    private func navigateToMyPage() {
-        if let tabBarController = tabBarController {
-            tabBarController.selectedIndex = 3
+    // MARK: - 업로드뷰 초기화 YJ
+    private func initUploadVC() {
+        self.viewModel.feedRelay.accept([])
+        self.viewModel.cellData.accept([])
+        
+        // 새로운 인스턴스 생성
+        let newUploadVC = UploadVC()
+        
+        if let tabBarController = tabBarController,
+           var viewControllers = tabBarController.viewControllers {
+            
+            let newUploadNavVC = UINavigationController(rootViewController: newUploadVC)
+            newUploadNavVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
+            
+            viewControllers[2] = newUploadNavVC   // 기존 탭바2에 세로운 인스턴스 삽입
+            
+            tabBarController.setViewControllers(viewControllers, animated: false) // 변경된 뷰를 탭 바에 설정
+            tabBarController.selectedIndex = 2    // 새로 생성한 곳으로 전환
         }
+        
+        setNavigation()
+        textView.delegate = self
+        setLayout()
+        mediaItemsBind()
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
+        setGymView()
+        setAlert()
+        setLoading()
+        setNotifications()
+        setUIMenu()
+        bindPostButton()
     }
 }
