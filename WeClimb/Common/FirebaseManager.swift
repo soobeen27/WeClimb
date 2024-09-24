@@ -599,5 +599,3 @@ final class FirebaseManager {
      gymImageView.image = UIImage(named: "defaultImage")
      }
      */
-}
-

@@ -19,7 +19,7 @@ class ClimbingGymVM {
     let isDataLoaded = BehaviorRelay<Bool>(value: false)
     
     let gymData = BehaviorRelay<Gym?>(value: nil)
-    let sectorNames = BehaviorRelay<[String]>(value:[])
+    let sectorNames = BehaviorRelay<[String]>(value: [])
     let items = BehaviorRelay<[Item]>(value: [])
     let selectedSegment = BehaviorRelay<Int>(value: 0)
     let itemSelected = PublishSubject<IndexPath>()
@@ -69,26 +69,30 @@ class ClimbingGymVM {
     
     func setGymInfo(gymName: String) {
         // 이미 요청된 Gym이면 중복 요청 방지
-                guard !requestedGymNames.contains(gymName) else {
-                    print("Gym info for \(gymName) is already being fetched.")
-                    return
-                }
+        guard !requestedGymNames.contains(gymName) else {
+            print("Gym info for \(gymName) is already being fetched.")
+            return
+        }
+
+        requestedGymNames.insert(gymName)
+        isDataLoaded.accept(false)
+        
+        // Firebase에서 암장 정보를 가져옴
+        FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
+            guard let self = self, let gym = gym else {
+                self?.isDataLoaded.accept(true)
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.gymData.accept(gym)
+                // 섹터 이름을 가져와서 sectorNames에 저장
+                let sectorNames = gym.sector.components(separatedBy: ", ")
+                self.sectorNames.accept(sectorNames)
                 
-                requestedGymNames.insert(gymName)
-                
-                // Firebase에서 암장 정보를 가져옴
-                FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
-                    guard let self, let gym = gym else { return }
-                    
-                    DispatchQueue.main.async {
-                        self.gymData.accept(gym)
-                        // 섹터 이름을 가져와서 sectorNames에 저장
-                        let sectorNames = gym.sector.components(separatedBy: ", ")
-                        self.sectorNames.accept(sectorNames)
-                        
-                        self.isDataLoaded.accept(true)
-                    }
-                }
+                self.isDataLoaded.accept(true)
+            }
+        }
     }
     
     // 선택된 Item에서 DetailItem 생성

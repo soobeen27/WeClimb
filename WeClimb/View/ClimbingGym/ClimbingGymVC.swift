@@ -51,7 +51,7 @@ class ClimbingGymVC: UIViewController {
     func configure(with gym: Gym) {
         viewModel.setGymInfo(gymName: gym.gymName)
 //        headerView.configure(with: gym)
-//        climbingGymInfoView.configure(with: gym)
+        climbingGymInfoView.viewModel = viewModel
     }
     
     // MARK: - 네비게이션 - DS

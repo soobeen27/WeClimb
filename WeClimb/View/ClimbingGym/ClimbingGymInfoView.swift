@@ -7,9 +7,26 @@
 
 import UIKit
 
+import RxCocoa
+import RxSwift
 import SnapKit
 
 class ClimbingGymInfoView: UIView {
+    
+    var viewModel: ClimbingGymVM? {
+        didSet {
+            bindViewModel()
+        }
+    }
+    
+    private let disposeBag = DisposeBag()
+    
+    // 운영 정보 레이블
+    private let hoursLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 15)
+        return label
+    }()
     
     // 시설 정보 레이블
     private let facilityLabel: UILabel = {
@@ -38,28 +55,12 @@ class ClimbingGymInfoView: UIView {
     
     // 난이도 색상 바
     private let difficultyBarView: UIStackView = {
-        let colors: [UIColor] = [.yellow, .green, .blue, .purple, .red, .orange, .brown, .black]
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.distribution = .fillEqually
-        stackView.spacing = 4
-        
-        for color in colors {
-            let view = UIView()
-            view.backgroundColor = color
-            view.layer.cornerRadius = 2
-            stackView.addArrangedSubview(view)
-        }
+        stackView.alignment = .fill
+        stackView.spacing = 0
         return stackView
-    }()
-    
-    // 난이도 설명 레이블
-    private let difficultyDescriptionLabel: UILabel = {
-        let label = UILabel()
-        label.text = ClimbingGymNameSpace.difficultyDescription
-        label.font = UIFont.systemFont(ofSize: 15)
-        label.textColor = .systemGray
-        return label
     }()
     
     // 정보 없음 알림 레이블
@@ -75,7 +76,6 @@ class ClimbingGymInfoView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setLayout()
-        setupFacilityInfo()
     }
     
     required init?(coder: NSCoder) {
@@ -84,16 +84,21 @@ class ClimbingGymInfoView: UIView {
     
     private func setLayout() {
         [
+            hoursLabel,
             facilityLabel,
             facilityInfoStackView,
             difficultyLabel,
             difficultyBarView,
-            difficultyDescriptionLabel,
             noInfoLabel
         ].forEach { addSubview($0) }
         
+        hoursLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(16)
+            $0.leading.trailing.equalToSuperview().inset(16)
+        }
+        
         facilityLabel.snp.makeConstraints {
-            $0.top.equalToSuperview()
+            $0.top.equalTo(hoursLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(40)
         }
@@ -115,42 +120,115 @@ class ClimbingGymInfoView: UIView {
             $0.height.equalTo(20)
         }
         
-        difficultyDescriptionLabel.snp.makeConstraints {
-            $0.top.equalTo(difficultyBarView.snp.bottom).offset(8)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(40)
-        }
-        
         noInfoLabel.snp.makeConstraints {
-            $0.top.equalTo(difficultyDescriptionLabel.snp.bottom).offset(32)
+            $0.top.equalTo(difficultyBarView.snp.bottom).offset(32)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().offset(-16)
         }
     }
     
-    private func setupFacilityInfo() {
-        let facilityItems = [
-            (ClimbingGymNameSpace.FacilityFirst, "hand.raised.fill"),
-            (ClimbingGymNameSpace.FacilitySecond, "ruler.fill"),
-            (ClimbingGymNameSpace.FacilityThird, "dumbbell.fill"),
-            (ClimbingGymNameSpace.FacilityFourth, "shower.fill")
-        ]
+    private func bindViewModel() {
+        guard let viewModel else { return }
         
-        for (title, systemName) in facilityItems {
-            let iconImageView = UIImageView(image: UIImage(systemName: systemName))
-            iconImageView.tintColor = .label
-            iconImageView.contentMode = .scaleAspectFit
-            iconImageView.snp.makeConstraints { $0.size.equalTo(CGSize(width: 24, height: 24)) }
-            
-            let label = UILabel()
-            label.text = title
-            label.font = UIFont.systemFont(ofSize: 15)
-            
-            let horizontalStackView = UIStackView(arrangedSubviews: [iconImageView, label])
-            horizontalStackView.axis = .horizontal
-            horizontalStackView.spacing = 8
-            
-            facilityInfoStackView.addArrangedSubview(horizontalStackView)
+        viewModel.gymData
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [ weak self] gym in
+                self?.updateView(with: gym)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func updateView(with gym: Gym) {
+        // 운영시간 설정
+        let hours = gym.additionalInfo["hours"] as? String ?? "운영시간 정보 없음"
+        hoursLabel.text = hours.isEmpty ? "운영시간 정보 없음" : hours
+        
+        // 시설 정보 설정
+        setupFacilityInfo(parking: gym.additionalInfo["parking"] as? String ?? "",
+                          shower: gym.additionalInfo["shower"] as? Bool ?? false,
+                          trainingBoard: gym.additionalInfo["trainingBoard"] as? Bool ?? false,
+                          footWasher: gym.additionalInfo["footWasher"] as? Bool ?? false)
+        
+        // 난이도 색상 바 설정
+        let grades = gym.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+        setupDifficultyBarView(from: grades)
+        
+        // 정보 없음 메시지 설정
+        let isAnyFacilityInfoAvailable = !(gym.additionalInfo["parking"] as? String ?? "").isEmpty
+        || gym.additionalInfo["shower"] as? Bool ?? false
+        || gym.additionalInfo["trainingBoard"] as? Bool ?? false
+        || gym.additionalInfo["footWasher"] as? Bool ?? false
+        
+        noInfoLabel.isHidden = isAnyFacilityInfoAvailable
+    }
+    
+    private func setupFacilityInfo(parking: String, shower: Bool, trainingBoard: Bool, footWasher: Bool) {
+        facilityInfoStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        // 각각의 정보를 조건에 따라 표시
+        if parking != "주차 불가" {
+            addFacilityInfo(description: "주차", iconName: "parkingsign.circle")
         }
+        if shower {
+            addFacilityInfo(description: "샤워", iconName: "shower")
+        }
+        if trainingBoard {
+            addFacilityInfo(description: "트레이닝 보드", iconName: "figure.play")
+        }
+        if footWasher {
+            addFacilityInfo(description: "세족장", iconName: "hands.and.sparkles")
+        }
+    }
+    
+    private func addFacilityInfo(description: String, iconName: String) {
+        let iconImageView = UIImageView(image: UIImage(systemName: iconName))
+        iconImageView.tintColor = .label
+        iconImageView.contentMode = .scaleAspectFit
+        iconImageView.snp.makeConstraints { $0.size.equalTo(CGSize(width: 24, height: 24)) }
+        
+        let label = UILabel()
+        label.text = description
+        label.font = UIFont.systemFont(ofSize: 15)
+        
+        let horizontalStackView = UIStackView(arrangedSubviews: [iconImageView, label])
+        horizontalStackView.axis = .horizontal
+        horizontalStackView.spacing = 8
+        
+        facilityInfoStackView.addArrangedSubview(horizontalStackView)
+    }
+    
+    private func setupDifficultyBarView(from grades: [String]) {
+        // 기존에 추가된 뷰를 모두 제거
+        difficultyBarView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        // 각 grade 문자열을 색상으로 변환하여 UIImageView 생성
+        let coloredViews = grades.compactMap { grade -> UIImageView? in
+            let color = grade.colorInfo.color
+            
+            // "rectangle.fill" 심볼을 사용하여 이미지 생성 및 색상 적용
+            if let image = UIImage(systemName: "rectangle.fill")?.withTintColor(color, renderingMode: .alwaysOriginal) {
+                let imageView = UIImageView(image: image)
+                imageView.contentMode = .center
+                imageView.clipsToBounds = true
+                
+                imageView.transform = CGAffineTransform(scaleX: 1.6, y: 1.5)
+                return imageView
+            }
+            return nil
+        }
+        
+        for imageView in coloredViews {
+            difficultyBarView.addArrangedSubview(imageView)
+            
+            // 각 이미지뷰의 크기 설정
+            imageView.snp.makeConstraints {
+                $0.width.equalTo(difficultyBarView.snp.width).multipliedBy(1.0 / CGFloat(coloredViews.count))
+                $0.height.equalTo(difficultyBarView.snp.height)
+            }
+        }
+        
+        // 스택뷰의 좌우 간격을 0으로 설정
+        difficultyBarView.spacing = 0
     }
 }
