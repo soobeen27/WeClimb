@@ -97,9 +97,9 @@ class ClimbingGymVC: UIViewController {
                .disposed(by: disposeBag)
            
            // 테이블 뷰의 아이템 선택을 ViewModel의 itemSelected로 전달
-           tableView.rx.itemSelected
-               .bind(to: viewModel.itemSelected)
-               .disposed(by: disposeBag)
+//           tableView.rx.itemSelected
+//               .bind(to: viewModel.itemSelected)
+//               .disposed(by: disposeBag)
     }
     
     // 초기 UI 설정 메서드

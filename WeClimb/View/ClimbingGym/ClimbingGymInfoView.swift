@@ -256,74 +256,6 @@ class ClimbingGymInfoView: UIView {
         facilityInfoStackView.addArrangedSubview(horizontalStackView)
     }
     
-//    private func setupDifficultyBarView(from grades: [String]) {
-//        // 기존에 추가된 뷰를 모두 제거
-//        difficultyBarView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-//        
-//        // 각 grade 문자열을 색상으로 변환하여 UIImageView 생성
-//        let coloredViews = grades.compactMap { grade -> UIImageView? in
-//            let color = grade.colorInfo.color
-//            
-//            // "rectangle.fill" 심볼을 사용하여 이미지 생성 및 색상 적용
-//            if let image = UIImage(systemName: "rectangle.fill")?.withTintColor(color, renderingMode: .alwaysOriginal) {
-//                let imageView = UIImageView(image: image)
-//                imageView.contentMode = .center
-//                imageView.clipsToBounds = true
-//                
-//                imageView.transform = CGAffineTransform(scaleX: 1.6, y: 1.5)
-//                return imageView
-//            }
-//            return nil
-//        }
-//        
-//        for imageView in coloredViews {
-//            difficultyBarView.addArrangedSubview(imageView)
-//            
-//            // 각 이미지뷰의 크기 설정
-//            imageView.snp.makeConstraints {
-//                $0.width.equalTo(difficultyBarView.snp.width).multipliedBy(1.0 / CGFloat(coloredViews.count))
-//                $0.height.equalTo(difficultyBarView.snp.height)
-//            }
-//        }
-//        
-//        // 스택뷰의 좌우 간격을 0으로 설정
-//        difficultyBarView.spacing = 0
-//    }
-//    private func setupDifficultyBarView(from grades: [String]) {
-//        // 기존에 추가된 뷰를 모두 제거
-//        difficultyBarView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-//        
-//        // 각 grade 문자열을 색상으로 변환하여 UIView 생성
-//        let coloredViews = grades.map { grade -> UIView in
-//            let color = grade.colorInfo.color
-//            
-//            // UIView 생성 및 색상 설정
-//            let colorView = UIView()
-//            colorView.backgroundColor = color
-//            
-//            colorView.layer.borderWidth = 0.5 // 테두리 두께
-//            colorView.layer.borderColor = UIColor.label.cgColor
-//            
-//            colorView.layer.cornerRadius = 4 // 모서리 둥글게 설정 (필요 시)
-//            colorView.clipsToBounds = true
-//            
-//            return colorView
-//        }
-//        
-//        // 생성한 UIView들을 스택뷰에 추가
-//        for colorView in coloredViews {
-//            difficultyBarView.addArrangedSubview(colorView)
-//            
-//            // 각 UIView의 크기 설정
-//            colorView.snp.makeConstraints { make in
-//                make.width.equalTo(difficultyBarView.snp.width).multipliedBy(1.0 / CGFloat(coloredViews.count))
-//                make.height.equalTo(difficultyBarView.snp.height)
-//            }
-//        }
-//        
-//        // 스택뷰의 좌우 간격을 0으로 설정
-//        difficultyBarView.spacing = 0
-//    }
     private func setupDifficultyBarView(from grades: [String]) {
         // 기존에 추가된 뷰를 모두 제거
         difficultyBarView.arrangedSubviews.forEach { $0.removeFromSuperview() }
@@ -331,40 +263,34 @@ class ClimbingGymInfoView: UIView {
         // 각 grade 문자열을 색상으로 변환하여 UIView 생성
         let coloredViews = grades.map { grade -> UIView in
             let color = grade.colorInfo.color
-            
-            // UIView 생성 및 색상 설정
             let colorView = UIView()
             colorView.backgroundColor = color
-            
             return colorView
         }
         
         // 생성한 UIView들을 스택뷰에 추가
         for colorView in coloredViews {
             difficultyBarView.addArrangedSubview(colorView)
-            
-            // 각 UIView의 크기 설정
-            colorView.snp.makeConstraints { make in
-                make.width.equalTo(difficultyBarView.snp.width).multipliedBy(1.0 / CGFloat(coloredViews.count))
-                make.height.equalTo(difficultyBarView.snp.height)
+            colorView.snp.makeConstraints {
+                $0.width.equalTo(difficultyBarView.snp.width).multipliedBy(1.0 / CGFloat(coloredViews.count))
+                $0.height.equalTo(difficultyBarView.snp.height)
             }
         }
         
-        // 스택뷰의 좌우 간격을 0으로 설정
         difficultyBarView.spacing = 0
 
         // 기존 containerView가 있다면 제거
         self.subviews.filter { $0.tag == 100 }.forEach { $0.removeFromSuperview() }
         
-        // `difficultyBarView`를 감싸는 containerView 생성 및 설정
+        // containerView 생성
         let containerView = UIView()
         containerView.tag = 100
-        containerView.layer.borderWidth = 1 // 테두리 두께 설정
-        containerView.layer.borderColor = UIColor.gray.cgColor // 테두리 색상 설정
-        containerView.layer.cornerRadius = 4 // 모서리 둥글게 설정
+        containerView.layer.borderWidth = 1
+        containerView.layer.borderColor = UIColor.gray.cgColor
+        containerView.layer.cornerRadius = 4
         containerView.clipsToBounds = true
         
-        // `difficultyBarView`를 containerView에 추가
+        // difficultyBarView를 containerView에 추가
         containerView.addSubview(difficultyBarView)
         
         // containerView를 self에 추가
@@ -374,12 +300,13 @@ class ClimbingGymInfoView: UIView {
         containerView.snp.makeConstraints {
             $0.top.equalTo(difficultyLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(20) // containerView 높이를 `difficultyBarView`와 동일하게 설정
+            $0.height.equalTo(20)
         }
         
         // difficultyBarView 레이아웃 설정
         difficultyBarView.snp.makeConstraints {
-            $0.edges.equalToSuperview() // `containerView`의 경계에 맞게 설정
+            $0.edges.equalToSuperview()
         }
     }
+
 }
