@@ -24,9 +24,10 @@ class SearchVC: UIViewController {
         return searchController
     }()
     
+    // 내 주변 암장 표시
     private let nearbyLabel: UILabel = {
         let label = UILabel()
-        label.text = SearchNameSpace.nearby
+        label.text = "" //SearchNameSpace.nearby
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 13)
         return label
@@ -75,6 +76,18 @@ class SearchVC: UIViewController {
         bind()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        // Large Titles 설정
+            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationItem.largeTitleDisplayMode = .always
+            
+            // 네비게이션 타이틀 설정
+            navigationItem.title = SearchNameSpace.title
+            
+            // 검색 바가 숨겨지지 않도록 설정
+            navigationItem.hidesSearchBarWhenScrolling = false
+    }
+    
     private func setNavigationBar() {
 //        navigationItem.title = SearchNameSpace.title
         self.title = SearchNameSpace.title
@@ -94,7 +107,7 @@ class SearchVC: UIViewController {
     }
     
     private func setLayout() {
-        [segmentedControl, nearbyLabel, gymTableView, userTableView]
+        [segmentedControl, gymTableView, userTableView]
             .forEach { view.addSubview($0) }
         
         // 상황에 따라 세그먼트 컨트롤의 위치 변경
