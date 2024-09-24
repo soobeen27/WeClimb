@@ -16,7 +16,7 @@ enum FeedNameSpace {
        """
     static let reportReason1 = "스팸 또는 허가되지 않은 광고게시물"
     static let reportReason2 = "타인 비방 조장 게시물"
-    static let reportReason3 = "음란성 게시물"
+    static let reportReason3 = "음란&폭력성 게시물"
     static let reportReason4 = "암장 정보가 일치하지 않음"
     static let reportReason5 = "클라이밍 관련 게시물이 아님"
     static let reportReason6 = "기타 사유"

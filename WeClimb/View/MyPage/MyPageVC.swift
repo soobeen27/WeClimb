@@ -16,19 +16,21 @@ class MyPageVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = MyPageVM()
     
+    
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .gray
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 40
         imageView.clipsToBounds = true
+        imageView.image = UIImage(named: "testStone") // 기본 프로필 이미지
         return imageView
     }()
     
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.text = "iOSClimber"
-        label.font = UIFont.systemFont(ofSize: 17)
+        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
         label.numberOfLines = 1
         return label
     }()
@@ -156,7 +158,23 @@ class MyPageVC: UIViewController {
         setLayout()
         bind()
         setNavigation()
+        updateUserInfo()
 //        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
+    }
+    
+    
+    // MARK: - 파이어베이스에 저장된 유저 닉네임 마이페이지 업데이트
+    private func updateUserInfo() {
+        FirebaseManager.shared.currentUserInfo { [weak self] (result: Result<User, Error>) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let user):
+                    self?.nameLabel.text = user.userName
+                case .failure(let error):
+                    print("현재 유저 정보 가져오기 실패: \(error)")
+                }
+            }
+        }
     }
     
     // MARK: - 설정 버튼 YJ
@@ -197,7 +215,7 @@ class MyPageVC: UIViewController {
         [profileImage, profileStackView, totalStackView, collectionView]
             .forEach{ view.addSubview($0) }
         
-        [nameStackView, infoLabel, editButton]
+        [nameStackView, /*infoLabel, */editButton]
             .forEach{ profileStackView.addArrangedSubview($0) }
         
         [nameLabel, levelLabel]

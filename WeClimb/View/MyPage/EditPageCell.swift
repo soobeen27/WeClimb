@@ -49,6 +49,12 @@ class EditPageCell: UITableViewCell {
         return imageView
     }()
     
+    private let separatorLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = .lightGray
+        return view
+    }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setColor()
@@ -63,7 +69,7 @@ class EditPageCell: UITableViewCell {
     private func setLayout() {
         leftStackView.addArrangedSubview(titleLabel)
         
-        [infoLabel, nextImagView]
+        [/*infoLabel, */nextImagView]
             .forEach { rightStackView.addArrangedSubview($0) }
         
         [leftStackView, rightStackView]
@@ -83,6 +89,9 @@ class EditPageCell: UITableViewCell {
         titleLabel.snp.makeConstraints {
             $0.height.equalTo(44)
         }
+//        separatorLine.snp.makeConstraints {
+//            $0.
+//        }
     }
     
     // MARK: - 커스텀 색상 YJ
@@ -99,7 +108,7 @@ class EditPageCell: UITableViewCell {
     
     func configure(with model: EditModel) {
         titleLabel.text = model.title
-        infoLabel.text = model.info
+//        infoLabel.text = model.info
     }
     
 }
