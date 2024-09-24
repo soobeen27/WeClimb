@@ -9,9 +9,14 @@ import Foundation
 import FirebaseFirestore
 
 struct Media: Codable {
+    let mediaUID: String
     let url: String
-    let sector: String
-    let grade: String
+    let sector: String?
+    let grade: String?
+    let postRef: DocumentReference
+    //    let authorUID: String
+    //    let postUID: String
+    //    let gym: String?
 }
 
 //게시글
@@ -22,7 +27,8 @@ struct Post: Codable {
     let caption: String?
     let like: [String]?
     let gym: String?
-    let medias: [Media]?
+    let medias: [DocumentReference]
+//    let medias: [Media]?
 }
 
 // 댓글
