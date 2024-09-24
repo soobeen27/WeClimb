@@ -30,8 +30,10 @@
 		43A79AE22C85BD3B00B960A2 /* SettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE12C85BD3B00B960A2 /* SettingModel.swift */; };
 		43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE32C85C3B800B960A2 /* SettingCell.swift */; };
 		43A79AE62C86CEFE00B960A2 /* SettingNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */; };
+		43E883532CA27BFE00EF7469 /* CommonManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43E883522CA27BFE00EF7469 /* CommonManager.swift */; };
 		43EC6ACB2C8B5026004A2E2F /* FeedCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */; };
 		43EC6AD72C9171AA004A2E2F /* LightCompressor in Frameworks */ = {isa = PBXBuildFile; productRef = 43EC6AD62C9171AA004A2E2F /* LightCompressor */; };
+		6B16C0ED2C9AE121004249AF /* UserPageVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B16C0EC2C9AE121004249AF /* UserPageVM.swift */; };
 		6B2815462C8572A800BE1D40 /* ClimbingGym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2815452C8572A800BE1D40 /* ClimbingGym.swift */; };
 		6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6B376D2C85807800C9C87A /* GymHeaderView.swift */; };
 		6B8467BC2C85DDE9006B062D /* ClimbingGymInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */; };
@@ -135,7 +137,9 @@
 		43A79AE12C85BD3B00B960A2 /* SettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingModel.swift; sourceTree = "<group>"; };
 		43A79AE32C85C3B800B960A2 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
 		43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNameSpace.swift; sourceTree = "<group>"; };
+		43E883522CA27BFE00EF7469 /* CommonManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonManager.swift; sourceTree = "<group>"; };
 		43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCellModel.swift; sourceTree = "<group>"; };
+		6B16C0EC2C9AE121004249AF /* UserPageVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPageVM.swift; sourceTree = "<group>"; };
 		6B2815452C8572A800BE1D40 /* ClimbingGym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGym.swift; sourceTree = "<group>"; };
 		6B6B376D2C85807800C9C87A /* GymHeaderView.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = GymHeaderView.swift; sourceTree = "<group>"; tabWidth = 4; };
 		6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymInfoView.swift; sourceTree = "<group>"; };
@@ -424,6 +428,7 @@
 				43A79AD72C85481300B960A2 /* DetailEditVM.swift */,
 				43A79ADF2C85BB7E00B960A2 /* SettingVM.swift */,
 				91F71CDE2C88A3C400405778 /* LoginVM.swift */,
+				6B16C0EC2C9AE121004249AF /* UserPageVM.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -442,6 +447,7 @@
 				43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */,
 				91F71CE02C89835700405778 /* FirebaseManager.swift */,
 				91AF25602C8C15FC002283BD /* Enumeration.swift */,
+				43E883522CA27BFE00EF7469 /* CommonManager.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -579,6 +585,7 @@
 				C4E29C1D2C898AFB0076BCA6 /* SFMainFeedVC.swift in Sources */,
 				F4892C2B2C7CCDF200C5FF16 /* Identifiers.swift in Sources */,
 				F4892C182C7C983A00C5FF16 /* MainFeedVC.swift in Sources */,
+				6B16C0ED2C9AE121004249AF /* UserPageVM.swift in Sources */,
 				436AEAF82C7F0EEE00E0D85A /* SearchModel.swift in Sources */,
 				43A79ACC2C819CB200B960A2 /* EditPageVM.swift in Sources */,
 				6B9033422C8AAA5E0012D955 /* RangePickerVC.swift in Sources */,
@@ -597,6 +604,7 @@
 				F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */,
 				43A79ADC2C85AA7400B960A2 /* SettingVC.swift in Sources */,
 				C47A0AFA2C8AF1A60068173A /* FeedCommentModalVC.swift in Sources */,
+				43E883532CA27BFE00EF7469 /* CommonManager.swift in Sources */,
 				43A79AE62C86CEFE00B960A2 /* SettingNameSpace.swift in Sources */,
 				6B2815462C8572A800BE1D40 /* ClimbingGym.swift in Sources */,
 				F4892C3E2C7EFD4700C5FF16 /* UploadVC.swift in Sources */,

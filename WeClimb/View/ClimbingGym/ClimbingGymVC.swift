@@ -48,8 +48,10 @@ class ClimbingGymVC: UIViewController {
         
     }
     
-    func configure(with data: Gym) {
-        self.gymData = data
+    func configure(with gym: Gym) {
+        viewModel.setGymInfo(gymName: gym.gymName)
+//        headerView.configure(with: gym)
+        climbingGymInfoView.viewModel = viewModel
     }
     
     // MARK: - 네비게이션 - DS
@@ -63,71 +65,98 @@ class ClimbingGymVC: UIViewController {
         }
     }
     
-    // MARK: - 액션 설정 (버튼, 세그먼트 컨트롤) - DS
-    private func actions() {
-        headerView.followButton.addAction(UIAction { [weak self] _ in
-            guard let self else { return }
-            
-            if self.headerView.followButton.title(for: .normal) == ClimbingGymNameSpace.follow {
-                self.headerView.followButton.setTitle(ClimbingGymNameSpace.unFollow, for: .normal)
-                self.headerView.followButton.backgroundColor = .lightGray
-                self.headerView.followButton.setTitleColor(.black, for: .normal)
-                
-                ClimbingGymNameSpace.totalFollow += 1
-            } else {
-                self.headerView.followButton.setTitle(ClimbingGymNameSpace.follow, for: .normal)
-                self.headerView.followButton.backgroundColor = .mainPurple
-                self.headerView.followButton.setTitleColor(.white, for: .normal)
-                
-                if ClimbingGymNameSpace.totalFollow > 0 {
-                    ClimbingGymNameSpace.totalFollow -= 1
-                }
-            }
-            self.headerView.updateFollowersCount(ClimbingGymNameSpace.follower)
-        }, for: .touchUpInside)
-        
-        headerView.segmentControl.addAction(UIAction { [weak self] _ in
-            guard let self else { return }
-            let selectedIndex = self.headerView.segmentControl.selectedSegmentIndex
-            self.viewModel.selectedSegment.accept(selectedIndex)
-            
-            if selectedIndex == 1 {
-                self.tableView.isHidden = true
-                self.climbingGymInfoView.isHidden = false
-            } else {
-                self.tableView.isHidden = false
-                self.climbingGymInfoView.isHidden = true
-            }
-        }, for: .valueChanged)
-    }
-    
     // MARK: - 데이터 바인딩 - DS
     private func bindSectionData() {
-        viewModel.dummys
-            .bind(to: tableView.rx.items(cellIdentifier: Identifiers.sectionTableViewCell, cellType: SectionTableViewCell.self)) { row, item, cell in
-                // Detail Items에 대한 ViewModel 생성
-                let detailVM = ClimbingDetailGymVM(detailItems: item.detailItems)
-                
-                // detailData의 개수를 완료된 항목 수로 설정
-                let completedCount = detailVM.numberOfDetails()
-                let totalCount = item.itemCount
-                
-                // 셀 설정
-                cell.configure(with: item, completedCount: completedCount, totalCount: totalCount)
-            }
-            .disposed(by: disposeBag)
-        
-        
-        tableView.rx.itemSelected
-            .subscribe(onNext: { [weak self] indexPath in
-                self?.viewModel.itemSelected.onNext(indexPath)
-            })
-            .disposed(by: disposeBag)
+        // gymData와 바인딩하여 UI 업데이트
+               viewModel.gymData
+                   .compactMap { $0 } // nil이 아닐 때만 처리
+                   .observe(on: MainScheduler.instance)
+                   .subscribe(onNext: { [weak self] gym in
+                       guard let self = self else { return }
+                       // Gym 데이터를 헤더와 정보 뷰에 설정
+                       self.headerView.configure(with: gym)
+//                       self.climbingGymInfoView.configure(with: gym)
+                   })
+                   .disposed(by: disposeBag)
+               
+               // isDataLoaded 상태에 따라 UI 초기화
+               viewModel.isDataLoaded
+                   .filter { $0 } // true일 때만 실행
+                   .observe(on: MainScheduler.instance)
+                   .subscribe(onNext: { [weak self] _ in
+                       guard let self = self else { return }
+                       // 데이터 로딩 후 초기 UI 설정
+                       self.setupInitialUI()
+                   })
+                   .disposed(by: disposeBag)
+           // ViewModel의 items와 테이블 뷰 바인딩
+           viewModel.items
+            .bind(to: tableView.rx.items(cellIdentifier: SectionTableViewCell.className, cellType: SectionTableViewCell.self)) { row, item, cell in
+                   cell.configure(with: item, completedCount: 0, totalCount: 0)
+               }
+               .disposed(by: disposeBag)
+           
+           // 테이블 뷰의 아이템 선택을 ViewModel의 itemSelected로 전달
+//           tableView.rx.itemSelected
+//               .bind(to: viewModel.itemSelected)
+//               .disposed(by: disposeBag)
     }
+    
+    // 초기 UI 설정 메서드
+        private func setupInitialUI() {
+            let initialSegmentIndex = viewModel.selectedSegment.value
+            headerView.segmentControl.selectedSegmentIndex = initialSegmentIndex
+            updateSegmentControlUI(selectedIndex: initialSegmentIndex)
+        }
+    
+    // Segment Control 선택 인덱스에 따른 UI 업데이트
+        private func updateSegmentControlUI(selectedIndex: Int) {
+            if selectedIndex == 1 {
+                tableView.isHidden = true
+                climbingGymInfoView.isHidden = false
+            } else {
+                tableView.isHidden = false
+                climbingGymInfoView.isHidden = true
+            }
+        }
+    
+    // MARK: - 세그먼트 컨트롤 및 버튼 액션 설정 - DS
+        private func actions() {
+            headerView.followButton.addAction(UIAction { [weak self] _ in
+                guard let self = self else { return }
+                
+                if self.headerView.followButton.title(for: .normal) == ClimbingGymNameSpace.follow {
+                    self.headerView.followButton.setTitle(ClimbingGymNameSpace.unFollow, for: .normal)
+                    self.headerView.followButton.backgroundColor = .lightGray
+                    self.headerView.followButton.setTitleColor(.black, for: .normal)
+                    ClimbingGymNameSpace.totalFollow += 1
+                } else {
+                    self.headerView.followButton.setTitle(ClimbingGymNameSpace.follow, for: .normal)
+                    self.headerView.followButton.backgroundColor = .mainPurple
+                    self.headerView.followButton.setTitleColor(.white, for: .normal)
+                    if ClimbingGymNameSpace.totalFollow > 0 {
+                        ClimbingGymNameSpace.totalFollow -= 1
+                    }
+                }
+                self.headerView.updateFollowersCount(ClimbingGymNameSpace.follower)
+            }, for: .touchUpInside)
+            
+            // 세그먼트 컨트롤 값 변경 액션 설정
+            headerView.segmentControl.addAction(UIAction { [weak self] _ in
+                guard let self = self else { return }
+                
+                let selectedIndex = self.headerView.segmentControl.selectedSegmentIndex
+                self.viewModel.selectedSegment.accept(selectedIndex)
+                
+                // 세그먼트 선택에 따른 UI 업데이트
+                self.updateSegmentControlUI(selectedIndex: selectedIndex)
+            }, for: .valueChanged)
+        }
     
     // MARK: - 레이아웃 설정 - DS
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        climbingGymInfoView.isHidden = true
         
         [
             headerView,
@@ -152,7 +181,5 @@ class ClimbingGymVC: UIViewController {
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().offset(-16)
         }
-        
-        climbingGymInfoView.isHidden = true
     }
 }

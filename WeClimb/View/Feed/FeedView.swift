@@ -98,7 +98,7 @@ class FeedView : UIView {
     }
     
     private func bind() {
-        viewModel.feedRelay
+        viewModel.cellData
             .bind(to: collectionView.rx.items(
                 cellIdentifier: FeedCell.className, cellType: FeedCell.self)
             ) { row, data, cell in
@@ -123,9 +123,12 @@ extension FeedView : UICollectionViewDelegate {
         guard pageControl.currentPage != pageIndex else { return } // 페이지가 정확하게 넘어간것만 걸러내기
         pageControl.currentPage = pageIndex
         
+        // 페이지 변경 시 클로저 호출
+        viewModel.pageChanged(to: pageIndex)
+        
         let changedItem = viewModel.feedRelay.value[pageIndex]
         
-        if changedItem.image != nil {
+        if changedItem.imageURL != nil {
             pauseAllVideo()
             return
         }

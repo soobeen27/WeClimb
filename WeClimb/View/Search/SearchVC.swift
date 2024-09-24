@@ -24,13 +24,14 @@ class SearchVC: UIViewController {
         return searchController
     }()
     
-    private let nearbyLabel: UILabel = {
-        let label = UILabel()
-        label.text = SearchNameSpace.nearby
-        label.textAlignment = .left
-        label.font = UIFont.systemFont(ofSize: 13)
-        return label
-    }()
+    // 내 주변 암장 표시
+    //    private let nearbyLabel: UILabel = {
+    //        let label = UILabel()
+    //        label.text = " " //SearchNameSpace.nearby
+    //        label.textAlignment = .left
+    //        label.font = UIFont.systemFont(ofSize: 13)
+    //        return label
+    //    }()
     
     private let gymTableView: UITableView = {
         let tableView = UITableView()
@@ -75,16 +76,32 @@ class SearchVC: UIViewController {
         bind()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Large Titles를 사용하지 않도록 설정
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .never
+        
+        // 네비게이션 타이틀 설정
+        navigationItem.title = SearchNameSpace.title
+        
+        // 검색 바가 숨겨지지 않도록 설정
+        navigationItem.hidesSearchBarWhenScrolling = false
+    }
+    
     private func setNavigationBar() {
-//        navigationItem.title = SearchNameSpace.title
+        // 네비게이션 바 타이틀 설정
         self.title = SearchNameSpace.title
         
         // 탭바 빈 문자열로 설정
         if let tabBarItem = self.tabBarItem {
             tabBarItem.title = ""
         }
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
+        
+        // Large Titles 비활성화 및 작은 타이틀 설정
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .never
     }
     
     private func setSearchController() {
@@ -94,7 +111,7 @@ class SearchVC: UIViewController {
     }
     
     private func setLayout() {
-        [segmentedControl, nearbyLabel, gymTableView, userTableView]
+        [segmentedControl, gymTableView, userTableView]
             .forEach { view.addSubview($0) }
         
         // 상황에 따라 세그먼트 컨트롤의 위치 변경
@@ -109,19 +126,21 @@ class SearchVC: UIViewController {
             }
         }
         
-        nearbyLabel.snp.makeConstraints {
-            $0.top.equalTo(segmentedControl.snp.bottom).offset(10)
-            $0.leading.trailing.equalToSuperview().inset(16)
-        }
+        //        nearbyLabel.snp.makeConstraints {
+        //            $0.top.equalTo(segmentedControl.snp.bottom).offset(10)
+        //            $0.leading.trailing.equalToSuperview().inset(16)
+        //        }
         
         gymTableView.snp.makeConstraints {
-            $0.top.equalTo(nearbyLabel.snp.bottom).offset(8)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.top.equalTo(segmentedControl.snp.bottom).offset(10)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
         
         userTableView.snp.makeConstraints {
-            $0.top.equalTo(nearbyLabel.snp.bottom).offset(8)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.top.equalTo(segmentedControl.snp.bottom).offset(10)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
     }
     
@@ -130,7 +149,7 @@ class SearchVC: UIViewController {
         gymTableView.rx.modelSelected(Gym.self)
             .subscribe(onNext: { [weak self] selectedItem in
                 guard let self else { return }
-                    
+                
                 self.onSelectedGym?(selectedItem)
                 
                 if self.nextPush {
@@ -145,17 +164,17 @@ class SearchVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        // MARK: - User TableView 선택 이벤트 처리 (미완성) - DS
-//        userTableView.rx.modelSelected(Gym.self)
-//            .subscribe(onNext: { [weak self] selectedItem in
-//                guard let self else { return }
-//                let userPageVC = UserPageVC()
-//                userPageVC.configure(with: selectedItem)
-//                navigationController?.navigationBar.prefersLargeTitles = false
+        // MARK: - User TableView 선택 이벤트 처리 - DS
+        userTableView.rx.modelSelected(User.self)
+            .subscribe(onNext: { [weak self] selectedItem in
+                guard let self else { return }
+                let userPageVC = UserPageVC()
+                userPageVC.configure(with: selectedItem)
+                navigationController?.navigationBar.prefersLargeTitles = false
 //                userPageVC.setNavigation()
-//                self.navigationController?.pushViewController(userPageVC, animated: true)
-//            })
-//            .disposed(by: disposeBag)
+                self.navigationController?.pushViewController(userPageVC, animated: true)
+            })
+            .disposed(by: disposeBag)
         
         // MARK: - Gym Data 바인딩 - DS
         searchViewModel.filteredData
@@ -186,34 +205,31 @@ class SearchVC: UIViewController {
         
         // MARK: - SearchBar 텍스트 바인딩 - YJ
         searchController.searchBar.rx.text.orEmpty
-                .bind(to: searchViewModel.searchText)
-                .disposed(by: disposeBag)
+            .bind(to: searchViewModel.searchText)
+            .disposed(by: disposeBag)
         
         // MARK: - SearchBar 텍스트 입력 시작 및 종료 이벤트 처리 - YJ
         searchController.searchBar.rx.textDidBeginEditing
             .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
                 // 서치바가 클릭되면 나머지 뷰들을 숨김
                 UIView.animate(withDuration: 0.2, animations: {
-                    self?.segmentedControl.alpha = 0.0
-                    self?.nearbyLabel.alpha = 0.0
-//                    self?.gymTableView.alpha = 0.0
-//                    self?.userTableView.alpha = 0.0
-                })
-                
-                UIView.animate(withDuration: 0.6, animations: {
-                    self?.segmentedControl.alpha = 1
-                })
+                    self.segmentedControl.alpha = 0.0
+                }) { _ in
+                    UIView.animate(withDuration: 0.6) {
+                        self.segmentedControl.alpha = 1.0
+                    }
+                }
             })
             .disposed(by: disposeBag)
         
         searchController.searchBar.rx.textDidEndEditing
             .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
                 // 서치바에서 나갈 때 나머지 뷰들을 다시 보이게 함
-                UIView.animate(withDuration: 0.2, animations: {
-                    self?.nearbyLabel.alpha = 1.0
-//                    self?.gymTableView.alpha = 1.0
-//                    self?.userTableView.alpha = 1.0
-                })
+                UIView.animate(withDuration: 0.2) {
+                    self.segmentedControl.alpha = 1.0
+                }
             })
             .disposed(by: disposeBag)
     }

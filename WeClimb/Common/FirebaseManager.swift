@@ -11,6 +11,7 @@ import CryptoKit
 import FirebaseAuth
 import FirebaseCore
 import FirebaseFirestore
+import FirebaseFunctions
 import FirebaseStorage
 import GoogleSignIn
 import RxSwift
@@ -22,6 +23,7 @@ final class FirebaseManager {
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     private let disposeBag = DisposeBag()
+    private var ongoingRequests = [String: Bool]()
     private var lastFeed: QueryDocumentSnapshot?
     
     static let shared = FirebaseManager()
@@ -40,7 +42,40 @@ final class FirebaseManager {
             completion()
         }
     }
-  
+    
+    func uploadProfileImage(image: URL) -> Observable<URL> {
+        guard let user = Auth.auth().currentUser else { return Observable.error(UserError.none) }
+        let storageRef = self.storage.reference()
+        let profileImageRef = storageRef.child("users/\(user.uid)/profileImage.jpg")
+        
+        return Observable<URL>.create { [weak self] observer in
+            guard let self else { return Disposables.create() }
+            profileImageRef.putFile(from: image, metadata: nil) { metaData, error in
+                if let error = error {
+                    observer.onError(error)
+                    return
+                }
+                profileImageRef.downloadURL { url, error in
+                    if let error = error {
+                        observer.onError(error)
+                        return
+                    }
+                    guard let url else {
+                        print("url 없음")
+                        return
+                    }
+                    
+                    self.updateAccount(with: url.absoluteString, for: .profileImage) {
+                        observer.onNext(url)
+                        observer.onCompleted()
+                    }
+                }
+            }
+            
+            return Disposables.create()
+        }
+        
+    }
     //  MARK: 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
     func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
         let ref = db.collection("users").whereField("userName", isEqualTo: name)
@@ -75,6 +110,25 @@ final class FirebaseManager {
     }
     
     // MARK: 내 포스트 가져오기 최신순
+    // 사용 예시 현재 유저를 가져오고 user.posts 를 인자로 넣는다
+    //        FirebaseManager.shared.currentUserInfo { [weak self] result in
+    //            guard let self else { return }
+    //            switch result {
+    //            case.success(let user):
+    //                guard let postRefs = user.posts else { return }
+    //                FirebaseManager.shared.allMyPost(postRefs: postRefs)
+    //                    .subscribe { posts in
+    //                        posts.map {
+    //                            $0.forEach {
+    //                                print($0.creationDate)
+    //                            }
+    //                        }
+    //                    }
+    //                    .disposed(by: self.disposeBag)
+    //            case.failure(let error):
+    //                print("테스트에러 \(error)")
+    //            }
+    //        }
     func allMyPost(postRefs: [DocumentReference]) -> Observable<[Post]> {
         let posts = postRefs.map { ref in
             return Observable<Post>.create { observer in
@@ -202,7 +256,7 @@ final class FirebaseManager {
                     return
                 }
                 guard let document = document, document.exists,
-                      let data = document.data() 
+                      let data = document.data()
                 else {
                     print("정보없음")
                     completion(nil)
@@ -225,13 +279,13 @@ final class FirebaseManager {
                 additionalInfo.removeValue(forKey: "sector")
                 additionalInfo.removeValue(forKey: "profileImage")
                 
-                completion(Gym(address: address, grade: grade, 
+                completion(Gym(address: address, grade: grade,
                                gymName: gymName, sector: sector,
                                profileImage: profileImage, additionalInfo: additionalInfo))
             }
     }
     // MARK: 포스트 업로드
-    func uploadPost(media: [(url: URL, sector: String, grade: String)], caption: String?, gym: String?) {
+    func uploadPost(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?) {
         guard let user = Auth.auth().currentUser else {
             print("로그인이 되지않음")
             return
@@ -241,7 +295,6 @@ final class FirebaseManager {
         
         let uploadedMedia = media.enumerated().map { index, media -> Observable<(Int, Media)> in
             let fileName = media.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.url.lastPathComponent
-//            let fileName = UUID().uuidString
             let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
 
             return Observable<(Int, Media)>.create { observer in
@@ -256,7 +309,7 @@ final class FirebaseManager {
                             return
                         }
                         guard let url = url else { return }
-                        let medias = Media(url: url.absoluteString, sector: media.sector, grade: media.grade)
+                        let medias = Media(url: url.absoluteString, sector: media.sector ?? "", grade: media.grade ?? "")
                         observer.onNext((index, medias))
                         observer.onCompleted()
                     }
@@ -269,7 +322,7 @@ final class FirebaseManager {
                 guard let self else { return }
                 let sortedUserMedia = userMedia.sorted(by: { $0.0 < $1.0}).map { $0.1 }
                 let postUID = UUID().uuidString
-                let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: 0, gym: gym, medias: sortedUserMedia)
+                let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: sortedUserMedia)
                 
                 let userRef = self.db.collection("users").document(user.uid)
                 let postRef = self.db.collection("posts").document(postUID)
@@ -300,7 +353,7 @@ final class FirebaseManager {
         let postRef = db.collection("posts").document(postUid)
         let userRef = self.db.collection("users").document(user.uid)
         let commentRef = db.collection("posts").document(postUid).collection("comments").document(commentUID)
-        let comment = Comment(commentUID: commentUID, authorUID: user.uid, content: content, creationDate: Date(), like: 0, postRef: postRef)
+        let comment = Comment(commentUID: commentUID, authorUID: user.uid, content: content, creationDate: Date(), like: nil, postRef: postRef)
         do {
             try commentRef.setData(from: comment) { error in
                 if let error = error {
@@ -338,6 +391,40 @@ final class FirebaseManager {
             let sortedComments = comments.sorted { $0.creationDate > $1.creationDate }
             
             completion(sortedComments)
+        }
+    }
+    
+    //MARK: 좋아요
+    // uid로 부터
+    func like(from uid: String, type: Like) -> Observable<[String]> {
+        return Observable<[String]>.create { [weak self] observer in
+            guard let user = Auth.auth().currentUser, let self else {
+                observer.onError(UserError.none)
+                return Disposables.create()
+            }
+            let contentRef = self.db.collection(type.string).document(uid)
+            contentRef.updateData(["like" : FieldValue.arrayUnion([user.uid])]) { error in
+                if let error = error {
+                    print("좋아요 실행중 오류: \(error)")
+                    observer.onError(error)
+                }
+                contentRef.getDocument { document, error in
+                    if let error = error {
+                        print("좋아요 목록 가져오는 중 에러: \(error)")
+                        observer.onError(error)
+                    }
+                    guard let document, document.exists else {
+                        observer.onError(UserError.none)
+                        return
+                    }
+                    guard let likeList = document.get("like") as? [String] else {
+                        print("라이크 없음")
+                        return
+                    }
+                    observer.onNext(likeList)
+                }
+            }
+            return Disposables.create()
         }
     }
     
@@ -410,14 +497,14 @@ final class FirebaseManager {
     
     
     // MARK: - DS 작업 (유저 신고, HTTP 변환)
-//     유저 신고내역
+    //     유저 신고내역
     func userReport(content: String, userName: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let userReport: [String: Any] = [
             "content": content,
             "userName": userName,
             "time": Timestamp()
         ]
-
+        
         db.collection("report").addDocument(data: userReport) { error in
             if let error = error {
                 print("Firestore 오류 발생: \(error.localizedDescription)")
@@ -431,58 +518,84 @@ final class FirebaseManager {
     
     // gs:// URL을 HTTP/HTTPS로 변환하는 함수
     func fetchImageURL(from gsURL: String, completion: @escaping (URL?) -> Void) {
-        let storageReference = storage.reference(forURL: gsURL)
-        
-        storageReference.downloadURL { url, error in
-            if let error = error {
-                print("Error converting gsURL to httpsURL: \(error.localizedDescription)")
+            // 이미 요청 중인지 확인
+            guard ongoingRequests[gsURL] == nil else {
+                print("Request for \(gsURL) is already in progress.")
                 completion(nil)
                 return
             }
-            completion(url)
-        }
-    }
-    
-    // Kingfisher를 사용하여 이미지 로드하는 함수 (gs:// 및 http/https URL 모두 처리)
-    func loadImage(from imageUrl: String?, into imageView: UIImageView) {
-        guard let imageUrl = imageUrl else {
-            imageView.image = UIImage(named: "defaultImage")
-            return
+
+            // 요청 중 상태로 설정
+            ongoingRequests[gsURL] = true
+
+            let storageReference = storage.reference(forURL: gsURL)
+            
+            storageReference.downloadURL { [weak self] url, error in
+                guard let self = self else { return }
+                
+                // 요청이 완료되었으므로 상태 제거
+                self.ongoingRequests[gsURL] = nil
+
+                if let error = error {
+                    print("Error converting gsURL to httpsURL: \(error.localizedDescription)")
+                    completion(nil)
+                    return
+                }
+                
+                // 완료된 URL 반환
+                completion(url)
+            }
         }
 
-        if imageUrl.hasPrefix("gs://") {
-            // gs:// URL을 HTTPS로 변환 후 이미지 로드
-            fetchImageURL(from: imageUrl) { httpsURL in
-                self.setImage(with: httpsURL, into: imageView)
+        // Kingfisher를 사용하여 이미지 로드하는 함수 (gs:// 및 http/https URL 모두 처리)
+        func loadImage(from imageUrl: String?, into imageView: UIImageView) {
+            guard let imageUrl = imageUrl else {
+                imageView.image = UIImage(named: "defaultImage")
+                return
             }
-        } else {
-            // HTTP/HTTPS URL 처리
-            let url = URL(string: imageUrl)
-            setImage(with: url, into: imageView)
+
+            if imageUrl.hasPrefix("gs://") {
+                // gs:// URL을 HTTPS로 변환 후 이미지 로드
+                fetchImageURL(from: imageUrl) { httpsURL in
+                    guard let httpsURL = httpsURL else {
+                        imageView.image = UIImage(named: "defaultImage")
+                        return
+                    }
+                    self.setImage(with: httpsURL, into: imageView)
+                }
+            } else {
+                // HTTP/HTTPS URL 처리
+                guard let url = URL(string: imageUrl) else {
+                    imageView.image = UIImage(named: "defaultImage")
+                    return
+                }
+                setImage(with: url, into: imageView)
+            }
+        }
+        
+        // Kingfisher로 이미지를 설정하는 함수
+        private func setImage(with url: URL?, into imageView: UIImageView) {
+            let options: KingfisherOptionsInfo = [
+                .transition(.fade(0.2)), // 부드러운 페이드 애니메이션
+                .cacheOriginalImage // 원본 이미지를 캐시
+            ]
+            imageView.kf.setImage(with: url, placeholder: UIImage(named: "defaultImage"), options: options)
         }
     }
-    
-    // Kingfisher로 이미지를 설정하는 함수
-    private func setImage(with url: URL?, into imageView: UIImageView) {
-        imageView.kf.setImage(with: url, placeholder: UIImage(named: "defaultImage"))
-    }
-    
     /*
      HTTP 변환 사용 예시
      1. UIImageView 인스턴스 생성
      let gymImageView = UIImageView()
-
+     
      2. 이미지 URL을 가져옴 (gs:// 또는 http/https 형식 가능)
      let imageUrl = model.imageUrl // 예: "gs://your-bucket-name/path-to-image" 또는 "https://example.com/image.jpg"
-
+     
      3. ImageConversion을 사용하여 이미지 로드
      if let imageUrl = imageUrl {
-         // ImageConversion 클래스를 사용하여 이미지 로드 (gs:// URL 변환 포함)
-         ImageConversion.shared.loadImage(from: imageUrl, into: gymImageView)
+     // ImageConversion 클래스를 사용하여 이미지 로드 (gs:// URL 변환 포함)
+     ImageConversion.shared.loadImage(from: imageUrl, into: gymImageView)
      } else {
-         이미지 URL이 없을 때 기본 이미지 설정
-         gymImageView.image = UIImage(named: "defaultImage")
+     이미지 URL이 없을 때 기본 이미지 설정
+     gymImageView.image = UIImage(named: "defaultImage")
      }
      */
-}
-
