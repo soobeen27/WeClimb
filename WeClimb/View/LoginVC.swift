@@ -30,9 +30,9 @@ class LoginVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     
-    private let loginTitleImage: UIImageView = {
+    private let logo: UIImageView = {
         let image = UIImageView()
-        image.image = UIImage(named: "testLogo")
+        image.image = UIImage(named: "LogoText")
         return image
     }()
     
@@ -168,7 +168,7 @@ class LoginVC: UIViewController {
     
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [loginTitleImage, buttonStackView]
+        [logo, buttonStackView]
             .forEach {
                 view.addSubview($0)
             }
@@ -176,10 +176,10 @@ class LoginVC: UIViewController {
             .forEach {
                 buttonStackView.addArrangedSubview($0)
             }
-        loginTitleImage.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 200, height: 200))
+        logo.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 160, height: 30))
             $0.centerX.equalToSuperview()
-            $0.top.equalTo(view.safeAreaLayoutGuide).inset(100)
+            $0.top.equalTo(view.safeAreaLayoutGuide).inset(140)
         }
         buttonStackView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
