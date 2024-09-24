@@ -75,7 +75,7 @@ extension UploadVM {
 extension UploadVM {
     // MARK: - 미디어 항목을 처리하는 메서드 YJ
     func setMedia() {
-        isLoading.accept(true) // 로딩 시작
+        isLoading.accept(true)
         
         let group = DispatchGroup() // 비동기 작업을 추적하기 위한 그룹
         var models = [FeedCellModel?](repeating: nil, count: mediaItems.value.count)
@@ -117,10 +117,21 @@ extension UploadVM {
                     
                     // 최종적으로 비디오 파일 로드
                     Task {
+                        let asset = AVAsset(url: tempVideoURL)
+                        let isPlayable = try await asset.load(.isPlayable)
+                        let hasProtectedContent = try await asset.load(.hasProtectedContent)
+                        print("비디오 파일 상태: isPlayable=\(isPlayable), hasProtectedContent=\(hasProtectedContent)")
+
+                        guard isPlayable else {
+                            print("비디오 파일이 재생 불가능 상태.")
+                            group.leave()
+                            return
+                        }
+
                         let durationInSeconds = await self.checkVideoDuration(url: tempVideoURL)
                         if durationInSeconds > 60 {
                             self.showAlert.accept(())
-                            print("비디오가 너무 깁니다. 알람을 보냅니다.")
+                            print("비디오가 1분 이상")
                         } else {
                             models[index] = FeedCellModel(imageURL: nil, videoURL: tempVideoURL)
                         }
@@ -167,13 +178,20 @@ extension UploadVM {
 extension UploadVM {
     // MARK: - 비디오 길이를 체크하는 메서드
     func checkVideoDuration(url: URL) async -> Double {
+        print("비디오 URL: \(url)")
         let asset = AVAsset(url: url)
         
         do {
-            // duration 속성을 await으로 로드
-            let duration: CMTime = try await asset.load(.duration)
-            // CMTime 객체를 초 단위로 변환
-            let durationInSeconds = CMTimeGetSeconds(duration)
+            // 비디오 트랙 로드
+            let tracks = try await asset.loadTracks(withMediaType: .video)
+            if tracks.isEmpty {
+                print("지원되지 않는 비디오 형식입니다. 비디오 트랙이 없습니다.")
+                return 0
+            }
+            
+            // 비디오 길이 확인
+            let duration: CMTime = try await asset.load(.duration)  // duration 속성을 await으로 로드
+            let durationInSeconds = CMTimeGetSeconds(duration)  // CMTime 객체를 초 단위로 변환
             print("비디오 길이: \(durationInSeconds)초")
             return durationInSeconds
         } catch {
