@@ -158,10 +158,10 @@ class PersonalDetailsVC: UIViewController {
                 rangePickerVC.selectedRange
                     .subscribe(onNext: { [weak self] selectedRange in
                         self?.heightButton.setTitle("\(selectedRange) cm", for: .normal)
-                        self?.viewModel.heightInput.onNext(selectedRange)
+                        self?.viewModel.heightInput.accept(selectedRange)  // onNext 대신 accept 사용
                     })
                     .disposed(by: self.disposeBag)
-                
+
                 self.present(rangePickerVC, animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
@@ -205,7 +205,7 @@ class PersonalDetailsVC: UIViewController {
                 rangePickerVC.selectedRange
                     .subscribe(onNext: { [weak self] selectedRange in
                         self?.armReachButton.setTitle("\(selectedRange) cm", for: .normal)
-                        self?.viewModel.armReachInput.onNext(selectedRange)
+                        self?.viewModel.armReachInput.accept(selectedRange)
                     })
                     .disposed(by: self.disposeBag)
                 

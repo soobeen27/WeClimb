@@ -14,6 +14,7 @@ import RxSwift
 class EditPersonalDetailsVC: UIViewController {
     
     private let disposeBag = DisposeBag()
+    private let viewModel = PersonalDetailsVM()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -49,7 +50,7 @@ class EditPersonalDetailsVC: UIViewController {
         return button
     }()
     
-    private let armLengthLabel: UILabel = {
+    private let armReachLabel: UILabel = {
         let label = UILabel()
         label.text = "팔길이"
         label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
@@ -57,7 +58,7 @@ class EditPersonalDetailsVC: UIViewController {
         return label
     }()
     
-    private let armLengthButton: UIButton = {
+    private let armReachButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("cm", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
@@ -73,7 +74,7 @@ class EditPersonalDetailsVC: UIViewController {
         button.backgroundColor = UIColor.mainPurple
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 8
-//        button.isEnabled = false
+        //        button.isEnabled = true
         return button
     }()
     
@@ -92,8 +93,8 @@ class EditPersonalDetailsVC: UIViewController {
             titleDetailLabel,
             heightLabel,
             heightButton,
-            armLengthLabel,
-            armLengthButton,
+            armReachLabel,
+            armReachButton,
             confirmButton
         ].forEach { view.addSubview($0) }
         
@@ -120,13 +121,13 @@ class EditPersonalDetailsVC: UIViewController {
             $0.height.equalTo(40)
         }
         
-        armLengthLabel.snp.makeConstraints {
+        armReachLabel.snp.makeConstraints {
             $0.top.equalTo(heightLabel.snp.bottom).offset(40)
             $0.leading.equalToSuperview().offset(16)
         }
         
-        armLengthButton.snp.makeConstraints {
-            $0.centerY.equalTo(armLengthLabel)
+        armReachButton.snp.makeConstraints {
+            $0.centerY.equalTo(armReachLabel)
             $0.trailing.equalToSuperview().offset(-16)
             $0.width.equalTo(160)
             $0.height.equalTo(40)
@@ -157,6 +158,7 @@ class EditPersonalDetailsVC: UIViewController {
                 rangePickerVC.selectedRange
                     .subscribe(onNext: { [weak self] selectedRange in
                         self?.heightButton.setTitle("\(selectedRange) cm", for: .normal)
+                        self?.viewModel.heightInput.accept(selectedRange)  // onNext 대신 accept 사용
                     })
                     .disposed(by: self.disposeBag)
                 
@@ -164,9 +166,10 @@ class EditPersonalDetailsVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        armLengthButton.rx.tap
+        
+        armReachButton.rx.tap
             .subscribe(onNext: { [weak self] in
-                guard let self else { return }
+                guard let self = self else { return }
                 let rangePickerVC = RangePickerVC()
                 
                 rangePickerVC.modalPresentationStyle = .pageSheet
@@ -179,7 +182,8 @@ class EditPersonalDetailsVC: UIViewController {
                 
                 rangePickerVC.selectedRange
                     .subscribe(onNext: { [weak self] selectedRange in
-                        self?.armLengthButton.setTitle("\(selectedRange) cm", for: .normal)
+                        self?.armReachButton.setTitle("\(selectedRange) cm", for: .normal)
+                        self?.viewModel.armReachInput.accept(selectedRange)  // BehaviorRelay 값 업데이트
                     })
                     .disposed(by: self.disposeBag)
                 
@@ -187,15 +191,62 @@ class EditPersonalDetailsVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        // 네비게이션
-        confirmButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                let tabBarController = TabBarController()
-                self?.navigationController?.pushViewController(tabBarController, animated: true)
-                //탭바로 넘어갈 때 네비게이션바 가리기
-                self?.navigationController?.setNavigationBarHidden(true, animated: true)
+        // 버튼 항상 활성화
+        //        Observable.merge(
+        //            viewModel.heightInput.map { _ in true },
+        //            viewModel.armReachInput.map { _ in true }
+        //        )
+        //        .bind(to: confirmButton.rx.isEnabled)
+        //        .disposed(by: disposeBag)
+        
+        // heightInput과 armReachInput 결합
+        Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput)
+            .subscribe(onNext: { [weak self] newHeight, newArmReach in
+                guard let self = self else { return }
+                
+                self.confirmButton.rx.tap
+                    .subscribe(onNext: {
+                        print("ConfirmButton tapped _ height: \(newHeight) armReach: \(newArmReach)")
+                        FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
+                            FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach, completion: {
+                                DispatchQueue.main.async {
+                                    let alert = UIAlertController(title: "정보 수정이 완료 되었습니다", message: nil, preferredStyle: .alert)
+                                    alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
+                                        self.navigationController?.popViewController(animated: true)
+                                    }))
+                                    self.present(alert, animated: true, completion: nil)
+                                }
+                            })
+                        }
+                    })
+                    .disposed(by: self.disposeBag) // 내부 subscribe의 구독 해제
             })
-            .disposed(by: disposeBag)
+            .disposed(by: disposeBag) // 외부 Observable의 구독 해제
+        
+        //        // 버튼 탭 이벤트와 입력 조합을 결합해서 탭할 때마다 최신 입력 값을 사용
+        //        Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput)
+        //            .subscribe(onNext: { [weak self] newHeight, newArmReach in
+        //                guard let self = self else { return }
+        //
+        //                // 네비게이션
+        //                self.confirmButton.rx.tap
+        //                    .subscribe(onNext: {
+        //                        print("Confirmbutton tapped")
+        //                        FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
+        //                            FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach, completion: {
+        //                                DispatchQueue.main.async {
+        //                                    let alert = UIAlertController(title: "정보 수정이 완료되었습니다", message: nil, preferredStyle: .alert)
+        //                                    alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
+        //                                        self.navigationController?.popViewController(animated: true)
+        //                                    }))
+        //                                    self.present(alert, animated: true, completion: nil)
+        //                                }
+        //                            })
+        //                        }
+        //                    })
+        //                    .disposed(by: self.disposeBag)
+        //            })
+        //            .disposed(by: disposeBag)
     }
 }
 
