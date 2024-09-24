@@ -171,7 +171,7 @@ class SearchVC: UIViewController {
                 let userPageVC = UserPageVC()
                 userPageVC.configure(with: selectedItem)
                 navigationController?.navigationBar.prefersLargeTitles = false
-                userPageVC.setNavigation()
+//                userPageVC.setNavigation()
                 self.navigationController?.pushViewController(userPageVC, animated: true)
             })
             .disposed(by: disposeBag)

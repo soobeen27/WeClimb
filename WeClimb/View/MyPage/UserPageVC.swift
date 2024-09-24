@@ -144,7 +144,9 @@ class UserPageVC: UIViewController {
     }()
     
     private let segmentControl: UISegmentedControl = {
-        let segmentControl = UISegmentedControl(items: [UIImage(systemName: "square.grid.2x2") ?? UIImage(), UserPageNameSpace.none])
+        // 추후 하나 생성예정
+//        let segmentControl = UISegmentedControl(items: [UIImage(systemName: "square.grid.2x2") ?? UIImage(), UserPageNameSpace.none])
+        let segmentControl = UISegmentedControl(items: [UIImage(systemName: "square.grid.2x2") ?? UIImage()])
         segmentControl.selectedSegmentIndex = 0
         return segmentControl
     }()
@@ -189,35 +191,35 @@ class UserPageVC: UIViewController {
         }
     
     // MARK: - 로그아웃 버튼 YJ
-    // 이 기능은 아직 보류지만 로그아웃을 위해 우선 여기에..
-    func setNavigation() {
-        let rightBarButton = UIBarButtonItem(
-            image: UIImage(systemName: "ellipsis"),
-            style: .plain,
-            target: self,
-            action: #selector(self.rightBarButtonTapped)
-        )
-        navigationController?.navigationBar.tintColor = .label
-        navigationItem.rightBarButtonItem = rightBarButton
-    }
+    // 이 기능은 아직 보류지만 로그아웃을 위해 우선 여기에.. 보류보류
+//    func setNavigation() {
+//        let rightBarButton = UIBarButtonItem(
+//            image: UIImage(systemName: "ellipsis"),
+//            style: .plain,
+//            target: self,
+//            action: #selector(self.rightBarButtonTapped)
+//        )
+//        navigationController?.navigationBar.tintColor = .label
+//        navigationItem.rightBarButtonItem = rightBarButton
+//    }
     
-    @objc private func rightBarButtonTapped() {
-        let settingsVC = SettingVC()
-        navigationController?.pushViewController(settingsVC, animated: true)
-        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        let logout = UIAlertAction(title: UserPageNameSpace.logout, style: .default) { _ in
-            guard let navigationController = self.tabBarController?.navigationController else { return }
-            navigationController.popToRootViewController(animated: true)
-        }
-        
-        let close = UIAlertAction(title: UserPageNameSpace.close, style: .cancel)
-        
-        [logout, close]
-            .forEach { actionSheet.addAction($0) }
-        
-        present(actionSheet, animated: true)
-    }
+//    @objc private func rightBarButtonTapped() {
+//        let settingsVC = SettingVC()
+//        navigationController?.pushViewController(settingsVC, animated: true)
+//        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//        
+//        let logout = UIAlertAction(title: UserPageNameSpace.logout, style: .default) { _ in
+//            guard let navigationController = self.tabBarController?.navigationController else { return }
+//            navigationController.popToRootViewController(animated: true)
+//        }
+//        
+//        let close = UIAlertAction(title: UserPageNameSpace.close, style: .cancel)
+//        
+//        [logout, close]
+//            .forEach { actionSheet.addAction($0) }
+//        
+//        present(actionSheet, animated: true)
+//    }
     
     private func buttonTapped() {
         isFollowing.toggle()
