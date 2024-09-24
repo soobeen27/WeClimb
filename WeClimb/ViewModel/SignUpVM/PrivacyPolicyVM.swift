@@ -12,6 +12,7 @@ import RxSwift
 
 class PrivacyPolicyVM {
     // Output: View로 내보낼 데이터
+    // 약관동의
     let isAllAgreed = BehaviorRelay<Bool>(value: false)
     let isTerms1Agreed = BehaviorRelay<Bool>(value: false)
     let isTerms2Agreed = BehaviorRelay<Bool>(value: false)

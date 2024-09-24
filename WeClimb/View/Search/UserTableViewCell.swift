@@ -71,12 +71,12 @@ class UserTableViewCell: UITableViewCell {
         }
     }
     
-    func configure(with model: User) {
-        titleLabel.text = model.userName
+    func configure(with data: User) {
+        titleLabel.text = data.userName
         titleDetail.text = ""
         
         // Kingfisher로 이미지 로드
-        if let imageUrl = model.profileImage {
+        if let imageUrl = data.profileImage {
             FirebaseManager.shared.loadImage(from: imageUrl, into: userImage)
         } else {
             userImage.image = UIImage(named: "defaultImage")

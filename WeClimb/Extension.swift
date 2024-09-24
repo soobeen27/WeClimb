@@ -55,8 +55,12 @@ extension UIButton {
     
     //비활성화 상태
     private var normalImage: UIImage? {
+        let isDarkMode = (traitCollection.userInterfaceStyle == .dark) || (backgroundColor == UIColor(hex: "#0C1014"))
+
+        let tintColor = isDarkMode ? UIColor(hex: "#FFFFFF") : UIColor(hex: "#CDCDCD")
+
         return UIImage(systemName: "heart")?
-            .withTintColor(UIColor(hex: "#FFFFFF"))  //"#CDCDCD"
+            .withTintColor(tintColor)
             .withRenderingMode(.alwaysOriginal)
     }
     
@@ -104,10 +108,23 @@ extension UIViewController {
         if let sheet = modalVC.sheetPresentationController {
             sheet.detents = [.medium(), .large()]  // 미디움과 라지 크기 조절
             sheet.preferredCornerRadius = 20
-            sheet.largestUndimmedDetentIdentifier = .medium
+            sheet.largestUndimmedDetentIdentifier = nil  //모든 크기에서 배경 흐림 처리(모달 터치와 관련)
             sheet.prefersGrabberVisible = true  // 상단 그랩바
         }
         present(modalVC, animated: true, completion: nil)
+    }
+    private func modalTapGesture() {
+      let tapGesture = UITapGestureRecognizer(target: self, action: #selector(outsideTap(_:)))
+      view.superview?.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func outsideTap(_ gesture: UITapGestureRecognizer) {
+      let touchLocation = gesture.location(in: self.view)
+      
+      //모달의 콘텐츠 영역을 제외한 빈 영역을 클릭했을 때만 모달을 닫음
+      if !self.view.point(inside: touchLocation, with: nil) {
+        self.dismiss(animated: true, completion: nil)
+      }
     }
 }
 

@@ -75,14 +75,14 @@ extension UploadVM {
 extension UploadVM {
     // MARK: - 미디어 항목을 처리하는 메서드 YJ
     func setMedia() {
-        isLoading.accept(true)
+        isLoading.accept(true) // 로딩 시작
         
-        let group = DispatchGroup()
+        let group = DispatchGroup() // 비동기 작업을 추적하기 위한 그룹
         var models = [FeedCellModel?](repeating: nil, count: mediaItems.value.count)
         
         mediaItems.value.enumerated().forEach { (index, mediaItem) in
-            group.enter()
-
+            group.enter()   // 비동기 작업 시작 알려줌
+            
             if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
                 mediaItem.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { [weak self] (url, error) in
                     guard let self = self, let url = url, error == nil else {
@@ -90,68 +90,73 @@ extension UploadVM {
                         group.leave()
                         return
                     }
-
+                    
+                    // 임시 디렉토리로 파일 복사
                     let tempVideoURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("mov")
                     do {
                         try FileManager.default.copyItem(at: url, to: tempVideoURL)
-                        print("비디오 파일을 임시 디렉토리에 저장: \(tempVideoURL.path)")
-                    } catch {
-                        print("비디오 파일 복사 실패: \(error.localizedDescription)")
-                        group.leave()
-                        return
-                    }
-
-                    // 비디오 상태 확인
-                    Task {
-                        let asset = AVAsset(url: tempVideoURL)
-                        let isPlayable = try await asset.load(.isPlayable)
-                        let hasProtectedContent = try await asset.load(.hasProtectedContent)
-                        print("비디오 파일 상태: isPlayable=\(isPlayable), hasProtectedContent=\(hasProtectedContent)")
-
-                        guard isPlayable else {
-                            print("비디오 파일이 재생 불가능 상태.")
+                        print("비디오 파일이 임시 디렉토리에 저장됨: \(tempVideoURL.path)")
+                        } catch {
+                            print("비디오 파일 복사 실패: \(error.localizedDescription)")
                             group.leave()
                             return
                         }
-
-                        let durationInSeconds = await self.checkVideoDuration(url: tempVideoURL)
-                        if durationInSeconds > 60 {
-                            self.showAlert.accept(())
-                            print("비디오가 1분 이상")
-                        } else {
-                            models[index] = FeedCellModel(imageURL: nil, videoURL: tempVideoURL)
+                        
+                        // AVAsset으로 비디오 상태 확인
+                        let asset = AVAsset(url: tempVideoURL)
+                        let isPlayable = asset.isPlayable
+                        let hasProtectedContent = asset.hasProtectedContent
+                        print("비디오 파일 상태: isPlayable=\(isPlayable), hasProtectedContent=\(hasProtectedContent)")
+                        
+                        // 파일이 재생 가능한 상태인지 확인
+                        guard isPlayable else {
+                            print("비디오 파일이 재생 불가능 상태입니다.")
+                            group.leave()
+                            return
                         }
-                        group.leave()
-                    }
-                }
-            } else if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
-                mediaItem.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
-                    guard let uiImage = image as? UIImage else {
-                        print("이미지 로드 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
-                        group.leave()
-                        return
-                    }
-
-                    // 임시 디렉토리에 이미지 저장
-                    let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
-
-                    if let data = uiImage.jpegData(compressionQuality: 1) {
-                        do {
-                            try data.write(to: tempImageURL)
-                            models[index] = FeedCellModel(imageURL: tempImageURL, videoURL: nil)
-                        } catch {
-                            print("이미지 저장 실패: \(error.localizedDescription)")
+                        
+                        // 최종적으로 비디오 파일 로드
+                        Task {
+                            let durationInSeconds = await self.checkVideoDuration(url: tempVideoURL)
+                            if durationInSeconds > 60 {
+                                self.showAlert.accept(())
+                                print("비디오가 너무 깁니다. 알람을 보냅니다.")
+                                    } else {
+                                        models[index] = FeedCellModel(imageURL: nil, videoURL: tempVideoURL)
+                                    }
+                                    group.leave()
+                                }
+                            }
+                        } else if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+                            mediaItem.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
+                                guard let uiImage = image as? UIImage else {
+                                    print("이미지 로드 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
+                                    group.leave()
+                                    return
+                                }
+                                
+                                // 임시 디렉토리에 이미지 저장
+                                let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
+                                
+                                if let data = uiImage.jpegData(compressionQuality: 1) {
+                                    do {
+                                        try data.write(to: tempImageURL)
+                                        models[index] = FeedCellModel(imageURL: tempImageURL, videoURL: nil)
+                                    } catch {
+                                        print("이미지 저장 실패: \(error.localizedDescription)")
+                                    }
+                                }
+                                group.leave()
+                            }
                         }
                     }
-                    group.leave()
-                }
-            }
-        }
-    
+
+        
+        // 비동기 작업이 모두 완료되었을 때 호출되는 클로저
         group.notify(queue: .main) { [weak self] in
             guard let self else { return }
-            self.isLoading.accept(false)
-
+            self.isLoading.accept(false) // 로딩 종료
+            
             if !models.isEmpty {
                 self.feedRelay.accept(models.compactMap { $0 })
                 self.cellData.accept(models.compactMap { $0 })
@@ -167,16 +172,10 @@ extension UploadVM {
         let asset = AVAsset(url: url)
         
         do {
-            // 비디오 트랙 로드
-            let tracks = try await asset.loadTracks(withMediaType: .video)
-            if tracks.isEmpty {
-                print("지원되지 않는 비디오 형식입니다. 비디오 트랙이 없습니다.")
-                return 0
-            }
-            
-            // 비디오 길이 확인
-            let duration: CMTime = try await asset.load(.duration)  // duration 속성을 await으로 로드
-            let durationInSeconds = CMTimeGetSeconds(duration)  // CMTime 객체를 초 단위로 변환
+            // duration 속성을 await으로 로드
+            let duration: CMTime = try await asset.load(.duration)
+            // CMTime 객체를 초 단위로 변환
+            let durationInSeconds = CMTimeGetSeconds(duration)
             print("비디오 길이: \(durationInSeconds)초")
             return durationInSeconds
         } catch {
@@ -211,9 +210,11 @@ extension UploadVM {
             }
             
             dispatchGroup.notify(queue: .main) {
-                FirebaseManager.shared.uploadPost(media: uploadMedia, caption: caption, gym: gym)
-                observer.onNext(())
-                observer.onCompleted()
+                Task { [uploadMedia, caption, gym] in
+                    await FirebaseManager.shared.uploadPost(media: uploadMedia, caption: caption, gym: gym)
+                    observer.onNext(())
+                    observer.onCompleted()
+                }
             }
             
             return Disposables.create()

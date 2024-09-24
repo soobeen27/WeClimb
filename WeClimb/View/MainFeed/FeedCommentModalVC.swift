@@ -30,6 +30,10 @@ class FeedCommentModalVC: UIViewController {
     setLayout()
   }
   
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+  }
+  
   private func setTableView() {
     tableView.register(FeedCommentCell.self, forCellReuseIdentifier: Identifiers.commentTableViewCell)
     
@@ -41,6 +45,7 @@ class FeedCommentModalVC: UIViewController {
     
     tableView.rowHeight = UITableView.automaticDimension  //셀 height 유동적으로 설정
     tableView.estimatedRowHeight = 70  //셀 height 기본값 설정(지금 안먹히는 듯..)
+//    tableView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
   }
   
   private func setLayout() {
