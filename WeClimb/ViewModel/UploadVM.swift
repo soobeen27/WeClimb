@@ -91,65 +91,66 @@ extension UploadVM {
                         return
                     }
                     
-                    // 임시 디렉토리로 파일을 복사하여 관리
+                    // 임시 디렉토리로 파일 복사
                     let tempVideoURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("mov")
                     do {
                         try FileManager.default.copyItem(at: url, to: tempVideoURL)
                         print("비디오 파일이 임시 디렉토리에 저장됨: \(tempVideoURL.path)")
-                    } catch {
-                        print("비디오 파일 복사 실패: \(error.localizedDescription)")
-                        group.leave()
-                        return
-                    }
-                    
-                    // AVAsset으로 비디오 상태 확인
-                    let asset = AVAsset(url: tempVideoURL)
-                    let isPlayable = asset.isPlayable
-                    let hasProtectedContent = asset.hasProtectedContent
-                    print("비디오 파일 상태: isPlayable=\(isPlayable), hasProtectedContent=\(hasProtectedContent)")
-                    
-                    // 파일이 재생 가능한 상태인지 확인
-                    guard isPlayable else {
-                        print("비디오 파일이 재생 불가능 상태입니다.")
-                        group.leave()
-                        return
-                    }
-                    
-                    // 최종적으로 비디오 파일 로드
-                    Task {
-                        let durationInSeconds = await self.checkVideoDuration(url: tempVideoURL)
-                        if durationInSeconds > 60 {
-                            self.showAlert.accept(())
-                            print("비디오가 너무 깁니다. 알람을 보냅니다.")
-                        } else {
-                            models[index] = FeedCellModel(imageURL: nil, videoURL: tempVideoURL)
-                        }
-                        group.leave()
-                    }
-                }
-            } else if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
-                mediaItem.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
-                    guard let uiImage = image as? UIImage else {
-                        print("이미지 로드 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
-                        group.leave()
-                        return
-                    }
-                    
-                    // 임시 디렉토리에 이미지 저장
-                    let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
-                    
-                    if let data = uiImage.jpegData(compressionQuality: 1) {
-                        do {
-                            try data.write(to: tempImageURL)
-                            models[index] = FeedCellModel(imageURL: tempImageURL, videoURL: nil)
                         } catch {
-                            print("이미지 저장 실패: \(error.localizedDescription)")
+                            print("비디오 파일 복사 실패: \(error.localizedDescription)")
+                            group.leave()
+                            return
+                        }
+                        
+                        // AVAsset으로 비디오 상태 확인
+                        let asset = AVAsset(url: tempVideoURL)
+                        let isPlayable = asset.isPlayable
+                        let hasProtectedContent = asset.hasProtectedContent
+                        print("비디오 파일 상태: isPlayable=\(isPlayable), hasProtectedContent=\(hasProtectedContent)")
+                        
+                        // 파일이 재생 가능한 상태인지 확인
+                        guard isPlayable else {
+                            print("비디오 파일이 재생 불가능 상태입니다.")
+                            group.leave()
+                            return
+                        }
+                        
+                        // 최종적으로 비디오 파일 로드
+                        Task {
+                            let durationInSeconds = await self.checkVideoDuration(url: tempVideoURL)
+                            if durationInSeconds > 60 {
+                                self.showAlert.accept(())
+                                print("비디오가 너무 깁니다. 알람을 보냅니다.")
+                                    } else {
+                                        models[index] = FeedCellModel(imageURL: nil, videoURL: tempVideoURL)
+                                    }
+                                    group.leave()
+                                }
+                            }
+                        } else if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+                            mediaItem.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
+                                guard let uiImage = image as? UIImage else {
+                                    print("이미지 로드 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
+                                    group.leave()
+                                    return
+                                }
+                                
+                                // 임시 디렉토리에 이미지 저장
+                                let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
+                                
+                                if let data = uiImage.jpegData(compressionQuality: 1) {
+                                    do {
+                                        try data.write(to: tempImageURL)
+                                        models[index] = FeedCellModel(imageURL: tempImageURL, videoURL: nil)
+                                    } catch {
+                                        print("이미지 저장 실패: \(error.localizedDescription)")
+                                    }
+                                }
+                                group.leave()
+                            }
                         }
                     }
-                    group.leave()
-                }
-            }
-        }
+
         
         // 비동기 작업이 모두 완료되었을 때 호출되는 클로저
         group.notify(queue: .main) { [weak self] in
@@ -163,10 +164,11 @@ extension UploadVM {
         }
     }
 }
-    
+
 extension UploadVM {
     // MARK: - 비디오 길이를 체크하는 메서드
     func checkVideoDuration(url: URL) async -> Double {
+        print("비디오 URL: \(url)")
         let asset = AVAsset(url: url)
         
         do {
