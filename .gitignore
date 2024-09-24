@@ -154,14 +154,16 @@ Config.xcconfig
 
 GoogleService-Info.plist
 
-firestore-debug
+firestore-debug.log
 
-firestore.indexes
+firestore.indexes.json
 
 firestore.rules
 
-package-lock
+package-lock.json
 
-package
+package.json
 
-ui-debug
+ui-debug.log
+
+node_modules
