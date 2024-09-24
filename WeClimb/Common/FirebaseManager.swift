@@ -17,9 +17,9 @@ import GoogleSignIn
 import RxSwift
 import Kingfisher
 
-                
+
 final class FirebaseManager {
- 
+    
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     private let disposeBag = DisposeBag()
@@ -181,7 +181,7 @@ final class FirebaseManager {
                 }
             }
     }
-
+    
     // MARK: 이름으로 다른 유저 정보 가져오기
     func getUserInfoFrom(name: String, completion: @escaping (Result<User, Error>) -> Void) {
         let userRef = db.collection("users").whereField("userName", isEqualTo: name)
@@ -255,7 +255,7 @@ final class FirebaseManager {
                     return
                 }
                 guard let document = document, document.exists,
-                      let data = document.data() 
+                      let data = document.data()
                 else {
                     print("정보없음")
                     completion(nil)
@@ -278,69 +278,82 @@ final class FirebaseManager {
                 additionalInfo.removeValue(forKey: "sector")
                 additionalInfo.removeValue(forKey: "profileImage")
                 
-                completion(Gym(address: address, grade: grade, 
+                completion(Gym(address: address, grade: grade,
                                gymName: gymName, sector: sector,
                                profileImage: profileImage, additionalInfo: additionalInfo))
             }
     }
     // MARK: 포스트 업로드
-    func uploadPost(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?) {
+    func uploadPost(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?) async {
         guard let user = Auth.auth().currentUser else {
             print("로그인이 되지않음")
             return
         }
         
         let storageRef = storage.reference()
+        let db = Firestore.firestore()
+        let postUID = UUID().uuidString
+        let postRef = db.collection("posts").document(postUID)
         
-        let uploadedMedia = media.enumerated().map { index, media -> Observable<(Int, Media)> in
-            let fileName = media.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.url.lastPathComponent
-            let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
-
-            return Observable<(Int, Media)>.create { observer in
-                mediaRef.putFile(from: media.url, metadata: nil) { metaData, error in
+        do {
+            // Firestore 배치 생성
+            let batch = db.batch()
+            
+            // 비동기로 각각의 미디어 파일을 업로드하고 Firestore 배치에 추가
+            var mediaReferences: [DocumentReference] = []
+            for media in media.enumerated() {
+                let fileName = media.element.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.element.url.lastPathComponent
+                let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
+                
+                let mediaURL = try await uploadMedia(mediaRef: mediaRef, mediaURL: media.element.url)
+                
+                // Media 문서 생성
+                let mediaUID = UUID().uuidString
+                let mediaDocRef = db.collection("media").document(mediaUID)
+                let mediaData = Media(mediaUID: mediaUID, url: mediaURL.absoluteString, sector: media.element.sector, grade: media.element.grade, postRef: postRef)
+                
+                // Media 문서를 배치에 추가
+                batch.setData(try Firestore.Encoder().encode(mediaData), forDocument: mediaDocRef)
+                
+                mediaReferences.append(mediaDocRef)
+            }
+            
+            // 포스트 데이터를 Firestore에 저장
+            let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: mediaReferences)
+            
+            let userRef = db.collection("users").document(user.uid)
+            batch.setData(try Firestore.Encoder().encode(post), forDocument: postRef)
+            batch.updateData(["posts": FieldValue.arrayUnion([postRef])], forDocument: userRef)
+            
+            // 배치 커밋
+            try await batch.commit()
+            print("포스트 업로드 및 미디어 저장 완료")
+            
+        } catch {
+            print("업로드 중 오류 발생: \(error)")
+        }
+    }
+    
+    func uploadMedia(mediaRef: StorageReference, mediaURL: URL) async throws -> URL {
+        try await withCheckedThrowingContinuation { continuation in
+            mediaRef.putFile(from: mediaURL, metadata: nil) { metaData, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                
+                mediaRef.downloadURL { url, error in
                     if let error = error {
-                        observer.onError(error)
-                        return
-                    }
-                    mediaRef.downloadURL { url, error in
-                        if let error = error {
-                            observer.onError(error)
-                            return
-                        }
-                        guard let url = url else { return }
-                        let medias = Media(url: url.absoluteString, sector: media.sector ?? "", grade: media.grade ?? "")
-                        observer.onNext((index, medias))
-                        observer.onCompleted()
+                        continuation.resume(throwing: error)
+                    } else if let url = url {
+                        continuation.resume(returning: url)
                     }
                 }
-                return Disposables.create()
             }
         }
-        Observable.zip(uploadedMedia)
-            .subscribe(onNext: { [weak self] userMedia in
-                guard let self else { return }
-                let sortedUserMedia = userMedia.sorted(by: { $0.0 < $1.0}).map { $0.1 }
-                let postUID = UUID().uuidString
-                let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: sortedUserMedia)
-                
-                let userRef = self.db.collection("users").document(user.uid)
-                let postRef = self.db.collection("posts").document(postUID)
-                do {
-                    try postRef.setData(from: post) { error in
-                        if let error = error {
-                            print("포스트 셋데이터 오류: \(error)")
-                            return
-                        }
-                        userRef.updateData(["posts" : FieldValue.arrayUnion([postRef])])
-                    }
-                } catch {
-                    print("업로드중 오류 셋데이터")
-                }
-
-            }, onError: { error in
-                print("업로드중 오류 발생: \(error)")
-            }).disposed(by: disposeBag)
     }
+    
+    
     
     // MARK: 댓글달기
     func addComment(fromPostUid postUid: String, content: String) {
@@ -428,7 +441,7 @@ final class FirebaseManager {
     }
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
-    func feedFirst(completion: @escaping ([Post]?) -> Void) {
+    func feedFirst(completion: @escaping ([(post: Post, media: [Media])]?) -> Void) {
         let postRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
             .limit(to: 10)
@@ -441,11 +454,13 @@ final class FirebaseManager {
                 completion(nil)
                 return
             }
+            
             guard let documents = snapshot?.documents else {
                 print("현재 피드가 없음")
                 completion(nil)
                 return
             }
+            
             if let lastDocument = documents.last {
                 self.lastFeed = lastDocument
             }
@@ -457,13 +472,37 @@ final class FirebaseManager {
                     return nil
                 }
             }
-            completion(posts)
+            
+            // Post에 있는 Media DocumentReference들을 비동기적으로 배치로 가져오기
+            Task {
+                var postWithMedias: [(post: Post, media: [Media])] = []
+                let lock = NSLock() // 동시성 제어용 Lock
+                
+                try await withThrowingTaskGroup(of: (Post, [Media]).self) { group in
+                    for post in posts {
+                        group.addTask {
+                            // 각 Post에 해당하는 Media 문서들을 배치로 가져오기
+                            let medias = try await self.fetchMedias(for: post)
+                            return (post, medias)
+                        }
+                    }
+                    
+                    // TaskGroup 내에서 동시성 관리
+                    for try await (post, medias) in group {
+                        lock.lock() // 스레드 안전하게 배열에 추가
+                        postWithMedias.append((post: post, media: medias))
+                        lock.unlock()
+                    }
+                }
+                
+                completion(postWithMedias)
+            }
         }
     }
     
-    // MARK: feedFirst 이후에 피드를 더 가져오기
-    func feedLoding(completion: @escaping ([Post]?) -> Void) {
-        guard let lastFeed = lastFeed else { 
+    //    // MARK: feedFirst 이후에 피드를 더 가져오기
+    func feedLoading(completion: @escaping ([(post: Post, media: [Media])]?) -> Void) {
+        guard let lastFeed = lastFeed else {
             print("초기 피드가 존재하지 않음")
             return
         }
@@ -471,18 +510,26 @@ final class FirebaseManager {
             .order(by: "creationDate", descending: true)
             .limit(to: 10)
             .start(afterDocument: lastFeed)
-        
-        postRef.getDocuments { snapshot, error in
+
+        postRef.getDocuments { [weak self] snapshot, error in
+            guard let self else { return }
+            
             if let error = error {
                 print("피드 가져오는중 에러: \(error)")
                 completion(nil)
                 return
             }
+            
             guard let documents = snapshot?.documents else {
                 print("현재 피드가 없음")
                 completion(nil)
                 return
             }
+            
+            if let lastDocument = documents.last {
+                self.lastFeed = lastDocument
+            }
+            
             let posts = documents.compactMap {
                 do {
                     return try $0.data(as: Post.self)
@@ -490,20 +537,71 @@ final class FirebaseManager {
                     return nil
                 }
             }
-            completion(posts)
+            
+            // Post에 있는 Media DocumentReference들을 비동기적으로 배치로 가져오기
+            Task {
+                var postWithMedias: [(post: Post, media: [Media])] = []
+                let lock = NSLock() // 동시성 제어용 Lock
+                
+                try await withThrowingTaskGroup(of: (Post, [Media]).self) { group in
+                    for post in posts {
+                        group.addTask {
+                            // 각 Post에 해당하는 Media 문서들을 배치로 가져오기
+                            let medias = try await self.fetchMedias(for: post)
+                            return (post, medias)
+                        }
+                    }
+                    
+                    // TaskGroup 내에서 동시성 관리
+                    for try await (post, medias) in group {
+                        lock.lock() // 스레드 안전하게 배열에 추가
+                        postWithMedias.append((post: post, media: medias))
+                        lock.unlock()
+                    }
+                }
+                
+                completion(postWithMedias)
+            }
         }
+    }
+
+    func fetchMedias(for post: Post) async throws -> [Media] {
+        // medias의 DocumentReference들을 한 번에 가져오기 위한 batch 작업
+        var mediaRefs: [DocumentReference] = post.medias
+        var medias: [Media] = []
+        
+        guard !mediaRefs.isEmpty else {
+            return medias // 미디어가 없으면 빈 배열 반환
+        }
+        
+        // Firestore에서 여러 DocumentReference를 한 번에 가져오기
+        let batchQuery = try await db.getAllDocuments(from: mediaRefs)
+        
+        // 가져온 문서들을 Media 객체로 변환
+        medias = batchQuery.compactMap { document in
+            do {
+                return try document.data(as: Media.self)
+            } catch {
+                print("Media 데이터를 파싱하는데 실패: \(error)")
+                return nil
+            }
+        }
+        
+        return medias
     }
     
     
+    
+    
     // MARK: - DS 작업 (유저 신고, HTTP 변환)
-//     유저 신고내역
+    //     유저 신고내역
     func userReport(content: String, userName: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let userReport: [String: Any] = [
             "content": content,
             "userName": userName,
             "time": Timestamp()
         ]
-
+        
         db.collection("report").addDocument(data: userReport) { error in
             if let error = error {
                 print("Firestore 오류 발생: \(error.localizedDescription)")
@@ -535,7 +633,7 @@ final class FirebaseManager {
             imageView.image = UIImage(named: "defaultImage")
             return
         }
-
+        
         if imageUrl.hasPrefix("gs://") {
             // gs:// URL을 HTTPS로 변환 후 이미지 로드
             fetchImageURL(from: imageUrl) { httpsURL in
@@ -557,18 +655,35 @@ final class FirebaseManager {
      HTTP 변환 사용 예시
      1. UIImageView 인스턴스 생성
      let gymImageView = UIImageView()
-
+     
      2. 이미지 URL을 가져옴 (gs:// 또는 http/https 형식 가능)
      let imageUrl = model.imageUrl // 예: "gs://your-bucket-name/path-to-image" 또는 "https://example.com/image.jpg"
-
+     
      3. ImageConversion을 사용하여 이미지 로드
      if let imageUrl = imageUrl {
-         // ImageConversion 클래스를 사용하여 이미지 로드 (gs:// URL 변환 포함)
-         ImageConversion.shared.loadImage(from: imageUrl, into: gymImageView)
+     // ImageConversion 클래스를 사용하여 이미지 로드 (gs:// URL 변환 포함)
+     ImageConversion.shared.loadImage(from: imageUrl, into: gymImageView)
      } else {
-         이미지 URL이 없을 때 기본 이미지 설정
-         gymImageView.image = UIImage(named: "defaultImage")
+     이미지 URL이 없을 때 기본 이미지 설정
+     gymImageView.image = UIImage(named: "defaultImage")
      }
      */
 }
 
+extension Firestore {
+    func getAllDocuments(from refs: [DocumentReference]) async throws -> [DocumentSnapshot] {
+        try await withThrowingTaskGroup(of: DocumentSnapshot.self) { group in
+            for ref in refs {
+                group.addTask {
+                    return try await ref.getDocument()
+                }
+            }
+            
+            var documents: [DocumentSnapshot] = []
+            for try await document in group {
+                documents.append(document)
+            }
+            return documents
+        }
+    }
+}

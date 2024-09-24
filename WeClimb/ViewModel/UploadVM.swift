@@ -190,9 +190,11 @@ extension UploadVM {
             }
             
             dispatchGroup.notify(queue: .main) {
-                FirebaseManager.shared.uploadPost(media: uploadMedia, caption: caption, gym: gym)
-                observer.onNext(())
-                observer.onCompleted()
+                Task { [uploadMedia, caption, gym] in
+                    await FirebaseManager.shared.uploadPost(media: uploadMedia, caption: caption, gym: gym)
+                    observer.onNext(())
+                    observer.onCompleted()
+                }
             }
             
             return Disposables.create()
