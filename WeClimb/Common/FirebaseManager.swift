@@ -23,6 +23,7 @@ final class FirebaseManager {
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     private let disposeBag = DisposeBag()
+    private var ongoingRequests = [String: Bool]()
     private var lastFeed: QueryDocumentSnapshot?
     
     static let shared = FirebaseManager()
@@ -255,7 +256,7 @@ final class FirebaseManager {
                     return
                 }
                 guard let document = document, document.exists,
-                      let data = document.data() 
+                      let data = document.data()
                 else {
                     print("정보없음")
                     completion(nil)
@@ -278,7 +279,7 @@ final class FirebaseManager {
                 additionalInfo.removeValue(forKey: "sector")
                 additionalInfo.removeValue(forKey: "profileImage")
                 
-                completion(Gym(address: address, grade: grade, 
+                completion(Gym(address: address, grade: grade,
                                gymName: gymName, sector: sector,
                                profileImage: profileImage, additionalInfo: additionalInfo))
             }
@@ -496,14 +497,14 @@ final class FirebaseManager {
     
     
     // MARK: - DS 작업 (유저 신고, HTTP 변환)
-//     유저 신고내역
+    //     유저 신고내역
     func userReport(content: String, userName: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let userReport: [String: Any] = [
             "content": content,
             "userName": userName,
             "time": Timestamp()
         ]
-
+        
         db.collection("report").addDocument(data: userReport) { error in
             if let error = error {
                 print("Firestore 오류 발생: \(error.localizedDescription)")
@@ -517,58 +518,84 @@ final class FirebaseManager {
     
     // gs:// URL을 HTTP/HTTPS로 변환하는 함수
     func fetchImageURL(from gsURL: String, completion: @escaping (URL?) -> Void) {
-        let storageReference = storage.reference(forURL: gsURL)
-        
-        storageReference.downloadURL { url, error in
-            if let error = error {
-                print("Error converting gsURL to httpsURL: \(error.localizedDescription)")
+            // 이미 요청 중인지 확인
+            guard ongoingRequests[gsURL] == nil else {
+                print("Request for \(gsURL) is already in progress.")
                 completion(nil)
                 return
             }
-            completion(url)
-        }
-    }
-    
-    // Kingfisher를 사용하여 이미지 로드하는 함수 (gs:// 및 http/https URL 모두 처리)
-    func loadImage(from imageUrl: String?, into imageView: UIImageView) {
-        guard let imageUrl = imageUrl else {
-            imageView.image = UIImage(named: "defaultImage")
-            return
+
+            // 요청 중 상태로 설정
+            ongoingRequests[gsURL] = true
+
+            let storageReference = storage.reference(forURL: gsURL)
+            
+            storageReference.downloadURL { [weak self] url, error in
+                guard let self = self else { return }
+                
+                // 요청이 완료되었으므로 상태 제거
+                self.ongoingRequests[gsURL] = nil
+
+                if let error = error {
+                    print("Error converting gsURL to httpsURL: \(error.localizedDescription)")
+                    completion(nil)
+                    return
+                }
+                
+                // 완료된 URL 반환
+                completion(url)
+            }
         }
 
-        if imageUrl.hasPrefix("gs://") {
-            // gs:// URL을 HTTPS로 변환 후 이미지 로드
-            fetchImageURL(from: imageUrl) { httpsURL in
-                self.setImage(with: httpsURL, into: imageView)
+        // Kingfisher를 사용하여 이미지 로드하는 함수 (gs:// 및 http/https URL 모두 처리)
+        func loadImage(from imageUrl: String?, into imageView: UIImageView) {
+            guard let imageUrl = imageUrl else {
+                imageView.image = UIImage(named: "defaultImage")
+                return
             }
-        } else {
-            // HTTP/HTTPS URL 처리
-            let url = URL(string: imageUrl)
-            setImage(with: url, into: imageView)
+
+            if imageUrl.hasPrefix("gs://") {
+                // gs:// URL을 HTTPS로 변환 후 이미지 로드
+                fetchImageURL(from: imageUrl) { httpsURL in
+                    guard let httpsURL = httpsURL else {
+                        imageView.image = UIImage(named: "defaultImage")
+                        return
+                    }
+                    self.setImage(with: httpsURL, into: imageView)
+                }
+            } else {
+                // HTTP/HTTPS URL 처리
+                guard let url = URL(string: imageUrl) else {
+                    imageView.image = UIImage(named: "defaultImage")
+                    return
+                }
+                setImage(with: url, into: imageView)
+            }
+        }
+        
+        // Kingfisher로 이미지를 설정하는 함수
+        private func setImage(with url: URL?, into imageView: UIImageView) {
+            let options: KingfisherOptionsInfo = [
+                .transition(.fade(0.2)), // 부드러운 페이드 애니메이션
+                .cacheOriginalImage // 원본 이미지를 캐시
+            ]
+            imageView.kf.setImage(with: url, placeholder: UIImage(named: "defaultImage"), options: options)
         }
     }
-    
-    // Kingfisher로 이미지를 설정하는 함수
-    private func setImage(with url: URL?, into imageView: UIImageView) {
-        imageView.kf.setImage(with: url, placeholder: UIImage(named: "defaultImage"))
-    }
-    
     /*
      HTTP 변환 사용 예시
      1. UIImageView 인스턴스 생성
      let gymImageView = UIImageView()
-
+     
      2. 이미지 URL을 가져옴 (gs:// 또는 http/https 형식 가능)
      let imageUrl = model.imageUrl // 예: "gs://your-bucket-name/path-to-image" 또는 "https://example.com/image.jpg"
-
+     
      3. ImageConversion을 사용하여 이미지 로드
      if let imageUrl = imageUrl {
-         // ImageConversion 클래스를 사용하여 이미지 로드 (gs:// URL 변환 포함)
-         ImageConversion.shared.loadImage(from: imageUrl, into: gymImageView)
+     // ImageConversion 클래스를 사용하여 이미지 로드 (gs:// URL 변환 포함)
+     ImageConversion.shared.loadImage(from: imageUrl, into: gymImageView)
      } else {
-         이미지 URL이 없을 때 기본 이미지 설정
-         gymImageView.image = UIImage(named: "defaultImage")
+     이미지 URL이 없을 때 기본 이미지 설정
+     gymImageView.image = UIImage(named: "defaultImage")
      }
      */
-}
-
