@@ -80,10 +80,42 @@ class EditPersonalDetailsVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        updateUserInfo()
         setLayout()
         setupBindings()
     }
     
+    // MARK: - 파이어베이스에 저장된 유저 정보 업데이트
+    private func updateUserInfo() {
+        FirebaseManager.shared.currentUserInfo { [weak self] (result: Result<User, Error>) in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let user):
+                    if let userHeight = user.height {  // user.height 값이 존재하면
+                        self.viewModel.heightInput.accept(userHeight)  // input에 저장
+                        self.heightButton.setTitle("\(String(describing: self.viewModel.heightInput.value)) cm", for: .normal)
+                    } else {
+                        self.viewModel.heightInput.accept("cm")
+                    }
+                    if let userArmReach = user.armReach {
+                        self.viewModel.armReachInput.accept(userArmReach)
+                        self.armReachButton.setTitle("\(String(describing: self.viewModel.armReachInput.value)) cm", for: .normal)
+                    } else {
+                        self.viewModel.armReachInput.accept("cm")
+                    }
+                    
+                case .failure(let error):
+                    print("현재 유저 정보 가져오기 실패: \(error)")
+                    self.heightButton.setTitle("cm", for: .normal)
+                    self.armReachButton.setTitle("cm", for: .normal)
+                }
+            }
+        }
+    }
+    
+    
+    // MARK: - 레이아웃
     private func setLayout() {
         view.backgroundColor = .white
         self.overrideUserInterfaceStyle = .light
@@ -140,7 +172,9 @@ class EditPersonalDetailsVC: UIViewController {
             $0.height.equalTo(50)
         }
     }
+
     
+    // MARK: - bind
     private func setupBindings() {
         heightButton.rx.tap
             .subscribe(onNext: { [weak self] in
@@ -191,14 +225,6 @@ class EditPersonalDetailsVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        // 버튼 항상 활성화
-        //        Observable.merge(
-        //            viewModel.heightInput.map { _ in true },
-        //            viewModel.armReachInput.map { _ in true }
-        //        )
-        //        .bind(to: confirmButton.rx.isEnabled)
-        //        .disposed(by: disposeBag)
-        
         // heightInput과 armReachInput 결합
         Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput)
             .subscribe(onNext: { [weak self] newHeight, newArmReach in
@@ -222,31 +248,6 @@ class EditPersonalDetailsVC: UIViewController {
                     .disposed(by: self.disposeBag) // 내부 subscribe의 구독 해제
             })
             .disposed(by: disposeBag) // 외부 Observable의 구독 해제
-        
-        //        // 버튼 탭 이벤트와 입력 조합을 결합해서 탭할 때마다 최신 입력 값을 사용
-        //        Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput)
-        //            .subscribe(onNext: { [weak self] newHeight, newArmReach in
-        //                guard let self = self else { return }
-        //
-        //                // 네비게이션
-        //                self.confirmButton.rx.tap
-        //                    .subscribe(onNext: {
-        //                        print("Confirmbutton tapped")
-        //                        FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
-        //                            FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach, completion: {
-        //                                DispatchQueue.main.async {
-        //                                    let alert = UIAlertController(title: "정보 수정이 완료되었습니다", message: nil, preferredStyle: .alert)
-        //                                    alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
-        //                                        self.navigationController?.popViewController(animated: true)
-        //                                    }))
-        //                                    self.present(alert, animated: true, completion: nil)
-        //                                }
-        //                            })
-        //                        }
-        //                    })
-        //                    .disposed(by: self.disposeBag)
-        //            })
-        //            .disposed(by: disposeBag)
     }
 }
 

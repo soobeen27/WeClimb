@@ -76,7 +76,7 @@ class EditNickNameVC: UIViewController, UITextFieldDelegate {
     }
     
     
-    // MARK: - 파이어베이스에 저장된 유저 닉네임 마이페이지 업데이트
+    // MARK: - 파이어베이스에 저장된 유저 닉네임 업데이트
     private func updateUserInfo() {
         FirebaseManager.shared.currentUserInfo { [weak self] (result: Result<User, Error>) in
             DispatchQueue.main.async {
