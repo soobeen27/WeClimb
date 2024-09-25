@@ -18,8 +18,7 @@ class SettingVC: UIViewController {
     private var datas: [SettingItem] = [
         //        SettingItem(section: .notifications, titles: [SettingNameSpace.notifications]),
         SettingItem(section: .policy, titles: [SettingNameSpace.termsOfService, SettingNameSpace.privacyPolic]),
-        SettingItem(section: .account, titles: [SettingNameSpace.editProfile, SettingNameSpace.logout, SettingNameSpace.accountRemove]),
-        SettingItem(section: .account, titles: [SettingNameSpace.blackList, SettingNameSpace.logout, SettingNameSpace.accountRemove])
+        SettingItem(section: .account, titles: [SettingNameSpace.editProfile, SettingNameSpace.blackList, SettingNameSpace.logout, SettingNameSpace.accountRemove]),
     ]
     
     private let tableView: UITableView = {
