@@ -18,19 +18,24 @@ class TabBarController: UITabBarController {
         
         let sfMainFeedVC = UINavigationController(rootViewController: SFMainFeedVC())
         let searchVC = UINavigationController(rootViewController: SearchVC())
-        let uploadVC = UINavigationController(rootViewController: UploadVC())
         
         sfMainFeedVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "house"), selectedImage: nil)
         searchVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "magnifyingglass"), selectedImage: nil)
-        uploadVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
         
         let myPageVC: UIViewController
+        let uploadVC: UIViewController
         if Auth.auth().currentUser != nil {
             myPageVC = UINavigationController(rootViewController: MyPageVC())
             myPageVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "person"), selectedImage: nil)
+            
+            uploadVC = UINavigationController(rootViewController: UploadVC())
+            uploadVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
         } else {
             myPageVC = UINavigationController(rootViewController: GuestVC())
             myPageVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "person"), selectedImage: nil)
+            
+            uploadVC = UINavigationController(rootViewController: GuestVC())
+            uploadVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
         }
         self.setViewControllers([sfMainFeedVC, searchVC, uploadVC, myPageVC], animated: true)
         
