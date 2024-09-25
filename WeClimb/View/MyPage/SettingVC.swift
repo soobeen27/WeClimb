@@ -16,9 +16,9 @@ class SettingVC: UIViewController {
     private let viewModel = SettingVM()
     
     private var datas: [SettingItem] = [
-//        SettingItem(section: .notifications, titles: [SettingNameSpace.notifications]),
+        //        SettingItem(section: .notifications, titles: [SettingNameSpace.notifications]),
         SettingItem(section: .policy, titles: [SettingNameSpace.termsOfService, SettingNameSpace.privacyPolic]),
-        SettingItem(section: .account, titles: [SettingNameSpace.logout, SettingNameSpace.accountRemove])
+        SettingItem(section: .account, titles: [SettingNameSpace.editProfile, SettingNameSpace.logout, SettingNameSpace.accountRemove])
     ]
     
     private let tableView: UITableView = {
@@ -27,6 +27,7 @@ class SettingVC: UIViewController {
         tableView.isScrollEnabled = false // 스크롤 되지 않도록
         tableView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         tableView.register(SettingCell.self, forCellReuseIdentifier: SettingCell.className)
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         return tableView
     }()
     
@@ -68,6 +69,8 @@ class SettingVC: UIViewController {
                     self.openWeb(urlString: "https://www.notion.so/iosclimber/104292bf48c947b2b3b7a8cacdf1d130")
                 case SettingNameSpace.privacyPolic:
                     self.openWeb(urlString: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928")
+                case SettingNameSpace.editProfile:
+                    self.setEditProfile()
                 case SettingNameSpace.logout:
                     self.setLogout()
                 case SettingNameSpace.accountRemove:
@@ -79,12 +82,21 @@ class SettingVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    
     // MARK: - 웹 페이지 열기 YJ
     private func openWeb(urlString: String) {
         guard let url = URL(string: urlString) else { return }
         let safariVC = SFSafariViewController(url: url)
         present(safariVC, animated: true, completion: nil)
     }
+    
+    
+    // MARK: - 프로필 편집 화면 전환
+    private func setEditProfile() {
+        let editPageVC = EditPageVC()
+        navigationController?.pushViewController(editPageVC, animated: true)
+    }
+    
     
     // MARK: - 로그아웃 및 화면전환 YJ
     private func setLogout() {
@@ -106,6 +118,7 @@ class SettingVC: UIViewController {
         present(actionSheet, animated: true)
     }
     
+    
     // MARK: - 회원탈퇴 및 화면전환 YJ
     private func setDeleteUser() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -125,6 +138,7 @@ class SettingVC: UIViewController {
         [deleteAction, closeAction].forEach { actionSheet.addAction($0) }
         present(actionSheet, animated: true)
     }
+    
     
     // MARK: - 로그인 화면으로 전환 YJ
     private func navigateToLoginVC() {

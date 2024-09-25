@@ -46,9 +46,18 @@ class MyPageVC: UIViewController {
         return label
     }()
     
-    private let infoLabel: UILabel = {
+    private let heightLabel: UILabel = {
         let label = UILabel()
-        label.text = "체형: 177cm | 183cm"
+        label.text = "키"
+        label.font = UIFont.systemFont(ofSize: 13)
+        label.textColor = .gray
+        label.numberOfLines = 1
+        return label
+    }()
+    
+    private let armReachLabel: UILabel = {
+        let label = UILabel()
+        label.text = "팔길이"
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .gray
         label.numberOfLines = 1
@@ -195,10 +204,10 @@ class MyPageVC: UIViewController {
     }
     
     //프로필 편집뷰 이동
-    private func editButtonTapped() {
-        let editPageVC = EditPageVC()
-        navigationController?.pushViewController(editPageVC, animated: true)
-    }
+//    private func editButtonTapped() {
+//        let editPageVC = EditPageVC()
+//        navigationController?.pushViewController(editPageVC, animated: true)
+//    }
     
     //상세 피드뷰 이동
     private func navigateDetailFeedView(at indexPath: IndexPath) {
@@ -212,10 +221,10 @@ class MyPageVC: UIViewController {
         collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
             
         
-        [profileImage, profileStackView, totalStackView, collectionView]
+        [profileImage, profileStackView, totalStackView, /*editButton, */collectionView]
             .forEach{ view.addSubview($0) }
         
-        [nameStackView, /*infoLabel, */editButton]
+        [nameStackView, heightLabel, armReachLabel]
             .forEach{ profileStackView.addArrangedSubview($0) }
         
         [nameLabel, levelLabel]
@@ -242,18 +251,22 @@ class MyPageVC: UIViewController {
             $0.height.equalTo(80)
         }
         
-        editButton.snp.makeConstraints {
-            $0.width.equalTo(120)
-        }
+//        editButton.snp.makeConstraints {
+//            $0.top.equalTo(totalStackView.snp.bottom).offset(30)
+////            $0.centerX.equalTo(totalStackView.snp.centerX)
+//            $0.trailing.equalToSuperview().inset(16)
+//            $0.width.equalTo(120)
+//        }
         
         totalStackView.snp.makeConstraints {
+//            $0.top.equalTo(profileImage.snp.top)
             $0.leading.equalTo(profileStackView.snp.trailing).offset(32)
             $0.centerY.equalTo(profileImage.snp.centerY)
             $0.height.equalTo(80)
         }
         
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(profileStackView.snp.bottom).offset(32)
+            $0.top.equalTo(profileImage.snp.bottom).offset(32)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
         }
@@ -268,12 +281,12 @@ class MyPageVC: UIViewController {
             .disposed(by: disposeBag)
         
         // 프로필 편집 버튼 눌렀을 때 YJ
-        editButton.rx.tap
-            .bind { [weak self] in
-                print("editButton tapped")
-                self?.editButtonTapped()
-            }
-            .disposed(by: disposeBag)
+//        editButton.rx.tap
+//            .bind { [weak self] in
+//                print("editButton tapped")
+//                self?.editButtonTapped()
+//            }
+//            .disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
             .bind { [weak self ] indexPath in
