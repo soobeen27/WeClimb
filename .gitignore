@@ -153,3 +153,17 @@ functions/
 Config.xcconfig
 
 GoogleService-Info.plist
+
+firestore-debug.log
+
+firestore.indexes.json
+
+firestore.rules
+
+package-lock.json
+
+package.json
+
+ui-debug.log
+
+node_modules

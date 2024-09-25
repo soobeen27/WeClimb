@@ -202,8 +202,8 @@ class MyPageVC: UIViewController {
     
     //상세 피드뷰 이동
     private func navigateDetailFeedView(at indexPath: IndexPath) {
-        let myPageDetailFeedVC = MyPageDetailFeedVC()
-        navigationController?.pushViewController(myPageDetailFeedVC, animated: true)
+        let sFMainFeedVC = SFMainFeedVC()
+        navigationController?.pushViewController(sFMainFeedVC, animated: true)
     }
 
     //MARK: - 레이아웃
