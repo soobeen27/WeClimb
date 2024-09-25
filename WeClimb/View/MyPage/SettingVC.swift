@@ -18,7 +18,7 @@ class SettingVC: UIViewController {
     private var datas: [SettingItem] = [
 //        SettingItem(section: .notifications, titles: [SettingNameSpace.notifications]),
         SettingItem(section: .policy, titles: [SettingNameSpace.termsOfService, SettingNameSpace.privacyPolic]),
-        SettingItem(section: .account, titles: [SettingNameSpace.logout, SettingNameSpace.accountRemove])
+        SettingItem(section: .account, titles: [SettingNameSpace.blackList, SettingNameSpace.logout, SettingNameSpace.accountRemove])
     ]
     
     private let tableView: UITableView = {
@@ -68,6 +68,8 @@ class SettingVC: UIViewController {
                     self.openWeb(urlString: "https://www.notion.so/iosclimber/104292bf48c947b2b3b7a8cacdf1d130")
                 case SettingNameSpace.privacyPolic:
                     self.openWeb(urlString: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928")
+                case SettingNameSpace.blackList:
+                    self.blackListMove()
                 case SettingNameSpace.logout:
                     self.setLogout()
                 case SettingNameSpace.accountRemove:
@@ -84,6 +86,12 @@ class SettingVC: UIViewController {
         guard let url = URL(string: urlString) else { return }
         let safariVC = SFSafariViewController(url: url)
         present(safariVC, animated: true, completion: nil)
+    }
+    
+    // MARK: - 차단목록 화면전환 DS
+    private func blackListMove() {
+        let blackListVC = BlackListVC()
+        self.navigationController?.pushViewController(blackListVC, animated: true)
     }
     
     // MARK: - 로그아웃 및 화면전환 YJ
