@@ -169,6 +169,7 @@ class SearchVC: UIViewController {
             .subscribe(onNext: { [weak self] selectedItem in
                 guard let self else { return }
                 let userPageVC = UserPageVC()
+                userPageVC.hidesBottomBarWhenPushed = true
                 userPageVC.configure(with: selectedItem)
                 navigationController?.navigationBar.prefersLargeTitles = false
 //                userPageVC.setNavigation()
