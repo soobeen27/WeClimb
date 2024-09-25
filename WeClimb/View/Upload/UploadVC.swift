@@ -128,6 +128,8 @@ class UploadVC: UIViewController {
         setNotifications()
         setUIMenu()
         bindPostButton()
+        self.viewModel.feedRelay.accept([])
+        self.viewModel.cellData.accept([])
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -228,8 +230,19 @@ class UploadVC: UIViewController {
     }
     
     private func setGymView() {
+        viewModel.cellData
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                if self.viewModel.cellData.value.isEmpty {
+                    self.gymView.isUserInteractionEnabled = false
+                } else {
+                    self.gymView.isUserInteractionEnabled = true
+                }
+            })
+            .disposed(by: disposeBag)
+        
         let gymTapGesture = UITapGestureRecognizer()
-        gymView.isUserInteractionEnabled = true
         gymView.addGestureRecognizer(gymTapGesture)
         
         gymTapGesture.rx.event
@@ -537,10 +550,11 @@ extension UploadVC {
                 // 업로드 메서드 호출
                 self.viewModel.upload(media: media, caption: caption, gym: gym)
                     .subscribe(onNext: {
-                        print("업로드 성공")
-                        CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
-                        
-                        self.initUploadVC()
+                        DispatchQueue.main.async {
+                            print("업로드 성공")
+                            CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
+                            self.initUploadVC()
+                        }
                     }, onError: { error in
                         print("업로드 실패: \(error.localizedDescription)")
                     })
@@ -551,8 +565,6 @@ extension UploadVC {
     
     // MARK: - 업로드뷰 초기화 YJ
     private func initUploadVC() {
-        self.viewModel.feedRelay.accept([])
-        self.viewModel.cellData.accept([])
         
         // 새로운 인스턴스 생성
         let newUploadVC = UploadVC()

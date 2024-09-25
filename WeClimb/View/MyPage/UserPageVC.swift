@@ -174,7 +174,7 @@ class UserPageVC: UIViewController {
         
         setLayout()
         bind()
-//        setNavigation()
+        setNavigation()
     }
     
     func configure(with data: User) {
@@ -190,36 +190,39 @@ class UserPageVC: UIViewController {
             }
         }
     
-    // MARK: - 로그아웃 버튼 YJ
-    // 이 기능은 아직 보류지만 로그아웃을 위해 우선 여기에.. 보류보류
-//    func setNavigation() {
-//        let rightBarButton = UIBarButtonItem(
-//            image: UIImage(systemName: "ellipsis"),
-//            style: .plain,
-//            target: self,
-//            action: #selector(self.rightBarButtonTapped)
-//        )
-//        navigationController?.navigationBar.tintColor = .label
-//        navigationItem.rightBarButtonItem = rightBarButton
-//    }
+    func setNavigation() {
+        let rightBarButton = UIBarButtonItem(
+            image: UIImage(systemName: "ellipsis"),
+            style: .plain,
+            target: self,
+            action: #selector(self.rightBarButtonTapped)
+        )
+        navigationController?.navigationBar.tintColor = .label
+        navigationItem.rightBarButtonItem = rightBarButton
+    }
+
+    //MARK: - 신고하기, 차단 버튼 YJ
+    @objc private func rightBarButtonTapped() {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
+            self?.reportModal()
+        }
+        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive, handler: nil)
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+        
+        [reportAction, deleteAction, cancelAction]
+            .forEach {
+                actionSheet.addAction($0)
+            }
+
+        self.present(actionSheet, animated: true, completion: nil)
+    }
     
-//    @objc private func rightBarButtonTapped() {
-//        let settingsVC = SettingVC()
-//        navigationController?.pushViewController(settingsVC, animated: true)
-//        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-//        
-//        let logout = UIAlertAction(title: UserPageNameSpace.logout, style: .default) { _ in
-//            guard let navigationController = self.tabBarController?.navigationController else { return }
-//            navigationController.popToRootViewController(animated: true)
-//        }
-//        
-//        let close = UIAlertAction(title: UserPageNameSpace.close, style: .cancel)
-//        
-//        [logout, close]
-//            .forEach { actionSheet.addAction($0) }
-//        
-//        present(actionSheet, animated: true)
-//    }
+    //MARK: - 신고하기 모달 시트
+    private func reportModal() {
+        let modalVC = FeedReportModalVC()
+        presentModal(modalVC: modalVC)
+    }
     
     private func buttonTapped() {
         isFollowing.toggle()

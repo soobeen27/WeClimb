@@ -16,7 +16,8 @@ class MyPageDetailFeedVC: UIViewController {
         layout.scrollDirection = .horizontal //가로 스크롤
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.mainCollectionViewCell)
+//        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.mainCollectionViewCell)
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: SFCollectionViewCell.className)
         collectionView.backgroundColor = .gray
         return collectionView
     }()
@@ -99,7 +100,7 @@ class MyPageDetailFeedVC: UIViewController {
         
         likeButton.configureHeartButton()
         setLayout()
-        configure()
+//        configure()
     }
     
     private func setLayout() {
