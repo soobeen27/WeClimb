@@ -281,14 +281,14 @@ class MyPageVC: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        // 프로필 편집 버튼 눌렀을 때 YJ
-        editButton.rx.tap
-            .bind { [weak self] in
-                guard let self = self else { return }
-                print("editButton tapped")
-                self.editButtonTapped()
-            }
-            .disposed(by: disposeBag)
+//        // 프로필 편집 버튼 눌렀을 때 YJ
+//        editButton.rx.tap
+//            .bind { [weak self] in
+//                guard let self = self else { return }
+//                print("editButton tapped")
+//                self.editButtonTapped()
+//            }
+//            .disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
             .bind { [weak self ] indexPath in
