@@ -8,6 +8,7 @@
 import UIKit
 
 import RxSwift
+import RxCocoa
 import SnapKit
 
 class SearchVC: UIViewController {
@@ -77,8 +78,28 @@ class SearchVC: UIViewController {
         setSearchController()
         setLayout()
         bind()
+        setupKeyboardDismissOnScroll()
     }
     
+    func setupKeyboardDismissOnScroll() {
+        gymTableView.rx.willBeginDragging
+            .subscribe(onNext: { [weak self] _ in
+                // 키보드가 활성화된 상태에서만 키보드를 숨김
+                if self?.searchController.searchBar.isFirstResponder == true {
+                    self?.searchController.searchBar.resignFirstResponder()
+                }
+            })
+            .disposed(by: disposeBag)
+
+        userTableView.rx.willBeginDragging
+            .subscribe(onNext: { [weak self] _ in
+                if self?.searchController.searchBar.isFirstResponder == true {
+                    self?.searchController.searchBar.resignFirstResponder()
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+ 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
