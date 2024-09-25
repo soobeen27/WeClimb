@@ -183,7 +183,7 @@ class LoginVC: UIViewController {
         }
         buttonStackView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(100)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(80)
             $0.width.equalToSuperview().multipliedBy(0.8)
         }
         kakaoLoginButton.snp.makeConstraints {
