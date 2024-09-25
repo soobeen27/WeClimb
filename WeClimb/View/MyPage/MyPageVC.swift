@@ -162,6 +162,12 @@ class MyPageVC: UIViewController {
 //        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationController?.navigationBar.tintColor = .label
+    }
+    
     
     // MARK: - 파이어베이스에 저장된 유저 닉네임 마이페이지 업데이트
     private func updateUserInfo() {
