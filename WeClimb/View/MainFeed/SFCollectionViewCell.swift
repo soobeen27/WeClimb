@@ -126,14 +126,6 @@ class SFCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    let ellipsisButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(systemName: "ellipsis"), for: .normal)
-        button.imageView?.contentMode = .scaleAspectFit
-        button.tintColor = .white
-        return button
-    }()
-    
     private let feedProfileStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -186,14 +178,14 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     // MARK: - UI 구성
     private func setupUI() {
-        [feedUserNameLabel, likeButton, commentButton, followButton, likeButtonCounter, commentButtonCounter, ellipsisButton]
+        [feedUserNameLabel, likeButton, commentButton, followButton, likeButtonCounter, commentButtonCounter]
             .forEach { view in
                 addShadow(to: view)
             }
         
         self.backgroundColor = UIColor(hex: "#0C1014")
         self.addSubview(collectionView)
-        [feedProfileStackView, followButton, likeStackView, commentStackView, gymInfoStackView, feedCaptionLabel, ellipsisButton]
+        [feedProfileStackView, followButton, likeStackView, commentStackView, gymInfoStackView, feedCaptionLabel]
             .forEach {
                 self.addSubview($0)
             }
@@ -282,14 +274,6 @@ class SFCollectionViewCell: UICollectionViewCell {
         commentButton.imageView?.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 35, height: 35))
         }
-        ellipsisButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 40, height: 22))
-            $0.top.equalTo(self.safeAreaLayoutGuide).offset(5)
-            $0.trailing.equalToSuperview().inset(16)
-        }
-        ellipsisButton.imageView?.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 40, height: 22))
-        }
     }
     
     // MARK: - configure 메서드
@@ -318,12 +302,12 @@ class SFCollectionViewCell: UICollectionViewCell {
             
 //            // 일단 임시로 그냥 뷰에 박아놓음 - DS
 //            guard let gymName = post.gym else { return }
-//            
+//
 //            // FirebaseManager에서 gym 정보를 받아와서 처리
 //            FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
 //                guard let self = self, let gym = gym, let profileImageURL = gym.profileImage,
 //                      let url = URL(string: profileImageURL) else { return }
-//                
+//
 //                // 프로필 이미지가 있으면 Kingfisher로 로드
 //                self.feedUserProfileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"))
 //            }

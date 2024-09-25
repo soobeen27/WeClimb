@@ -53,21 +53,31 @@ class SFMainFeedVC: UIViewController {
        }
     
     //MARK: - 네비게이션바, 탭바 세팅
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
     
     private func setNavigationBar() {
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         self.navigationController?.navigationBar.shadowImage = UIImage()
         self.navigationController?.navigationBar.isTranslucent = true
+        
+        let rightButton = UIButton()
+        rightButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+        rightButton.tintColor = .white
+        rightButton.addTarget(self, action: #selector(rightButtonTapped), for: .touchUpInside)
+        
+        rightButton.frame = CGRect(x: 0, y: 0, width: 40, height: 40) // 버튼 크기
+        
+        rightButton.layer.shadowColor = UIColor.black.cgColor // 그림자 색상
+        rightButton.layer.shadowOffset = CGSize(width: 1, height: 1) // 그림자 위치
+        rightButton.layer.shadowOpacity = 0.5 // 그림자 투명도
+        rightButton.layer.shadowRadius = 2 // 그림자의 흐림(퍼짐) 정도
+        rightButton.layer.masksToBounds = false // 테두리에 그림자가 잘리지 않도록 설정
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightButton)
     }
+    
+    @objc private func rightButtonTapped() {
+            actionSheet()
+        }
     
     private func setTabBar(){
         if let tabBar = self.tabBarController?.tabBar {
@@ -146,12 +156,6 @@ extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlow
         
         let postData = posts[indexPath.item]
         cell.configure(with: postData.post, media: postData.media)
-        
-        cell.ellipsisButton.rx.tap
-            .bind { [weak self] in
-                self?.showActionSheet(for: postData.post)
-            }
-            .disposed(by: cell.disposeBag)
         
         cell.commentButton.rx.tap
             .bind { [weak self] in
