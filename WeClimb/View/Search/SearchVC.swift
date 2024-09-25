@@ -92,7 +92,7 @@ class SearchVC: UIViewController {
     
     private func setNavigationBar() {
         // 네비게이션 바 타이틀 설정
-        self.title = SearchNameSpace.title
+//        view.title = SearchNameSpace.title
         
         // 탭바 빈 문자열로 설정
         if let tabBarItem = self.tabBarItem {
