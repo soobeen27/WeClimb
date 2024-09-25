@@ -128,6 +128,8 @@ class UploadVC: UIViewController {
         setNotifications()
         setUIMenu()
         bindPostButton()
+        self.viewModel.feedRelay.accept([])
+        self.viewModel.cellData.accept([])
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -228,8 +230,19 @@ class UploadVC: UIViewController {
     }
     
     private func setGymView() {
+        viewModel.cellData
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                if self.viewModel.cellData.value.isEmpty {
+                    self.gymView.isUserInteractionEnabled = false
+                } else {
+                    self.gymView.isUserInteractionEnabled = true
+                }
+            })
+            .disposed(by: disposeBag)
+        
         let gymTapGesture = UITapGestureRecognizer()
-        gymView.isUserInteractionEnabled = true
         gymView.addGestureRecognizer(gymTapGesture)
         
         gymTapGesture.rx.event
@@ -551,8 +564,6 @@ extension UploadVC {
     
     // MARK: - 업로드뷰 초기화 YJ
     private func initUploadVC() {
-        self.viewModel.feedRelay.accept([])
-        self.viewModel.cellData.accept([])
         
         // 새로운 인스턴스 생성
         let newUploadVC = UploadVC()
