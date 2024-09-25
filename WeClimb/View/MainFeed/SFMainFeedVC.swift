@@ -14,6 +14,9 @@ import RxCocoa
 class SFMainFeedVC: UIViewController {
     
     private let disposeBag = DisposeBag()
+    private let viewModel = MainFeedVM()
+    
+    private var posts: [(post: Post, media: [Media])] = []
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -30,8 +33,24 @@ class SFMainFeedVC: UIViewController {
         setTabBar()
         setCollectionView()
         setLayout()
+        
+        bindViewModel()
     }
     
+    // MARK: - 데이터 바인딩
+       private func bindViewModel() {
+           // ViewModel의 데이터 바인딩
+           viewModel.posts
+               .observe(on: MainScheduler.instance)
+               .subscribe(onNext: { [weak self] posts in
+                   self?.posts = posts
+                   self?.collectionView.reloadData()
+               })
+               .disposed(by: disposeBag)
+           
+           // ViewModel에서 피드 데이터를 가져오는 메서드 호출
+           viewModel.fetchInitialFeed()
+       }
     
     //MARK: - 네비게이션바, 탭바 세팅
     override func viewWillAppear(_ animated: Bool) {
@@ -117,7 +136,7 @@ class SFMainFeedVC: UIViewController {
 //MARK: - 컬렉션뷰 프로토콜 설정
 extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return posts.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -125,35 +144,45 @@ extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlow
             return UICollectionViewCell()
         }
         
-        if let image = UIImage(named: "testImage") {
-            cell.configure(userProfileImage: image,
-                           userName: "더 클라임 신림",
-                           address: "서울시 관악구 신림동",
-                           caption: "나 최우림, 더클 신림에서 V6 난이도 부셔버림👊🏻",
-                           level: "V6",
-                           sector: "1섹터",
-                           dDay: "D-14",
-                           likeCounter: "330",
-                           commentCounter: "17")
-        }
+        let postData = posts[indexPath.item]
+        cell.configure(with: postData.post, media: postData.media)
         
         cell.ellipsisButton.rx.tap
             .bind { [weak self] in
-                self?.actionSheet()
+                self?.showActionSheet(for: postData.post)
             }
-            .disposed(by: disposeBag)
-        
+            .disposed(by: cell.disposeBag)
         
         cell.commentButton.rx.tap
             .bind { [weak self] in
-                self?.commentModal()
+                self?.showCommentModal(for: postData.post)
             }
-            .disposed(by: disposeBag)
+            .disposed(by: cell.disposeBag)
         
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
+    }
+    
+    // MARK: - 신고하기 및 댓글 모달 표시
+    private func showActionSheet(for post: Post) {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
+            self?.reportModal()
+        }
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+        
+        [reportAction, cancelAction].forEach {
+            actionSheet.addAction($0)
+        }
+        
+        self.present(actionSheet, animated: true, completion: nil)
+    }
+    
+    private func showCommentModal(for post: Post) {
+        let modalVC = FeedCommentModalVC()
+        presentModal(modalVC: modalVC)
     }
 }

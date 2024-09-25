@@ -8,20 +8,20 @@
 import UIKit
 
 import SnapKit
+import RxSwift
 
 class SFCollectionViewCell: UICollectionViewCell {
     
-    var commentButtonTapped: (() -> Void)? // 클로저 정의
+    var disposeBag = DisposeBag()
     
     //MARK: - UI 세팅
-    lazy var collectionView: UICollectionView = {
+    private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal //가로 스크롤
-        layout.itemSize = CGSize(width: self.frame.width, height: self.frame.width * (16.0/9.0))
+        layout.itemSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        collectionView.frame = self.bounds
         collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
         return collectionView
     }()
@@ -31,8 +31,8 @@ class SFCollectionViewCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 13)
         label.textColor = .white
         label.textAlignment = .left
-        label.numberOfLines = 1  //1줄까지만 표시
-        label.lineBreakMode = .byTruncatingTail  //1줄 이상 ... 표기
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
         return label
     }()
     
@@ -52,6 +52,14 @@ class SFCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    // 피드 이미지
+    private let feedImage: UIImageView = {
+        let image = UIImageView()
+        image.contentMode = .scaleAspectFill
+        image.translatesAutoresizingMaskIntoConstraints = false
+        return image
+    }()
+    
     private let feedProfileAddressLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
@@ -60,6 +68,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    // 팔로우 버튼 임시 히든
     private let followButton: UIButton = {
         let button = UIButton()
         button.setTitle("Follow", for: .normal)
@@ -67,6 +76,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         button.layer.cornerRadius = 5
         button.layer.borderWidth = 0.5
         button.layer.borderColor = UIColor.systemGray3.cgColor
+        button.isHidden = true
         return button
     }()
     
@@ -152,23 +162,21 @@ class SFCollectionViewCell: UICollectionViewCell {
         return stackView
     }()
     
-    
-    //MARK: - 코드 시작
+    // MARK: - 초기화 및 레이아웃 설정
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         likeButton.configureHeartButton()
-        setCollectionView()
+        setupUI()
         setLayout()
     }
     
     required init?(coder: NSCoder) {
-        fatalError("*T_T*")
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        //셀의 내용을 초기화하여 이전 데이터 제거
+        disposeBag = DisposeBag()
         feedUserNameLabel.text = nil
         feedProfileAddressLabel.text = nil
         feedCaptionLabel.text = nil
@@ -176,19 +184,8 @@ class SFCollectionViewCell: UICollectionViewCell {
         feedUserProfileImage.image = nil
     }
     
-    private func setCollectionView() {
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.collectionViewCell)
-        
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        
-        collectionView.isPagingEnabled = true
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)  //컬렉션뷰 상단좌우 여백 삭제
-    }
-    
-    
-    //MARK: - 레이아웃 설정
-    private func setLayout() {
+    // MARK: - UI 구성
+    private func setupUI() {
         [feedUserNameLabel, likeButton, commentButton, followButton, likeButtonCounter, commentButtonCounter, ellipsisButton]
             .forEach { view in
                 addShadow(to: view)
@@ -221,13 +218,16 @@ class SFCollectionViewCell: UICollectionViewCell {
                 $0.layer.cornerRadius = 5
                 $0.layer.borderWidth = 0.5
                 $0.layer.borderColor = UIColor.systemGray5.cgColor
-                $0.layer.opacity = 0.8  //투명도
-                $0.layer.masksToBounds = true  //코너를 넘지 않도록 설정
+                $0.layer.opacity = 0.8
+                $0.layer.masksToBounds = true
             }
-        
+    }
+    
+    // MARK: - 레이아웃 설정
+    private func setLayout() {
         collectionView.snp.makeConstraints {
             $0.width.equalToSuperview()
-            $0.height.equalTo(collectionView.snp.width).multipliedBy(16.0/9.0) //아이폰 평균 동영상 촬영 비율(16:9)
+            $0.height.equalTo(collectionView.snp.width).multipliedBy(16.0/9.0)
         }
         feedProfileStackView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.76)
@@ -237,7 +237,7 @@ class SFCollectionViewCell: UICollectionViewCell {
             $0.size.equalTo(CGSize(width: 40, height: 40))
         }
         feedUserNameLabel.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 100, height: 40))
+            $0.size.equalTo(CGSize(width: 200, height: 40))
         }
         followButton.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 50, height: 20))
@@ -262,7 +262,7 @@ class SFCollectionViewCell: UICollectionViewCell {
             $0.size.equalTo(CGSize(width: 45, height: 20))
         }
         likeStackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.57)  //기기화면 비율
+            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.57)
             $0.trailing.equalToSuperview().inset(10)
         }
         likeButton.imageView?.snp.makeConstraints {
@@ -273,7 +273,6 @@ class SFCollectionViewCell: UICollectionViewCell {
         }
         commentStackView.snp.makeConstraints {
             $0.top.equalTo(likeStackView.snp.bottom).offset(20)
-            //            $0.centerY.equalTo(likeStackView.snp.centerY)
             $0.trailing.equalToSuperview().inset(10)
         }
         commentButton.snp.makeConstraints {
@@ -293,64 +292,50 @@ class SFCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    
-    //MARK: - configure
-    func configure(userProfileImage: UIImage, userName: String, address: String, caption: String, level: String, sector: String, dDay: String, likeCounter: String, commentCounter: String) {
-        feedUserProfileImage.image = userProfileImage
-        feedUserNameLabel.text = userName
-        feedProfileAddressLabel.text = address
-        feedCaptionLabel.text = caption
-        levelLabel.text = level
-        sectorLabel.text = sector
-        dDayLabel.text = dDay
-        likeButtonCounter.text = likeCounter
-        commentButtonCounter.text = commentCounter
-    }
-    
-    
-    //MARK: - 버튼 그림자 모드
-    func addShadow(to view: UIView) {
-        view.layer.shadowColor = UIColor.black.cgColor //그림자 색상
-        view.layer.shadowOffset = CGSize(width: 1, height: 1) //그림자 위치
-        view.layer.shadowOpacity = 0.5 //그림자 투명도
-        view.layer.shadowRadius = 2 //그림자의 흐림(퍼짐) 정도
-        view.layer.masksToBounds = false //테두리에 그림자가 잘리지 않도록 설정
-    }
-}
-    
-
-//MARK: - 컬렉션뷰 프로토콜 설정
-extension SFCollectionViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Identifiers.collectionViewCell, for: indexPath)
-        cell.backgroundColor = UIColor(hex: "#0C1014")
+    // MARK: - configure 메서드
+    func configure(with post: Post, media: [Media]) {
+        // post 데이터와 media 데이터를 기반으로 UI 업데이트
+        feedUserNameLabel.text = post.gym
+        feedCaptionLabel.text = post.caption
         
-        //샘플 이미지 삽입
-        let testImage: UIImageView = {
-            let image = UIImageView()
-            image.image = UIImage(named: "feedTestImage")
-            image.contentMode = .scaleAspectFill
-            image.translatesAutoresizingMaskIntoConstraints = false
-            return image
-        }()
-        
-        cell.contentView.addSubview(testImage)
-        
-        testImage.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+        // media 배열을 순회하며 각 Media 객체의 정보를 사용
+        if let firstMedia = media.first {
+            // 첫 번째 미디어의 URL을 사용하여 이미지 로드
+            if let mediaURL = URL(string: firstMedia.url) {
+                feedImage.kf.setImage(with: mediaURL, placeholder: UIImage(named: "placeholder"))
+            }
+            
+            // 섹터 및 등급 정보를 사용할 수 있다면 UI 업데이트
+            if let sector = firstMedia.sector {
+                sectorLabel.text = "\(sector)"
+            }
+            
+            if let grade = firstMedia.grade {
+                levelLabel.text = "\(grade)"
+            }
+            
+            // profileImage, media를 표시하는 추가 설정 필요
+            
+//            // 일단 임시로 그냥 뷰에 박아놓음 - DS
+//            guard let gymName = post.gym else { return }
+//            
+//            // FirebaseManager에서 gym 정보를 받아와서 처리
+//            FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
+//                guard let self = self, let gym = gym, let profileImageURL = gym.profileImage,
+//                      let url = URL(string: profileImageURL) else { return }
+//                
+//                // 프로필 이미지가 있으면 Kingfisher로 로드
+//                self.feedUserProfileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"))
+//            }
         }
-        
-        
-        print("내부 컬렉션뷰셀의 cellForItemAt 호출됨: \(indexPath)")
-        return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
+    // MARK: - 버튼 그림자 모드
+    func addShadow(to view: UIView) {
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 1, height: 1)
+        view.layer.shadowOpacity = 0.5
+        view.layer.shadowRadius = 2
+        view.layer.masksToBounds = false
     }
 }
-
