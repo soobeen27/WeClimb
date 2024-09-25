@@ -96,10 +96,41 @@ class PrivacyPolicyVC: UIViewController {
         return button
     }()
     
+    private let termsTextView: UITextView = {
+        let textView = UITextView()
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.isUserInteractionEnabled = true
+        textView.dataDetectorTypes = [.link] // 링크 감지
+
+        // 링크 텍스트 설정
+        let text = "이용약관  및  개인정보 처리방침"
+        let attributedString = NSMutableAttributedString(string: text)
+
+        // 링크 범위 설정
+        let termsRange = (text as NSString).range(of: "이용약관")
+        let andRange = (text as NSString).range(of: "및")
+        let privacyPolicyRange = (text as NSString).range(of: "개인정보 처리방침")
+
+        attributedString.addAttribute(.link, value: "https://www.notion.so/iosclimber/104292bf48c947b2b3b7a8cacdf1d130", range: termsRange)
+        attributedString.addAttribute(.foregroundColor, value: UIColor.lightGray, range: andRange)
+        attributedString.addAttribute(.link, value: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928", range: privacyPolicyRange)
+
+        textView.attributedText = attributedString
+        textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.systemGray, 
+                                       NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue]
+        
+        textView.textAlignment = .right
+
+        return textView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
         bindViewModel()
+        
+        termsTextView.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -136,6 +167,7 @@ class PrivacyPolicyVC: UIViewController {
             termsCheckBox2,
             termsCheckBox3,
             termsCheckBox4,
+            termsTextView,
             confirmButton
         ].forEach { view.addSubview($0) }
     
@@ -174,6 +206,13 @@ class PrivacyPolicyVC: UIViewController {
             $0.top.equalTo(termsCheckBox3.snp.bottom).offset(20)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
+        }
+        
+        termsTextView.snp.makeConstraints {
+            $0.top.equalTo(termsCheckBox4.snp.bottom).offset(35)
+            $0.leading.equalToSuperview().offset(16)
+            $0.trailing.equalToSuperview().offset(-16)
+            $0.height.equalTo(30)
         }
         
         confirmButton.snp.makeConstraints {
@@ -291,5 +330,12 @@ class PrivacyPolicyVC: UIViewController {
                 self?.navigationController?.pushViewController(personalDetailsVC, animated: true)
             })
             .disposed(by: disposeBag)
+    }
+}
+
+extension PrivacyPolicyVC: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        UIApplication.shared.open(URL)
+        return false
     }
 }
