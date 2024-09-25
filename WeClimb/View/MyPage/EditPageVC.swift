@@ -15,7 +15,6 @@ class EditPageVC: UIViewController {
     
     private let editPageViewModel = EditPageVM()
     private let disposeBag = DisposeBag()
-    private let detailEditVM = DetailEditVM()
     
     private let profileImagePicker = ProfileImagePickerVC()
     
