@@ -24,6 +24,7 @@ class UserPageVC: UIViewController {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 40
         imageView.clipsToBounds = true
+        imageView.image = UIImage(named: "testStone")
         return imageView
     }()
     
@@ -178,17 +179,18 @@ class UserPageVC: UIViewController {
     }
     
     func configure(with data: User) {
-            nameLabel.text = data.userName
+        nameLabel.text = data.userName
+
 //            levelLabel.text = data.userRole
 //            infoLabel.text = "체형: \(data.height ?? "정보 없음") | 팔길이: \(data.armReach ?? "정보 없음")"
-            
-            // 이미지 로드 (Kingfisher 사용)
-            if let profileImageURL = data.profileImage {
-                FirebaseManager.shared.loadImage(from: profileImageURL, into: profileImage)
-            } else {
-                profileImage.image = UIImage(named: "defaultImage")
-            }
+        
+        // 이미지 로드 (Kingfisher 사용)
+        if let profileImageURL = data.profileImage {
+            FirebaseManager.shared.loadImage(from: profileImageURL, into: profileImage)
+        } else {
+            profileImage.image = UIImage(named: "testStone")
         }
+    }
     
     func setNavigation() {
         let rightBarButton = UIBarButtonItem(
