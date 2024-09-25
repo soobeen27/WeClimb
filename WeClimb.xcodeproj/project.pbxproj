@@ -194,7 +194,7 @@
 		F4892C132C7C973800C5FF16 /* TabBarController.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C152C7C981000C5FF16 /* LoginVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C172C7C983A00C5FF16 /* MainFeedVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedVC.swift; sourceTree = "<group>"; tabWidth = 4; };
-		F4892C192C7C984A00C5FF16 /* SearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVC.swift; sourceTree = "<group>"; };
+		F4892C192C7C984A00C5FF16 /* SearchVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = SearchVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C1B2C7C988A00C5FF16 /* ClimbingGymVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ClimbingGymVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C1D2C7C98A100C5FF16 /* MyPageVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MyPageVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C212C7C9DC700C5FF16 /* CodingConvention.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CodingConvention.md; sourceTree = "<group>"; };
