@@ -32,22 +32,30 @@ class SFMainFeedVC: UIViewController {
         setLayout()
     }
     
-    
     //MARK: - 네비게이션바, 탭바 세팅
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
     private func setNavigationBar() {
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         self.navigationController?.navigationBar.shadowImage = UIImage()
         self.navigationController?.navigationBar.isTranslucent = true
+
+        let rightButton = UIButton()
+        rightButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+        rightButton.tintColor = .white
+        rightButton.addTarget(self, action: #selector(rightButtonTapped), for: .touchUpInside)
+
+        rightButton.frame = CGRect(x: 0, y: 0, width: 40, height: 40) // 버튼 크기
+
+        rightButton.layer.shadowColor = UIColor.black.cgColor // 그림자 색상
+        rightButton.layer.shadowOffset = CGSize(width: 1, height: 1) // 그림자 위치
+        rightButton.layer.shadowOpacity = 0.5 // 그림자 투명도
+        rightButton.layer.shadowRadius = 2 // 그림자의 흐림(퍼짐) 정도
+        rightButton.layer.masksToBounds = false // 테두리에 그림자가 잘리지 않도록 설정
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightButton)
+    }
+    
+    @objc private func rightButtonTapped() {
+        actionSheet()
     }
     
     private func setTabBar(){
@@ -58,7 +66,6 @@ class SFMainFeedVC: UIViewController {
             tabBar.backgroundColor = .clear  //탭바 배경투명
         }
     }
-    
     
     //MARK: - 컬렉션뷰 & 레이아웃 설정
     private func setCollectionView() {
@@ -80,7 +87,6 @@ class SFMainFeedVC: UIViewController {
         }
     }
     
-    
     //MARK: - 더보기 액션 시트
     private func actionSheet() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -98,13 +104,11 @@ class SFMainFeedVC: UIViewController {
         self.present(actionSheet, animated: true, completion: nil)
     }
     
-    
     //MARK: - 신고하기 모달 시트
     private func reportModal() {
         let modalVC = FeedReportModalVC()
         presentModal(modalVC: modalVC)
     }
-    
     
     //MARK: - 댓글 모달 시트
     private func commentModal() {
@@ -112,7 +116,6 @@ class SFMainFeedVC: UIViewController {
         presentModal(modalVC: modalVC)
     }
 }
-
 
 //MARK: - 컬렉션뷰 프로토콜 설정
 extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -136,13 +139,6 @@ extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlow
                            likeCounter: "330",
                            commentCounter: "17")
         }
-        
-        cell.ellipsisButton.rx.tap
-            .bind { [weak self] in
-                self?.actionSheet()
-            }
-            .disposed(by: disposeBag)
-        
         
         cell.commentButton.rx.tap
             .bind { [weak self] in

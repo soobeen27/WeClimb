@@ -71,6 +71,7 @@
 		91F71CE32C89844900405778 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CE22C89844900405778 /* User.swift */; };
 		C40397B72C7CB4CC00923777 /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B62C7CB4CC00923777 /* Extension.swift */; };
 		C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */; };
+		C440789E2CA319B200B747A6 /* GuestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C440789D2CA319B200B747A6 /* GuestVC.swift */; };
 		C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C45DC9D42C80519100FC4C1D /* FeedModel.swift */; };
 		C47A0AFA2C8AF1A60068173A /* FeedCommentModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0AF92C8AF1A60068173A /* FeedCommentModalVC.swift */; };
 		C47A0AFD2C90310B0068173A /* FeedReportModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0AFC2C90310B0068173A /* FeedReportModalVC.swift */; };
@@ -117,7 +118,7 @@
 		436AEADF2C7D69CB00E0D85A /* GymTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymTableViewCell.swift; sourceTree = "<group>"; };
 		436AEAE12C7D69F000E0D85A /* SearchVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVM.swift; sourceTree = "<group>"; };
 		436AEAE92C7DCD1100E0D85A /* MyPageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageCell.swift; sourceTree = "<group>"; };
-		436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageVM.swift; sourceTree = "<group>"; };
+		436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MyPageVM.swift; sourceTree = "<group>"; tabWidth = 4; };
 		436AEAED2C7EC1F500E0D85A /* MypageNameSpace.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MypageNameSpace.swift; sourceTree = "<group>"; tabWidth = 4; };
 		436AEAEF2C7EE63C00E0D85A /* SearchNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchNameSpace.swift; sourceTree = "<group>"; };
 		436AEAF32C7EEE9900E0D85A /* UserPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPageVC.swift; sourceTree = "<group>"; };
@@ -165,6 +166,7 @@
 		91F71CE22C89844900405778 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		C40397B62C7CB4CC00923777 /* Extension.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedTabelCell.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C440789D2CA319B200B747A6 /* GuestVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = GuestVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C45DC9D42C80519100FC4C1D /* FeedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedModel.swift; sourceTree = "<group>"; };
 		C47A0AF92C8AF1A60068173A /* FeedCommentModalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCommentModalVC.swift; sourceTree = "<group>"; };
 		C47A0AFC2C90310B0068173A /* FeedReportModalVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = FeedReportModalVC.swift; sourceTree = "<group>"; tabWidth = 4; };
@@ -377,8 +379,9 @@
 		F4892C092C7C278500C5FF16 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				F4892C152C7C981000C5FF16 /* LoginVC.swift */,
 				F4892C132C7C973800C5FF16 /* TabBarController.swift */,
+				F4892C152C7C981000C5FF16 /* LoginVC.swift */,
+				C440789D2CA319B200B747A6 /* GuestVC.swift */,
 				6B8F38B72C888F4E0018C40D /* SignUp */,
 				916D64D12C848BA70064B766 /* Feed */,
 				C45DC9D32C80502E00FC4C1D /* MainFeed */,
@@ -568,6 +571,7 @@
 				043942932C86BCF000AA0D9D /* FirebaseModel.swift in Sources */,
 				436AEAEE2C7EC1F500E0D85A /* MypageNameSpace.swift in Sources */,
 				6B8F38CB2C8955350018C40D /* PrivacyPolicyVM.swift in Sources */,
+				C440789E2CA319B200B747A6 /* GuestVC.swift in Sources */,
 				6B8467BE2C86129B006B062D /* ClimbingGymNameSpace.swift in Sources */,
 				F4892C1E2C7C98A100C5FF16 /* MyPageVC.swift in Sources */,
 				6B8F38B92C888F6B0018C40D /* PrivacyPolicyVC.swift in Sources */,
