@@ -32,7 +32,6 @@ class SFMainFeedVC: UIViewController {
         setLayout()
     }
     
-    
     //MARK: - 네비게이션바, 탭바 세팅
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
