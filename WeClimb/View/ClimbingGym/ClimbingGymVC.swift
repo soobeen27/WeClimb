@@ -173,7 +173,7 @@ class ClimbingGymVC: UIViewController {
             $0.top.equalTo(headerView.snp.bottom)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
         
         climbingGymInfoView.snp.makeConstraints {

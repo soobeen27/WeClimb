@@ -114,7 +114,7 @@ class LoginVC: UIViewController {
                         //회원가입 페이지 ㄱㄱ
                         let signUpVC = PrivacyPolicyVC()
                         self.navigationController?.pushViewController(signUpVC, animated: true)
-                        self.navigationController?.setNavigationBarHidden(true, animated: true)
+                        self.navigationController?.setNavigationBarHidden(false, animated: true)
                     }
                 }
             }
@@ -150,7 +150,7 @@ class LoginVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         //로그인 창으로 돌아왔을때 네비게이션 바 보이기
-        navigationController?.setNavigationBarHidden(false, animated: true)
+        navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
     private func buttonTapped() {
@@ -183,7 +183,7 @@ class LoginVC: UIViewController {
         }
         buttonStackView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(100)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(80)
             $0.width.equalToSuperview().multipliedBy(0.8)
         }
         kakaoLoginButton.snp.makeConstraints {
