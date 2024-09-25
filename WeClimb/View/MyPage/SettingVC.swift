@@ -17,7 +17,7 @@ class SettingVC: UIViewController {
     
     private var datas: [SettingItem] = [
         //        SettingItem(section: .notifications, titles: [SettingNameSpace.notifications]),
-        SettingItem(section: .policy, titles: [SettingNameSpace.termsOfService, SettingNameSpace.privacyPolic]),
+        SettingItem(section: .policy, titles: [SettingNameSpace.termsOfService, SettingNameSpace.privacyPolic, SettingNameSpace.inquiry]),
         SettingItem(section: .account, titles: [SettingNameSpace.editProfile, SettingNameSpace.logout, SettingNameSpace.accountRemove])
     ]
     
@@ -69,6 +69,8 @@ class SettingVC: UIViewController {
                     self.openWeb(urlString: "https://www.notion.so/iosclimber/104292bf48c947b2b3b7a8cacdf1d130")
                 case SettingNameSpace.privacyPolic:
                     self.openWeb(urlString: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928")
+                case SettingNameSpace.inquiry:
+                          self.openWeb(urlString: "https://forms.gle/UUaJmFeLAyuFXFFS9")
                 case SettingNameSpace.editProfile:
                     self.setEditProfile()
                 case SettingNameSpace.logout:
