@@ -16,7 +16,7 @@ class UserPageVM {
     var userData: Observable<User?> {
         return userSubject.asObservable()
     }
-
+    
     // Firebase에서 유저 정보를 가져오는 함수
     func fetchUserInfo(userName: String) {
         FirebaseManager.shared.getUserInfoFrom(name: userName) { [weak self] result in
@@ -26,6 +26,17 @@ class UserPageVM {
             case .failure(let error):
                 print("Failed to fetch user info: \(error)")
                 self?.userSubject.onError(error)  // 에러가 발생하면 에러 방출
+            }
+        }
+    }
+    
+    // 사용자를 차단하는 함수
+    func blockUser(withUID userUID: String) {
+        FirebaseManager.shared.addBlackList(blockedUser: userUID) { success in
+            if success {
+                print("User successfully blocked.")
+            } else {
+                print("Failed to block user.")
             }
         }
     }
