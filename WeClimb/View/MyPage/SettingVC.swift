@@ -18,7 +18,7 @@ class SettingVC: UIViewController {
     private var datas: [SettingItem] = [
         //        SettingItem(section: .notifications, titles: [SettingNameSpace.notifications]),
         SettingItem(section: .policy, titles: [SettingNameSpace.termsOfService, SettingNameSpace.privacyPolic]),
-        SettingItem(section: .account, titles: [SettingNameSpace.editProfile, SettingNameSpace.logout, SettingNameSpace.accountRemove])
+        SettingItem(section: .account, titles: [SettingNameSpace.editProfile, SettingNameSpace.logout, SettingNameSpace.accountRemove]),
         SettingItem(section: .account, titles: [SettingNameSpace.blackList, SettingNameSpace.logout, SettingNameSpace.accountRemove])
     ]
     
@@ -98,7 +98,8 @@ class SettingVC: UIViewController {
     private func setEditProfile() {
         let editPageVC = EditPageVC()
         navigationController?.pushViewController(editPageVC, animated: true)
-        
+    }
+    
     // MARK: - 차단목록 화면전환 DS
     private func blackListMove() {
         let blackListVC = BlackListVC()
@@ -163,7 +164,7 @@ class SettingVC: UIViewController {
 }
 
 // 헤더 바인딩
-extension SettingVC: UITableViewDelegate, UITableViewDataSource{
+extension SettingVC: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return datas.count
