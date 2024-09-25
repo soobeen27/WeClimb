@@ -20,5 +20,6 @@ struct User: Codable {
     let comments: [DocumentReference]?
     let followers: [DocumentReference]?
     let following: [DocumentReference]?
+    let blackList: [String]?
 }
 

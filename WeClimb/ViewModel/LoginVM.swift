@@ -52,7 +52,7 @@ class LoginVM {
 //                            try tokenRef.setData(from: User(userUID: user.uid, lastModified: Date(), loginType: loginType.string,
 //                                                            registrationDate: Date(), userName: nil, userRole: "user", armReach: nil,
 //                                                            height: nil, followers: nil, following: nil, profileImage: nil))
-                            try tokenRef.setData(from: User(userName: nil, profileImage: nil, registerationDate: Date(), lastModified: Date(), userRole: "user", armReach: nil, height: nil, posts: nil, comments: nil, followers: nil, following: nil))
+                            try tokenRef.setData(from: User(userName: nil, profileImage: nil, registerationDate: Date(), lastModified: Date(), userRole: "user", armReach: nil, height: nil, posts: nil, comments: nil, followers: nil, following: nil, blackList: nil))
                             completion(.createAccount)
                         } catch {
                             print("setData Error: \(error)")

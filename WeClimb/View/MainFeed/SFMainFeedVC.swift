@@ -76,6 +76,10 @@ class SFMainFeedVC: UIViewController {
     }
     
     @objc private func rightButtonTapped() {
+        actionSheet()
+    }
+    
+    @objc private func rightButtonTapped() {
             actionSheet()
         }
     
@@ -87,7 +91,6 @@ class SFMainFeedVC: UIViewController {
             tabBar.backgroundColor = .clear  //탭바 배경투명
         }
     }
-    
     
     //MARK: - 컬렉션뷰 & 레이아웃 설정
     private func setCollectionView() {
@@ -109,7 +112,6 @@ class SFMainFeedVC: UIViewController {
         }
     }
     
-    
     //MARK: - 더보기 액션 시트
     private func actionSheet() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -127,13 +129,11 @@ class SFMainFeedVC: UIViewController {
         self.present(actionSheet, animated: true, completion: nil)
     }
     
-    
     //MARK: - 신고하기 모달 시트
     private func reportModal() {
         let modalVC = FeedReportModalVC()
         presentModal(modalVC: modalVC)
     }
-    
     
     //MARK: - 댓글 모달 시트
     private func commentModal() {
@@ -141,7 +141,6 @@ class SFMainFeedVC: UIViewController {
         presentModal(modalVC: modalVC)
     }
 }
-
 
 //MARK: - 컬렉션뷰 프로토콜 설정
 extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
