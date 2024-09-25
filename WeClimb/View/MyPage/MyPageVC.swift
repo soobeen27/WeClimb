@@ -29,7 +29,7 @@ class MyPageVC: UIViewController {
     
     private let nameLabel: UILabel = {
         let label = UILabel()
-        label.text = "iOSClimber"
+        label.text = "WeClimber"
         label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
         label.numberOfLines = 1
         return label
@@ -67,7 +67,7 @@ class MyPageVC: UIViewController {
     
     private let followCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "123"
+        label.text = "0"
         label.font = UIFont.boldSystemFont(ofSize: 13)
         label.textAlignment = .center
         return label
@@ -75,7 +75,7 @@ class MyPageVC: UIViewController {
     
     private let followingCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "456"
+        label.text = "0"
         label.font = UIFont.boldSystemFont(ofSize: 13)
         label.textAlignment = .center
         return label

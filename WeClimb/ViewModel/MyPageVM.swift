@@ -8,10 +8,14 @@
 import UIKit
 
 import RxSwift
+import RxCocoa
+import FirebaseFirestore
+import FirebaseAuth
 
 class MyPageVM {
 
     let profileImages: Observable<[UIImage]>
+    let db = Firestore.firestore()
     
     // 샘플 데이터 YJ
     let sampleImages: [UIImage] = [
@@ -25,4 +29,7 @@ class MyPageVM {
     init() {
         profileImages = Observable.just(sampleImages)
     }
+  
+        // Firestore에서 유저 정보 확인
+
 }
