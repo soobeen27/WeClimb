@@ -18,7 +18,7 @@ class UploadOptionView : UIView {
         return imageView
     }()
     
-    let optionLabel: UILabel = {
+    private let optionLabel: UILabel = {
         let label = UILabel()
         label.text = UploadNameSpace.selectGym
         label.font = .systemFont(ofSize: 17, weight: .regular)
