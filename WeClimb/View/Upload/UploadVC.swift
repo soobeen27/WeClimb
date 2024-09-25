@@ -550,10 +550,11 @@ extension UploadVC {
                 // 업로드 메서드 호출
                 self.viewModel.upload(media: media, caption: caption, gym: gym)
                     .subscribe(onNext: {
-                        print("업로드 성공")
-                        CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
-                        
-                        self.initUploadVC()
+                        DispatchQueue.main.async {
+                            print("업로드 성공")
+                            CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
+                            self.initUploadVC()
+                        }
                     }, onError: { error in
                         print("업로드 실패: \(error.localizedDescription)")
                     })

@@ -193,6 +193,7 @@ class MyPageVC: UIViewController {
 
     @objc private func rightBarButtonTapped() {
         let settingsVC = SettingVC()
+        settingsVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(settingsVC, animated: true)
     }
     
@@ -205,6 +206,7 @@ class MyPageVC: UIViewController {
     //상세 피드뷰 이동
     private func navigateDetailFeedView(at indexPath: IndexPath) {
         let sFMainFeedVC = SFMainFeedVC()
+        sFMainFeedVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(sFMainFeedVC, animated: true)
     }
 

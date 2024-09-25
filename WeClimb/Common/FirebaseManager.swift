@@ -43,6 +43,37 @@ final class FirebaseManager {
         }
     }
     
+    // MARK: 차단 관련
+    func addBlackList(blockedUser uid: String, completion: @escaping (Bool) -> Void) {
+        guard let user = Auth.auth().currentUser else { return }
+        
+        let userRef = db.collection("users").document(user.uid)
+        
+        userRef.updateData(["blackList" : FieldValue.arrayUnion([uid])]) { error in
+            if let error = error {
+                print("차단하는 과정중 에러: \(error)")
+                completion(false)
+            }
+            print("차단 성공")
+            completion(true)
+        }
+    }
+    
+    func removeBlackList(blockedUser uid: String, completion: @escaping (Bool) -> Void) {
+        guard let user = Auth.auth().currentUser else { return }
+        
+        let userRef = db.collection("users").document(user.uid)
+        
+        userRef.updateData(["blackList" : FieldValue.arrayRemove([uid])]) { error in
+            if let error = error {
+                print("차단 해제중 오류: \(error)")
+                completion(false)
+            }
+            print("차단 해제 성공")
+            completion(true)
+        }
+    }
+    
     func uploadProfileImage(image: URL) -> Observable<URL> {
         guard let user = Auth.auth().currentUser else { return Observable.error(UserError.none) }
         let storageRef = self.storage.reference()
@@ -110,25 +141,6 @@ final class FirebaseManager {
     }
     
     // MARK: 내 포스트 가져오기 최신순
-    // 사용 예시 현재 유저를 가져오고 user.posts 를 인자로 넣는다
-    //        FirebaseManager.shared.currentUserInfo { [weak self] result in
-    //            guard let self else { return }
-    //            switch result {
-    //            case.success(let user):
-    //                guard let postRefs = user.posts else { return }
-    //                FirebaseManager.shared.allMyPost(postRefs: postRefs)
-    //                    .subscribe { posts in
-    //                        posts.map {
-    //                            $0.forEach {
-    //                                print($0.creationDate)
-    //                            }
-    //                        }
-    //                    }
-    //                    .disposed(by: self.disposeBag)
-    //            case.failure(let error):
-    //                print("테스트에러 \(error)")
-    //            }
-    //        }
     func allMyPost(postRefs: [DocumentReference]) -> Observable<[Post]> {
         let posts = postRefs.map { ref in
             return Observable<Post>.create { observer in
@@ -301,11 +313,14 @@ final class FirebaseManager {
             let batch = db.batch()
             
             // 비동기로 각각의 미디어 파일을 업로드하고 Firestore 배치에 추가
+//            var urlForThumbnail: URL?
             var mediaReferences: [DocumentReference] = []
             for media in media.enumerated() {
+//                if media.offset == 0 {
+//                    urlForThumbnail = media.element.url
+//                }
                 let fileName = media.element.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.element.url.lastPathComponent
                 let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
-                
                 let mediaURL = try await uploadMedia(mediaRef: mediaRef, mediaURL: media.element.url)
                 
                 // Media 문서 생성
@@ -443,6 +458,18 @@ final class FirebaseManager {
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
     func feedFirst(completion: @escaping ([(post: Post, media: [Media])]?) -> Void) {
+        var blackList: [String] = []
+        currentUserInfo { result in
+            switch result {
+            case .success(let user):
+                if let black = user.blackList {
+                    blackList = black
+                }
+            case .failure(let error):
+                print("유저 정보 가져오는 중 에러: \(error)")
+            }
+        }
+        
         let postRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
             .limit(to: 10)
@@ -466,7 +493,7 @@ final class FirebaseManager {
                 self.lastFeed = lastDocument
             }
             
-            let posts = documents.compactMap {
+            var posts = documents.compactMap {
                 do {
                     return try $0.data(as: Post.self)
                 } catch {
@@ -495,14 +522,27 @@ final class FirebaseManager {
                         lock.unlock()
                     }
                 }
-                
-                completion(postWithMedias)
+                let filteredPosts = postWithMedias.filter { post in
+                    !blackList.contains(post.post.authorUID)
+                }
+                completion(filteredPosts)
             }
         }
     }
     
     //    // MARK: feedFirst 이후에 피드를 더 가져오기
     func feedLoading(completion: @escaping ([(post: Post, media: [Media])]?) -> Void) {
+        var blackList: [String] = []
+        currentUserInfo { result in
+            switch result {
+            case .success(let user):
+                if let black = user.blackList {
+                    blackList = black
+                }
+            case .failure(let error):
+                print("유저 정보 가져오는 중 에러: \(error)")
+            }
+        }
         guard let lastFeed = lastFeed else {
             print("초기 피드가 존재하지 않음")
             return
@@ -560,8 +600,10 @@ final class FirebaseManager {
                         lock.unlock()
                     }
                 }
-                
-                completion(postWithMedias)
+                let filteredPosts = postWithMedias.filter { post in
+                    !blackList.contains(post.post.authorUID)
+                }
+                completion(filteredPosts)
             }
         }
     }
