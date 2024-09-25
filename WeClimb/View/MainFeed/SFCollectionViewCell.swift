@@ -116,14 +116,6 @@ class SFCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    let ellipsisButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(systemName: "ellipsis"), for: .normal)
-        button.imageView?.contentMode = .scaleAspectFit
-        button.tintColor = .white
-        return button
-    }()
-    
     private let feedProfileStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -151,7 +143,6 @@ class SFCollectionViewCell: UICollectionViewCell {
         stackView.spacing = 1
         return stackView
     }()
-    
     
     //MARK: - 코드 시작
     override init(frame: CGRect) {
@@ -186,17 +177,16 @@ class SFCollectionViewCell: UICollectionViewCell {
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)  //컬렉션뷰 상단좌우 여백 삭제
     }
     
-    
     //MARK: - 레이아웃 설정
     private func setLayout() {
-        [feedUserNameLabel, likeButton, commentButton, followButton, likeButtonCounter, commentButtonCounter, ellipsisButton]
+        [feedUserNameLabel, likeButton, commentButton, followButton, likeButtonCounter, commentButtonCounter/*, ellipsisButton*/]
             .forEach { view in
                 addShadow(to: view)
             }
         
         self.backgroundColor = UIColor(hex: "#0C1014")
         self.addSubview(collectionView)
-        [feedProfileStackView, followButton, likeStackView, commentStackView, gymInfoStackView, feedCaptionLabel, ellipsisButton]
+        [feedProfileStackView, followButton, likeStackView, commentStackView, gymInfoStackView, feedCaptionLabel/*, ellipsisButton*/]
             .forEach {
                 self.addSubview($0)
             }
@@ -283,16 +273,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         commentButton.imageView?.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 35, height: 35))
         }
-        ellipsisButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 40, height: 22))
-            $0.top.equalTo(self.safeAreaLayoutGuide).offset(5)
-            $0.trailing.equalToSuperview().inset(16)
-        }
-        ellipsisButton.imageView?.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 40, height: 22))
-        }
     }
-    
     
     //MARK: - configure
     func configure(userProfileImage: UIImage, userName: String, address: String, caption: String, level: String, sector: String, dDay: String, likeCounter: String, commentCounter: String) {
@@ -307,7 +288,6 @@ class SFCollectionViewCell: UICollectionViewCell {
         commentButtonCounter.text = commentCounter
     }
     
-    
     //MARK: - 버튼 그림자 모드
     func addShadow(to view: UIView) {
         view.layer.shadowColor = UIColor.black.cgColor //그림자 색상
@@ -317,7 +297,6 @@ class SFCollectionViewCell: UICollectionViewCell {
         view.layer.masksToBounds = false //테두리에 그림자가 잘리지 않도록 설정
     }
 }
-    
 
 //MARK: - 컬렉션뷰 프로토콜 설정
 extension SFCollectionViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -344,7 +323,6 @@ extension SFCollectionViewCell: UICollectionViewDelegate, UICollectionViewDataSo
             $0.edges.equalToSuperview()
         }
         
-        
         print("내부 컬렉션뷰셀의 cellForItemAt 호출됨: \(indexPath)")
         return cell
     }
@@ -353,4 +331,3 @@ extension SFCollectionViewCell: UICollectionViewDelegate, UICollectionViewDataSo
         return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
     }
 }
-
