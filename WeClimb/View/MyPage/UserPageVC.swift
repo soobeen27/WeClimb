@@ -29,7 +29,7 @@ class UserPageVC: UIViewController {
     
     private let nameLabel: UILabel = {
         let label = UILabel()
-//        label.text = "qockqock"
+        //        label.text = "qockqock"
         label.font = UIFont.systemFont(ofSize: 17)
         label.numberOfLines = 1
         return label
@@ -38,7 +38,7 @@ class UserPageVC: UIViewController {
     // 추후 추가예정
     private let levelLabel: UILabel = {
         let label = UILabel()
-//        label.text = "V4"
+        //        label.text = "V4"
         label.backgroundColor = .systemGreen
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .white
@@ -50,7 +50,7 @@ class UserPageVC: UIViewController {
     // 아직 연동안됨
     private let infoLabel: UILabel = {
         let label = UILabel()
-//        label.text = "체형: 183cm | 185cm"
+        //        label.text = "체형: 183cm | 185cm"
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .gray
         label.numberOfLines = 1
@@ -145,7 +145,7 @@ class UserPageVC: UIViewController {
     
     private let segmentControl: UISegmentedControl = {
         // 추후 하나 생성예정
-//        let segmentControl = UISegmentedControl(items: [UIImage(systemName: "square.grid.2x2") ?? UIImage(), UserPageNameSpace.none])
+        //        let segmentControl = UISegmentedControl(items: [UIImage(systemName: "square.grid.2x2") ?? UIImage(), UserPageNameSpace.none])
         let segmentControl = UISegmentedControl(items: [UIImage(systemName: "square.grid.2x2") ?? UIImage()])
         segmentControl.selectedSegmentIndex = 0
         return segmentControl
@@ -178,17 +178,17 @@ class UserPageVC: UIViewController {
     }
     
     func configure(with data: User) {
-            nameLabel.text = data.userName
-//            levelLabel.text = data.userRole
-//            infoLabel.text = "체형: \(data.height ?? "정보 없음") | 팔길이: \(data.armReach ?? "정보 없음")"
-            
-            // 이미지 로드 (Kingfisher 사용)
-            if let profileImageURL = data.profileImage {
-                FirebaseManager.shared.loadImage(from: profileImageURL, into: profileImage)
-            } else {
-                profileImage.image = UIImage(named: "defaultImage")
-            }
+        nameLabel.text = data.userName
+        //            levelLabel.text = data.userRole
+        //            infoLabel.text = "체형: \(data.height ?? "정보 없음") | 팔길이: \(data.armReach ?? "정보 없음")"
+        
+        // 이미지 로드 (Kingfisher 사용)
+        if let profileImageURL = data.profileImage {
+            FirebaseManager.shared.loadImage(from: profileImageURL, into: profileImage)
+        } else {
+            profileImage.image = UIImage(named: "defaultImage")
         }
+    }
     
     func setNavigation() {
         let rightBarButton = UIBarButtonItem(
@@ -200,7 +200,7 @@ class UserPageVC: UIViewController {
         navigationController?.navigationBar.tintColor = .label
         navigationItem.rightBarButtonItem = rightBarButton
     }
-
+    
     //MARK: - 신고하기, 차단 버튼 YJ
     @objc private func rightBarButtonTapped() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -214,7 +214,7 @@ class UserPageVC: UIViewController {
             .forEach {
                 actionSheet.addAction($0)
             }
-
+        
         self.present(actionSheet, animated: true, completion: nil)
     }
     
@@ -224,9 +224,14 @@ class UserPageVC: UIViewController {
         presentModal(modalVC: modalVC)
     }
     
+    //MARK: - 차단하기 기능
+    private func blackList(userUID: String) {
+        viewModel.blockUser(withUID: userUID)
+    }
+    
     private func buttonTapped() {
         isFollowing.toggle()
-
+        
         if isFollowing {
             followFollowingButton.setTitle(UserPageNameSpace.follow, for: .normal)
             followFollowingButton.backgroundColor = .systemGray6
@@ -237,7 +242,7 @@ class UserPageVC: UIViewController {
             followFollowingButton.setTitleColor(.white, for: .normal)
         }
     }
-    
+
     private func setLayout() {
         [profileImage, profileStackView, totalStackView, segmentControl, collectionView]
             .forEach{ view.addSubview($0) }
@@ -302,11 +307,11 @@ class UserPageVC: UIViewController {
             .disposed(by: disposeBag)
         
         followFollowingButton.rx.tap
-          .bind { [weak self] in
-          print("followFollowingButton tapped")
-          self?.buttonTapped()
-        }
-        .disposed(by: disposeBag)
+            .bind { [weak self] in
+                print("followFollowingButton tapped")
+                self?.buttonTapped()
+            }
+            .disposed(by: disposeBag)
     }
 }
 

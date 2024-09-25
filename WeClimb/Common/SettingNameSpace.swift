@@ -14,6 +14,7 @@ enum SettingNameSpace {
     static let privacyPolic = "개인정보 처리방침"
     static let inquiry = "위클팀 문의"
     static let editProfile = "프로필 편집"
+    static let blackList = "차단목록"
     static let logout = "로그아웃"
     static let accountRemove = "회원탈퇴"
 }

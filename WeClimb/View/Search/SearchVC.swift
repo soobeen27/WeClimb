@@ -16,6 +16,9 @@ class SearchVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let searchViewModel = SearchViewModel()
     
+    private var lastSearchText: String = ""
+    private var lastSegmentIndex: Int = 0
+    
     var onSelectedGym: ((Gym) -> Void)?
     
     private lazy var searchController: UISearchController = {
@@ -109,11 +112,25 @@ class SearchVC: UIViewController {
         
         // 검색 바가 숨겨지지 않도록 설정
         navigationItem.hidesSearchBarWhenScrolling = false
+        
+        // 검색어와 세그먼트 상태 복원
+        searchController.searchBar.text = lastSearchText
+        segmentedControl.selectedSegmentIndex = lastSegmentIndex
+        searchViewModel.isSelectGym.accept(lastSegmentIndex == 0)
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // 검색어와 세그먼트 상태 저장
+        lastSearchText = searchController.searchBar.text ?? ""
+        lastSegmentIndex = segmentedControl.selectedSegmentIndex
+    }
+
     
     private func setNavigationBar() {
         // 네비게이션 바 타이틀 설정
-//        self.title = SearchNameSpace.title
+//        view.title = SearchNameSpace.title
         
         // 탭바 빈 문자열로 설정
         if let tabBarItem = self.tabBarItem {
@@ -166,6 +183,9 @@ class SearchVC: UIViewController {
     }
     
     private func bind() {
+        searchViewModel.isSelectGym.accept(lastSegmentIndex == 0)
+        searchViewModel.searchText.accept(lastSearchText)
+        
         // MARK: - Gym TableView 선택 이벤트 처리 - DS
         gymTableView.rx.modelSelected(Gym.self)
             .subscribe(onNext: { [weak self] selectedItem in
@@ -190,6 +210,7 @@ class SearchVC: UIViewController {
             .subscribe(onNext: { [weak self] selectedItem in
                 guard let self else { return }
                 let userPageVC = UserPageVC()
+//                userPageVC.hidesBottomBarWhenPushed = true
                 userPageVC.configure(with: selectedItem)
                 navigationController?.navigationBar.prefersLargeTitles = false
 //                userPageVC.setNavigation()

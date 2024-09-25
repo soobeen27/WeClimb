@@ -62,17 +62,18 @@ class PrivacyPolicyVC: UIViewController {
         return button
     }()
     
-    private let termsCheckBox3: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(systemName: "checkmark.circle"), for: .selected)
-        button.setImage(UIImage(systemName: "circle"), for: .normal)
-        button.setTitle(" (필수) WeClimb 위치정보 이용동의 및 위치기반서비스 이용약관", for: .normal)
-        button.setTitleColor(.systemGray, for: .normal)
-        button.contentHorizontalAlignment = .left
-        button.titleLabel?.font = .systemFont(ofSize: 13)
-        button.titleLabel?.numberOfLines = 2
-        return button
-    }()
+    // 추후 추가
+//    private let termsCheckBox3: UIButton = {
+//        let button = UIButton()
+//        button.setImage(UIImage(systemName: "checkmark.circle"), for: .selected)
+//        button.setImage(UIImage(systemName: "circle"), for: .normal)
+//        button.setTitle(" (필수) WeClimb 위치정보 이용동의 및 위치기반서비스 이용약관", for: .normal)
+//        button.setTitleColor(.systemGray, for: .normal)
+//        button.contentHorizontalAlignment = .left
+//        button.titleLabel?.font = .systemFont(ofSize: 13)
+//        button.titleLabel?.numberOfLines = 2
+//        return button
+//    }()
     
     private let termsCheckBox4: UIButton = {
         let button = UIButton()
@@ -96,10 +97,41 @@ class PrivacyPolicyVC: UIViewController {
         return button
     }()
     
+    private let termsTextView: UITextView = {
+        let textView = UITextView()
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.isUserInteractionEnabled = true
+        textView.dataDetectorTypes = [.link] // 링크 감지
+
+        // 링크 텍스트 설정
+        let text = "이용약관  및  개인정보 처리방침"
+        let attributedString = NSMutableAttributedString(string: text)
+
+        // 링크 범위 설정
+        let termsRange = (text as NSString).range(of: "이용약관")
+        let andRange = (text as NSString).range(of: "및")
+        let privacyPolicyRange = (text as NSString).range(of: "개인정보 처리방침")
+
+        attributedString.addAttribute(.link, value: "https://www.notion.so/iosclimber/104292bf48c947b2b3b7a8cacdf1d130", range: termsRange)
+        attributedString.addAttribute(.foregroundColor, value: UIColor.lightGray, range: andRange)
+        attributedString.addAttribute(.link, value: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928", range: privacyPolicyRange)
+
+        textView.attributedText = attributedString
+        textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.systemGray, 
+                                       NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue]
+        
+        textView.textAlignment = .right
+
+        return textView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
         bindViewModel()
+        
+        termsTextView.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -108,21 +140,44 @@ class PrivacyPolicyVC: UIViewController {
     }
     
     private func setNavigationBar() {
-        self.title = "WeClimb"
         self.navigationController?.navigationBar.prefersLargeTitles = true
+        self.navigationItem.hidesBackButton = false
+        
+        let imageView = UIImageView(image: UIImage(named: "LogoText")?.withTintColor(UIColor.mainPurple))
+        imageView.contentMode = .scaleAspectFit // 이미지 비율 유지
+        
+        let containerView = UIView()
+        containerView.addSubview(imageView)
+        
+        imageView.snp.makeConstraints {
+            $0.centerX.equalTo(containerView)
+            $0.leading.equalTo(containerView)
+            $0.width.equalTo(120)
+            $0.height.equalTo(40)
+        }
+        
+        if let navigationBar = navigationController?.navigationBar {
+            navigationBar.addSubview(containerView)
+            
+            containerView.snp.makeConstraints {
+                $0.leading.equalTo(navigationBar.safeAreaLayoutGuide.snp.leading).offset(16)
+                $0.bottom.equalTo(navigationBar.safeAreaLayoutGuide.snp.bottom)
+                $0.width.equalTo(120)
+                $0.height.equalTo(40)
+            }
+        }
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground() // 투명도 없는 배경 설정
         appearance.backgroundColor = .white // 원하는 배경 색상 설정
         appearance.shadowColor = nil
         
-        appearance.largeTitleTextAttributes = [
-            NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 32),
-            NSAttributedString.Key.foregroundColor: UIColor.mainPurple
-        ]
-        
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
+    }
+    
+    @objc private func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
     }
     
     private func setLayout() {
@@ -134,8 +189,9 @@ class PrivacyPolicyVC: UIViewController {
             allAgreeCheckBox,
             termsCheckBox1,
             termsCheckBox2,
-            termsCheckBox3,
+//            termsCheckBox3,
             termsCheckBox4,
+            termsTextView,
             confirmButton
         ].forEach { view.addSubview($0) }
     
@@ -164,16 +220,23 @@ class PrivacyPolicyVC: UIViewController {
             $0.trailing.equalToSuperview().offset(-16)
         }
         
-        termsCheckBox3.snp.makeConstraints {
+//        termsCheckBox3.snp.makeConstraints {
+//            $0.top.equalTo(termsCheckBox2.snp.bottom).offset(20)
+//            $0.leading.equalToSuperview().offset(16)
+//            $0.trailing.equalToSuperview().offset(-16)
+//        }
+        
+        termsCheckBox4.snp.makeConstraints {
             $0.top.equalTo(termsCheckBox2.snp.bottom).offset(20)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
         }
         
-        termsCheckBox4.snp.makeConstraints {
-            $0.top.equalTo(termsCheckBox3.snp.bottom).offset(20)
+        termsTextView.snp.makeConstraints {
+            $0.top.equalTo(termsCheckBox4.snp.bottom).offset(35)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
+            $0.height.equalTo(30)
         }
         
         confirmButton.snp.makeConstraints {
@@ -198,9 +261,9 @@ class PrivacyPolicyVC: UIViewController {
             .bind(to: termsCheckBox2.rx.isSelected)
             .disposed(by: disposeBag)
         
-        viewModel.isTerms3Agreed
-            .bind(to: termsCheckBox3.rx.isSelected)
-            .disposed(by: disposeBag)
+//        viewModel.isTerms3Agreed
+//            .bind(to: termsCheckBox3.rx.isSelected)
+//            .disposed(by: disposeBag)
         
         viewModel.isTerms4Agreed
             .bind(to: termsCheckBox4.rx.isSelected) // 선택 항목 처리
@@ -230,12 +293,12 @@ class PrivacyPolicyVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        viewModel.isTerms3Agreed
-            .map { $0 ? UIColor.systemBlue : .systemGray3 }
-            .subscribe(onNext: { [weak self] color in
-                self?.termsCheckBox3.setTitleColor(color, for: .normal)
-            })
-            .disposed(by: disposeBag)
+//        viewModel.isTerms3Agreed
+//            .map { $0 ? UIColor.systemBlue : .systemGray3 }
+//            .subscribe(onNext: { [weak self] color in
+//                self?.termsCheckBox3.setTitleColor(color, for: .normal)
+//            })
+//            .disposed(by: disposeBag)
         
         viewModel.isTerms4Agreed
             .map { $0 ? UIColor.systemBlue : .systemGray3 } // 선택 항목 처리
@@ -273,11 +336,11 @@ class PrivacyPolicyVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        termsCheckBox3.rx.tap
-            .subscribe(onNext: { [weak self] in
-                self?.viewModel.toggleTerms3()
-            })
-            .disposed(by: disposeBag)
+//        termsCheckBox3.rx.tap
+//            .subscribe(onNext: { [weak self] in
+//                self?.viewModel.toggleTerms3()
+//            })
+//            .disposed(by: disposeBag)
         
         termsCheckBox4.rx.tap // 선택 항목에 대한 액션 처리
             .subscribe(onNext: { [weak self] in
@@ -291,5 +354,12 @@ class PrivacyPolicyVC: UIViewController {
                 self?.navigationController?.pushViewController(personalDetailsVC, animated: true)
             })
             .disposed(by: disposeBag)
+    }
+}
+
+extension PrivacyPolicyVC: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        UIApplication.shared.open(URL)
+        return false
     }
 }
