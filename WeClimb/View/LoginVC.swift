@@ -91,7 +91,7 @@ class LoginVC: UIViewController {
                         // 회원가입 페이지 푸시
                         let signUpVC = PrivacyPolicyVC()
                         self.navigationController?.pushViewController(signUpVC, animated: true)
-                        self.navigationController?.setNavigationBarHidden(true, animated: true)
+                        self.navigationController?.setNavigationBarHidden(false, animated: true)
                     }
                 }
             }
@@ -255,7 +255,7 @@ extension LoginVC: ASAuthorizationControllerDelegate {
                     //회원가입 페이지 ㄱㄱ
                     let signUpVC = PrivacyPolicyVC()
                     self.navigationController?.pushViewController(signUpVC, animated: true)
-                    self.navigationController?.setNavigationBarHidden(true, animated: true)
+                    self.navigationController?.setNavigationBarHidden(false, animated: true)
                 }
             }
         }

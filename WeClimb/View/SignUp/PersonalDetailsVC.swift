@@ -82,6 +82,45 @@ class PersonalDetailsVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         setupBindings()
+        setNavigationBar()
+    }
+    
+    private func setNavigationBar() {
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+        self.navigationItem.hidesBackButton = false
+        navigationItem.largeTitleDisplayMode = .always
+        
+        let imageView = UIImageView(image: UIImage(named: "LogoText")?.withTintColor(UIColor.mainPurple))
+        imageView.contentMode = .scaleAspectFit // 이미지 비율 유지
+        
+        let containerView = UIView()
+        containerView.addSubview(imageView)
+        
+        imageView.snp.makeConstraints {
+            $0.centerX.equalTo(containerView)
+            $0.leading.equalTo(containerView)
+            $0.width.equalTo(120)
+            $0.height.equalTo(40)
+        }
+        
+        if let navigationBar = navigationController?.navigationBar {
+            navigationBar.addSubview(containerView)
+            
+            containerView.snp.makeConstraints {
+                $0.leading.equalTo(navigationBar.safeAreaLayoutGuide.snp.leading).offset(16)
+                $0.bottom.equalTo(navigationBar.safeAreaLayoutGuide.snp.bottom)
+                $0.width.equalTo(120)
+                $0.height.equalTo(40)
+            }
+        }
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground() // 투명한 배경 설정
+        appearance.backgroundColor = .clear // 배경 색상을 투명하게 설정
+        appearance.shadowColor = nil
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
     
     private func setLayout() {

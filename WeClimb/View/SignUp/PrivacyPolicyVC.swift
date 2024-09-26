@@ -118,7 +118,7 @@ class PrivacyPolicyVC: UIViewController {
         attributedString.addAttribute(.link, value: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928", range: privacyPolicyRange)
 
         textView.attributedText = attributedString
-        textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.systemGray, 
+        textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.systemGray,
                                        NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue]
         
         textView.textAlignment = .right
@@ -142,6 +142,7 @@ class PrivacyPolicyVC: UIViewController {
     private func setNavigationBar() {
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.hidesBackButton = false
+        navigationItem.largeTitleDisplayMode = .always
         
         let imageView = UIImageView(image: UIImage(named: "LogoText")?.withTintColor(UIColor.mainPurple))
         imageView.contentMode = .scaleAspectFit // 이미지 비율 유지
@@ -168,8 +169,8 @@ class PrivacyPolicyVC: UIViewController {
         }
         
         let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground() // 투명도 없는 배경 설정
-        appearance.backgroundColor = .white // 원하는 배경 색상 설정
+        appearance.configureWithTransparentBackground() // 투명한 배경 설정
+        appearance.backgroundColor = .clear // 배경 색상을 투명하게 설정
         appearance.shadowColor = nil
         
         navigationController?.navigationBar.standardAppearance = appearance
