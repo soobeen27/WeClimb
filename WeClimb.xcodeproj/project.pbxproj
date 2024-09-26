@@ -67,8 +67,6 @@
 		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
 		91995F202CA4A24100BCC004 /* SFFeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */; };
-		91995F232CA4AE6500BCC004 /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 91995F222CA4AE6500BCC004 /* Differentiator */; };
-		91995F252CA4AE6500BCC004 /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 91995F242CA4AE6500BCC004 /* RxDataSources */; };
 		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
 		91BFA9332C91962F0044D5AD /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BFA9322C91962F0044D5AD /* Post.swift */; };
@@ -236,8 +234,6 @@
 				6BC91F9D2C7EEACF00B34083 /* KakaoSDK in Frameworks */,
 				6BC91FA62C7EEB4E00B34083 /* FirebaseAnalytics in Frameworks */,
 				F4892C422C8038B500C5FF16 /* RxSwift in Frameworks */,
-				91995F232CA4AE6500BCC004 /* Differentiator in Frameworks */,
-				91995F252CA4AE6500BCC004 /* RxDataSources in Frameworks */,
 				6BC91FA32C7EEACF00B34083 /* KakaoSDKUser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -515,8 +511,6 @@
 				6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */,
 				F4892C412C8038B500C5FF16 /* RxSwift */,
 				43EC6AD62C9171AA004A2E2F /* LightCompressor */,
-				91995F222CA4AE6500BCC004 /* Differentiator */,
-				91995F242CA4AE6500BCC004 /* RxDataSources */,
 			);
 			productName = WeClimb;
 			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
@@ -554,7 +548,6 @@
 				6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
 				6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				43EC6AD52C9171AA004A2E2F /* XCRemoteSwiftPackageReference "LightCompressor_iOS" */,
-				91995F212CA4AE6500BCC004 /* XCRemoteSwiftPackageReference "RxDataSources" */,
 			);
 			productRefGroup = F4892BE42C7C237700C5FF16 /* Products */;
 			projectDirPath = "";
@@ -940,14 +933,6 @@
 				minimumVersion = 11.1.0;
 			};
 		};
-		91995F212CA4AE6500BCC004 /* XCRemoteSwiftPackageReference "RxDataSources" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/RxSwiftCommunity/RxDataSources.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.2;
-			};
-		};
 		F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -1039,16 +1024,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
-		};
-		91995F222CA4AE6500BCC004 /* Differentiator */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 91995F212CA4AE6500BCC004 /* XCRemoteSwiftPackageReference "RxDataSources" */;
-			productName = Differentiator;
-		};
-		91995F242CA4AE6500BCC004 /* RxDataSources */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 91995F212CA4AE6500BCC004 /* XCRemoteSwiftPackageReference "RxDataSources" */;
-			productName = RxDataSources;
 		};
 		F4892BFB2C7C239900C5FF16 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
