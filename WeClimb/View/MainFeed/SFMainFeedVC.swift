@@ -9,7 +9,6 @@ import UIKit
 
 import SnapKit
 import RxCocoa
-import RxDataSources
 import RxSwift
 
 class SFMainFeedVC: UIViewController {
@@ -99,6 +98,7 @@ class SFMainFeedVC: UIViewController {
         collectionView.isPagingEnabled = true  //스크롤 시 한 화면씩 넘기기(페이징 모드 활성화)
         collectionView.contentInsetAdjustmentBehavior = .never  //네비게이션바 자동 여백 삭제
         collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
+        collectionView.backgroundColor = UIColor(hex: "#0B1013")
     }
     
     private func bindCollectionView() {
