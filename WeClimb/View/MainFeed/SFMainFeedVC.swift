@@ -181,10 +181,10 @@ class SFMainFeedVC: UIViewController {
         let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
             self?.reportModal()
         }
+        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive, handler: nil)
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
-        
-        [reportAction, cancelAction]
+        [reportAction, deleteAction, cancelAction]
             .forEach {
                 actionSheet.addAction($0)
             }

@@ -46,24 +46,23 @@ class MyPageVC: UIViewController {
         return label
     }()
     
-    private let infoLabel: UILabel = {
+    private let userInfoLabel: UILabel = {
         let label = UILabel()
-        label.text = "체형: 177cm | 183cm"
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .gray
         label.numberOfLines = 1
         return label
     }()
     
-    private let editButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle(MypageNameSpace.edit, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 13)
-        button.backgroundColor = .systemGray6
-        button.setTitleColor(.label, for: .normal)
-        button.layer.cornerRadius = 5
-        return button
-    }()
+//    private let editButton: UIButton = {
+//        let button = UIButton(type: .system)
+//        button.setTitle(MypageNameSpace.edit, for: .normal)
+//        button.titleLabel?.font = UIFont.systemFont(ofSize: 13)
+//        button.backgroundColor = .systemGray6
+//        button.setTitleColor(.label, for: .normal)
+//        button.layer.cornerRadius = 5
+//        return button
+//    }()
     
     private let followCountLabel: UILabel = {
         let label = UILabel()
@@ -116,7 +115,7 @@ class MyPageVC: UIViewController {
     private let totalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 32
+        stackView.spacing = 25
         stackView.alignment = .center
         return stackView
     }()
@@ -170,6 +169,9 @@ class MyPageVC: UIViewController {
                 switch result {
                 case .success(let user):
                     self?.nameLabel.text = user.userName
+                    self?.userInfoLabel.text = "\(user.height ?? "")cm  |  \(user.armReach ?? "")cm"
+//                    self?.heightLabel.text = "\(user.height ?? "")cm (Height)"
+//                    self?.armReachLabel.text = "\(user.armReach ?? "")cm (ArmReach)"
                 case .failure(let error):
                     print("현재 유저 정보 가져오기 실패: \(error)")
                 }
@@ -191,21 +193,20 @@ class MyPageVC: UIViewController {
 
     @objc private func rightBarButtonTapped() {
         let settingsVC = SettingVC()
-        settingsVC.hidesBottomBarWhenPushed = true
+//        settingsVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(settingsVC, animated: true)
     }
     
     //프로필 편집뷰 이동
-    private func editButtonTapped() {
-        let editPageVC = EditPageVC()
-        editPageVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(editPageVC, animated: true)
-    }
+//    private func editButtonTapped() {
+//        let editPageVC = EditPageVC()
+//        navigationController?.pushViewController(editPageVC, animated: true)
+//    }
     
     //상세 피드뷰 이동
     private func navigateDetailFeedView(at indexPath: IndexPath) {
         let sFMainFeedVC = SFMainFeedVC()
-        sFMainFeedVC.hidesBottomBarWhenPushed = true
+//        sFMainFeedVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(sFMainFeedVC, animated: true)
     }
 
@@ -215,13 +216,13 @@ class MyPageVC: UIViewController {
         collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
             
         
-        [profileImage, profileStackView, totalStackView, collectionView]
+        [profileImage, profileStackView, /*totalStackView,*/ /*editButton, */collectionView]
             .forEach{ view.addSubview($0) }
         
-        [nameStackView, /*infoLabel, */editButton]
+        [nameStackView, userInfoLabel]
             .forEach{ profileStackView.addArrangedSubview($0) }
-        
-        [nameLabel, levelLabel]
+
+        [nameLabel, /*levelLabel*/]
             .forEach{ nameStackView.addArrangedSubview($0) }
         
         [followCountLabel, followLabel]
@@ -230,8 +231,8 @@ class MyPageVC: UIViewController {
         [followingCountLabel, followingLabel]
             .forEach{ followingStackView.addArrangedSubview($0) }
         
-        [followStackView, followingStackView]
-            .forEach{ totalStackView.addArrangedSubview($0) }
+//        [followStackView, followingStackView]
+//            .forEach{ totalStackView.addArrangedSubview($0) }
         
         profileImage.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).inset(8)
@@ -242,21 +243,26 @@ class MyPageVC: UIViewController {
         profileStackView.snp.makeConstraints {
             $0.leading.equalTo(profileImage.snp.trailing).offset(16)
             $0.centerY.equalTo(profileImage.snp.centerY)
-            $0.height.equalTo(80)
+            $0.height.equalTo(50)
         }
         
-        editButton.snp.makeConstraints {
-            $0.width.equalTo(120)
-        }
+//        editButton.snp.makeConstraints {
+//            $0.top.equalTo(totalStackView.snp.bottom).offset(30)
+////            $0.centerX.equalTo(totalStackView.snp.centerX)
+//            $0.trailing.equalToSuperview().inset(16)
+//            $0.width.equalTo(120)
+//        }
         
-        totalStackView.snp.makeConstraints {
-            $0.leading.equalTo(profileStackView.snp.trailing).offset(32)
-            $0.centerY.equalTo(profileImage.snp.centerY)
-            $0.height.equalTo(80)
-        }
+//        totalStackView.snp.makeConstraints {
+////            $0.top.equalTo(profileImage.snp.top)
+////            $0.leading.equalTo(profileStackView.snp.trailing).offset(32)
+//            $0.trailing.equalToSuperview().inset(16)
+//            $0.centerY.equalTo(profileImage.snp.centerY)
+//            $0.height.equalTo(80)
+//        }
         
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(profileStackView.snp.bottom).offset(32)
+            $0.top.equalTo(profileImage.snp.bottom).offset(32)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
         }
@@ -271,12 +277,12 @@ class MyPageVC: UIViewController {
             .disposed(by: disposeBag)
         
         // 프로필 편집 버튼 눌렀을 때 YJ
-        editButton.rx.tap
-            .bind { [weak self] in
-                print("editButton tapped")
-                self?.editButtonTapped()
-            }
-            .disposed(by: disposeBag)
+//        editButton.rx.tap
+//            .bind { [weak self] in
+//                print("editButton tapped")
+//                self?.editButtonTapped()
+//            }
+//            .disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
             .bind { [weak self ] indexPath in
