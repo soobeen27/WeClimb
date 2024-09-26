@@ -157,10 +157,15 @@ class MyPageVC: UIViewController {
         setLayout()
         bind()
         setNavigation()
-        updateUserInfo()
 //        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationController?.navigationBar.tintColor = .label
+        updateUserInfo()
+    }
     
     // MARK: - 파이어베이스에 저장된 유저 닉네임 마이페이지 업데이트
     private func updateUserInfo() {
@@ -276,11 +281,12 @@ class MyPageVC: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        // 프로필 편집 버튼 눌렀을 때 YJ
+//        // 프로필 편집 버튼 눌렀을 때 YJ
 //        editButton.rx.tap
 //            .bind { [weak self] in
+//                guard let self = self else { return }
 //                print("editButton tapped")
-//                self?.editButtonTapped()
+//                self.editButtonTapped()
 //            }
 //            .disposed(by: disposeBag)
         

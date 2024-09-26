@@ -61,21 +61,15 @@ class SFMainFeedVC: UIViewController {
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         self.navigationController?.navigationBar.shadowImage = UIImage()
         self.navigationController?.navigationBar.isTranslucent = true
-        
-        let rightButton = UIButton()
-        rightButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
-        rightButton.tintColor = .white
-        rightButton.addTarget(self, action: #selector(rightButtonTapped), for: .touchUpInside)
-        
-        rightButton.frame = CGRect(x: 0, y: 0, width: 40, height: 40) // 버튼 크기
-        
-        rightButton.layer.shadowColor = UIColor.black.cgColor // 그림자 색상
-        rightButton.layer.shadowOffset = CGSize(width: 1, height: 1) // 그림자 위치
-        rightButton.layer.shadowOpacity = 0.5 // 그림자 투명도
-        rightButton.layer.shadowRadius = 2 // 그림자의 흐림(퍼짐) 정도
-        rightButton.layer.masksToBounds = false // 테두리에 그림자가 잘리지 않도록 설정
-        
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightButton)
+
+        let rightBarButton = UIBarButtonItem(
+            image: UIImage(systemName: "ellipsis"),
+            style: .plain,
+            target: self,
+            action: #selector(self.rightButtonTapped)
+        )
+        navigationController?.navigationBar.tintColor = .white
+        navigationItem.rightBarButtonItem = rightBarButton
     }
     
     @objc private func rightButtonTapped() {
