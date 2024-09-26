@@ -9,6 +9,7 @@ import UIKit
 import AVKit
 
 import SnapKit
+import Kingfisher
 
 class SFFeedCell: UICollectionViewCell {
     var imageView: UIImageView!
@@ -76,15 +77,9 @@ class SFFeedCell: UICollectionViewCell {
     }
     
     private func loadImage(from url: URL) {
-        DispatchQueue.global().async {
-            if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                DispatchQueue.main.async {
-                    self.isVideo = false
-                    self.playButton.isHidden = true
-                    self.imageView.image = image
-                }
-            }
-        }
+        self.isVideo = false
+        self.playButton.isHidden = true
+        imageView.kf.setImage(with: url)
     }
     
     private func loadVideo(from media: Media) {
