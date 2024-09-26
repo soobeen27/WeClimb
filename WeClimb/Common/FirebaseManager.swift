@@ -195,7 +195,7 @@ final class FirebaseManager {
             }
     }
     
-    // MARK: 이름으로 다른 유저 정보 가져오기
+    // MARK: 다른 유저 정보 가져오기
     func getUserInfoFrom(name: String, completion: @escaping (Result<User, Error>) -> Void) {
         let userRef = db.collection("users").whereField("userName", isEqualTo: name)
         
@@ -211,6 +211,32 @@ final class FirebaseManager {
                     completion(.failure(UserError.none))
                 }
             }
+        }
+    }
+    
+    func getUserInfoFrom(uid: String, completion: @escaping (Result<User, Error>) -> Void) {
+        let userRef = db.collection("users").document(uid)
+        
+        userRef.getDocument { snapshot, error in
+            if let error = error {
+                completion(.failure(error))
+            }
+            guard let snapshot, snapshot.exists else { 
+                completion(.failure(UserError.none))
+                return }
+            do {
+                try completion(.success(snapshot.data(as: User.self)))
+            } catch {
+                completion(.failure(UserError.none))
+            }
+                
+//            snapshot.documents.forEach { document in
+//                if let user = try? document.data(as: User.self) {
+//                    completion(.success(user))
+//                } else {
+//                    completion(.failure(UserError.none))
+//                }
+//            }
         }
     }
     

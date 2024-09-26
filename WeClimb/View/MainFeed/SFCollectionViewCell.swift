@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 import RxCocoa
 import RxSwift
+import Kingfisher
 
 class SFCollectionViewCell: UICollectionViewCell {
     
@@ -17,8 +18,10 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     var medias: [Media] = []
     
+    let pauseVide: ((SFFeedCell) -> Void)? = nil
+    
     //MARK: - UI 세팅
-    private lazy var collectionView: UICollectionView = {
+    lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal //가로 스크롤
         layout.itemSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
@@ -35,8 +38,9 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
-//        pageControl.numberOfPages = images.count
-        pageControl.currentPage = 0
+        //        pageControl.numberOfPages = images.count
+        pageControl.pageIndicatorTintColor = .lightGray
+        pageControl.currentPageIndicatorTintColor = .white
         return pageControl
     }()
     
@@ -188,6 +192,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         feedCaptionLabel.text = nil
         likeButtonCounter.text = nil
         feedUserProfileImage.image = nil
+        pageControl.currentPage = 0
         medias = []
     }
     
@@ -199,8 +204,12 @@ class SFCollectionViewCell: UICollectionViewCell {
             }
         
         self.backgroundColor = UIColor(hex: "#0C1014")
-        self.addSubview(collectionView)
-        [feedProfileStackView, followButton, likeStackView, commentStackView, gymInfoStackView, feedCaptionLabel]
+        //        self.addSubview(collectionView)
+//        [collectionView, pageControl, feedProfileStackView, followButton, likeStackView, commentStackView, gymInfoStackView, feedCaptionLabel]
+//            .forEach {
+//                self.addSubview($0)
+//        }
+        [collectionView, pageControl, feedProfileStackView, feedCaptionLabel]
             .forEach {
                 self.addSubview($0)
             }
@@ -208,26 +217,29 @@ class SFCollectionViewCell: UICollectionViewCell {
             .forEach {
                 feedProfileStackView.addArrangedSubview($0)
             }
-        [likeButton, likeButtonCounter]
-            .forEach {
-                likeStackView.addArrangedSubview($0)
-            }
-        [commentButton, commentButtonCounter]
-            .forEach {
-                commentStackView.addArrangedSubview($0)
-            }
-        [levelLabel, sectorLabel, dDayLabel]
-            .forEach {
-                gymInfoStackView.addArrangedSubview($0)
-                $0.font = .systemFont(ofSize: 13)
-                $0.textColor = .white
-                $0.textAlignment = .center
-                $0.layer.cornerRadius = 5
-                $0.layer.borderWidth = 0.5
-                $0.layer.borderColor = UIColor.systemGray5.cgColor
-                $0.layer.opacity = 0.8
-                $0.layer.masksToBounds = true
-            }
+//        [likeButton, likeButtonCounter]
+//            .forEach {
+//                likeStackView.addArrangedSubview($0)
+//            }
+//        [commentButton, commentButtonCounter]
+//            .forEach {
+//                commentStackView.addArrangedSubview($0)
+//            }
+//        [levelLabel, sectorLabel, dDayLabel]
+//            .forEach {
+//                gymInfoStackView.addArrangedSubview($0)
+//                $0.font = .systemFont(ofSize: 13)
+//                $0.textColor = .white
+//                $0.textAlignment = .center
+//                $0.layer.cornerRadius = 5
+//                $0.layer.borderWidth = 0.5
+//                $0.layer.borderColor = UIColor.systemGray5.cgColor
+//                $0.layer.opacity = 0.8
+//                $0.layer.masksToBounds = true
+//            }
+    }
+    func pauseVideo(cell: SFFeedCell) {
+        cell.player?.pause() // 비디오 정지
     }
     
     // MARK: - 레이아웃 설정
@@ -235,6 +247,10 @@ class SFCollectionViewCell: UICollectionViewCell {
         collectionView.snp.makeConstraints {
             $0.width.equalToSuperview()
             $0.height.equalTo(collectionView.snp.width).multipliedBy(16.0/9.0)
+        }
+        pageControl.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(collectionView.snp.bottom).offset(-40)
         }
         feedProfileStackView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.76)
@@ -246,90 +262,107 @@ class SFCollectionViewCell: UICollectionViewCell {
         feedUserNameLabel.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 200, height: 40))
         }
-        followButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 50, height: 20))
-            $0.centerY.equalTo(feedProfileStackView.snp.centerY)
-            $0.leading.equalTo(feedProfileStackView.snp.trailing)
-        }
+//        followButton.snp.makeConstraints {
+//            $0.size.equalTo(CGSize(width: 50, height: 20))
+//            $0.centerY.equalTo(feedProfileStackView.snp.centerY)
+//            $0.leading.equalTo(feedProfileStackView.snp.trailing)
+//        }
         feedCaptionLabel.snp.makeConstraints {
             $0.top.equalTo(feedProfileStackView.snp.bottom).offset(15)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
-        gymInfoStackView.snp.makeConstraints {
-            $0.top.equalTo(feedCaptionLabel.snp.bottom).offset(12)
-            $0.leading.equalToSuperview().inset(16)
-        }
-        levelLabel.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 45, height: 20))
-        }
-        sectorLabel.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 45, height: 20))
-        }
-        dDayLabel.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 45, height: 20))
-        }
-        likeStackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.57)
-            $0.trailing.equalToSuperview().inset(10)
-        }
-        likeButton.imageView?.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 35, height: 30))
-        }
-        likeButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 35, height: 35))
-        }
-        commentStackView.snp.makeConstraints {
-            $0.top.equalTo(likeStackView.snp.bottom).offset(20)
-            $0.trailing.equalToSuperview().inset(10)
-        }
-        commentButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 35, height: 35))
-            $0.top.equalTo(likeStackView.snp.bottom).offset(20)
-        }
-        commentButton.imageView?.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 35, height: 35))
-        }
+//        gymInfoStackView.snp.makeConstraints {
+//            $0.top.equalTo(feedCaptionLabel.snp.bottom).offset(12)
+//            $0.leading.equalToSuperview().inset(16)
+//        }
+//        levelLabel.snp.makeConstraints {
+//            $0.size.equalTo(CGSize(width: 45, height: 20))
+//        }
+//        sectorLabel.snp.makeConstraints {
+//            $0.size.equalTo(CGSize(width: 45, height: 20))
+//        }
+//        dDayLabel.snp.makeConstraints {
+//            $0.size.equalTo(CGSize(width: 45, height: 20))
+//        }
+//        likeStackView.snp.makeConstraints {
+//            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.57)
+//            $0.trailing.equalToSuperview().inset(10)
+//        }
+//        likeButton.imageView?.snp.makeConstraints {
+//            $0.size.equalTo(CGSize(width: 35, height: 30))
+//        }
+//        likeButton.snp.makeConstraints {
+//            $0.size.equalTo(CGSize(width: 35, height: 35))
+//        }
+//        commentStackView.snp.makeConstraints {
+//            $0.top.equalTo(likeStackView.snp.bottom).offset(20)
+//            $0.trailing.equalToSuperview().inset(10)
+//        }
+//        commentButton.snp.makeConstraints {
+//            $0.size.equalTo(CGSize(width: 35, height: 35))
+//            $0.top.equalTo(likeStackView.snp.bottom).offset(20)
+//        }
+//        commentButton.imageView?.snp.makeConstraints {
+//            $0.size.equalTo(CGSize(width: 35, height: 35))
+//        }
     }
     
     // MARK: - configure 메서드
     func configure(with post: Post, media: [Media]) {
-        // post 데이터와 media 데이터를 기반으로 UI 업데이트
-        feedUserNameLabel.text = post.gym
+        FirebaseManager.shared.getUserInfoFrom(uid: post.authorUID) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case.success(let user):
+                if let imageUrlString = user.profileImage {
+                    if let imageUrl = URL(string: imageUrlString) {
+                        self.feedUserProfileImage.kf.setImage(with: imageUrl)
+                    }
+                } else {
+                    self.feedUserProfileImage.image = UIImage(named: "testStone")
+                }
+                DispatchQueue.main.async {
+                    self.feedUserNameLabel.text = user.userName
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
         feedCaptionLabel.text = post.caption
         pageControl.numberOfPages = media.count
+        pageControl.currentPage = 0
         medias = media
         collectionView.reloadData()
         
         // media 배열을 순회하며 각 Media 객체의 정보를 사용
-//        if let firstMedia = media.first {
-//            // 첫 번째 미디어의 URL을 사용하여 이미지 로드
-//            if let mediaURL = URL(string: firstMedia.url) {
-//                feedImage.kf.setImage(with: mediaURL, placeholder: UIImage(named: "placeholder"))
-//            }
-//            
-//            // 섹터 및 등급 정보를 사용할 수 있다면 UI 업데이트
-//            if let sector = firstMedia.sector {
-//                sectorLabel.text = "\(sector)"
-//            }
-//            
-//            if let grade = firstMedia.grade {
-//                levelLabel.text = "\(grade)"
-//            }
-            
-            // profileImage, media를 표시하는 추가 설정 필요
-            
-//            // 일단 임시로 그냥 뷰에 박아놓음 - DS
-//            guard let gymName = post.gym else { return }
-//
-//            // FirebaseManager에서 gym 정보를 받아와서 처리
-//            FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
-//                guard let self = self, let gym = gym, let profileImageURL = gym.profileImage,
-//                      let url = URL(string: profileImageURL) else { return }
-//
-//                // 프로필 이미지가 있으면 Kingfisher로 로드
-//                self.feedUserProfileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"))
-//            }
-//        }
+        //        if let firstMedia = media.first {
+        //            // 첫 번째 미디어의 URL을 사용하여 이미지 로드
+        //            if let mediaURL = URL(string: firstMedia.url) {
+        //                feedImage.kf.setImage(with: mediaURL, placeholder: UIImage(named: "placeholder"))
+        //            }
+        //
+        //            // 섹터 및 등급 정보를 사용할 수 있다면 UI 업데이트
+        //            if let sector = firstMedia.sector {
+        //                sectorLabel.text = "\(sector)"
+        //            }
+        //
+        //            if let grade = firstMedia.grade {
+        //                levelLabel.text = "\(grade)"
+        //            }
+        
+        // profileImage, media를 표시하는 추가 설정 필요
+        
+        //            // 일단 임시로 그냥 뷰에 박아놓음 - DS
+        //            guard let gymName = post.gym else { return }
+        //
+        //            // FirebaseManager에서 gym 정보를 받아와서 처리
+        //            FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
+        //                guard let self = self, let gym = gym, let profileImageURL = gym.profileImage,
+        //                      let url = URL(string: profileImageURL) else { return }
+        //
+        //                // 프로필 이미지가 있으면 Kingfisher로 로드
+        //                self.feedUserProfileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"))
+        //            }
+        //        }
     }
     
     // MARK: - 버튼 그림자 모드
@@ -352,51 +385,18 @@ extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDele
             return UICollectionViewCell()
         }
         let currentMedia = medias[indexPath.row]
-        guard let mediaURL = URL(string: currentMedia.url) else { return UICollectionViewCell() }
-//        let feedCellModel = FeedCellModel(imageURL: mediaURL, videoURL: mediaURL, grade: currentMedia.grade, sector: currentMedia.sector)
         cell.configure(with: currentMedia)
         return cell
     }
-//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        guard let sfFeedCell = cell as? SFFeedCell,
-//              let url = URL(string:medias[indexPath.item].url)
-//        else { return }
-//        sfFeedCell.configure(with: medias[indexPath.row]) // 셀 나타날 때 URL로 데이터 로드
-//        print(url)
-//    }
     
-//    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        guard let sfFeedCell = cell as? SFFeedCell else { return }
-//        sfFeedCell.stopVideo() // 셀이 사라질 때 비디오 정지
-//    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        return CGSize(width: self.bounds.width, height: self.bounds.height)
-        CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        stopVideos()
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let pageIndex = round(scrollView.contentOffset.x / scrollView.frame.size.width)
-        pageControl.currentPage = Int(pageIndex)
-    }
-    
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        for cell in collectionView.visibleCells {
-            if let verticalCell = cell as? SFFeedCell {
-                verticalCell.playVideo()
-            }
-        }
-    }
-
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if !decelerate {
-            stopVideos()
-        }
-    }
-
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        stopVideos()
+        let pageIndex = Int(round(scrollView.contentOffset.x / self.frame.width))
+        guard pageControl.currentPage != pageIndex else { return } // 페이지가 정확하게 넘어간것만 걸러내기
+        pageControl.currentPage = pageIndex
     }
 
     private func stopVideos() {

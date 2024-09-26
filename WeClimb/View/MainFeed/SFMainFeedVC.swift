@@ -219,38 +219,47 @@ class SFMainFeedVC: UIViewController {
     }
     
     private func showCommentModal(for post: Post) {
-        let modalVC = FeedCommentModalVC()
-        presentModal(modalVC: modalVC)
+//        let modalVC = FeedCommentModalVC()
+//        presentModal(modalVC: modalVC)
+        print("기능없음")
+    }
+    
+    func innerCollectionViewPlayers(playOrPause: Bool) {
+        // 현재 보이는 셀을 가져옴
+        guard let visibleCells = collectionView.visibleCells as? [SFCollectionViewCell] else { return }
+        
+        // 각 셀 안의 AVPlayer 일시정지
+        visibleCells.forEach { cell in
+            let innerCollectionView = cell.collectionView
+            guard let innerVisibleCells = innerCollectionView.visibleCells as? [SFFeedCell] else { return }
+            
+            if playOrPause {
+//                innerVisibleCells.forEach { innerCell in
+//                    innerCell.playVideo()
+//                }
+                if let cell = innerVisibleCells.last {
+                    cell.playVideo()
+                }
+            } else {
+                innerVisibleCells.forEach { innerCell in
+                    innerCell.stopVideo()
+                }
+//                if let cell = innerVisibleCells.first {
+//                    cell.stopVideo()
+//                }
+            }
+        }
     }
 }
 
 //MARK: - 컬렉션뷰 프로토콜 설정
-//extension SFMainFeedVC: UICollectionViewDataSource {
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return viewModel.posts.count
-//    }
-//
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SFCollectionViewCell.className, for: indexPath) as! SFCollectionViewCell
-//        let post = viewModel.posts[indexPath.item]
-//        
-//        cell.configure(with: post.post, media: post.media)
-//        
-//        cell.commentButton.addTarget(self, action: #selector(commentButtonTapped(_:)), for: .touchUpInside)
-//        
-//        return cell
-//    }
-//    
-//    @objc private func commentButtonTapped(_ sender: UIButton) {
-//        guard let cell = sender.superview?.superview as? SFCollectionViewCell,
-//              let indexPath = collectionView.indexPath(for: cell) else { return }
-//        let post = viewModel.posts[indexPath.item]
-//        showCommentModal(for: post.post)
-//    }
-//}
 
 extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
     }
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        innerCollectionViewPlayers(playOrPause: false)
+    }
+
 }
