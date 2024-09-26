@@ -45,7 +45,9 @@ class EditPageVC: UIViewController {
         setNavigation()
         setLayout()
         bind()
-        setProfileImageTap()
+        
+        // 이미지 탭 피커 임시 주석
+//        setProfileImageTap()
     }
     
     override func viewWillAppear(_ animated: Bool) {
