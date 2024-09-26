@@ -8,16 +8,16 @@
 import UIKit
 
 import SnapKit
-import RxSwift
 import RxCocoa
+import RxDataSources
+import RxSwift
 
 class SFMainFeedVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private let viewModel = MainFeedVM()
     
-    private var posts: [(post: Post, media: [Media])] = []
-    
+//    private var posts: [(post: Post, media: [Media])] = []
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -34,23 +34,26 @@ class SFMainFeedVC: UIViewController {
         setCollectionView()
         setLayout()
         
-        bindViewModel()
+//        bindViewModel()
+        
+        bindCollectionView()
+        setupCollectionViewScrollEvent()
     }
     
     // MARK: - 데이터 바인딩
-       private func bindViewModel() {
-           // ViewModel의 데이터 바인딩
-           viewModel.posts
-               .observe(on: MainScheduler.instance)
-               .subscribe(onNext: { [weak self] posts in
-                   self?.posts = posts
-                   self?.collectionView.reloadData()
-               })
-               .disposed(by: disposeBag)
-           
-           // ViewModel에서 피드 데이터를 가져오는 메서드 호출
-           viewModel.fetchInitialFeed()
-       }
+//       private func bindViewModel() {
+//           // ViewModel의 데이터 바인딩
+//           viewModel.posts
+//               .observe(on: MainScheduler.instance)
+//               .subscribe(onNext: { [weak self] posts in
+////                   self?.posts = posts
+//                   self?.collectionView.reloadData()
+//               })
+//               .disposed(by: disposeBag)
+//           
+//           // ViewModel에서 피드 데이터를 가져오는 메서드 호출
+////           viewModel.fetchInitialFeed()
+//       }
     
     //MARK: - 네비게이션바, 탭바 세팅
     
@@ -79,36 +82,96 @@ class SFMainFeedVC: UIViewController {
         actionSheet()
     }
     
-    @objc private func rightButtonTapped() {
-            actionSheet()
-        }
-    
     private func setTabBar(){
         if let tabBar = self.tabBarController?.tabBar {
             tabBar.backgroundImage = UIImage()  //탭바 배경 투명하게 설정
-            //            tabBar.shadowImage = UIImage()  //탭바 하단 그림자 제거
+            tabBar.shadowImage = UIImage()  //탭바 하단 그림자 제거
             tabBar.isTranslucent = true  //탭바 반투명
             tabBar.backgroundColor = .clear  //탭바 배경투명
+//            tabBar.backgroundColor = UIColor(hex: "#0B1013")
         }
     }
     
     //MARK: - 컬렉션뷰 & 레이아웃 설정
     private func setCollectionView() {
-        collectionView.register(SFCollectionViewCell.self, forCellWithReuseIdentifier: Identifiers.mainCollectionViewCell)
+        collectionView.register(SFCollectionViewCell.self, forCellWithReuseIdentifier: SFCollectionViewCell.className)
         
-        collectionView.dataSource = self
-        collectionView.delegate = self
+//        collectionView.dataSource = self
+//        collectionView.delegate = self
         collectionView.frame = view.bounds  //컬렉션뷰 셀 프레임을 화면 전체에 맞춤
         collectionView.isPagingEnabled = true  //스크롤 시 한 화면씩 넘기기(페이징 모드 활성화)
         collectionView.contentInsetAdjustmentBehavior = .never  //네비게이션바 자동 여백 삭제
         collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
     }
     
+    private func bindCollectionView() {
+        viewModel.posts
+            .bind(to: collectionView.rx
+                .items(cellIdentifier: SFCollectionViewCell.className,
+                cellType: SFCollectionViewCell.self)) { index, post, cell in
+                
+                cell.configure(with: post.post, media: post.media)
+                cell.commentButton.rx.tap
+                          .bind { [weak self] in
+                              guard let self else { return }
+                              self.showCommentModal(for: post.post)
+                          }
+                          .disposed(by: cell.disposeBag)
+            }
+                .disposed(by: disposeBag)
+        
+        collectionView.rx.modelSelected((post: Post, media: [Media]).self)
+            .subscribe(onNext: { [weak self] post in
+                self?.showCommentModal(for: post.post)
+            })
+            .disposed(by: disposeBag)
+        
+        // 셀 크기 설정
+        collectionView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
+    }
+    
+    private func setupCollectionViewScrollEvent() {
+            collectionView.rx.contentOffset
+                .subscribe(onNext: { [weak self] contentOffset in
+                    guard let self else { return }
+                    
+                    let scrollViewHeight = self.collectionView.frame.size.height
+                    let scrollContentSizeHeight = self.collectionView.contentSize.height
+                    let scrollOffsetThreshold = scrollContentSizeHeight - scrollViewHeight
+
+                    // 스크롤이 마지막 셀에 도달했는지 확인
+                    if contentOffset.y >= scrollOffsetThreshold {
+//                        if let indexPaths = self.collectionView.indexPathsForVisibleItems.sorted(),
+                          if let lastIndexPath = self.collectionView.indexPathsForVisibleItems.sorted().last {
+                              let isLastItem = lastIndexPath.item == (self.viewModel.posts.value.count - 1)
+                            
+                              if isLastItem && !self.viewModel.isLastCell {
+                                  self.viewModel.isLastCell = true
+                                  self.onLastCellReached()
+                              }
+                          }
+                      } else {
+                          // 스크롤이 마지막 셀에 도달하지 않으면 플래그를 리셋
+                          self.viewModel.isLastCell = false
+                      }
+                })
+                .disposed(by: disposeBag)
+        }
+        
+        // 마지막 셀 도달 시 처리할 이벤트 함수
+        func onLastCellReached() {
+            print("마지막 셀에 도달!")
+            // 필요한 작업을 여기에 추가하세요
+            viewModel.fetchMoreFeed()
+        }
     
     private func setLayout() {
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+//            $0.edges.equalToSuperview()
+            $0.top.left.right.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
     
@@ -140,35 +203,6 @@ class SFMainFeedVC: UIViewController {
         let modalVC = FeedCommentModalVC()
         presentModal(modalVC: modalVC)
     }
-}
-
-//MARK: - 컬렉션뷰 프로토콜 설정
-extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return posts.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Identifiers.mainCollectionViewCell, for: indexPath) as? SFCollectionViewCell else {
-            return UICollectionViewCell()
-        }
-        
-        let postData = posts[indexPath.item]
-        cell.configure(with: postData.post, media: postData.media)
-        
-        cell.commentButton.rx.tap
-            .bind { [weak self] in
-                self?.showCommentModal(for: postData.post)
-            }
-            .disposed(by: cell.disposeBag)
-        
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
-    }
-    
     // MARK: - 신고하기 및 댓글 모달 표시
     private func showActionSheet(for post: Post) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -187,5 +221,36 @@ extension SFMainFeedVC: UICollectionViewDataSource, UICollectionViewDelegateFlow
     private func showCommentModal(for post: Post) {
         let modalVC = FeedCommentModalVC()
         presentModal(modalVC: modalVC)
+    }
+}
+
+//MARK: - 컬렉션뷰 프로토콜 설정
+//extension SFMainFeedVC: UICollectionViewDataSource {
+//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        return viewModel.posts.count
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SFCollectionViewCell.className, for: indexPath) as! SFCollectionViewCell
+//        let post = viewModel.posts[indexPath.item]
+//        
+//        cell.configure(with: post.post, media: post.media)
+//        
+//        cell.commentButton.addTarget(self, action: #selector(commentButtonTapped(_:)), for: .touchUpInside)
+//        
+//        return cell
+//    }
+//    
+//    @objc private func commentButtonTapped(_ sender: UIButton) {
+//        guard let cell = sender.superview?.superview as? SFCollectionViewCell,
+//              let indexPath = collectionView.indexPath(for: cell) else { return }
+//        let post = viewModel.posts[indexPath.item]
+//        showCommentModal(for: post.post)
+//    }
+//}
+
+extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
     }
 }

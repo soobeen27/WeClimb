@@ -472,6 +472,7 @@ final class FirebaseManager {
         
         let postRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
+//            .limit(to: 10)
             .limit(to: 10)
         
         postRef.getDocuments { [weak self] snapshot, error in
@@ -549,7 +550,7 @@ final class FirebaseManager {
         }
         let postRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
-            .limit(to: 10)
+            .limit(to: 2)
             .start(afterDocument: lastFeed)
         
         postRef.getDocuments { [weak self] snapshot, error in

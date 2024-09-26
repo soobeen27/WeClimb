@@ -8,14 +8,17 @@
 import UIKit
 
 import SnapKit
+import RxCocoa
 import RxSwift
 
 class SFCollectionViewCell: UICollectionViewCell {
     
     var disposeBag = DisposeBag()
     
+    var medias: [Media] = []
+    
     //MARK: - UI 세팅
-    private let collectionView: UICollectionView = {
+    private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal //가로 스크롤
         layout.itemSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
@@ -23,7 +26,18 @@ class SFCollectionViewCell: UICollectionViewCell {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
+        collectionView.isPagingEnabled = true
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(SFFeedCell.self, forCellWithReuseIdentifier: SFFeedCell.className)
         return collectionView
+    }()
+    
+    private lazy var pageControl: UIPageControl = {
+        let pageControl = UIPageControl()
+//        pageControl.numberOfPages = images.count
+        pageControl.currentPage = 0
+        return pageControl
     }()
     
     private let feedCaptionLabel: UILabel = {
@@ -174,6 +188,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         feedCaptionLabel.text = nil
         likeButtonCounter.text = nil
         feedUserProfileImage.image = nil
+        medias = []
     }
     
     // MARK: - UI 구성
@@ -281,22 +296,25 @@ class SFCollectionViewCell: UICollectionViewCell {
         // post 데이터와 media 데이터를 기반으로 UI 업데이트
         feedUserNameLabel.text = post.gym
         feedCaptionLabel.text = post.caption
+        pageControl.numberOfPages = media.count
+        medias = media
+        collectionView.reloadData()
         
         // media 배열을 순회하며 각 Media 객체의 정보를 사용
-        if let firstMedia = media.first {
-            // 첫 번째 미디어의 URL을 사용하여 이미지 로드
-            if let mediaURL = URL(string: firstMedia.url) {
-                feedImage.kf.setImage(with: mediaURL, placeholder: UIImage(named: "placeholder"))
-            }
-            
-            // 섹터 및 등급 정보를 사용할 수 있다면 UI 업데이트
-            if let sector = firstMedia.sector {
-                sectorLabel.text = "\(sector)"
-            }
-            
-            if let grade = firstMedia.grade {
-                levelLabel.text = "\(grade)"
-            }
+//        if let firstMedia = media.first {
+//            // 첫 번째 미디어의 URL을 사용하여 이미지 로드
+//            if let mediaURL = URL(string: firstMedia.url) {
+//                feedImage.kf.setImage(with: mediaURL, placeholder: UIImage(named: "placeholder"))
+//            }
+//            
+//            // 섹터 및 등급 정보를 사용할 수 있다면 UI 업데이트
+//            if let sector = firstMedia.sector {
+//                sectorLabel.text = "\(sector)"
+//            }
+//            
+//            if let grade = firstMedia.grade {
+//                levelLabel.text = "\(grade)"
+//            }
             
             // profileImage, media를 표시하는 추가 설정 필요
             
@@ -311,7 +329,7 @@ class SFCollectionViewCell: UICollectionViewCell {
 //                // 프로필 이미지가 있으면 Kingfisher로 로드
 //                self.feedUserProfileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"))
 //            }
-        }
+//        }
     }
     
     // MARK: - 버튼 그림자 모드
@@ -321,5 +339,71 @@ class SFCollectionViewCell: UICollectionViewCell {
         view.layer.shadowOpacity = 0.5
         view.layer.shadowRadius = 2
         view.layer.masksToBounds = false
+    }
+}
+// MARK: CollectionView Setting
+extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return medias.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SFFeedCell.className, for: indexPath) as? SFFeedCell else {
+            return UICollectionViewCell()
+        }
+        let currentMedia = medias[indexPath.row]
+        guard let mediaURL = URL(string: currentMedia.url) else { return UICollectionViewCell() }
+//        let feedCellModel = FeedCellModel(imageURL: mediaURL, videoURL: mediaURL, grade: currentMedia.grade, sector: currentMedia.sector)
+        cell.configure(with: currentMedia)
+        return cell
+    }
+//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        guard let sfFeedCell = cell as? SFFeedCell,
+//              let url = URL(string:medias[indexPath.item].url)
+//        else { return }
+//        sfFeedCell.configure(with: medias[indexPath.row]) // 셀 나타날 때 URL로 데이터 로드
+//        print(url)
+//    }
+    
+//    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        guard let sfFeedCell = cell as? SFFeedCell else { return }
+//        sfFeedCell.stopVideo() // 셀이 사라질 때 비디오 정지
+//    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+//        return CGSize(width: self.bounds.width, height: self.bounds.height)
+        CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let pageIndex = round(scrollView.contentOffset.x / scrollView.frame.size.width)
+        pageControl.currentPage = Int(pageIndex)
+    }
+    
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        for cell in collectionView.visibleCells {
+            if let verticalCell = cell as? SFFeedCell {
+                verticalCell.playVideo()
+            }
+        }
+    }
+
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            stopVideos()
+        }
+    }
+
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        stopVideos()
+    }
+
+    private func stopVideos() {
+        for cell in collectionView.visibleCells {
+            if let verticalCell = cell as? SFFeedCell {
+                verticalCell.stopVideo()
+            }
+        }
     }
 }
