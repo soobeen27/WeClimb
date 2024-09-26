@@ -124,7 +124,7 @@ class ClimbingGymVC: UIViewController {
         private func actions() {
             headerView.followButton.addAction(UIAction { [weak self] _ in
                 guard let self = self else { return }
-                
+                self.headerView.followButton.isHidden = true
                 if self.headerView.followButton.title(for: .normal) == ClimbingGymNameSpace.follow {
                     self.headerView.followButton.setTitle(ClimbingGymNameSpace.unFollow, for: .normal)
                     self.headerView.followButton.backgroundColor = .lightGray

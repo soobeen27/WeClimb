@@ -25,12 +25,14 @@ class GymHeaderView: UIView {
         label.font = UIFont.boldSystemFont(ofSize: 17)
         return label
     }()
-    
+
+    // 팔로우 레이블 히든
     let followerLabel: UILabel = {
         let label = UILabel()
-        label.text = ClimbingGymNameSpace.follower
+//        label.text = ClimbingGymNameSpace.follower
         label.font = UIFont.systemFont(ofSize: 15)
         label.textColor = .gray
+        label.isHidden = true
         return label
     }()
     
@@ -56,6 +58,7 @@ class GymHeaderView: UIView {
         button.titleLabel?.font = .systemFont(ofSize: 13)
         button.backgroundColor = .mainPurple
         button.layer.cornerRadius = 10
+        button.isHidden = true
         return button
     }()
     
