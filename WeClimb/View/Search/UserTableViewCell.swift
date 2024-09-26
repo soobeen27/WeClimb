@@ -79,7 +79,7 @@ class UserTableViewCell: UITableViewCell {
         if let imageUrl = data.profileImage {
             FirebaseManager.shared.loadImage(from: imageUrl, into: userImage)
         } else {
-            userImage.image = UIImage(named: "defaultImage")
+            userImage.image = UIImage(named: "testStone")
         }
     }
 }

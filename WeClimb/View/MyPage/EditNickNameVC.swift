@@ -213,7 +213,7 @@ class EditNickNameVC: UIViewController, UITextFieldDelegate {
             .withLatestFrom(viewModel.nicknameInput) // nicknameInput의 최신 값 가져오기
             .subscribe(onNext: { [weak self] newName in
                 guard let self else { return }
-                FirebaseManager.shared.updateAccount(with: newName, for: .userName, completion: {
+                FirebaseManager.shared.updateAccount(with: newName, for: .userName) {
                     DispatchQueue.main.async {
                         let alert = UIAlertController(title: "닉네임 수정이 완료되었습니다", message: nil, preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
@@ -221,7 +221,7 @@ class EditNickNameVC: UIViewController, UITextFieldDelegate {
                         }))
                         self.present(alert, animated: true, completion: nil)
                     }
-                })
+                }
             })
             .disposed(by: disposeBag)
     }
