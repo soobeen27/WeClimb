@@ -35,6 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             KakaoSDK.initSDK(appKey: nativeAppKey)
         }
         
+        Thread.sleep(forTimeInterval: 0.7)
         return true
     }
     
