@@ -27,7 +27,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         layout.itemSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        collectionView.backgroundColor = UIColor(hex: "#0B1013")
         collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
         collectionView.isPagingEnabled = true
         collectionView.delegate = self

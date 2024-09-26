@@ -23,12 +23,15 @@ class SFMainFeedVC: UIViewController {
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0  //셀간 여백 조정(효과없음)
         //        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0) //플로우 레이아웃 인셋 조정(효과없음)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = UIColor(hex: "#0B1013")
+                                
         return UICollectionView(frame: .zero, collectionViewLayout: layout) //레이아웃을 반환
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.backgroundColor = UIColor(hex: "#0B1013")
         setNavigationBar()
         setTabBar()
         setCollectionView()

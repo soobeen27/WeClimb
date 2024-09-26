@@ -31,6 +31,7 @@ class SFFeedCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        contentView.backgroundColor = UIColor(hex: "#0B1013")
         // 이미지 뷰 초기화
         imageView = UIImageView(frame: contentView.bounds)
         imageView.contentMode = .scaleAspectFill
