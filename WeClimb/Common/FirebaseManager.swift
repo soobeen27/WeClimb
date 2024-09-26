@@ -23,8 +23,12 @@ final class FirebaseManager {
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     private let disposeBag = DisposeBag()
-    private var ongoingRequests = [String: Bool]()
     private var lastFeed: QueryDocumentSnapshot?
+    
+    // 중복 요청 방지 및 캐싱 관리
+    private var ongoingRequests = [String: Bool]()
+    private var urlCache = NSCache<NSString, NSURL>()
+    private var imageCache = NSCache<NSString, UIImage>()
     
     static let shared = FirebaseManager()
     private init() {}
@@ -339,12 +343,12 @@ final class FirebaseManager {
             let batch = db.batch()
             
             // 비동기로 각각의 미디어 파일을 업로드하고 Firestore 배치에 추가
-//            var urlForThumbnail: URL?
+            //            var urlForThumbnail: URL?
             var mediaReferences: [DocumentReference] = []
             for media in media.enumerated() {
-//                if media.offset == 0 {
-//                    urlForThumbnail = media.element.url
-//                }
+                //                if media.offset == 0 {
+                //                    urlForThumbnail = media.element.url
+                //                }
                 let fileName = media.element.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.element.url.lastPathComponent
                 let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
                 let mediaURL = try await uploadMedia(mediaRef: mediaRef, mediaURL: media.element.url)
@@ -685,6 +689,12 @@ final class FirebaseManager {
     
     // gs:// URL을 HTTP/HTTPS로 변환하는 함수
     func fetchImageURL(from gsURL: String, completion: @escaping (URL?) -> Void) {
+        // 이미 캐싱된 URL이 있는지 확인
+        if let cachedURL = urlCache.object(forKey: gsURL as NSString) {
+            completion(cachedURL as URL)
+            return
+        }
+        
         // 이미 요청 중인지 확인
         guard ongoingRequests[gsURL] == nil else {
             print("Request for \(gsURL) is already in progress.")
@@ -709,6 +719,11 @@ final class FirebaseManager {
                 return
             }
             
+            if let url = url {
+                // 변환된 URL 캐싱
+                self.urlCache.setObject(url as NSURL, forKey: gsURL as NSString)
+            }
+            
             // 완료된 URL 반환
             completion(url)
         }
@@ -721,14 +736,20 @@ final class FirebaseManager {
             return
         }
         
+        // 이미 캐싱된 이미지 확인
+        if let cachedImage = imageCache.object(forKey: imageUrl as NSString) {
+            imageView.image = cachedImage
+            return
+        }
+        
         if imageUrl.hasPrefix("gs://") {
             // gs:// URL을 HTTPS로 변환 후 이미지 로드
-            fetchImageURL(from: imageUrl) { httpsURL in
-                guard let httpsURL = httpsURL else {
+            fetchImageURL(from: imageUrl) { [weak self] httpsURL in
+                guard let self = self, let httpsURL = httpsURL else {
                     imageView.image = UIImage(named: "defaultImage")
                     return
                 }
-                self.setImage(with: httpsURL, into: imageView)
+                self.setImage(with: httpsURL, into: imageView, cacheKey: imageUrl)
             }
         } else {
             // HTTP/HTTPS URL 처리
@@ -736,17 +757,26 @@ final class FirebaseManager {
                 imageView.image = UIImage(named: "defaultImage")
                 return
             }
-            setImage(with: url, into: imageView)
+            setImage(with: url, into: imageView, cacheKey: imageUrl)
         }
     }
     
     // Kingfisher로 이미지를 설정하는 함수
-    private func setImage(with url: URL?, into imageView: UIImageView) {
+    private func setImage(with url: URL?, into imageView: UIImageView, cacheKey: String) {
         let options: KingfisherOptionsInfo = [
             .transition(.fade(0.2)), // 부드러운 페이드 애니메이션
             .cacheOriginalImage // 원본 이미지를 캐시
         ]
-        imageView.kf.setImage(with: url, placeholder: UIImage(named: "defaultImage"), options: options)
+        
+        imageView.kf.setImage(with: url, placeholder: UIImage(named: "defaultImage"), options: options) { [weak self] result in
+            switch result {
+            case .success(let value):
+                // 성공적으로 로드된 이미지를 캐시에 저장
+                self?.imageCache.setObject(value.image, forKey: cacheKey as NSString)
+            case .failure(let error):
+                print("Failed to load image: \(error.localizedDescription)")
+            }
+        }
     }
 }
 /*

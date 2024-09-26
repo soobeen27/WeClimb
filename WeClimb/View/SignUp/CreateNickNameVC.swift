@@ -209,15 +209,35 @@ class CreateNickNameVC: UIViewController {
             .bind(to: characterCountLabel.rx.text)
             .disposed(by: disposeBag)
         
-        // 네비게이션
+        // 닉네임 중복 여부 확인
         confirmButton.rx.tap
-            .withLatestFrom(viewModel.nicknameInput) // nicknameInput의 최신 값 가져오기
-            .subscribe(onNext: { [weak self] newName in
-                guard let self else { return }
-                FirebaseManager.shared.updateAccount(with: newName, for: .userName, completion: {
-                    let personalDetailVC = PersonalDetailsVC()
-                    self.navigationController?.pushViewController(personalDetailVC, animated: true)
-                })
+            .subscribe(onNext: { [weak self] in
+                self?.viewModel.checkNicknameDuplication()
+            })
+            .disposed(by: disposeBag)
+        
+        // 닉네임 중복 체크 결과에 따라 처리
+        viewModel.isNicknameDuplicateCheck
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] isDuplicate in
+                guard let self = self else { return }
+                
+                if isDuplicate {
+                    // 닉네임 중복일 경우 알림 표시
+                    CommonManager.shared.showAlert(
+                        from: self,
+                        title: "중복된 닉네임",
+                        message: "이미 사용중인 닉네임입니다. 다른 닉네임을 입력해주세요.",
+                        includeCancel: false
+                    )
+                } else {
+                    // 닉네임 중복이 아닐 경우 네비게이션 실행
+                    guard let newName = try? self.viewModel.nicknameInput.value() else { return }
+                    FirebaseManager.shared.updateAccount(with: newName, for: .userName, completion: {
+                        let personalDetailVC = PersonalDetailsVC()
+                        self.navigationController?.pushViewController(personalDetailVC, animated: true)
+                    })
+                }
             })
             .disposed(by: disposeBag)
     }
