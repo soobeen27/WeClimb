@@ -15,172 +15,171 @@ class ClimbingGymVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private let viewModel = ClimbingGymVM()
+    private let climbingGymInfoView = ClimbingGymInfoView()
+    private var gymData: Gym?
     
-    // MARK: - 간단 레이블 구성 DS
-    private let profileImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.backgroundColor = .lightGray
-        imageView.layer.cornerRadius = 40
-        imageView.clipsToBounds = true
-        return imageView
-    }()
+    // MARK: - 공통 헤더 뷰 - DS
+    private let headerView = GymHeaderView()
     
-    private let profileNameLabel: UILabel = {
-        let label = UILabel()
-        label.text = "000 클라이밍"
-        label.font = UIFont.boldSystemFont(ofSize: 17)
-        return label
-    }()
-    
-    private let followerLabel: UILabel = {
-        let label = UILabel()
-        label.text = "1999 팔로워"
-        label.font = UIFont.systemFont(ofSize: 15)
-        label.textColor = .gray
-        return label
-    }()
-    
-    private let followButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("팔로우", for: .normal)
-        button.setTitleColor(.black, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 13)
-        button.backgroundColor = .lightGray
-        button.layer.cornerRadius = 10
-        return button
-    }()
-    
-    private let segmentControl: UISegmentedControl = {
-        let segmentControl = UISegmentedControl(items: ["세팅", "정보"])
-        segmentControl.selectedSegmentIndex = 0
-        return segmentControl
-    }()
-    
-    private let contentView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .lightGray
-        return view
-    }()
-    
-    // MARK: - 테이블 뷰
+    // MARK: - 테이블 뷰 구성 - DS
     lazy var tableView: UITableView = {
         let tableView = UITableView()
-        tableView.backgroundColor = UIColor.lightGray
+        tableView.backgroundColor = .clear
         tableView.clipsToBounds = true
         tableView.layer.cornerRadius = 10
+        tableView.showsVerticalScrollIndicator = false
+        tableView.separatorStyle = .singleLine
+        tableView.separatorColor = UIColor.label.withAlphaComponent(0.2)
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+        tableView.rowHeight = 120
         
-        tableView.separatorStyle = .singleLine // 기본 선 스타일
-        tableView.separatorColor = .black // 구분선 색상
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15) // 좌우 여백
         return tableView
     }()
     
-    // MARK: - 라이프 사이클 DS
-    
+    // MARK: - 라이프사이클 - DS
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
         bindSectionData()
         actions()
+//        navigation()
         
-        // 임시레지스터
         tableView.register(SectionTableViewCell.self, forCellReuseIdentifier: Identifiers.sectionTableViewCell)
-    }
-    
-    // MARK: - addAction 부분 (버튼, 세그먼트 컨트롤) DS
-    private func actions() {
-        followButton.addAction(UIAction { [weak self] _ in
-            guard let self = self else { return }
-            if self.followButton.title(for: .normal) == Identifiers.follow {
-                self.followButton.setTitle(Identifiers.unFollow, for: .normal)
-            } else {
-                self.followButton.setTitle(Identifiers.follow, for: .normal)
-            }
-        }, for: .touchUpInside)
         
-        segmentControl.addAction(UIAction { [weak self] _ in
-            guard let self = self else { return }
-            self.viewModel.selectedSegment.accept(self.segmentControl.selectedSegmentIndex)
-        }, for: .valueChanged)
     }
     
-    // MARK: - 바인딩 DS
+    func configure(with gym: Gym) {
+        viewModel.setGymInfo(gymName: gym.gymName)
+//        headerView.configure(with: gym)
+        climbingGymInfoView.viewModel = viewModel
+    }
+    
+    // MARK: - 네비게이션 - DS
+    func navigation() {
+        viewModel.onItemSelected = { [weak self] (detailItems: [DetailItem]) in
+            guard let self else { return }
+            
+            let detailVM = ClimbingDetailGymVM(detailItems: detailItems)
+            let detailVC = ClimbingDetailGymVC(viewModel: detailVM)
+            self.navigationController?.pushViewController(detailVC, animated: true)
+        }
+    }
+    
+    // MARK: - 데이터 바인딩 - DS
     private func bindSectionData() {
-        viewModel.dummys
-            .bind(to: tableView.rx.items(cellIdentifier: Identifiers.sectionTableViewCell, cellType: UITableViewCell.self)) { row, item, cell in
-                cell.textLabel?.text = item.name
+        // gymData와 바인딩하여 UI 업데이트
+               viewModel.gymData
+                   .compactMap { $0 } // nil이 아닐 때만 처리
+                   .observe(on: MainScheduler.instance)
+                   .subscribe(onNext: { [weak self] gym in
+                       guard let self = self else { return }
+                       // Gym 데이터를 헤더와 정보 뷰에 설정
+                       self.headerView.configure(with: gym)
+//                       self.climbingGymInfoView.configure(with: gym)
+                   })
+                   .disposed(by: disposeBag)
+               
+               // isDataLoaded 상태에 따라 UI 초기화
+               viewModel.isDataLoaded
+                   .filter { $0 } // true일 때만 실행
+                   .observe(on: MainScheduler.instance)
+                   .subscribe(onNext: { [weak self] _ in
+                       guard let self = self else { return }
+                       // 데이터 로딩 후 초기 UI 설정
+                       self.setupInitialUI()
+                   })
+                   .disposed(by: disposeBag)
+           // ViewModel의 items와 테이블 뷰 바인딩
+           viewModel.items
+            .bind(to: tableView.rx.items(cellIdentifier: SectionTableViewCell.className, cellType: SectionTableViewCell.self)) { row, item, cell in
+                   cell.configure(with: item, completedCount: 0, totalCount: 0)
+               }
+               .disposed(by: disposeBag)
+           
+           // 테이블 뷰의 아이템 선택을 ViewModel의 itemSelected로 전달
+//           tableView.rx.itemSelected
+//               .bind(to: viewModel.itemSelected)
+//               .disposed(by: disposeBag)
+    }
+    
+    // 초기 UI 설정 메서드
+        private func setupInitialUI() {
+            let initialSegmentIndex = viewModel.selectedSegment.value
+            headerView.segmentControl.selectedSegmentIndex = initialSegmentIndex
+            updateSegmentControlUI(selectedIndex: initialSegmentIndex)
+        }
+    
+    // Segment Control 선택 인덱스에 따른 UI 업데이트
+        private func updateSegmentControlUI(selectedIndex: Int) {
+            if selectedIndex == 1 {
+                tableView.isHidden = true
+                climbingGymInfoView.isHidden = false
+            } else {
+                tableView.isHidden = false
+                climbingGymInfoView.isHidden = true
             }
-            .disposed(by: disposeBag)
-
-        tableView.rx.itemSelected
-            .bind(to: viewModel.itemSelected)
-            .disposed(by: disposeBag)
-    }
+        }
     
-    // MARK: - 레이아웃 구성 DS
+    // MARK: - 세그먼트 컨트롤 및 버튼 액션 설정 - DS
+        private func actions() {
+            headerView.followButton.addAction(UIAction { [weak self] _ in
+                guard let self = self else { return }
+                self.headerView.followButton.isHidden = true
+                if self.headerView.followButton.title(for: .normal) == ClimbingGymNameSpace.follow {
+                    self.headerView.followButton.setTitle(ClimbingGymNameSpace.unFollow, for: .normal)
+                    self.headerView.followButton.backgroundColor = .lightGray
+                    self.headerView.followButton.setTitleColor(.black, for: .normal)
+                    ClimbingGymNameSpace.totalFollow += 1
+                } else {
+                    self.headerView.followButton.setTitle(ClimbingGymNameSpace.follow, for: .normal)
+                    self.headerView.followButton.backgroundColor = .mainPurple
+                    self.headerView.followButton.setTitleColor(.white, for: .normal)
+                    if ClimbingGymNameSpace.totalFollow > 0 {
+                        ClimbingGymNameSpace.totalFollow -= 1
+                    }
+                }
+                self.headerView.updateFollowersCount(ClimbingGymNameSpace.follower)
+            }, for: .touchUpInside)
+            
+            // 세그먼트 컨트롤 값 변경 액션 설정
+            headerView.segmentControl.addAction(UIAction { [weak self] _ in
+                guard let self = self else { return }
+                
+                let selectedIndex = self.headerView.segmentControl.selectedSegmentIndex
+                self.viewModel.selectedSegment.accept(selectedIndex)
+                
+                // 세그먼트 선택에 따른 UI 업데이트
+                self.updateSegmentControlUI(selectedIndex: selectedIndex)
+            }, for: .valueChanged)
+        }
+    
+    // MARK: - 레이아웃 설정 - DS
     private func setLayout() {
-        view.backgroundColor = .white
-    
-        setupUI()
-        setConstraints()
-    }
-    
-    // MARK: - 에드섭뷰 해주기 DS
-    private func setupUI() {
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        climbingGymInfoView.isHidden = true
+        
         [
-            profileImageView,
-            profileNameLabel,
-            followerLabel,
-            followButton,
-            segmentControl,
-            contentView
+            headerView,
+            tableView,
+            climbingGymInfoView
         ].forEach { view.addSubview($0) }
         
-        [
-            tableView
-        ].forEach { contentView.addSubview($0) }
-    }
-    
-    // MARK: - 레이아웃 잡기 DS
-    private func setConstraints() {
-        profileImageView.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(16)
-            $0.leading.equalToSuperview().offset(16)
-            $0.width.height.equalTo(80)
-        }
-        
-        profileNameLabel.snp.makeConstraints {
-            $0.top.equalTo(profileImageView.snp.top)
-            $0.leading.equalTo(profileImageView.snp.trailing).offset(16)
-        }
-
-        followerLabel.snp.makeConstraints {
-            $0.top.equalTo(profileNameLabel.snp.bottom).offset(8)
-            $0.leading.equalTo(profileNameLabel.snp.leading)
-        }
-        
-        followButton.snp.makeConstraints {
-            $0.centerY.equalTo(profileImageView.snp.centerY)
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.width.equalTo(80)
-            $0.height.equalTo(32)
-        }
-        
-        segmentControl.snp.makeConstraints {
-            $0.top.equalTo(profileImageView.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(16)
-        }
-        
-        contentView.snp.makeConstraints {
-            $0.top.equalTo(segmentControl.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.bottom.equalToSuperview()
+        headerView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
         }
         
         tableView.snp.makeConstraints {
-            $0.edges.equalTo(contentView)
+            $0.top.equalTo(headerView.snp.bottom)
+            $0.leading.equalToSuperview().offset(16)
+            $0.trailing.equalToSuperview().offset(-16)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+        }
+        
+        climbingGymInfoView.snp.makeConstraints {
+            $0.top.equalTo(headerView.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.bottom.equalToSuperview().offset(-16)
         }
     }
 }
-

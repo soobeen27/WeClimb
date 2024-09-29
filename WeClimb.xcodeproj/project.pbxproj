@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		436AEAE02C7D69CB00E0D85A /* SearchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEADF2C7D69CB00E0D85A /* SearchTableViewCell.swift */; };
+		043942932C86BCF000AA0D9D /* FirebaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043942922C86BCF000AA0D9D /* FirebaseModel.swift */; };
+		435B7E422C8024AB00EB9816 /* EditPageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435B7E412C8024AB00EB9816 /* EditPageVC.swift */; };
+		436AEAE02C7D69CB00E0D85A /* GymTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEADF2C7D69CB00E0D85A /* GymTableViewCell.swift */; };
 		436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAE12C7D69F000E0D85A /* SearchVM.swift */; };
-		436AEAE82C7DC9D800E0D85A /* UploadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAE72C7DC9D800E0D85A /* UploadVC.swift */; };
 		436AEAEA2C7DCD1100E0D85A /* MyPageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAE92C7DCD1100E0D85A /* MyPageCell.swift */; };
 		436AEAEC2C7DCE3C00E0D85A /* MyPageVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */; };
 		436AEAEE2C7EC1F500E0D85A /* MypageNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAED2C7EC1F500E0D85A /* MypageNameSpace.swift */; };
@@ -17,10 +18,76 @@
 		436AEAF42C7EEE9900E0D85A /* UserPageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAF32C7EEE9900E0D85A /* UserPageVC.swift */; };
 		436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAF52C7EEF0A00E0D85A /* UserPageNameSpace.swift */; };
 		436AEAF82C7F0EEE00E0D85A /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */; };
+		43A79ACA2C81717500B960A2 /* EditPageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AC92C81717500B960A2 /* EditPageCell.swift */; };
+		43A79ACC2C819CB200B960A2 /* EditPageVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79ACB2C819CB200B960A2 /* EditPageVM.swift */; };
+		43A79AD62C853EC100B960A2 /* EditModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AD52C853EC100B960A2 /* EditModel.swift */; };
+		43A79AD82C85481300B960A2 /* DetailEditVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AD72C85481300B960A2 /* DetailEditVM.swift */; };
+		43A79ADA2C85930A00B960A2 /* ProfileImagePickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AD92C85930A00B960A2 /* ProfileImagePickerVC.swift */; };
+		43A79ADC2C85AA7400B960A2 /* SettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79ADB2C85AA7400B960A2 /* SettingVC.swift */; };
+		43A79AE02C85BB7E00B960A2 /* SettingVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79ADF2C85BB7E00B960A2 /* SettingVM.swift */; };
+		43A79AE22C85BD3B00B960A2 /* SettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE12C85BD3B00B960A2 /* SettingModel.swift */; };
+		43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE32C85C3B800B960A2 /* SettingCell.swift */; };
+		43A79AE62C86CEFE00B960A2 /* SettingNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */; };
+		43E883532CA27BFE00EF7469 /* CommonManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43E883522CA27BFE00EF7469 /* CommonManager.swift */; };
+		43EC6ACB2C8B5026004A2E2F /* FeedCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */; };
+		43EC6AD72C9171AA004A2E2F /* LightCompressor in Frameworks */ = {isa = PBXBuildFile; productRef = 43EC6AD62C9171AA004A2E2F /* LightCompressor */; };
+		6B16C0ED2C9AE121004249AF /* UserPageVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B16C0EC2C9AE121004249AF /* UserPageVM.swift */; };
+		6B2815462C8572A800BE1D40 /* ClimbingGym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2815452C8572A800BE1D40 /* ClimbingGym.swift */; };
+		6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6B376D2C85807800C9C87A /* GymHeaderView.swift */; };
+		6B7F76952CA47F1D00B05B3F /* BlackListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7F76942CA47F1D00B05B3F /* BlackListVC.swift */; };
+		6B7F76972CA4A1C300B05B3F /* BlackListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7F76962CA4A1C200B05B3F /* BlackListCell.swift */; };
+		6B7F76992CA4A8E900B05B3F /* BlackListVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7F76982CA4A8E900B05B3F /* BlackListVM.swift */; };
+		6B8467BC2C85DDE9006B062D /* ClimbingGymInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */; };
+		6B8467BE2C86129B006B062D /* ClimbingGymNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */; };
+		6B8F38B92C888F6B0018C40D /* PrivacyPolicyVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38B82C888F6A0018C40D /* PrivacyPolicyVC.swift */; };
+		6B8F38C72C894BC50018C40D /* CreateNickNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38C62C894BC50018C40D /* CreateNickNameVC.swift */; };
+		6B8F38CB2C8955350018C40D /* PrivacyPolicyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */; };
+		6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38CC2C8989D10018C40D /* CreateNickNameVM.swift */; };
+		6B9033402C89DB1B0012D955 /* PersonalDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B90333F2C89DB1B0012D955 /* PersonalDetailsVC.swift */; };
+		6B9033422C8AAA5E0012D955 /* RangePickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9033412C8AAA5E0012D955 /* RangePickerVC.swift */; };
+		6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */; };
+		6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */; };
+		6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */; };
 		6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */; };
 		6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */; };
+		6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F972C7EEA3F00B34083 /* GoogleSignIn */; };
+		6BC91F9A2C7EEA5A00B34083 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F992C7EEA5A00B34083 /* GoogleSignInSwift */; };
+		6BC91F9D2C7EEACF00B34083 /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F9C2C7EEACF00B34083 /* KakaoSDK */; };
+		6BC91F9F2C7EEACF00B34083 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F9E2C7EEACF00B34083 /* KakaoSDKAuth */; };
+		6BC91FA12C7EEACF00B34083 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA02C7EEACF00B34083 /* KakaoSDKCommon */; };
+		6BC91FA32C7EEACF00B34083 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA22C7EEACF00B34083 /* KakaoSDKUser */; };
+		6BC91FA62C7EEB4E00B34083 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA52C7EEB4E00B34083 /* FirebaseAnalytics */; };
+		6BC91FA82C7EEB4E00B34083 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA72C7EEB4E00B34083 /* FirebaseAuth */; };
+		6BC91FAA2C7EEB4E00B34083 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FA92C7EEB4E00B34083 /* FirebaseDatabase */; };
+		6BC91FAC2C7EEB4E00B34083 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FAB2C7EEB4E00B34083 /* FirebaseFirestore */; };
+		6BC91FAE2C7EEB4E00B34083 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FAD2C7EEB4E00B34083 /* FirebaseFunctions */; };
+		6BC91FB02C7EEB4E00B34083 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */; };
+		6BC91FB32C7F016A00B34083 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */; };
+		6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCF42D92C942C22000EF20B /* UserTableViewCell.swift */; };
+		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
+		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
+		91995F202CA4A24100BCC004 /* SFFeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */; };
+		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
+		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
+		91BFA9332C91962F0044D5AD /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BFA9322C91962F0044D5AD /* Post.swift */; };
+		91F71CDF2C88A3C400405778 /* LoginVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CDE2C88A3C400405778 /* LoginVM.swift */; };
+		91F71CE12C89835700405778 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CE02C89835700405778 /* FirebaseManager.swift */; };
+		91F71CE32C89844900405778 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CE22C89844900405778 /* User.swift */; };
 		C40397B72C7CB4CC00923777 /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B62C7CB4CC00923777 /* Extension.swift */; };
 		C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */; };
+		C440789E2CA319B200B747A6 /* GuestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C440789D2CA319B200B747A6 /* GuestVC.swift */; };
+		C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C45DC9D42C80519100FC4C1D /* FeedModel.swift */; };
+		C47A0AFA2C8AF1A60068173A /* FeedCommentModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0AF92C8AF1A60068173A /* FeedCommentModalVC.swift */; };
+		C47A0AFD2C90310B0068173A /* FeedReportModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0AFC2C90310B0068173A /* FeedReportModalVC.swift */; };
+		C47A0AFF2C9038990068173A /* FeedNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0AFE2C9038990068173A /* FeedNameSpace.swift */; };
+		C47A0B012C9115760068173A /* FeedCommentTabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0B002C9115760068173A /* FeedCommentTabelCell.swift */; };
+		C49FC7092C9F1B0E00CD66D9 /* EditNickNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49FC7082C9F1B0E00CD66D9 /* EditNickNameVC.swift */; };
+		C49FC70B2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49FC70A2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift */; };
+		C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49FC70C2CA265B300CD66D9 /* PersonalDetailsVM.swift */; };
+		C4E29C172C806F170076BCA6 /* MainFeedVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E29C162C806F170076BCA6 /* MainFeedVM.swift */; };
+		C4E29C1B2C8874780076BCA6 /* MyPageDetailFeedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E29C1A2C8874780076BCA6 /* MyPageDetailFeedVC.swift */; };
+		C4E29C1D2C898AFB0076BCA6 /* SFMainFeedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E29C1C2C898AFB0076BCA6 /* SFMainFeedVC.swift */; };
+		C4E29C1F2C898DC80076BCA6 /* SFCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E29C1E2C898DC80076BCA6 /* SFCollectionViewCell.swift */; };
 		F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892BE62C7C237700C5FF16 /* AppDelegate.swift */; };
 		F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */; };
 		F4892BF02C7C237900C5FF16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4892BEF2C7C237900C5FF16 /* Assets.xcassets */; };
@@ -44,25 +111,82 @@
 		F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C232C7CBC8700C5FF16 /* UploadVM.swift */; };
 		F4892C2B2C7CCDF200C5FF16 /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C2A2C7CCDF200C5FF16 /* Identifiers.swift */; };
 		F4892C2F2C7D9EA700C5FF16 /* UploadNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C2E2C7D9EA700C5FF16 /* UploadNameSpace.swift */; };
-		F4892C372C7E26D900C5FF16 /* UploadOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C362C7E26D900C5FF16 /* UploadOptionView.swift */; };
 		F4892C3E2C7EFD4700C5FF16 /* UploadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C3D2C7EFD4700C5FF16 /* UploadVC.swift */; };
+		F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4892C362C7E26D900C5FF16 /* UploadOptionView.swift */; };
+		F4892C422C8038B500C5FF16 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F4892C412C8038B500C5FF16 /* RxSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		436AEADF2C7D69CB00E0D85A /* SearchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableViewCell.swift; sourceTree = "<group>"; };
+		043942922C86BCF000AA0D9D /* FirebaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseModel.swift; sourceTree = "<group>"; };
+		435B7E412C8024AB00EB9816 /* EditPageVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = EditPageVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		436AEADF2C7D69CB00E0D85A /* GymTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymTableViewCell.swift; sourceTree = "<group>"; };
 		436AEAE12C7D69F000E0D85A /* SearchVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVM.swift; sourceTree = "<group>"; };
-		436AEAE72C7DC9D800E0D85A /* UploadVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadVC.swift; sourceTree = "<group>"; };
 		436AEAE92C7DCD1100E0D85A /* MyPageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageCell.swift; sourceTree = "<group>"; };
-		436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageVM.swift; sourceTree = "<group>"; };
-		436AEAED2C7EC1F500E0D85A /* MypageNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MypageNameSpace.swift; sourceTree = "<group>"; };
+		436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MyPageVM.swift; sourceTree = "<group>"; tabWidth = 4; };
+		436AEAED2C7EC1F500E0D85A /* MypageNameSpace.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MypageNameSpace.swift; sourceTree = "<group>"; tabWidth = 4; };
 		436AEAEF2C7EE63C00E0D85A /* SearchNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchNameSpace.swift; sourceTree = "<group>"; };
 		436AEAF32C7EEE9900E0D85A /* UserPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPageVC.swift; sourceTree = "<group>"; };
 		436AEAF52C7EEF0A00E0D85A /* UserPageNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPageNameSpace.swift; sourceTree = "<group>"; };
 		436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
+		43A79AC92C81717500B960A2 /* EditPageCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = EditPageCell.swift; sourceTree = "<group>"; tabWidth = 4; };
+		43A79ACB2C819CB200B960A2 /* EditPageVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPageVM.swift; sourceTree = "<group>"; };
+		43A79AD52C853EC100B960A2 /* EditModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditModel.swift; sourceTree = "<group>"; };
+		43A79AD72C85481300B960A2 /* DetailEditVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailEditVM.swift; sourceTree = "<group>"; };
+		43A79AD92C85930A00B960A2 /* ProfileImagePickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImagePickerVC.swift; sourceTree = "<group>"; };
+		43A79ADB2C85AA7400B960A2 /* SettingVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = SettingVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		43A79ADF2C85BB7E00B960A2 /* SettingVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingVM.swift; sourceTree = "<group>"; };
+		43A79AE12C85BD3B00B960A2 /* SettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingModel.swift; sourceTree = "<group>"; };
+		43A79AE32C85C3B800B960A2 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
+		43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNameSpace.swift; sourceTree = "<group>"; };
+		43E883522CA27BFE00EF7469 /* CommonManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonManager.swift; sourceTree = "<group>"; };
+		43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCellModel.swift; sourceTree = "<group>"; };
+		6B16C0EC2C9AE121004249AF /* UserPageVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPageVM.swift; sourceTree = "<group>"; };
+		6B2815452C8572A800BE1D40 /* ClimbingGym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGym.swift; sourceTree = "<group>"; };
+		6B6B376D2C85807800C9C87A /* GymHeaderView.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = GymHeaderView.swift; sourceTree = "<group>"; tabWidth = 4; };
+		6B7F76942CA47F1D00B05B3F /* BlackListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackListVC.swift; sourceTree = "<group>"; };
+		6B7F76962CA4A1C200B05B3F /* BlackListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackListCell.swift; sourceTree = "<group>"; };
+		6B7F76982CA4A8E900B05B3F /* BlackListVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackListVM.swift; sourceTree = "<group>"; };
+		6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymInfoView.swift; sourceTree = "<group>"; };
+		6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ClimbingGymNameSpace.swift; sourceTree = "<group>"; tabWidth = 4; };
+		6B8F38B82C888F6A0018C40D /* PrivacyPolicyVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyVC.swift; sourceTree = "<group>"; };
+		6B8F38C62C894BC50018C40D /* CreateNickNameVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = CreateNickNameVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyVM.swift; sourceTree = "<group>"; tabWidth = 4; };
+		6B8F38CC2C8989D10018C40D /* CreateNickNameVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNickNameVM.swift; sourceTree = "<group>"; };
+		6B90333F2C89DB1B0012D955 /* PersonalDetailsVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = PersonalDetailsVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		6B9033412C8AAA5E0012D955 /* RangePickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangePickerVC.swift; sourceTree = "<group>"; };
+		6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionDetailTableViewCell.swift; sourceTree = "<group>"; };
+		6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDeatilGymVC.swift; sourceTree = "<group>"; };
+		6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDetailGymVM.swift; sourceTree = "<group>"; };
 		6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTableViewCell.swift; sourceTree = "<group>"; };
 		6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVM.swift; sourceTree = "<group>"; };
-		C40397B62C7CB4CC00923777 /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
+		6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		6BC91FB22C7F016A00B34083 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		6BC91FB52C7F16D800B34083 /* WeClimb.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeClimb.entitlements; sourceTree = "<group>"; };
+		6BCF42D92C942C22000EF20B /* UserTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTableViewCell.swift; sourceTree = "<group>"; };
+		916D64CF2C848A540064B766 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
+		916D64D22C848BE00064B766 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
+		91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFFeedCell.swift; sourceTree = "<group>"; };
+		91AF25602C8C15FC002283BD /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
+		91AF25622C8D771A002283BD /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
+		91BFA9322C91962F0044D5AD /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
+		91F71CDE2C88A3C400405778 /* LoginVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVM.swift; sourceTree = "<group>"; };
+		91F71CE02C89835700405778 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
+		91F71CE22C89844900405778 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		C40397B62C7CB4CC00923777 /* Extension.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedTabelCell.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C440789D2CA319B200B747A6 /* GuestVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = GuestVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C45DC9D42C80519100FC4C1D /* FeedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedModel.swift; sourceTree = "<group>"; };
+		C47A0AF92C8AF1A60068173A /* FeedCommentModalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCommentModalVC.swift; sourceTree = "<group>"; };
+		C47A0AFC2C90310B0068173A /* FeedReportModalVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = FeedReportModalVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C47A0AFE2C9038990068173A /* FeedNameSpace.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = FeedNameSpace.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C47A0B002C9115760068173A /* FeedCommentTabelCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = FeedCommentTabelCell.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C49FC7082C9F1B0E00CD66D9 /* EditNickNameVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = EditNickNameVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C49FC70A2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = EditPersonalDetailsVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C49FC70C2CA265B300CD66D9 /* PersonalDetailsVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = PersonalDetailsVM.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C4E29C162C806F170076BCA6 /* MainFeedVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFeedVM.swift; sourceTree = "<group>"; };
+		C4E29C1A2C8874780076BCA6 /* MyPageDetailFeedVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MyPageDetailFeedVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C4E29C1C2C898AFB0076BCA6 /* SFMainFeedVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = SFMainFeedVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C4E29C1E2C898DC80076BCA6 /* SFCollectionViewCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = SFCollectionViewCell.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892BE32C7C237700C5FF16 /* WeClimb.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeClimb.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4892BE62C7C237700C5FF16 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -75,15 +199,15 @@
 		F4892C0D2C7C27BE00C5FF16 /* ExampleCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleCommon.swift; sourceTree = "<group>"; };
 		F4892C0F2C7C27D800C5FF16 /* ExampleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleModel.swift; sourceTree = "<group>"; };
 		F4892C112C7C27F500C5FF16 /* ExampleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleVM.swift; sourceTree = "<group>"; };
-		F4892C132C7C973800C5FF16 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		F4892C132C7C973800C5FF16 /* TabBarController.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C152C7C981000C5FF16 /* LoginVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C172C7C983A00C5FF16 /* MainFeedVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MainFeedVC.swift; sourceTree = "<group>"; tabWidth = 4; };
-		F4892C192C7C984A00C5FF16 /* SearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVC.swift; sourceTree = "<group>"; };
-		F4892C1B2C7C988A00C5FF16 /* ClimbingGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVC.swift; sourceTree = "<group>"; };
-		F4892C1D2C7C98A100C5FF16 /* MyPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageVC.swift; sourceTree = "<group>"; };
+		F4892C192C7C984A00C5FF16 /* SearchVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = SearchVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		F4892C1B2C7C988A00C5FF16 /* ClimbingGymVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ClimbingGymVC.swift; sourceTree = "<group>"; tabWidth = 4; };
+		F4892C1D2C7C98A100C5FF16 /* MyPageVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = MyPageVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C212C7C9DC700C5FF16 /* CodingConvention.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CodingConvention.md; sourceTree = "<group>"; };
 		F4892C232C7CBC8700C5FF16 /* UploadVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadVM.swift; sourceTree = "<group>"; };
-		F4892C2A2C7CCDF200C5FF16 /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
+		F4892C2A2C7CCDF200C5FF16 /* Identifiers.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; tabWidth = 4; };
 		F4892C2E2C7D9EA700C5FF16 /* UploadNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadNameSpace.swift; sourceTree = "<group>"; };
 		F4892C362C7E26D900C5FF16 /* UploadOptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadOptionView.swift; sourceTree = "<group>"; };
 		F4892C3D2C7EFD4700C5FF16 /* UploadVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadVC.swift; sourceTree = "<group>"; };
@@ -94,9 +218,23 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6BC91FA12C7EEACF00B34083 /* KakaoSDKCommon in Frameworks */,
+				6BC91FAE2C7EEB4E00B34083 /* FirebaseFunctions in Frameworks */,
+				43EC6AD72C9171AA004A2E2F /* LightCompressor in Frameworks */,
+				6BC91FAC2C7EEB4E00B34083 /* FirebaseFirestore in Frameworks */,
+				6BC91F9F2C7EEACF00B34083 /* KakaoSDKAuth in Frameworks */,
+				6BC91F9A2C7EEA5A00B34083 /* GoogleSignInSwift in Frameworks */,
 				F4892C062C7C23FA00C5FF16 /* Kingfisher in Frameworks */,
+				6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */,
 				F4892BFF2C7C23AC00C5FF16 /* RxCocoa in Frameworks */,
+				6BC91FB02C7EEB4E00B34083 /* FirebaseStorage in Frameworks */,
+				6BC91FAA2C7EEB4E00B34083 /* FirebaseDatabase in Frameworks */,
 				F4892BFC2C7C239900C5FF16 /* SnapKit in Frameworks */,
+				6BC91FA82C7EEB4E00B34083 /* FirebaseAuth in Frameworks */,
+				6BC91F9D2C7EEACF00B34083 /* KakaoSDK in Frameworks */,
+				6BC91FA62C7EEB4E00B34083 /* FirebaseAnalytics in Frameworks */,
+				F4892C422C8038B500C5FF16 /* RxSwift in Frameworks */,
+				6BC91FA32C7EEACF00B34083 /* KakaoSDKUser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,7 +246,17 @@
 			children = (
 				F4892C1D2C7C98A100C5FF16 /* MyPageVC.swift */,
 				436AEAE92C7DCD1100E0D85A /* MyPageCell.swift */,
+				C4E29C1A2C8874780076BCA6 /* MyPageDetailFeedVC.swift */,
 				436AEAF32C7EEE9900E0D85A /* UserPageVC.swift */,
+				435B7E412C8024AB00EB9816 /* EditPageVC.swift */,
+				43A79AC92C81717500B960A2 /* EditPageCell.swift */,
+				C49FC7082C9F1B0E00CD66D9 /* EditNickNameVC.swift */,
+				C49FC70A2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift */,
+				43A79AD92C85930A00B960A2 /* ProfileImagePickerVC.swift */,
+				43A79ADB2C85AA7400B960A2 /* SettingVC.swift */,
+				43A79AE32C85C3B800B960A2 /* SettingCell.swift */,
+				6B7F76942CA47F1D00B05B3F /* BlackListVC.swift */,
+				6B7F76962CA4A1C200B05B3F /* BlackListCell.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -117,18 +265,85 @@
 			isa = PBXGroup;
 			children = (
 				F4892C192C7C984A00C5FF16 /* SearchVC.swift */,
-				436AEADF2C7D69CB00E0D85A /* SearchTableViewCell.swift */,
+				436AEADF2C7D69CB00E0D85A /* GymTableViewCell.swift */,
+				6BCF42D92C942C22000EF20B /* UserTableViewCell.swift */,
 			);
 			path = Search;
+			sourceTree = "<group>";
+		};
+		6B8F38B72C888F4E0018C40D /* SignUp */ = {
+			isa = PBXGroup;
+			children = (
+				6B8F38B82C888F6A0018C40D /* PrivacyPolicyVC.swift */,
+				6B9033412C8AAA5E0012D955 /* RangePickerVC.swift */,
+				6B8F38C62C894BC50018C40D /* CreateNickNameVC.swift */,
+				6B90333F2C89DB1B0012D955 /* PersonalDetailsVC.swift */,
+			);
+			path = SignUp;
+			sourceTree = "<group>";
+		};
+		6B8F38C82C8954FD0018C40D /* ClimbingGymVM */ = {
+			isa = PBXGroup;
+			children = (
+				6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */,
+				6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */,
+			);
+			path = ClimbingGymVM;
+			sourceTree = "<group>";
+		};
+		6B8F38C92C89551E0018C40D /* SignUpVM */ = {
+			isa = PBXGroup;
+			children = (
+				6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */,
+				6B8F38CC2C8989D10018C40D /* CreateNickNameVM.swift */,
+				C49FC70C2CA265B300CD66D9 /* PersonalDetailsVM.swift */,
+			);
+			path = SignUpVM;
 			sourceTree = "<group>";
 		};
 		6BC91F912C7CC79300B34083 /* ClimbingGym */ = {
 			isa = PBXGroup;
 			children = (
+				6B6B376D2C85807800C9C87A /* GymHeaderView.swift */,
 				F4892C1B2C7C988A00C5FF16 /* ClimbingGymVC.swift */,
+				6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */,
+				6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */,
 				6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */,
+				6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */,
 			);
 			path = ClimbingGym;
+			sourceTree = "<group>";
+		};
+		916D64D12C848BA70064B766 /* Feed */ = {
+			isa = PBXGroup;
+			children = (
+				916D64CF2C848A540064B766 /* FeedView.swift */,
+				916D64D22C848BE00064B766 /* FeedCell.swift */,
+			);
+			path = Feed;
+			sourceTree = "<group>";
+		};
+		C45DC9D32C80502E00FC4C1D /* MainFeed */ = {
+			isa = PBXGroup;
+			children = (
+				C4E29C1C2C898AFB0076BCA6 /* SFMainFeedVC.swift */,
+				C4E29C1E2C898DC80076BCA6 /* SFCollectionViewCell.swift */,
+				C47A0AF92C8AF1A60068173A /* FeedCommentModalVC.swift */,
+				C47A0B002C9115760068173A /* FeedCommentTabelCell.swift */,
+				C47A0AFC2C90310B0068173A /* FeedReportModalVC.swift */,
+				C47A0AFB2C9019320068173A /* ArchiveFolder */,
+				91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */,
+			);
+			path = MainFeed;
+			sourceTree = "<group>";
+		};
+		C47A0AFB2C9019320068173A /* ArchiveFolder */ = {
+			isa = PBXGroup;
+			children = (
+				F4892C172C7C983A00C5FF16 /* MainFeedVC.swift */,
+				C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */,
+			);
+			path = ArchiveFolder;
 			sourceTree = "<group>";
 		};
 		F4892BDA2C7C237700C5FF16 = {
@@ -140,6 +355,7 @@
 				F4892C002C7C23CE00C5FF16 /* CommitConvention.md */,
 				F4892BE52C7C237700C5FF16 /* WeClimb */,
 				F4892BE42C7C237700C5FF16 /* Products */,
+				F4892C402C8038B500C5FF16 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -154,6 +370,7 @@
 		F4892BE52C7C237700C5FF16 /* WeClimb */ = {
 			isa = PBXGroup;
 			children = (
+				6BC91FB52C7F16D800B34083 /* WeClimb.entitlements */,
 				F4892BE62C7C237700C5FF16 /* AppDelegate.swift */,
 				F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */,
 				C40397B62C7CB4CC00923777 /* Extension.swift */,
@@ -164,6 +381,8 @@
 				F4892BF12C7C237900C5FF16 /* LaunchScreen.storyboard */,
 				F4892BEF2C7C237900C5FF16 /* Assets.xcassets */,
 				F4892BF42C7C237900C5FF16 /* Info.plist */,
+				6BC91FB22C7F016A00B34083 /* Config.xcconfig */,
+				6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */,
 			);
 			path = WeClimb;
 			sourceTree = "<group>";
@@ -171,13 +390,15 @@
 		F4892C092C7C278500C5FF16 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				F4892C132C7C973800C5FF16 /* TabBarController.swift */,
+				F4892C152C7C981000C5FF16 /* LoginVC.swift */,
+				C440789D2CA319B200B747A6 /* GuestVC.swift */,
+				6B8F38B72C888F4E0018C40D /* SignUp */,
+				916D64D12C848BA70064B766 /* Feed */,
+				C45DC9D32C80502E00FC4C1D /* MainFeed */,
 				436AEAF22C7EECA300E0D85A /* Search */,
 				436AEAF12C7EEC7900E0D85A /* MyPage */,
 				6BC91F912C7CC79300B34083 /* ClimbingGym */,
-				F4892C132C7C973800C5FF16 /* TabBarController.swift */,
-				F4892C152C7C981000C5FF16 /* LoginVC.swift */,
-				F4892C172C7C983A00C5FF16 /* MainFeedVC.swift */,
-				C40397B82C7CC34700923777 /* MainFeedTabelCell.swift */,
 				F4892C272C7CC18700C5FF16 /* Upload */,
 			);
 			path = View;
@@ -187,7 +408,16 @@
 			isa = PBXGroup;
 			children = (
 				F4892C0F2C7C27D800C5FF16 /* ExampleModel.swift */,
+				C45DC9D42C80519100FC4C1D /* FeedModel.swift */,
 				436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */,
+				043942922C86BCF000AA0D9D /* FirebaseModel.swift */,
+				43A79AD52C853EC100B960A2 /* EditModel.swift */,
+				43A79AE12C85BD3B00B960A2 /* SettingModel.swift */,
+				6B2815452C8572A800BE1D40 /* ClimbingGym.swift */,
+				43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */,
+				91F71CE22C89844900405778 /* User.swift */,
+				91AF25622C8D771A002283BD /* Gym.swift */,
+				91BFA9322C91962F0044D5AD /* Post.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -195,11 +425,19 @@
 		F4892C0B2C7C279300C5FF16 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				6B8F38C92C89551E0018C40D /* SignUpVM */,
+				6B8F38C82C8954FD0018C40D /* ClimbingGymVM */,
 				F4892C112C7C27F500C5FF16 /* ExampleVM.swift */,
-				6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */,
+				C4E29C162C806F170076BCA6 /* MainFeedVM.swift */,
 				F4892C232C7CBC8700C5FF16 /* UploadVM.swift */,
 				436AEAE12C7D69F000E0D85A /* SearchVM.swift */,
+				6B7F76982CA4A8E900B05B3F /* BlackListVM.swift */,
 				436AEAEB2C7DCE3C00E0D85A /* MyPageVM.swift */,
+				43A79ACB2C819CB200B960A2 /* EditPageVM.swift */,
+				43A79AD72C85481300B960A2 /* DetailEditVM.swift */,
+				43A79ADF2C85BB7E00B960A2 /* SettingVM.swift */,
+				91F71CDE2C88A3C400405778 /* LoginVM.swift */,
+				6B16C0EC2C9AE121004249AF /* UserPageVM.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -209,10 +447,16 @@
 			children = (
 				F4892C0D2C7C27BE00C5FF16 /* ExampleCommon.swift */,
 				F4892C2A2C7CCDF200C5FF16 /* Identifiers.swift */,
+				C47A0AFE2C9038990068173A /* FeedNameSpace.swift */,
+				6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */,
 				F4892C2E2C7D9EA700C5FF16 /* UploadNameSpace.swift */,
 				436AEAED2C7EC1F500E0D85A /* MypageNameSpace.swift */,
 				436AEAEF2C7EE63C00E0D85A /* SearchNameSpace.swift */,
 				436AEAF52C7EEF0A00E0D85A /* UserPageNameSpace.swift */,
+				43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */,
+				91F71CE02C89835700405778 /* FirebaseManager.swift */,
+				91AF25602C8C15FC002283BD /* Enumeration.swift */,
+				43E883522CA27BFE00EF7469 /* CommonManager.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -224,6 +468,13 @@
 				F4892C362C7E26D900C5FF16 /* UploadOptionView.swift */,
 			);
 			path = Upload;
+			sourceTree = "<group>";
+		};
+		F4892C402C8038B500C5FF16 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -246,6 +497,20 @@
 				F4892BFB2C7C239900C5FF16 /* SnapKit */,
 				F4892BFE2C7C23AC00C5FF16 /* RxCocoa */,
 				F4892C052C7C23FA00C5FF16 /* Kingfisher */,
+				6BC91F972C7EEA3F00B34083 /* GoogleSignIn */,
+				6BC91F992C7EEA5A00B34083 /* GoogleSignInSwift */,
+				6BC91F9C2C7EEACF00B34083 /* KakaoSDK */,
+				6BC91F9E2C7EEACF00B34083 /* KakaoSDKAuth */,
+				6BC91FA02C7EEACF00B34083 /* KakaoSDKCommon */,
+				6BC91FA22C7EEACF00B34083 /* KakaoSDKUser */,
+				6BC91FA52C7EEB4E00B34083 /* FirebaseAnalytics */,
+				6BC91FA72C7EEB4E00B34083 /* FirebaseAuth */,
+				6BC91FA92C7EEB4E00B34083 /* FirebaseDatabase */,
+				6BC91FAB2C7EEB4E00B34083 /* FirebaseFirestore */,
+				6BC91FAD2C7EEB4E00B34083 /* FirebaseFunctions */,
+				6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */,
+				F4892C412C8038B500C5FF16 /* RxSwift */,
+				43EC6AD62C9171AA004A2E2F /* LightCompressor */,
 			);
 			productName = WeClimb;
 			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
@@ -279,6 +544,10 @@
 				F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				F4892BFD2C7C23AC00C5FF16 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				F4892C042C7C23FA00C5FF16 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
+				6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				43EC6AD52C9171AA004A2E2F /* XCRemoteSwiftPackageReference "LightCompressor_iOS" */,
 			);
 			productRefGroup = F4892BE42C7C237700C5FF16 /* Products */;
 			projectDirPath = "";
@@ -300,6 +569,7 @@
 				F4892C222C7C9DC700C5FF16 /* CodingConvention.md in Resources */,
 				F4892C032C7C23D400C5FF16 /* CodeConvention.md in Resources */,
 				F4892C082C7C249300C5FF16 /* .gitignore in Resources */,
+				6BC91FB32C7F016A00B34083 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,38 +580,89 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				043942932C86BCF000AA0D9D /* FirebaseModel.swift in Sources */,
 				436AEAEE2C7EC1F500E0D85A /* MypageNameSpace.swift in Sources */,
+				6B8F38CB2C8955350018C40D /* PrivacyPolicyVM.swift in Sources */,
+				C440789E2CA319B200B747A6 /* GuestVC.swift in Sources */,
+				6B8467BE2C86129B006B062D /* ClimbingGymNameSpace.swift in Sources */,
 				F4892C1E2C7C98A100C5FF16 /* MyPageVC.swift in Sources */,
+				6B8F38B92C888F6B0018C40D /* PrivacyPolicyVC.swift in Sources */,
+				435B7E422C8024AB00EB9816 /* EditPageVC.swift in Sources */,
+				6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */,
 				F4892C122C7C27F500C5FF16 /* ExampleVM.swift in Sources */,
 				F4892C2F2C7D9EA700C5FF16 /* UploadNameSpace.swift in Sources */,
+				C4E29C1D2C898AFB0076BCA6 /* SFMainFeedVC.swift in Sources */,
 				F4892C2B2C7CCDF200C5FF16 /* Identifiers.swift in Sources */,
 				F4892C182C7C983A00C5FF16 /* MainFeedVC.swift in Sources */,
+				6B16C0ED2C9AE121004249AF /* UserPageVM.swift in Sources */,
 				436AEAF82C7F0EEE00E0D85A /* SearchModel.swift in Sources */,
+				43A79ACC2C819CB200B960A2 /* EditPageVM.swift in Sources */,
+				6B9033422C8AAA5E0012D955 /* RangePickerVC.swift in Sources */,
+				43A79AE02C85BB7E00B960A2 /* SettingVM.swift in Sources */,
+				6B9033402C89DB1B0012D955 /* PersonalDetailsVC.swift in Sources */,
+				C49FC7092C9F1B0E00CD66D9 /* EditNickNameVC.swift in Sources */,
 				F4892C162C7C981000C5FF16 /* LoginVC.swift in Sources */,
+				6B7F76972CA4A1C300B05B3F /* BlackListCell.swift in Sources */,
+				43A79AE22C85BD3B00B960A2 /* SettingModel.swift in Sources */,
 				F4892C102C7C27D800C5FF16 /* ExampleModel.swift in Sources */,
+				C49FC70B2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift in Sources */,
+				43A79ADA2C85930A00B960A2 /* ProfileImagePickerVC.swift in Sources */,
+				6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */,
 				436AEAEA2C7DCD1100E0D85A /* MyPageCell.swift in Sources */,
+				F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */,
 				436AEAF42C7EEE9900E0D85A /* UserPageVC.swift in Sources */,
-				F4892C2D2C7D9D2100C5FF16 /* CaptionCell.swift in Sources */,
 				F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */,
+				43A79ADC2C85AA7400B960A2 /* SettingVC.swift in Sources */,
+				C47A0AFA2C8AF1A60068173A /* FeedCommentModalVC.swift in Sources */,
+				43E883532CA27BFE00EF7469 /* CommonManager.swift in Sources */,
+				43A79AE62C86CEFE00B960A2 /* SettingNameSpace.swift in Sources */,
+				6B2815462C8572A800BE1D40 /* ClimbingGym.swift in Sources */,
 				F4892C3E2C7EFD4700C5FF16 /* UploadVC.swift in Sources */,
+				C47A0AFD2C90310B0068173A /* FeedReportModalVC.swift in Sources */,
 				F4892C1A2C7C984A00C5FF16 /* SearchVC.swift in Sources */,
-				436AEAE02C7D69CB00E0D85A /* SearchTableViewCell.swift in Sources */,
+				43A79ACA2C81717500B960A2 /* EditPageCell.swift in Sources */,
+				C4E29C1F2C898DC80076BCA6 /* SFCollectionViewCell.swift in Sources */,
+				436AEAE02C7D69CB00E0D85A /* GymTableViewCell.swift in Sources */,
+				6B8F38C72C894BC50018C40D /* CreateNickNameVC.swift in Sources */,
+				C4E29C172C806F170076BCA6 /* MainFeedVM.swift in Sources */,
+				C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */,
+				916D64D32C848BE00064B766 /* FeedCell.swift in Sources */,
 				6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */,
-				F4892C1A2C7C984A00C5FF16 /* SearchVC.swift in Sources */,
-				436AEAE02C7D69CB00E0D85A /* SearchTableViewCell.swift in Sources */,
+				C4E29C1B2C8874780076BCA6 /* MyPageDetailFeedVC.swift in Sources */,
+				91F71CDF2C88A3C400405778 /* LoginVM.swift in Sources */,
+				6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */,
 				6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */,
+				C47A0AFF2C9038990068173A /* FeedNameSpace.swift in Sources */,
 				F4892C1C2C7C988B00C5FF16 /* ClimbingGymVC.swift in Sources */,
+				91AF25632C8D771A002283BD /* Gym.swift in Sources */,
+				43A79AD62C853EC100B960A2 /* EditModel.swift in Sources */,
 				436AEAF02C7EE63C00E0D85A /* SearchNameSpace.swift in Sources */,
 				C40397B92C7CC34700923777 /* MainFeedTabelCell.swift in Sources */,
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
+				43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */,
+				43A79AD82C85481300B960A2 /* DetailEditVM.swift in Sources */,
+				91F71CE12C89835700405778 /* FirebaseManager.swift in Sources */,
 				F4892C142C7C973800C5FF16 /* TabBarController.swift in Sources */,
+				91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */,
 				F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */,
 				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
+				6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */,
+				916D64D02C848A540064B766 /* FeedView.swift in Sources */,
+				6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
 				F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */,
-				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
+				C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */,
+				6B7F76992CA4A8E900B05B3F /* BlackListVM.swift in Sources */,
+				C47A0B012C9115760068173A /* FeedCommentTabelCell.swift in Sources */,
+				91995F202CA4A24100BCC004 /* SFFeedCell.swift in Sources */,
 				F4892C0E2C7C27BE00C5FF16 /* ExampleCommon.swift in Sources */,
+				43EC6ACB2C8B5026004A2E2F /* FeedCellModel.swift in Sources */,
+				6B8467BC2C85DDE9006B062D /* ClimbingGymInfoView.swift in Sources */,
+				91BFA9332C91962F0044D5AD /* Post.swift in Sources */,
 				436AEAEC2C7DCE3C00E0D85A /* MyPageVM.swift in Sources */,
+				6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */,
+				6B7F76952CA47F1D00B05B3F /* BlackListVC.swift in Sources */,
+				91F71CE32C89844900405778 /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,6 +682,7 @@
 /* Begin XCBuildConfiguration section */
 		F4892BF52C7C237900C5FF16 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6BC91FB22C7F016A00B34083 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -424,6 +746,7 @@
 		};
 		F4892BF62C7C237900C5FF16 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6BC91FB22C7F016A00B34083 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -480,57 +803,83 @@
 		};
 		F4892BF82C7C237900C5FF16 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6BC91FB22C7F016A00B34083 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 72GVCX2P2A;
+				CODE_SIGN_ENTITLEMENTS = WeClimb/WeClimb.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = " 0.8.0";
+				DEVELOPMENT_TEAM = TBHH7W8T8K;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeClimb/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진앱 권한을 확인해주세요";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진앱 권한을 확인해주세요.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = " 0.8.0";
+				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
 		F4892BF92C7C237900C5FF16 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6BC91FB22C7F016A00B34083 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 72GVCX2P2A;
+				CODE_SIGN_ENTITLEMENTS = WeClimb/WeClimb.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = " 0.8.0";
+				DEVELOPMENT_TEAM = TBHH7W8T8K;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeClimb/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진앱 권한을 확인해주세요";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진앱 권한을 확인해주세요.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = " 0.8.0";
+				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -558,6 +907,38 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		43EC6AD52C9171AA004A2E2F /* XCRemoteSwiftPackageReference "LightCompressor_iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AbedElazizShe/LightCompressor_iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.22.6;
+			};
+		};
+		6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.1.0;
+			};
+		};
 		F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -585,6 +966,71 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		43EC6AD62C9171AA004A2E2F /* LightCompressor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 43EC6AD52C9171AA004A2E2F /* XCRemoteSwiftPackageReference "LightCompressor_iOS" */;
+			productName = LightCompressor;
+		};
+		6BC91F972C7EEA3F00B34083 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		6BC91F992C7EEA5A00B34083 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F962C7EEA3F00B34083 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		6BC91F9C2C7EEACF00B34083 /* KakaoSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDK;
+		};
+		6BC91F9E2C7EEACF00B34083 /* KakaoSDKAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKAuth;
+		};
+		6BC91FA02C7EEACF00B34083 /* KakaoSDKCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKCommon;
+		};
+		6BC91FA22C7EEACF00B34083 /* KakaoSDKUser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91F9B2C7EEACE00B34083 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKUser;
+		};
+		6BC91FA52C7EEB4E00B34083 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		6BC91FA72C7EEB4E00B34083 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		6BC91FA92C7EEB4E00B34083 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		6BC91FAB2C7EEB4E00B34083 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		6BC91FAD2C7EEB4E00B34083 /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
+		};
+		6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
 		F4892BFB2C7C239900C5FF16 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F4892BFA2C7C239900C5FF16 /* XCRemoteSwiftPackageReference "SnapKit" */;
@@ -599,6 +1045,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F4892C042C7C23FA00C5FF16 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		F4892C412C8038B500C5FF16 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4892BFD2C7C23AC00C5FF16 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

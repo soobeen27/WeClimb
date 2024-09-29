@@ -20,30 +20,43 @@ class UploadOptionView : UIView {
     
     private let optionLabel: UILabel = {
         let label = UILabel()
-        label.text = UploadNameSpace.gym
+        label.text = UploadNameSpace.selectGym
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = .label
         return label
     }()
     
-    private let selectedLabel: UILabel = {
+    let selectedLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 15, weight: .regular)
-        label.text = "test"
+        label.text = UploadNameSpace.select
         label.textColor = .secondaryLabel
+        label.textAlignment = .right
+        label.isHidden = true
         return label
     }()
     
-    private let greaterThanSign: UILabel = {
+    let nextImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "chevron.right"))
+        imageView.tintColor = .systemGray
+        imageView.contentMode = .scaleAspectFit
+        imageView.isHidden = true
+        return imageView
+    }()
+    
+    private let separatorLine: UILabel = {
         let label = UILabel()
-        label.text = UploadNameSpace.greaterThan
-        label.font = .systemFont(ofSize: 17, weight: .regular)
-        label.textColor = .secondaryLabel
+        label.backgroundColor = .secondarySystemBackground
         return label
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    private var showSelectedLabel: Bool
+    
+    init(symbolImage: UIImage, optionText: String, showSelectedLabel: Bool = true) {
+        self.showSelectedLabel = showSelectedLabel
+        super.init(frame: .zero)
+        symbolImageView.image = symbolImage
+        optionLabel.text = optionText
         setLayout()
     }
     
@@ -52,20 +65,25 @@ class UploadOptionView : UIView {
     }
     
     override var intrinsicContentSize: CGSize {
-        return CGSize(width: UIView.noIntrinsicMetric, height: 41)
+        return CGSize(width: UIView.noIntrinsicMetric, height: 57)
     }
 
     private func setLayout() {
-        self.backgroundColor = .systemBackground
-        [symbolImageView, optionLabel, greaterThanSign, selectedLabel]
-            .forEach {
-                self.addSubview($0)
-            }
+        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        
+        [symbolImageView, separatorLine, optionLabel]
+            .forEach { self.addSubview($0) }
+        
+        separatorLine.snp.makeConstraints {
+            $0.height.equalTo(1)
+            $0.left.right.equalToSuperview()
+            $0.top.equalToSuperview()
+        }
         
         symbolImageView.snp.makeConstraints {
-            $0.size.equalTo(25)
+            $0.size.equalTo(20)
             $0.leading.equalToSuperview().offset(16)
-            $0.top.bottom.equalToSuperview().inset(8)
+            $0.top.bottom.equalToSuperview().inset(16)
         }
         
         optionLabel.snp.makeConstraints {
@@ -73,20 +91,30 @@ class UploadOptionView : UIView {
             $0.leading.equalTo(symbolImageView.snp.trailing).offset(8)
         }
         
-        greaterThanSign.snp.makeConstraints {
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.centerY.equalToSuperview()
-        }
-        
-        selectedLabel.snp.makeConstraints {
-            $0.trailing.equalTo(greaterThanSign.snp.leading).offset(-8)
-            $0.centerY.equalToSuperview()
+        if showSelectedLabel {
+            [selectedLabel, nextImageView]
+                .forEach { self.addSubview($0) }
+            
+            selectedLabel.snp.makeConstraints {
+                $0.trailing.equalTo(nextImageView.snp.leading).offset(-8)
+                $0.centerY.equalToSuperview()
+            }
+            
+            nextImageView.snp.makeConstraints {
+                $0.trailing.equalToSuperview().offset(-16)
+                $0.centerY.equalToSuperview()
+            }
         }
     }
     
-    func configure(symbolImage: UIImage, option: String, selected: String) {
-        symbolImageView.image = symbolImage
-        optionLabel.text = option
-        selectedLabel.text = selected
+    // MARK: - 암장 선택시 버튼 업데이트 YJ
+    func updateText(with gymName: String) {
+        selectedLabel.text = gymName
+        selectedLabel.textColor = .label
+        
+        nextImageView.isHidden = true
+        nextImageView.snp.makeConstraints {
+            $0.width.equalTo(0)
+        }
     }
 }

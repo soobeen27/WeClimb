@@ -13,12 +13,39 @@ enum Identifiers {
     static let captionCell = "CaptionCell"
     static let uploadOptionCell = "UploadOptionCell"
     
-    //MainFeed CollectionView Cell
-    static let yourCollectionViewCellIdentifier = "YourCollectionViewCellIdentifier"
-    // ClimbingGymVC
-    static let follow = "팔로우"
-    static let unFollow = "언팔로우"
+//    //MainFeed CollectionView Cell
+//    static let yourCollectionViewCellIdentifier = "YourCollectionViewCellIdentifier"
+    
+    //SFMainfeedVC 식별자
+    static let mainCollectionViewCell = "MainCollectionViewCell"
+    
+    //SFCollectionViewCell 식별자
+    static let collectionViewCell = "CollectionViewCell"
+    
+    //FeedReportMadalVC 식별자
+    static let reportTableViewCell = "ReportTableViewCell"
+    
+    //FeedCommentMadalVC 식별자
+    static let commentTableViewCell = "CommentTableViewCell"
     
     // SectionTableViewCell
     static let sectionTableViewCell = "SectionTableViewCell"
+    
+    // sectionDetailTableViewCell
+    static let sectionDetailTableViewCell = "SectionDetailTableViewCell"
+}
+
+// MARK: - 클래스 이름을 문자열로 반환
+extension NSObject {
+    
+    // 인스턴스가 어떤 클래스의 객체인지 문자열로 반환
+    var className: String {
+        return String(describing: type(of: self))
+    }
+    
+    // 클래스 자체의 타입 이름을 문자열로 반환
+    class var className: String {
+        return String(describing: self)
+    }
+    
 }

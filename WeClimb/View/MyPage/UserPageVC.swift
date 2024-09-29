@@ -13,9 +13,10 @@ import SnapKit
 class UserPageVC: UIViewController {
     
     private let disposeBag = DisposeBag()
-    private let viewModel = MyPageVM()
+    private let viewModel = UserPageVM()
     
     private var isFollowing = false
+    private var userData: User?
     
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
@@ -23,20 +24,22 @@ class UserPageVC: UIViewController {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 40
         imageView.clipsToBounds = true
+        imageView.image = UIImage(named: "testStone")
         return imageView
     }()
     
     private let nameLabel: UILabel = {
         let label = UILabel()
-        label.text = "qockqock"
+        //        label.text = "qockqock"
         label.font = UIFont.systemFont(ofSize: 17)
         label.numberOfLines = 1
         return label
     }()
     
+    // 추후 추가예정
     private let levelLabel: UILabel = {
         let label = UILabel()
-        label.text = "V4"
+        //        label.text = "V4"
         label.backgroundColor = .systemGreen
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .white
@@ -45,9 +48,10 @@ class UserPageVC: UIViewController {
         return label
     }()
     
+    // 아직 연동안됨
     private let infoLabel: UILabel = {
         let label = UILabel()
-        label.text = "체형: 183cm | 185cm"
+        //        label.text = "체형: 183cm | 185cm"
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .gray
         label.numberOfLines = 1
@@ -61,7 +65,6 @@ class UserPageVC: UIViewController {
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 5
-        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -142,7 +145,9 @@ class UserPageVC: UIViewController {
     }()
     
     private let segmentControl: UISegmentedControl = {
-        let segmentControl = UISegmentedControl(items: [UIImage(systemName: "square.grid.2x2") ?? UIImage(), UserPageNameSpace.none])
+        // 추후 하나 생성예정
+        //        let segmentControl = UISegmentedControl(items: [UIImage(systemName: "square.grid.2x2") ?? UIImage(), UserPageNameSpace.none])
+        let segmentControl = UISegmentedControl(items: [UIImage(systemName: "square.grid.2x2") ?? UIImage()])
         segmentControl.selectedSegmentIndex = 0
         return segmentControl
     }()
@@ -158,7 +163,7 @@ class UserPageVC: UIViewController {
         layout.itemSize = CGSize(width: width, height: width)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: UserPageNameSpace.id)
+        collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MyPageCell.className)
         
         return collectionView
     }()
@@ -166,45 +171,69 @@ class UserPageVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
-        setupLayout()
+        setLayout()
         bind()
         setNavigation()
     }
     
-    // MARK: - 로그아웃 버튼 YJ
-    // 이 기능은 아직 보류지만 로그아웃을 위해 우선 여기에..
+    func configure(with data: User) {
+        nameLabel.text = data.userName
+
+//            levelLabel.text = data.userRole
+//            infoLabel.text = "체형: \(data.height ?? "정보 없음") | 팔길이: \(data.armReach ?? "정보 없음")"
+        
+        // 이미지 로드 (Kingfisher 사용)
+        if let profileImageURL = data.profileImage {
+            FirebaseManager.shared.loadImage(from: profileImageURL, into: profileImage)
+        } else {
+            profileImage.image = UIImage(named: "testStone")
+        }
+    }
+    
     func setNavigation() {
         let rightBarButton = UIBarButtonItem(
             image: UIImage(systemName: "ellipsis"),
             style: .plain,
             target: self,
-            action: #selector(rightBarButtonTapped)
+            action: #selector(self.rightBarButtonTapped)
         )
-        navigationController?.navigationBar.tintColor = .black
+        navigationController?.navigationBar.tintColor = .label
         navigationItem.rightBarButtonItem = rightBarButton
     }
     
+    //MARK: - 신고하기, 차단 버튼 YJ
     @objc private func rightBarButtonTapped() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        let logout = UIAlertAction(title: UserPageNameSpace.logout, style: .default) { _ in
-            guard let navigationController = self.tabBarController?.navigationController else { return }
-            navigationController.popToRootViewController(animated: true)
+        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
+            self?.reportModal()
         }
+        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive, handler: nil)
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
-        let close = UIAlertAction(title: UserPageNameSpace.close, style: .cancel)
+        [reportAction, deleteAction, cancelAction]
+            .forEach {
+                actionSheet.addAction($0)
+            }
         
-        [logout, close]
-            .forEach { actionSheet.addAction($0) }
-        
-        present(actionSheet, animated: true)
+        self.present(actionSheet, animated: true, completion: nil)
     }
     
-    @objc private func buttonTapped() {
+    //MARK: - 신고하기 모달 시트
+    private func reportModal() {
+        let modalVC = FeedReportModalVC()
+        presentModal(modalVC: modalVC)
+    }
+    
+    //MARK: - 차단하기 기능
+    private func blackList(userUID: String) {
+        viewModel.blockUser(withUID: userUID)
+    }
+    
+    private func buttonTapped() {
         isFollowing.toggle()
-
+        
         if isFollowing {
             followFollowingButton.setTitle(UserPageNameSpace.follow, for: .normal)
             followFollowingButton.backgroundColor = .systemGray6
@@ -215,8 +244,8 @@ class UserPageVC: UIViewController {
             followFollowingButton.setTitleColor(.white, for: .normal)
         }
     }
-    
-    private func setupLayout() {
+
+    private func setLayout() {
         [profileImage, profileStackView, totalStackView, segmentControl, collectionView]
             .forEach{ view.addSubview($0) }
         
@@ -270,9 +299,19 @@ class UserPageVC: UIViewController {
     }
     
     private func bind() {
-        viewModel.profileImages
-            .bind(to: collectionView.rx.items(cellIdentifier: UserPageNameSpace.id, cellType: MyPageCell.self)) { _, image, cell in
-                cell.configure(with: image)
+        viewModel.userData
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] user in
+                // 옵셔널 타입인 user를 언래핑
+                guard let self, let user = user else { return }
+                self.configure(with: user)
+            })
+            .disposed(by: disposeBag)
+        
+        followFollowingButton.rx.tap
+            .bind { [weak self] in
+                print("followFollowingButton tapped")
+                self?.buttonTapped()
             }
             .disposed(by: disposeBag)
     }
