@@ -90,3 +90,8 @@ enum PostError: Error {
         }
     }
 }
+
+enum UploadStatus {
+    case fail
+    case success
+}
