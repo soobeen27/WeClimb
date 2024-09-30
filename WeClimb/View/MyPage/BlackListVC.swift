@@ -18,8 +18,8 @@ class BlackListVC: UIViewController {
     
     private let blackListTableView: UITableView = {
         let tableView = UITableView()
-        tableView.separatorStyle = .singleLine
-        tableView.separatorColor = .darkGray
+        tableView.separatorStyle = .none
+//        tableView.separatorColor = .darkGray
         tableView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         tableView.tableFooterView = UIView() // 빈 셀 숨기기
         tableView.register(BlackListCell.self, forCellReuseIdentifier: BlackListCell.className)
@@ -31,34 +31,10 @@ class BlackListVC: UIViewController {
         
         setupUI()
         naviUI()
+//        bindTableView()
         
-//        bindViewModel()
+        viewModel.fetchBlackList()
     }
-    
-//    private func bindViewModel() {
-//        // ViewModel의 blackList를 TableView에 바인딩
-//        viewModel.blackList
-//            .bind(to: blackListTableView.rx.items(cellIdentifier: BlackListCell.className, cellType: BlackListCell.self)) { index, userUID, cell in
-//                cell.configure(icon: UIImage(named: "defaultUser"), name: userUID)
-//                
-//                cell.manageButton.addAction(UIAction { [weak self] _ in
-//                    self?.showManageAlert(for: userUID)
-//                }, for: .touchUpInside)
-//            }
-//            .disposed(by: disposeBag)
-//        
-//        // 로딩 상태 바인딩
-//        viewModel.isLoading
-//            .observe(on: MainScheduler.instance)
-//            .subscribe(onNext: { isLoading in
-//                if isLoading {
-//                    // 로딩 표시 (예: 로딩 인디케이터)
-//                } else {
-//                    // 로딩 해제
-//                }
-//            })
-//            .disposed(by: disposeBag)
-//    }
     
     private func naviUI() {
         self.title = "차단 목록"
@@ -68,25 +44,50 @@ class BlackListVC: UIViewController {
     private func setupUI() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
-        [
-            blackListTableView
-        ].forEach { view.addSubview($0) }
+        view.addSubview(blackListTableView)
         
         blackListTableView.snp.makeConstraints {
             $0.edges.equalTo(view.safeAreaLayoutGuide)
         }
+        
+        blackListTableView.rx.setDelegate(self).disposed(by: disposeBag)
     }
     
-//    private func showManageAlert(for userUID: String) {
-//            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-//            let unblockAction = UIAlertAction(title: "차단 해제", style: .destructive) { [weak self] _ in
-//                self?.viewModel.removeFromBlackList(userUID: userUID)
+    // TableView 바인딩
+//    private func bindTableView() {
+//        // ViewModel의 차단된 유저 데이터를 TableView에 바인딩
+//        viewModel.blackListedUsers
+//            .bind(to: blackListTableView.rx.items(cellIdentifier: BlackListCell.className, cellType: BlackListCell.self)) { row, user, cell in
+//                // 각 셀에 유저 정보 설정
+//                cell.configure(with: user)
+//                
+//                // 차단 해제 버튼 눌렀을 때 처리
+//                cell.manageButton.rx.tap
+//                    .bind { [weak self] in
+//                        guard let self = self else { return }
+//                        self.viewModel.unblockUser(uid: user.uid) { success in
+//                            if success {
+//                                print("차단 해제 완료")
+//                                self.viewModel.fetchBlackList()  // 차단 해제 후 목록 갱신
+//                            } else {
+//                                print("차단 해제 실패")
+//                            }
+//                        }
+//                    }
+//                    .disposed(by: cell.disposeBag) // 각 셀의 disposeBag을 사용
 //            }
-//            let cancelAction = UIAlertAction(title: "취소", style: .cancel)
-//            
-//            alert.addAction(unblockAction)
-//            alert.addAction(cancelAction)
-//            
-//            present(alert, animated: true)
-//        }
+//            .disposed(by: disposeBag) // 전체적인 바인딩은 view controller의 disposeBag에 저장
+//    }
+}
+
+extension BlackListVC: UITableViewDelegate {
+    // 셀 높이 조정 (셀 자체 높이)
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
+    }
+    
+    // 셀 사이에 간격 추가
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 15
+    }
 }
