@@ -321,23 +321,6 @@ class MyPageVC: UIViewController {
     }
     
     //MARK: - 바인드
-    private func bind() {
-        //        // 프로필 편집 버튼 눌렀을 때 YJ
-        //        editButton.rx.tap
-        //            .bind { [weak self] in
-        //                guard let self = self else { return }
-        //                print("editButton tapped")
-        //                self.editButtonTapped()
-        //            }
-        //            .disposed(by: disposeBag)
-        
-        collectionView.rx.itemSelected
-            .bind { [weak self ] indexPath in
-                self?.navigateDetailFeedView(at: indexPath)
-            }
-            .disposed(by: disposeBag)
-    }
-    
     private func bindPost() {
         viewModel.userMediaPosts
             .observe(on: MainScheduler.instance)
