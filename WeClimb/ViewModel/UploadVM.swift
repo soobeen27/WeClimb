@@ -185,7 +185,7 @@ extension UploadVM {
 }
 
 extension UploadVM {
-    func upload(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?) -> Observable<Void> {
+    func upload(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String) -> Observable<Void> {
         return Observable.create { observer in
             let dispatchGroup = DispatchGroup()
             var uploadMedia: [(url: URL, sector: String?, grade: String?)] = []
@@ -194,7 +194,7 @@ extension UploadVM {
                 dispatchGroup.enter()
                 
                 // 이미지인 경우
-                if item.url.pathExtension == "jpg" {
+                if item.url.pathExtension == "jpg" || item.url.pathExtension == "png" {
                     uploadMedia.append((url: item.url, sector: item.sector, grade: item.grade)) // 압축 X
                     dispatchGroup.leave()
                 } else {
@@ -210,7 +210,7 @@ extension UploadVM {
             
             dispatchGroup.notify(queue: .main) {
                 Task { [uploadMedia, caption, gym] in
-                    await FirebaseManager.shared.uploadPost(media: uploadMedia, caption: caption, gym: gym)
+                    await FirebaseManager.shared.uploadPost(media: uploadMedia, caption: caption, gym: gym, thumbnail: thumbnailURL)
                     observer.onNext(())
                     observer.onCompleted()
                 }
@@ -263,5 +263,46 @@ extension UploadVM {
             }
         })
         // compression.cancel = true
+    }
+    
+  func getThumbnailImage(from videoURL: URL, completion: @escaping (String?) -> Void) {
+        print("썸네일 이미지 생성중")
+        
+        let asset = AVAsset(url: videoURL)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        
+        let time = CMTime(seconds: 1, preferredTimescale: 600) // 1초에서 썸네일 생성
+        imageGenerator.requestedTimeToleranceBefore = .zero
+        imageGenerator.requestedTimeToleranceAfter = .zero
+        imageGenerator.appliesPreferredTrackTransform = true // 방향
+        
+        imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { _, image, _, result, error in
+            if let error = error {
+                print("썸네일 생성 중 오류 발생: \(error.localizedDescription)")
+                completion(nil)
+            } else if let image = image {
+                print("썸네일이 성공적으로 생성.")
+                let uiImage = UIImage(cgImage: image)
+                
+                // 이미지를 URL로 변환
+                if let thumbnailData = uiImage.jpegData(compressionQuality: 0.8) {
+                    let tempDirectory = FileManager.default.temporaryDirectory
+                    let thumbnailURL = tempDirectory.appendingPathComponent("\(UUID().uuidString).jpg")
+                    
+                    do {
+                        try thumbnailData.write(to: thumbnailURL)
+                        completion(thumbnailURL.absoluteString)
+                    } catch {
+                        print("썸네일 저장 실패: \(error.localizedDescription)")
+                        completion(nil)
+                    }
+                } else {
+                    completion(nil)
+                }
+            } else {
+                print("생성된 이미지가 없음.")
+                completion(nil)
+            }
+        }
     }
 }
