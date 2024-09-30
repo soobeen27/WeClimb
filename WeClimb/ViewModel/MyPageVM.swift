@@ -41,26 +41,22 @@ class MyPageVM {
                 var postsWithMedia: [(post: Post, media: [Media], thumbnailURL: String?)] = []
                 
                 for document in documents {
-                    print("문서 ID: \(document.documentID)")
-                    
                     if let post = try? document.data(as: Post.self) {
-                        print("문서 데이터: \(post)")
-                        
                         let mediaRefs = post.medias
                         let mediaDocuments = try await Firestore.firestore().getAllDocuments(from: mediaRefs)
                         
                         let allMedia = mediaDocuments.compactMap { try? $0.data(as: Media.self) }
                         
-                        let thumbnailURL = post.thumbnail
+                        let thumbnailURL = post.thumbnail ?? "no_Post"
                         
                         postsWithMedia.append((post: post, media: allMedia, thumbnailURL: thumbnailURL))
                     } else {
                         print("Post 데이터가 없거나 잘못된 형식입니다. Document ID: \(document.documentID)")
-                        print("postsWithMedia: \(postsWithMedia)")
                     }
                 }
                 
-                self.userMediaPosts.accept(postsWithMedia)
+                let sortedPosts = postsWithMedia.sorted { $0.post.creationDate > $1.post.creationDate }
+                self.userMediaPosts.accept(sortedPosts)
                 
             } catch {
                 print("미디어 포스트 가져오기 오류: \(error)")

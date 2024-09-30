@@ -183,6 +183,8 @@ class MyPageVC: UIViewController {
         return view
     }()
     
+    var uploadVC: UploadVC?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
@@ -190,8 +192,6 @@ class MyPageVC: UIViewController {
         //        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
         bindPost()
         bindEmpty()
-//        bindCollectionView()
-//        viewModel.loadUserMediaPosts()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -201,7 +201,7 @@ class MyPageVC: UIViewController {
         updateUserInfo()
         viewModel.loadUserMediaPosts()
     }
-    
+
     // MARK: - 파이어베이스에 저장된 유저 닉네임 마이페이지 업데이트
     private func updateUserInfo() {
         FirebaseManager.shared.currentUserInfo { [weak self] (result: Result<User, Error>) in
