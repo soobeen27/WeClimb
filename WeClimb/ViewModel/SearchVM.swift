@@ -17,6 +17,7 @@ class SearchViewModel {
     
     var filteredData = BehaviorRelay<[Gym]>(value: [])
     var userFilteredData = BehaviorRelay<[User]>(value: [])
+    var userUIDs = BehaviorRelay<[String]>(value: [])
     
     let searchText = BehaviorRelay<String>(value: "")
     let isSelectGym = BehaviorRelay<Bool>(value: true)
@@ -68,19 +69,28 @@ class SearchViewModel {
             .subscribe(onNext: { [weak self] query in
                 guard let self = self else { return }
                 
-                // Firestore에서 검색어에 맞는 유저만 가져옴
-                FirebaseManager.shared.searchUsers(with: query) { users, error in
+                // Firestore에서 검색어에 맞는 유저와 UID를 가져옴
+                FirebaseManager.shared.searchUsers(with: query) { users, uids, error in
                     if let error = error {
                         print("Error fetching users: \(error)")
                         self.userFilteredData.accept([])  // 에러 시 빈 배열 전달
-                    } else if let users = users {
+                        self.userUIDs.accept([])  // UID 배열도 빈값 전달
+                    } else {
                         self.userFilteredData.accept(users)  // 검색된 유저 데이터 업데이트
+                        self.userUIDs.accept(uids)  // 검색된 UID 배열 업데이트
+                        
+                        print("검색된 UID 배열: \(uids)")
                     }
                 }
             })
             .disposed(by: disposeBag)
     }
     
+    // 특정 유저의 UID 가져오기
+    func getUserUID(at index: Int) -> String? {
+        guard index < userUIDs.value.count else { return nil }
+        return userUIDs.value[index]
+    }
     
     func search(text: String) {
         if self.isSelectGym.value == true {
@@ -94,16 +104,19 @@ class SearchViewModel {
             }
             
         } else {
+            // User 검색 처리
             if text.isEmpty {
                 self.userFilteredData.accept([])
-                
+                self.userUIDs.accept([])  // UID 배열도 초기화
             } else {
-                FirebaseManager.shared.searchUsers(with: text) { users, error in
+                FirebaseManager.shared.searchUsers(with: text) { users, uids, error in
                     if let error = error {
                         print("Error fetching users: \(error)")
                         self.userFilteredData.accept([])
-                    } else if let users = users {
-                        self.userFilteredData.accept(users)
+                        self.userUIDs.accept([])  // 에러 발생 시 UID 배열도 초기화
+                    } else {
+                        self.userFilteredData.accept(users)  // 검색된 유저 데이터를 업데이트
+                        self.userUIDs.accept(uids)  // 검색된 UID 배열을 업데이트
                     }
                 }
             }
@@ -117,34 +130,4 @@ class SearchViewModel {
                     })
                     .disposed(by: disposeBag)
             }
-//        func bindSearchText() {
-//            searchText
-//                .subscribe(onNext: { [weak self] text in
-//                    guard let self = self else { return }
-//                    if self.isSelectGym.value == true {
-//                        if text.isEmpty {
-//                            self.filteredData.accept(self.data.value)  // Gym 검색
-//                            self.userFilteredData.accept(self.userData.value)  // User 검색
-//                        } else {
-//                            let filterdGyms = self.data.value.filter { $0.gymName.contains(text) }
-//                            self.filteredData.accept(filterdGyms)
-//                        }
-//                        
-//                    } else {
-//                        if text.isEmpty {
-//                            self.userFilteredData.accept([])
-//                            
-//                        } else {
-//                            FirebaseManager.shared.searchUsers(with: text) { users, error in
-//                                if let error = error {
-//                                    print("Error fetching users: \(error)")
-//                                    self.userFilteredData.accept([])
-//                                } else if let users = users {
-//                                    self.userFilteredData.accept(users)
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                )                           }
 }

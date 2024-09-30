@@ -14,9 +14,12 @@ class UserPageVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private let viewModel = UserPageVM()
+    private let searchViewModel = SearchViewModel()
     
     private var isFollowing = false
-    private var userData: User?
+    
+    // 값이 계속 변동하기 때문에 var로함 - DS
+    var userUID: String?
     
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
@@ -209,7 +212,10 @@ class UserPageVC: UIViewController {
         let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
             self?.reportModal()
         }
-        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive, handler: nil)
+        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
+            self?.blackList()
+        }
+        
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
         [reportAction, deleteAction, cancelAction]
@@ -227,9 +233,33 @@ class UserPageVC: UIViewController {
     }
     
     //MARK: - 차단하기 기능
-    private func blackList(userUID: String) {
-        viewModel.blockUser(withUID: userUID)
+    private func blackList() {
+        guard let userUID = userUID else {
+            print("차단할 유저 UID가 없습니다.")
+            return
+        }
+        
+        print("차단할 유저 UID: \(userUID)")
+        
+        // 차단 기능 수행
+        viewModel.blockUser(byUID: userUID) { [weak self] success in
+            guard let self = self else { return }
+            if success {
+                print("차단 완료!")
+                let alert = UIAlertController(title: "차단 완료", message: nil, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
+                    self.navigationController?.popViewController(animated: true)
+                }))
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                print("차단 실패")
+                let alert = UIAlertController(title: "차단 실패", message: "다시 시도해주세요.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
     }
+
     
     private func buttonTapped() {
         isFollowing.toggle()

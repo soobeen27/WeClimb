@@ -11,62 +11,7 @@ import RxCocoa
 import RxSwift
 
 class BlackListVM {
-    
-    private let disposeBag = DisposeBag()
-    
-    // ViewModel의 Output
-    let blackList = BehaviorRelay<[String]>(value: [])
-    let isLoading = BehaviorRelay<Bool>(value: false)
-    
-    // 초기화
-    init() {
-        fetchBlackList()
-    }
-    
-    // 차단 목록 가져오기
-    func fetchBlackList() {
-            isLoading.accept(true)
-            FirebaseManager.shared.currentUserInfo { [weak self] result in
-                guard let self else { return }
-                self.isLoading.accept(false)
-                
-                switch result {
-                case .success(let user):
-                    self.blackList.accept(user.blackList ?? [])
-                case .failure(let error):
-                    print("차단 목록 가져오기 실패: \(error)")
-                    self.blackList.accept([])
-                }
-            }
-        }
-    
-    // 차단 추가
-    func addToBlackList(userUID: String) {
-        isLoading.accept(true)
-        FirebaseManager.shared.addBlackList(blockedUser: userUID) { [weak self] success in
-            guard let self else { return }
-            if success {
-                print("차단 성공")
-                self.fetchBlackList()
-            } else {
-                print("차단 실패")
-                self.isLoading.accept(false)
-            }
-        }
-    }
-    
-    // 차단 해제
-    func removeFromBlackList(userUID: String) {
-        isLoading.accept(true)
-        FirebaseManager.shared.removeBlackList(blockedUser: userUID) { [weak self] success in
-            guard let self else { return }
-            if success {
-                print("차단 해제 성공")
-                self.fetchBlackList()
-            } else {
-                print("차단 해제 실패")
-                self.isLoading.accept(false)
-            }
-        }
-    }
+ 
+    // 블랙리스트 관리 뷰 모델으로서 차단 관리로직을 짜주면 될듯?
+    // 예를 들어 차단 해제 기능 같은거?
 }
