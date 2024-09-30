@@ -191,7 +191,7 @@ class MyPageVC: UIViewController {
         bindPost()
         bindEmpty()
 //        bindCollectionView()
-        viewModel.loadUserMediaPosts()
+//        viewModel.loadUserMediaPosts()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -199,6 +199,7 @@ class MyPageVC: UIViewController {
         
         navigationController?.navigationBar.tintColor = .label
         updateUserInfo()
+        viewModel.loadUserMediaPosts()
     }
     
     // MARK: - 파이어베이스에 저장된 유저 닉네임 마이페이지 업데이트

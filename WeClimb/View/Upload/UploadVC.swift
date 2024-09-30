@@ -523,7 +523,7 @@ extension UploadVC {
             .subscribe(onNext: { [weak self] in
                 guard let self = self else { return }
                 print("버튼 클릭.")
-          
+                
                 // 첫 번째 미디어 가져오기
                 guard let firstFeedItem = self.viewModel.feedRelay.value.first,
                       let videoURL = firstFeedItem.videoURL else {
@@ -553,7 +553,7 @@ extension UploadVC {
                     caption = self.textView.text ?? ""
                 }
                 
-                if media.count == 0 {
+                if media.isEmpty {
                     uploadStatus = .fail
                 }
                 
@@ -562,7 +562,6 @@ extension UploadVC {
                 }
                 
                 let gym = self.gymView.selectedLabel.text ?? ""
-               
                 
                 // 썸네일 생성
                 self.viewModel.getThumbnailImage(from: videoURL) { thumbnailImage in
@@ -570,36 +569,36 @@ extension UploadVC {
                         print("썸네일 생성 실패.")
                         return
                     }
-
-                switch uploadStatus {
-                case .fail:
-                    CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
-                case .success:
-                    DispatchQueue.main.async {
-                        CommonManager.shared.showToast(message: "업로드 중입니다.",
-                                                       font: UIFont.systemFont(ofSize: 13),
-                                                       position: CGPoint(x: UIScreen.main.bounds.width / 2 - 75,    // (전체 / 2 - 토스트의 넓이의 반)
-                                                                         y: UIScreen.main.bounds.height / 2 - 17.5))    // (전체 / 2 -토스트 높이의 반)
+                    
+                    switch uploadStatus {
+                    case .fail:
+                        CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
+                    case .success:
+                        DispatchQueue.main.async {
+                            CommonManager.shared.showToast(message: "업로드 중입니다.",
+                                                           font: UIFont.systemFont(ofSize: 13),
+                                                           position: CGPoint(x: UIScreen.main.bounds.width / 2 - 75,
+                                                                             y: UIScreen.main.bounds.height / 2 - 17.5))
+                        }
+                        self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailImage)
+                            .subscribe(onNext: {
+                                DispatchQueue.main.async {
+                                    print("업로드 성공")
+                                    CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
+                                    self.initUploadVC()
+                                }
+                            }, onError: { error in
+                                print("업로드 실패: \(error.localizedDescription)")
+                            })
+                            .disposed(by: self.disposeBag)
                     }
-                    self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailImage)
-                        .subscribe(onNext: {
-                            DispatchQueue.main.async {
-                                print("업로드 성공")
-                                CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
-                                self.initUploadVC()
-                            }
-                        }, onError: { error in
-                            print("업로드 실패: \(error.localizedDescription)")
-                        })
-                        .disposed(by: self.disposeBag)
                 }
             })
             .disposed(by: disposeBag)
     }
-    
+
     // MARK: - 업로드뷰 초기화 YJ
     private func initUploadVC() {
-        
         // 새로운 인스턴스 생성
         let newUploadVC = UploadVC()
         
