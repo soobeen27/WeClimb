@@ -14,9 +14,12 @@ import SnapKit
 class EditPageVC: UIViewController {
     
     private let editPageViewModel = EditPageVM()
+    private let createNickNameVM = CreateNickNameVM()
     private let disposeBag = DisposeBag()
     
     private let profileImagePicker = ProfileImagePickerVC()
+
+    var selectedImage: UIImage?
     
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
@@ -47,7 +50,7 @@ class EditPageVC: UIViewController {
         bind()
         
         // 이미지 탭 피커 임시 주석
-//        setProfileImageTap()
+        setProfileImageTap()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -56,6 +59,7 @@ class EditPageVC: UIViewController {
         self.navigationController?.navigationBar.prefersLargeTitles = false
         //화면 전환 후 뒤로가기 시 테이블뷰 리로드
         tableView.reloadData()
+        updateProfileImage()
     }
     
     func setNavigation() {
@@ -90,6 +94,8 @@ class EditPageVC: UIViewController {
             }
         }
     }
+    
+    
     
     private func bind() {
         editPageViewModel.items
@@ -126,6 +132,39 @@ class EditPageVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    
+    // MARK: - 파이어베이스에 저장된 유저 정보 업데이트
+    private func updateProfileImage() {
+        FirebaseManager.shared.currentUserInfo { [weak self] (result: Result<User, Error>) in
+            DispatchQueue.main.async {
+                if case .success(let user) = result {
+                    // Firebase Storage에서 이미지 로드
+                    if let profileImageUrl = user.profileImage, let url = URL(string: profileImageUrl) {
+                        URLSession.shared.dataTask(with: url) { data, response, error in
+                            if let error = error {
+                                print("이미지를 로드하는 데 실패했습니다: \(error.localizedDescription)")
+                                return
+                            }
+                            
+                            // 데이터가 유효한지 확인 후, UIImage로 변환
+                            if let data = data, let image = UIImage(data: data) {
+                                DispatchQueue.main.async {
+                                    self?.profileImage.image = image
+                                }
+                            } else {
+                                print("이미지 데이터가 유효하지 않습니다.")
+                            }
+                        }.resume()
+                    } else {
+                        print("프로필 이미지 URL이 없습니다.")
+                    }
+                } else {
+                    print("유저 정보를 가져오는 데 실패했습니다.")
+                }
+            }
+        }
+    }
+    
     //MARK: - 탭 제스처를 추가하고, 이미지 피커 띄우기 YJ
     private func setProfileImageTap() {
         let tapGesture = UITapGestureRecognizer()
@@ -140,5 +179,52 @@ class EditPageVC: UIViewController {
                 self.profileImagePicker.presentImagePicker(from: self)
             })
             .disposed(by: disposeBag)
+        
+        
+        // 이미지 선택 후 ViewModel에 이미지 전달
+        profileImagePicker.imageObservable
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] image in
+                guard let self = self else { return }
+                
+                if let selectedImage = image {
+                    print("프로필 사진 선택됨")
+                    self.selectedImage = selectedImage
+                    self.profileImage.image = selectedImage
+                    
+                    // 이미지를 로컬 URL로 변환
+                    if let imageUrl = self.saveImageToLocal(selectedImage) {
+                        print("이미지 변환 성공")
+                        self.createNickNameVM.uploadProfileImage(imageUrl: imageUrl)
+                    } else {
+                        print("이미지 변환 실패")
+                    }
+                } else {
+                    print("프로필 사진이 선택되지 않음")
+                }
+            })
+            .disposed(by: disposeBag)  
+    }
+    
+    // UIImage를 로컬 URL로 변환하는 함수
+    func saveImageToLocal(_ image: UIImage) -> URL? {
+        guard let data = image.jpegData(compressionQuality: 0.8) else {
+            print("이미지 데이터 변환 실패")
+            return nil
+        }
+        
+        // 고유한 파일 이름 생성 및 임시 디렉토리에 저장
+        let fileName = UUID().uuidString + ".jpg"
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+        
+        do {
+            try data.write(to: fileURL)
+            print("이미지 변환 성공 URL: \(fileURL.absoluteString)")
+            return fileURL
+        } catch {
+            print("이미지 저장 실패: \(error.localizedDescription)")
+            return nil
+        }
     }
 }
+
