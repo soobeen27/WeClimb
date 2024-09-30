@@ -188,7 +188,7 @@ class MyPageVC: UIViewController {
         setLayout()
         bind()
         setNavigation()
-//        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
+        //        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
         bindPost()
         bindEmpty()
         viewModel.loadUserThumbnailPosts()
@@ -199,10 +199,10 @@ class MyPageVC: UIViewController {
         
         navigationController?.navigationBar.tintColor = .label
         updateUserInfo()
-//        collectionView.reloadData()
+        //        collectionView.reloadData()
     }
     
-    // MARK: - 파이어베이스에 저장된 유저 닉네임 마이페이지 업데이트
+    // MARK: - 파이어베이스에 저장된 유저 정보 업데이트
     private func updateUserInfo() {
         FirebaseManager.shared.currentUserInfo { [weak self] (result: Result<User, Error>) in
             DispatchQueue.main.async {
@@ -210,8 +210,28 @@ class MyPageVC: UIViewController {
                 case .success(let user):
                     self?.nameLabel.text = user.userName
                     self?.userInfoLabel.text = "\(user.height ?? "")cm  |  \(user.armReach ?? "")cm"
-                    //                    self?.heightLabel.text = "\(user.height ?? "")cm (Height)"
-                    //                    self?.armReachLabel.text = "\(user.armReach ?? "")cm (ArmReach)"
+                    
+                    // Firebase Storage에서 이미지 로드
+                    if let profileImageUrl = user.profileImage, let url = URL(string: profileImageUrl) {
+                        URLSession.shared.dataTask(with: url) { data, response, error in
+                            if let error = error {
+                                print("이미지를 로드하는 데 실패했습니다: \(error.localizedDescription)")
+                                return
+                            }
+                            
+                            // 데이터가 유효한지 확인 후, UIImage로 변환
+                            if let data = data, let image = UIImage(data: data) {
+                                DispatchQueue.main.async {
+                                    self?.profileImage.image = image
+                                }
+                            } else {
+                                print("이미지 데이터가 유효하지 않습니다.")
+                            }
+                        }.resume()
+                    } else {
+                        print("프로필 이미지 URL이 없습니다.")
+                    }
+
                 case .failure(let error):
                     print("현재 유저 정보 가져오기 실패: \(error)")
                 }
@@ -308,8 +328,8 @@ class MyPageVC: UIViewController {
         }
         
         emptyPost.snp.makeConstraints {
-               $0.center.equalToSuperview()
-           }
+            $0.center.equalToSuperview()
+        }
     }
     
     //MARK: - 바인드
@@ -358,13 +378,13 @@ class MyPageVC: UIViewController {
             .disposed(by: disposeBag)
     }
 }
-    
+
 //extension MyPageVC: UICollectionViewDelegate {
-//    
+//
 //    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 //        let modalVC = MyPageModalVC()
 //        modalVC.modalPresentationStyle = .pageSheet
-//        
+//
 //        if let sheet = modalVC.sheetPresentationController {
 //            let customDetent = UISheetPresentationController.Detent.custom { context in
 //                return context.maximumDetentValue * 0.9

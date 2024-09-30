@@ -14,6 +14,8 @@ class CreateNickNameVM {
     // Input: 닉네임 텍스트
     let nicknameInput = BehaviorSubject<String>(value: "")
     private let checkDuplicationSubject = PublishSubject<Void>()
+    let disposeBag = DisposeBag()
+    let uploadResult = PublishSubject<Result<URL, Error>>()
     
     // Output: 닉네임이 유효한지 여부
     var isNicknameValid: Observable<Bool> {
@@ -62,4 +64,17 @@ class CreateNickNameVM {
         let regex = "^[가-힣a-zA-Z0-9]*$"
         return trimmed.range(of: regex, options: .regularExpression) != nil ? trimmed : ""
     }
+    
+    
+    //이미지 업로드
+    func uploadProfileImage(imageUrl: URL) {
+        FirebaseManager.shared.uploadProfileImage(image: imageUrl)
+            .subscribe(onNext: { [weak self] url in
+                self?.uploadResult.onNext(.success(url))
+            }, onError: { [weak self] error in
+                self?.uploadResult.onNext(.failure(error))
+            })
+            .disposed(by: disposeBag)
+    }
 }
+
