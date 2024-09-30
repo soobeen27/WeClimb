@@ -526,39 +526,55 @@ extension UploadVC {
                 DispatchQueue.main.async {
                     CommonManager.shared.showToast(message: "업로드 중입니다.",
                                                    font: UIFont.systemFont(ofSize: 13),
-                                                   position: CGPoint(x: UIScreen.main.bounds.width / 2 - 75,    // (전체 / 2 - 토스트의 넓이의 반)
-                                                                     y: UIScreen.main.bounds.height / 2 - 17.5))    // (전체 / 2 -토스트 높이의 반)
+                                                   position: CGPoint(x: UIScreen.main.bounds.width / 2 - 75,
+                                                                     y: UIScreen.main.bounds.height / 2 - 17.5))
+                }
+                // 첫 번째 미디어 가져오기
+                guard let firstFeedItem = self.viewModel.feedRelay.value.first,
+                      let videoURL = firstFeedItem.videoURL else {
+                    print("첫 번째 미디어가 없거나 비디오 URL이 없습니다.")
+                    return
                 }
                 
-                let media = self.viewModel.feedRelay.value.compactMap { feedItem -> (url: URL, sector: String?, grade: String?)? in
-                    // 비디오가 있는 경우
-                    if let videoURL = feedItem.videoURL {
-                        print("비디오 URL: \(videoURL)")
-                        return (url: videoURL, sector: feedItem.sector, grade: feedItem.grade)
+                // 썸네일 생성
+                self.viewModel.getThumbnailImage(from: videoURL) { thumbnailImage in
+                    guard let thumbnailImage = thumbnailImage else {
+                        print("썸네일 생성 실패.")
+                        return
                     }
-                    // 이미지가 있는 경우
-                    if let imageURL = feedItem.imageURL {
-                        print("이미지 URL: \(imageURL)")
-                        return (url: imageURL, sector: feedItem.sector, grade: feedItem.grade)
-                    }
-                    return nil
-                }.compactMap { $0 } // nil 제거
-                
-                let caption = self.textView.text ?? ""
-                let gym = self.gymView.selectedLabel.text ?? ""
-                
-                // 업로드 메서드 호출
-                self.viewModel.upload(media: media, caption: caption, gym: gym)
-                    .subscribe(onNext: {
-                        DispatchQueue.main.async {
-                            print("업로드 성공")
-                            CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
-                            self.initUploadVC()
+
+                    // 미디어 업로드
+                    let media = self.viewModel.feedRelay.value.compactMap { feedItem -> (url: URL, sector: String?, grade: String?)? in
+                        // 비디오가 있는 경우
+                        if let videoURL = feedItem.videoURL {
+                            print("비디오 URL: \(videoURL)")
+                            return (url: videoURL, sector: feedItem.sector, grade: feedItem.grade)
                         }
-                    }, onError: { error in
-                        print("업로드 실패: \(error.localizedDescription)")
-                    })
-                    .disposed(by: self.disposeBag)
+                        // 이미지가 있는 경우
+                        if let imageURL = feedItem.imageURL {
+                            print("이미지 URL: \(imageURL)")
+                            return (url: imageURL, sector: feedItem.sector, grade: feedItem.grade)
+                        }
+                        return nil
+                    }.compactMap { $0 } // nil 제거
+
+                    DispatchQueue.main.async {
+                        let caption = self.textView.text ?? ""
+                        let gym = self.gymView.selectedLabel.text ?? ""
+                        
+                        self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailImage)
+                            .subscribe(onNext: {
+                                DispatchQueue.main.async {
+                                    print("업로드 성공")
+                                    CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
+                                    self.initUploadVC()
+                                }
+                            }, onError: { error in
+                                print("업로드 실패: \(error.localizedDescription)")
+                            })
+                            .disposed(by: self.disposeBag)
+                    }
+                }
             })
             .disposed(by: disposeBag)
     }

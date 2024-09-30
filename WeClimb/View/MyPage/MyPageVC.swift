@@ -186,12 +186,12 @@ class MyPageVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
-        bind()
         setNavigation()
-//        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
+        //        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
         bindPost()
         bindEmpty()
-        viewModel.loadUserThumbnailPosts()
+//        bindCollectionView()
+        viewModel.loadUserMediaPosts()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -199,7 +199,6 @@ class MyPageVC: UIViewController {
         
         navigationController?.navigationBar.tintColor = .label
         updateUserInfo()
-//        collectionView.reloadData()
     }
     
     // MARK: - 파이어베이스에 저장된 유저 닉네임 마이페이지 업데이트
@@ -235,19 +234,6 @@ class MyPageVC: UIViewController {
         let settingsVC = SettingVC()
         //        settingsVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(settingsVC, animated: true)
-    }
-    
-    //프로필 편집뷰 이동
-    //    private func editButtonTapped() {
-    //        let editPageVC = EditPageVC()
-    //        navigationController?.pushViewController(editPageVC, animated: true)
-    //    }
-    
-    //상세 피드뷰 이동
-    private func navigateDetailFeedView(at indexPath: IndexPath) {
-        let sFMainFeedVC = SFMainFeedVC()
-        //        sFMainFeedVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(sFMainFeedVC, animated: true)
     }
     
     //MARK: - 레이아웃
@@ -308,55 +294,55 @@ class MyPageVC: UIViewController {
         }
         
         emptyPost.snp.makeConstraints {
-               $0.center.equalToSuperview()
-           }
+            $0.center.equalToSuperview()
+        }
     }
-    
-    //MARK: - 바인드
-    private func bind() {
-        //        // 프로필 편집 버튼 눌렀을 때 YJ
-        //        editButton.rx.tap
-        //            .bind { [weak self] in
-        //                guard let self = self else { return }
-        //                print("editButton tapped")
-        //                self.editButtonTapped()
-        //            }
-        //            .disposed(by: disposeBag)
-        
-        collectionView.rx.itemSelected
-            .bind { [weak self ] indexPath in
-                self?.navigateDetailFeedView(at: indexPath)
-            }
-            .disposed(by: disposeBag)
-    }
-    
+
     private func bindPost() {
-        viewModel.thumbnailURLs
-            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { index, url, cell in
-                print("Thumbnail URL: \(url)")
-                cell.configure(with: url)
-                self.collectionView.reloadData()
+        viewModel.userMediaPosts
+            .observe(on: MainScheduler.instance)
+            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { index, mediaPost, cell in
+                if let thumbnailURL = mediaPost.thumbnailURL {
+                    print("썸네일 URL: \(thumbnailURL)")
+                    cell.configure(with: thumbnailURL)
+                } else {
+                    print("썸네일이 없습니다.")
+                }
             }
             .disposed(by: disposeBag)
     }
     
     private func bindEmpty() {
-        viewModel.myPosts
+        viewModel.userMediaPosts
             .subscribe(onNext: { [weak self] posts in
                 guard let self = self else { return }
                 
                 DispatchQueue.main.async {
                     if posts.isEmpty {
-                        self.emptyPost.isHidden = false // 게시물이 없으면 emptyPost 보여주기
-                        self.collectionView.isHidden = true // 컬렉션 뷰 숨기기
+                        self.emptyPost.isHidden = false
+                        self.collectionView.isHidden = true
                     } else {
-                        self.emptyPost.isHidden = true // 게시물이 있으면 emptyPost 숨기기
-                        self.collectionView.isHidden = false // 컬렉션 뷰 보여주기
+                        self.emptyPost.isHidden = true
+                        self.collectionView.isHidden = false
                     }
                 }
             })
             .disposed(by: disposeBag)
     }
+  
+//    private func bindCollectionView() {
+//        print("bindCollectionView 호출됨")
+//        collectionView.rx.modelSelected((post: Post, media: [Media]).self)
+//            .subscribe(onNext: { [weak self] selectedMediaPost in
+//                print("셀 선택됨: \(selectedMediaPost)")
+//                guard let self = self else { return }
+//                print("셀 선택됨: \(selectedMediaPost.post), 미디어 수: \(selectedMediaPost.media.count)")
+//                let mainFeedVC = SFMainFeedVC()
+//                mainFeedVC.myPageConfigure(with: selectedMediaPost.post, media: selectedMediaPost.media)
+//                self.navigationController?.pushViewController(mainFeedVC, animated: true)
+//            })
+//            .disposed(by: disposeBag)
+//    }
 }
     
 //extension MyPageVC: UICollectionViewDelegate {

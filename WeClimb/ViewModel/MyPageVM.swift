@@ -15,10 +15,10 @@ import FirebaseAuth
 class MyPageVM {
     
     private let disposeBag = DisposeBag()
-    let myPosts = BehaviorSubject<[Post]>(value: [])
-    let thumbnailURLs = BehaviorSubject<[String]>(value: [])
     
-    func loadUserThumbnailPosts() {
+    let userMediaPosts = BehaviorRelay<[(post: Post, media: [Media], thumbnailURL: String?)]>(value: [])
+    
+    func loadUserMediaPosts() {
         FirebaseManager.shared.currentUserInfo { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -27,45 +27,43 @@ class MyPageVM {
                     print("사용자의 포스트가 없습니다.")
                     return
                 }
-                
-                self.fetchThumbnailURLs(from: postRefs)
+                self.fetchUserMediaPosts(from: postRefs)
             case .failure(let error):
                 print("현재 유저 정보 가져오기 오류: \(error)")
             }
         }
     }
     
-    // 포스트의 썸네일 URL만 가져오기
-    private func fetchThumbnailURLs(from refs: [DocumentReference]) {
+    private func fetchUserMediaPosts(from refs: [DocumentReference]) {
         Task {
             do {
-                let documents = try await Firestore.firestore().getAllDocuments(from: refs) // Firestore에서 문서 가져오기
-                
-                var urls: [String] = []
+                let documents = try await Firestore.firestore().getAllDocuments(from: refs)
+                var postsWithMedia: [(post: Post, media: [Media], thumbnailURL: String?)] = []
                 
                 for document in documents {
-                    // 문서 데이터 가져오기
-                    guard let data = document.data(),
-                          let mediaRefs = data["medias"] as? [DocumentReference] else {
-                        print("문서 데이터가 없거나 잘못된 형식입니다.")
-                        continue
-                    }
+                    print("문서 ID: \(document.documentID)")
                     
-                    let mediaDocuments = try await Firestore.firestore().getAllDocuments(from: mediaRefs)
-                    
-                    // 첫 번째 미디어의 URL을 썸네일로 사용
-                    if let mediaDocument = mediaDocuments.first,
-                       let mediaData = mediaDocument.data(),
-                       let thumbnailURL = mediaData["url"] as? String {
+                    if let post = try? document.data(as: Post.self) {
+                        print("문서 데이터: \(post)")
                         
-                        urls.append(thumbnailURL)
+                        let mediaRefs = post.medias
+                        let mediaDocuments = try await Firestore.firestore().getAllDocuments(from: mediaRefs)
+                        
+                        let allMedia = mediaDocuments.compactMap { try? $0.data(as: Media.self) }
+                        
+                        let thumbnailURL = post.thumbnail
+                        
+                        postsWithMedia.append((post: post, media: allMedia, thumbnailURL: thumbnailURL))
+                    } else {
+                        print("Post 데이터가 없거나 잘못된 형식입니다. Document ID: \(document.documentID)")
+                        print("postsWithMedia: \(postsWithMedia)")
                     }
                 }
                 
-                self.thumbnailURLs.onNext(urls)
+                self.userMediaPosts.accept(postsWithMedia)
                 
             } catch {
-                print("썸네일 URL 가져오기 오류: \(error)")
+                print("미디어 포스트 가져오기 오류: \(error)")
             }
         }
     }
