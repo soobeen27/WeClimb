@@ -1,0 +1,20 @@
+name: Add issue to project board
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add issue to project board
+        env:
+          GITHUB_TOKEN: ${{ secrets.DAESUNGTOKEN }}
+          PROJECT_NODE_ID: "PVT_kwDOCqx9GM4Ao_Iy"
+        run: |
+          ISSUE_NODE_ID=$(jq -r '.issue.node_id' "${{ github.event_path }}")
+          curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"query":"mutation { addProjectV2ItemById(input: {projectId: \"$PROJECT_NODE_ID\", contentId: \"$ISSUE_NODE_ID\"}) { item { id } } }"}' \
+            https://api.github.com/graphql

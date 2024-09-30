@@ -556,7 +556,10 @@ final class FirebaseManager {
                 let filteredPosts = postWithMedias.filter { post in
                     !blackList.contains(post.post.authorUID)
                 }
-                completion(filteredPosts)
+                let newestFirst = filteredPosts.sorted {
+                    $0.post.creationDate > $1.post.creationDate
+                }
+                completion(newestFirst)
             }
         }
     }
