@@ -183,15 +183,16 @@ class MyPageVC: UIViewController {
         return view
     }()
     
+    var uploadVC: UploadVC?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
-        bind()
         setNavigation()
         //        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
         bindPost()
         bindEmpty()
-        viewModel.loadUserThumbnailPosts()
+        bindCollectionView()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -199,7 +200,7 @@ class MyPageVC: UIViewController {
         
         navigationController?.navigationBar.tintColor = .label
         updateUserInfo()
-        //        collectionView.reloadData()
+        viewModel.loadUserMediaPosts()
     }
     
     // MARK: - 파이어베이스에 저장된 유저 정보 업데이트
@@ -255,19 +256,6 @@ class MyPageVC: UIViewController {
         let settingsVC = SettingVC()
         //        settingsVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(settingsVC, animated: true)
-    }
-    
-    //프로필 편집뷰 이동
-    //    private func editButtonTapped() {
-    //        let editPageVC = EditPageVC()
-    //        navigationController?.pushViewController(editPageVC, animated: true)
-    //    }
-    
-    //상세 피드뷰 이동
-    private func navigateDetailFeedView(at indexPath: IndexPath) {
-        let sFMainFeedVC = SFMainFeedVC()
-        //        sFMainFeedVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(sFMainFeedVC, animated: true)
     }
     
     //MARK: - 레이아웃
@@ -351,29 +339,57 @@ class MyPageVC: UIViewController {
     }
     
     private func bindPost() {
-        viewModel.thumbnailURLs
-            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { index, url, cell in
-                print("Thumbnail URL: \(url)")
-                cell.configure(with: url)
-                self.collectionView.reloadData()
+        viewModel.userMediaPosts
+            .observe(on: MainScheduler.instance)
+            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { index, mediaPost, cell in
+                if let thumbnailURL = mediaPost.thumbnailURL {
+                    print("썸네일 URL: \(thumbnailURL)")
+                    cell.configure(with: thumbnailURL)
+                } else {
+                    print("썸네일이 없습니다.")
+                }
             }
             .disposed(by: disposeBag)
     }
     
     private func bindEmpty() {
-        viewModel.myPosts
+        viewModel.userMediaPosts
             .subscribe(onNext: { [weak self] posts in
                 guard let self = self else { return }
                 
                 DispatchQueue.main.async {
                     if posts.isEmpty {
-                        self.emptyPost.isHidden = false // 게시물이 없으면 emptyPost 보여주기
-                        self.collectionView.isHidden = true // 컬렉션 뷰 숨기기
+                        self.emptyPost.isHidden = false
+                        self.collectionView.isHidden = true
                     } else {
-                        self.emptyPost.isHidden = true // 게시물이 있으면 emptyPost 숨기기
-                        self.collectionView.isHidden = false // 컬렉션 뷰 보여주기
+                        self.emptyPost.isHidden = true
+                        self.collectionView.isHidden = false
                     }
                 }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindCollectionView() {
+        collectionView.rx.itemSelected
+            .subscribe(onNext: { [weak self] indexPath in
+                guard let self = self else { return }
+                
+                let selectedIndex = indexPath.row
+                let allPosts = self.viewModel.userMediaPosts.value
+                
+                let mainFeedVM = MainFeedVM(shouldFetch: false)
+                
+                let userAll = allPosts.map { ($0.post, $0.media) }
+                mainFeedVM.posts.accept(userAll)
+                
+                let mainFeedVC = SFMainFeedVC()
+                mainFeedVC.viewModel = mainFeedVM
+                
+                mainFeedVC.startingIndex = selectedIndex // 선택된 인덱스에서 스크롤 위치 설정
+                print("전달할 인데스: \(mainFeedVC.startingIndex)")
+                    
+                self.navigationController?.pushViewController(mainFeedVC, animated: true)
             })
             .disposed(by: disposeBag)
     }
