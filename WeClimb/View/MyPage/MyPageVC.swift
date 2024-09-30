@@ -192,6 +192,7 @@ class MyPageVC: UIViewController {
         //        collectionView.rx.setDelegate(self).disposed(by: disposeBag)
         bindPost()
         bindEmpty()
+        bindCollectionView()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -201,7 +202,7 @@ class MyPageVC: UIViewController {
         updateUserInfo()
         viewModel.loadUserMediaPosts()
     }
-
+    
     // MARK: - 파이어베이스에 저장된 유저 닉네임 마이페이지 업데이트
     private func updateUserInfo() {
         FirebaseManager.shared.currentUserInfo { [weak self] (result: Result<User, Error>) in
@@ -298,7 +299,7 @@ class MyPageVC: UIViewController {
             $0.center.equalToSuperview()
         }
     }
-
+    
     private func bindPost() {
         viewModel.userMediaPosts
             .observe(on: MainScheduler.instance)
@@ -330,20 +331,30 @@ class MyPageVC: UIViewController {
             })
             .disposed(by: disposeBag)
     }
-  
-//    private func bindCollectionView() {
-//        print("bindCollectionView 호출됨")
-//        collectionView.rx.modelSelected((post: Post, media: [Media]).self)
-//            .subscribe(onNext: { [weak self] selectedMediaPost in
-//                print("셀 선택됨: \(selectedMediaPost)")
-//                guard let self = self else { return }
-//                print("셀 선택됨: \(selectedMediaPost.post), 미디어 수: \(selectedMediaPost.media.count)")
-//                let mainFeedVC = SFMainFeedVC()
-//                mainFeedVC.myPageConfigure(with: selectedMediaPost.post, media: selectedMediaPost.media)
-//                self.navigationController?.pushViewController(mainFeedVC, animated: true)
-//            })
-//            .disposed(by: disposeBag)
-//    }
+    
+    private func bindCollectionView() {
+        collectionView.rx.itemSelected
+            .subscribe(onNext: { [weak self] indexPath in
+                guard let self = self else { return }
+                
+                let selectedIndex = indexPath.row
+                let allPosts = self.viewModel.userMediaPosts.value
+                
+                let mainFeedVM = MainFeedVM(shouldFetch: false)
+                
+                let userAll = allPosts.map { ($0.post, $0.media) }
+                mainFeedVM.posts.accept(userAll)
+                
+                let mainFeedVC = SFMainFeedVC()
+                mainFeedVC.viewModel = mainFeedVM
+                
+                mainFeedVC.startingIndex = selectedIndex // 선택된 인덱스에서 스크롤 위치 설정
+                print("전달할 인데스: \(mainFeedVC.startingIndex)")
+                    
+                self.navigationController?.pushViewController(mainFeedVC, animated: true)
+            })
+            .disposed(by: disposeBag)
+    }
 }
     
 //extension MyPageVC: UICollectionViewDelegate {
