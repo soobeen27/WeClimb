@@ -29,7 +29,7 @@ class SFMainFeedVC: UIViewController{
     }()
     
     private lazy var activityIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .medium)
+        let indicator = UIActivityIndicatorView(style: .large)
         indicator.color = .gray
         indicator.center = CGPoint(x: collectionView.frame.width / 2, y: 50)
         return indicator
@@ -42,9 +42,6 @@ class SFMainFeedVC: UIViewController{
         setTabBar()
         setCollectionView()
         setLayout()
-        
-        //        bindViewModel()
-        
         bindCollectionView()
         setupCollectionViewScrollEvent()
         setupCollectionView()
@@ -70,15 +67,7 @@ class SFMainFeedVC: UIViewController{
     @objc private func rightButtonTapped() {
         actionSheet()
     }
-    
-    //    @objc private func refreshFeed() {
-    //        viewModel.fetchInitialFeed() { [weak self] in
-    //            DispatchQueue.main.async {
-    //                self?.refreshControll.endRefreshing()
-    //            }
-    //        }
-    //    }
-    
+
     private func setTabBar(){
         if let tabBar = self.tabBarController?.tabBar {
             tabBar.backgroundImage = UIImage()  //탭바 배경 투명하게 설정
@@ -123,7 +112,6 @@ class SFMainFeedVC: UIViewController{
             })
             .disposed(by: disposeBag)
         
-        // 셀 크기 설정
         collectionView.rx.setDelegate(self)
             .disposed(by: disposeBag)
     }
@@ -244,32 +232,33 @@ class SFMainFeedVC: UIViewController{
         }
     }
 }
-
-//MARK: - 컬렉션뷰 프로토콜 설정
-
-extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
-    }
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        innerCollectionViewPlayers(playOrPause: false)
-    }
-    // 스크롤바 위로 땡겼을때 리로딩 JS
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if collectionView.contentOffset.y < -100 {
-            activityIndicator.startAnimating()
-            if !isRefresh && viewModel.shouldFetch {
-                viewModel.fetchInitialFeed()
-                isRefresh = true
+    
+    //MARK: - 컬렉션뷰 델리게이트 설정
+    
+    extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
+        func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+            return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
+        }
+        func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+            innerCollectionViewPlayers(playOrPause: false)
+        }
+        // 스크롤바 위로 땡겼을때 리로딩 JS
+        func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            if collectionView.contentOffset.y < -100 {
+                activityIndicator.startAnimating()
+                if !isRefresh && viewModel.shouldFetch {
+                    viewModel.fetchInitialFeed()
+                    isRefresh = true
+                }
             }
         }
+        
+        func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+            activityIndicator.stopAnimating()
+            isRefresh = false
+        }
+        
     }
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        activityIndicator.stopAnimating()
-        isRefresh = false
-    }
-}
 
 extension SFMainFeedVC {
     func setupCollectionView() {
