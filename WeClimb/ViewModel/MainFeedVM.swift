@@ -23,11 +23,14 @@ class MainFeedVM {
     }
     
     // 피드 데이터 초기 로드
-    private func fetchInitialFeed() {
+    func fetchInitialFeed() {
         FirebaseManager.shared.feedFirst { [weak self] fetchedPosts in
             guard let self, let fetchedPosts = fetchedPosts else { return }
 //            print("******************************\(fetchedPosts)********************************************")
             self.posts.accept(fetchedPosts)
+            self.posts.value.forEach {
+                print($0.post.creationDate)
+            }
 //            self.posts = fetchedPosts
         }
     }

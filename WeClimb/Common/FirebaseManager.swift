@@ -329,7 +329,7 @@ final class FirebaseManager {
             }
     }
     // MARK: 포스트 업로드
-    func uploadPost(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?) async {
+    func uploadPost(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?, thumbnail: String) async {
         guard let user = Auth.auth().currentUser else {
             print("로그인이 되지않음")
             return
@@ -367,7 +367,7 @@ final class FirebaseManager {
             }
             
             // 포스트 데이터를 Firestore에 저장
-            let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: mediaReferences)
+            let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: mediaReferences, thumbnail: thumbnail)
             
             let userRef = db.collection("users").document(user.uid)
             batch.setData(try Firestore.Encoder().encode(post), forDocument: postRef)
@@ -558,7 +558,10 @@ final class FirebaseManager {
                 let filteredPosts = postWithMedias.filter { post in
                     !blackList.contains(post.post.authorUID)
                 }
-                completion(filteredPosts)
+                let newestFirst = filteredPosts.sorted {
+                    $0.post.creationDate > $1.post.creationDate
+                }
+                completion(newestFirst)
             }
         }
     }
