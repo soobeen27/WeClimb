@@ -528,6 +528,7 @@ extension UploadVC {
                 guard let firstFeedItem = self.viewModel.feedRelay.value.first,
                       let videoURL = firstFeedItem.videoURL else {
                     print("첫 번째 미디어가 없거나 비디오 URL이 없습니다.")
+                    CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
                     return
                 }
                 
