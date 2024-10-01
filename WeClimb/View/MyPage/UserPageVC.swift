@@ -246,16 +246,10 @@ class UserPageVC: UIViewController {
             guard let self = self else { return }
             if success {
                 print("차단 완료!")
-                let alert = UIAlertController(title: "차단 완료", message: nil, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
-                    self.navigationController?.popViewController(animated: true)
-                }))
-                self.present(alert, animated: true, completion: nil)
+                CommonManager.shared.showAlert(from: self, title: "차단완료", message: "")
             } else {
                 print("차단 실패")
-                let alert = UIAlertController(title: "차단 실패", message: "다시 시도해주세요.", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-                self.present(alert, animated: true, completion: nil)
+                CommonManager.shared.showAlert(from: self, title: "차단실패", message: "")
             }
         }
     }
