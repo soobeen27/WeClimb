@@ -168,7 +168,15 @@ class SFMainFeedVC: UIViewController{
         let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
             self?.reportModal()
         }
-        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive, handler: nil)
+        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                CommonManager.shared.showAlert(from: self,
+                                               title: "알림",
+                                               message: "차단 완료")
+                
+            }
+        }
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
         [reportAction, deleteAction, cancelAction]
