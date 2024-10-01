@@ -17,6 +17,8 @@ class SFMainFeedVC: UIViewController{
     private let viewModel = MainFeedVM()
     var isRefresh = false
     
+    var currentPost: Post?
+    
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -63,9 +65,14 @@ class SFMainFeedVC: UIViewController{
     }
     
     @objc private func rightButtonTapped() {
-        actionSheet()
+        guard let currentPost = currentPost else {
+            print("현재 보고 있는 게시물이 없습니다.")
+            return
+        }
+        
+        actionSheet(for: currentPost)
     }
-
+    
     private func setTabBar(){
         if let tabBar = self.tabBarController?.tabBar {
             tabBar.backgroundImage = UIImage()  //탭바 배경 투명하게 설정
@@ -125,18 +132,17 @@ class SFMainFeedVC: UIViewController{
                 
                 // 스크롤이 마지막 셀에 도달했는지 확인
                 if contentOffset.y >= scrollOffsetThreshold {
-                    //                        if let indexPaths = self.collectionView.indexPathsForVisibleItems.sorted(),
                     if let lastIndexPath = self.collectionView.indexPathsForVisibleItems.sorted().last {
-                        let isLastItem = lastIndexPath.item == (self.viewModel.posts.value.count - 1)
-                        
-                        if isLastItem && !self.viewModel.isLastCell {
-                            self.viewModel.isLastCell = true
-                            self.onLastCellReached()
-                        }
+                        self.viewModel.isLastCell = true
                     }
                 } else {
-                    // 스크롤이 마지막 셀에 도달하지 않으면 플래그를 리셋
                     self.viewModel.isLastCell = false
+                }
+                
+                // 현재 보고 있는 첫 번째 셀의 게시물 정보를 업데이트
+                if let visibleIndexPath = self.collectionView.indexPathsForVisibleItems.first {
+                    let post = self.viewModel.posts.value[visibleIndexPath.row]
+                    self.currentPost = post.post // 현재 게시물 정보 저장
                 }
             })
             .disposed(by: disposeBag)
@@ -159,12 +165,15 @@ class SFMainFeedVC: UIViewController{
     }
     
     //MARK: - 더보기 액션 시트
-    private func actionSheet() {
+    private func actionSheet(for post: Post) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
             self?.reportModal()
         }
-        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive, handler: nil)
+        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
+               guard let self else { return }
+               self.blockUser(authorUID: post.authorUID)
+           }
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
         [reportAction, deleteAction, cancelAction]
@@ -227,8 +236,21 @@ class SFMainFeedVC: UIViewController{
             }
         }
     }
+    //MARK: - 차단하기 관련 메서드
+    private func blockUser(authorUID: String) {
+        FirebaseManager.shared.addBlackList(blockedUser: authorUID) { [weak self] success in
+            guard let self else { return }
+            
+            if success {
+                print("차단 성공: \(authorUID)")
+                CommonManager.shared.showAlert(from: self, title: "차단 완료", message: "")
+            } else {
+                print("차단 실패: \(authorUID)")
+                CommonManager.shared.showAlert(from: self, title: "차단 실패", message: "차단을 실패했습니다. 다시 시도해주세요.")
+            }
+        }
+    }
 }
-    
     //MARK: - 컬렉션뷰 델리게이트 설정
     
     extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
