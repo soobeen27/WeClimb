@@ -31,7 +31,7 @@ class BlackListVC: UIViewController {
         
         setupUI()
         naviUI()
-//        bindTableView()
+        bindTableView()
         
         viewModel.fetchBlackList()
     }
@@ -53,31 +53,32 @@ class BlackListVC: UIViewController {
         blackListTableView.rx.setDelegate(self).disposed(by: disposeBag)
     }
     
-    // TableView 바인딩
-//    private func bindTableView() {
-//        // ViewModel의 차단된 유저 데이터를 TableView에 바인딩
-//        viewModel.blackListedUsers
-//            .bind(to: blackListTableView.rx.items(cellIdentifier: BlackListCell.className, cellType: BlackListCell.self)) { row, user, cell in
-//                // 각 셀에 유저 정보 설정
-//                cell.configure(with: user)
-//                
-//                // 차단 해제 버튼 눌렀을 때 처리
-//                cell.manageButton.rx.tap
-//                    .bind { [weak self] in
-//                        guard let self = self else { return }
-//                        self.viewModel.unblockUser(uid: user.uid) { success in
-//                            if success {
-//                                print("차단 해제 완료")
-//                                self.viewModel.fetchBlackList()  // 차단 해제 후 목록 갱신
-//                            } else {
-//                                print("차단 해제 실패")
-//                            }
-//                        }
-//                    }
-//                    .disposed(by: cell.disposeBag) // 각 셀의 disposeBag을 사용
-//            }
-//            .disposed(by: disposeBag) // 전체적인 바인딩은 view controller의 disposeBag에 저장
-//    }
+//     TableView 바인딩
+    private func bindTableView() {
+        viewModel.blackListedUsers
+            .bind(to: blackListTableView.rx.items(cellIdentifier: BlackListCell.className, cellType: BlackListCell.self)) { [weak self] row, user, cell in
+                guard let self else { return }
+                
+                // 각 셀에 유저 정보 설정
+                cell.configure(with: user)
+                
+                // 차단 해제 버튼 눌렀을 때 처리
+                cell.manageButton.rx.tap
+                    .bind {
+                        let uid = self.viewModel.blackListedUIDs.value[row]
+                        self.viewModel.unblockUser(uid: uid) { success in
+                            if success {
+                                print("차단 해제 완료")
+                                self.viewModel.fetchBlackList()  // 차단 해제 후 목록 갱신
+                            } else {
+                                print("차단 해제 실패")
+                            }
+                        }
+                    }
+                    .disposed(by: cell.disposeBag)
+            }
+            .disposed(by: disposeBag)
+    }
 }
 
 extension BlackListVC: UITableViewDelegate {

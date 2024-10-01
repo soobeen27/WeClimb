@@ -13,47 +13,46 @@ import RxSwift
 class BlackListVM {
     private let disposeBag = DisposeBag()
     
-    // 차단된 사용자 목록 (User 모델)
+    // 차단된 유저 정보와 UID 관리
     var blackListedUsers = BehaviorRelay<[User]>(value: [])
+    var blackListedUIDs = BehaviorRelay<[String]>(value: [])
     
     // 차단된 사용자 목록 가져오기
     func fetchBlackList() {
-        // 현재 사용자 정보 가져오기
-        FirebaseManager.shared.currentUserInfo { [weak self] result in
+        FirebaseManager.shared.currentUserInfo { result in
             switch result {
             case .success(let user):
-                // blackList가 있으면 해당 UID로 사용자 정보 가져오기
-                guard let blackListUIDs = user.blackList, !blackListUIDs.isEmpty else {
-                    print("차단된 사용자가 없습니다.")
-                    self?.blackListedUsers.accept([]) // 차단된 사용자가 없으면 빈 배열 전달
+                print("현재 유저 정보: \(user)") // 유저 정보가 제대로 오는지 확인
+                guard let blackList = user.blackList else {
+                    print("차단된 목록이 없습니다.")
                     return
                 }
+                print("차단된 유저 UID 목록: \(blackList)") // blackList가 nil이 아닌지 확인
                 
-                var blackListedUsers: [User] = []
-                let group = DispatchGroup()
+                let userFetchGroup = DispatchGroup()
+                var users: [User] = []
+                var uids: [String] = []
                 
-                // 차단된 UID에 해당하는 유저 정보를 가져오기
-                for uid in blackListUIDs {
-                    group.enter()
-                    FirebaseManager.shared.getUserInfoFrom(uid: uid) { result in
-                        switch result {
+                blackList.forEach { uid in
+                    userFetchGroup.enter()
+                    FirebaseManager.shared.getUserInfoFrom(uid: uid) { userResult in
+                        switch userResult {
                         case .success(let blockedUser):
-                            blackListedUsers.append(blockedUser)
+                            users.append(blockedUser)
+                            uids.append(uid)
                         case .failure(let error):
-                            print("차단된 사용자 정보를 가져오는 중 오류: \(error)")
+                            print("차단된 유저 정보 가져오기 에러: \(error)")
                         }
-                        group.leave()
+                        userFetchGroup.leave()
                     }
                 }
                 
-                // 모든 사용자 정보를 다 가져온 후에 완료 핸들러 호출
-                group.notify(queue: .main) {
-                    self?.blackListedUsers.accept(blackListedUsers)  // 차단된 유저 목록 업데이트
+                userFetchGroup.notify(queue: .main) {
+                    self.blackListedUsers.accept(users)
+                    self.blackListedUIDs.accept(uids)
                 }
-                
             case .failure(let error):
-                print("현재 유저 정보를 가져오는 중 오류: \(error)")
-                self?.blackListedUsers.accept([])  // 오류 발생 시 빈 배열 전달
+                print("현재 유저 정보 가져오기 실패: \(error)")
             }
         }
     }
