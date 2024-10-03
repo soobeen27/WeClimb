@@ -176,7 +176,7 @@ class PersonalDetailsVC: UIViewController {
                         self?.viewModel.heightInput.accept(selectedRange)  // onNext 대신 accept 사용
                     })
                     .disposed(by: self.disposeBag)
-
+                
                 self.present(rangePickerVC, animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
@@ -251,25 +251,41 @@ class PersonalDetailsVC: UIViewController {
         //            })
         //            .disposed(by: disposeBag)
         
-        // heightInput과 armReachInput 결합
-        Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput)
+        confirmButton.rx.tap
+            .withLatestFrom(Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput))
             .subscribe(onNext: { [weak self] newHeight, newArmReach in
                 guard let self = self else { return }
                 
-                // confirmButton 눌렀을 때 두 값 Firebase로 넘기기
-                self.confirmButton.rx.tap
-                    .subscribe(onNext: {
-                        FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
-                            FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach) {
-                                let tabBarController = TabBarController()
-                                self.navigationController?.pushViewController(tabBarController, animated: true)
-                                //탭바로 넘어갈 때 네비게이션바 가리기
-                                self.navigationController?.setNavigationBarHidden(true, animated: true)
-                            }
-                        }
-                    })
-                    .disposed(by: self.disposeBag)
+                FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
+                    FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach) {
+                        let tabBarController = TabBarController()
+                        self.navigationController?.pushViewController(tabBarController, animated: true)
+                        self.navigationController?.setNavigationBarHidden(true, animated: true)
+                    }
+                }
             })
             .disposed(by: disposeBag)
     }
+        
+//        // heightInput과 armReachInput 결합
+//        Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput)
+//            .subscribe(onNext: { [weak self] newHeight, newArmReach in
+//                guard let self = self else { return }
+//                
+//                // confirmButton 눌렀을 때 두 값 Firebase로 넘기기
+//                self.confirmButton.rx.tap
+//                    .subscribe(onNext: {
+//                        FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
+//                            FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach) {
+//                                let tabBarController = TabBarController()
+//                                self.navigationController?.pushViewController(tabBarController, animated: true)
+//                                //탭바로 넘어갈 때 네비게이션바 가리기
+//                                self.navigationController?.setNavigationBarHidden(true, animated: true)
+//                            }
+//                        }
+//                    })
+//                    .disposed(by: self.disposeBag)
+//            })
+//            .disposed(by: disposeBag)
+//    }
 }
