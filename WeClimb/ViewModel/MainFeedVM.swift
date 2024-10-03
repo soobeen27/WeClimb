@@ -6,3 +6,52 @@
 //
 
 import Foundation
+
+import RxCocoa
+import RxSwift
+
+class MainFeedVM {
+    private let disposeBag = DisposeBag()
+    
+//    let posts = PublishSubject<[(post: Post, media: [Media])]>() // 포스트 데이터 스트림
+    var posts = BehaviorRelay<[(post: Post, media: [Media])]>(value: [])
+//    var posts: [(post: Post, media: [Media])] = []
+    var isLastCell = false
+    var shouldFetch: Bool 
+    
+    init(shouldFetch: Bool) {
+        self.shouldFetch = shouldFetch
+        if shouldFetch {
+            fetchInitialFeed()
+        }
+    }
+    
+    // 피드 데이터 초기 로드
+    func fetchInitialFeed() {
+        FirebaseManager.shared.feedFirst { [weak self] fetchedPosts in
+            guard let self, let fetchedPosts = fetchedPosts else { return }
+//            print("******************************\(fetchedPosts)********************************************")
+            self.posts.accept(fetchedPosts)
+            self.posts.value.forEach {
+                print($0.post.creationDate)
+            }
+//            self.posts = fetchedPosts
+        }
+    }
+    
+    // 추가 데이터 로드
+    func fetchMoreFeed() {
+        FirebaseManager.shared.feedLoading { [weak self] fetchedPosts in
+            guard let self, let fetchedPosts = fetchedPosts else { return }
+            var loadedPosts = self.posts.value
+            fetchedPosts.forEach {
+                loadedPosts.append($0)
+            }
+            
+            self.posts.accept(loadedPosts)
+//            fetchedPosts.forEach {
+//                self.posts.append($0)
+//            }
+        }
+    }
+}

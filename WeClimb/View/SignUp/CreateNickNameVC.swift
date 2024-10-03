@@ -15,6 +15,9 @@ class CreateNickNameVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = CreateNickNameVM()
     private let profileImagePicker = ProfileImagePickerVC()
+    private let createNickNameVM = CreateNickNameVM()
+    
+    var selectedImage: UIImage?
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -208,6 +211,30 @@ class CreateNickNameVC: UIViewController {
                 self.profileImagePicker.presentImagePicker(from: self)
             })
             .disposed(by: disposeBag)
+        
+        // 이미지 선택 후 ViewModel에 이미지 전달
+        profileImagePicker.imageObservable
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] image in
+                guard let self = self else { return }
+                
+                if let selectedImage = image {
+                    print("프로필 사진 선택됨")
+                    self.selectedImage = selectedImage
+                    self.profileImageView.image = selectedImage
+                    
+                    // 이미지를 로컬 URL로 변환
+                    if let imageUrl = self.saveImageToLocal(selectedImage) {
+                        print("이미지 변환 성공")
+                        self.createNickNameVM.uploadProfileImage(imageUrl: imageUrl)
+                    } else {
+                        print("이미지 변환 실패")
+                    }
+                } else {
+                    print("프로필 사진이 선택되지 않음")
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     
@@ -232,17 +259,70 @@ class CreateNickNameVC: UIViewController {
             .bind(to: characterCountLabel.rx.text)
             .disposed(by: disposeBag)
         
-        // 네비게이션
+        // 닉네임 중복 여부 확인
         confirmButton.rx.tap
-            .withLatestFrom(viewModel.nicknameInput) // nicknameInput의 최신 값 가져오기
-            .subscribe(onNext: { [weak self] newName in
-                guard let self else { return }
-                FirebaseManager.shared.updateAccount(with: newName, for: .userName, completion: {
-                    let personalDetailVC = PersonalDetailsVC()
-                    self.navigationController?.pushViewController(personalDetailVC, animated: true)
-                })
+            .subscribe(onNext: { [weak self] in
+                self?.viewModel.checkNicknameDuplication()
             })
             .disposed(by: disposeBag)
+        
+        // 닉네임 중복 체크 결과에 따라 처리
+        viewModel.isNicknameDuplicateCheck
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] isDuplicate in
+                guard let self = self else { return }
+                
+                if isDuplicate {
+                    // 닉네임 중복일 경우 알림 표시
+                    CommonManager.shared.showAlert(
+                        from: self,
+                        title: "중복된 닉네임",
+                        message: "이미 사용중인 닉네임입니다. 다른 닉네임을 입력해주세요.",
+                        includeCancel: false
+                    )
+                } else {
+                    // 닉네임 중복이 아닐 경우 네비게이션 실행
+                    guard let newName = try? self.viewModel.nicknameInput.value() else { return }
+                    FirebaseManager.shared.updateAccount(with: newName, for: .userName, completion: {
+                        let personalDetailVC = PersonalDetailsVC()
+                        self.navigationController?.pushViewController(personalDetailVC, animated: true)
+                    })
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        createNickNameVM.uploadResult
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { result in
+                switch result {
+                case .success(let url):
+                    print("Image uploaded successfully, URL: \(url)")
+                case .failure(let error):
+                    print("Failed to upload image: \(error.localizedDescription)")
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    // UIImage를 로컬 URL로 변환하는 함수
+    func saveImageToLocal(_ image: UIImage) -> URL? {
+        guard let data = image.jpegData(compressionQuality: 0.8) else {
+            print("이미지 데이터 변환 실패")
+            return nil
+        }
+        
+        // 고유한 파일 이름 생성 및 임시 디렉토리에 저장
+        let fileName = UUID().uuidString + ".jpg"
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+        
+        do {
+            try data.write(to: fileURL)
+            print("이미지 변환 성공 URL: \(fileURL.absoluteString)")
+            return fileURL
+        } catch {
+            print("이미지 저장 실패: \(error.localizedDescription)")
+            return nil
+        }
     }
 }
 

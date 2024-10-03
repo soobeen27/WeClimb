@@ -48,9 +48,11 @@ class FeedCell : UICollectionViewCell {
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.videoGravity = .resizeAspect
         playerLayer?.frame = contentView.bounds
+        playerLayer?.backgroundColor = UIColor(named: "BackgroundColor")?.cgColor
         if let playerLayer = playerLayer {
             contentView.layer.addSublayer(playerLayer)
         }
+//        playVideo()
     }
     
     // 비디오 재생
@@ -78,15 +80,25 @@ class FeedCell : UICollectionViewCell {
     // MARK: - 셀을 구성하는 메서드 YJ
     func configure(with model: FeedCellModel) {
         self.data = model // 데이터 저장
-        if let image = model.imageURL {
-            // URL에서 이미지 데이터를 가져와서 UIImage 객체로 변환
-            if let imageData = try? Data(contentsOf: image), let image = UIImage(data: imageData) {
-                imageView.image = image
+        DispatchQueue.global().async { [weak self] in
+            guard let self else { return }
+//            if let image = model.imageURL {
+//                // URL에서 이미지 데이터를 가져와서 UIImage 객체로 변환
+//                print(image)
+//                if let imageData = try? Data(contentsOf: image), let image = UIImage(data: imageData) {
+//                    self.imageView.image = image
+//                }
+//                DispatchQueue.main.sync {
+//                    self.stopVideo()
+//                }
+//            } else 
+            if let videoURL = model.videoURL {
+                player = AVPlayer(url: videoURL)
+                print(videoURL)
+                DispatchQueue.main.sync {
+                    self.readyVideo()
+                }
             }
-            stopVideo()
-        } else if let videoURL = model.videoURL {
-            player = AVPlayer(url: videoURL)
-            readyVideo()
         }
     }
 }

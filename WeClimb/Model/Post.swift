@@ -28,6 +28,7 @@ struct Post: Codable {
     let like: [String]?
     let gym: String?
     let medias: [DocumentReference]
+    let thumbnail: String?
 //    let medias: [Media]?
 }
 

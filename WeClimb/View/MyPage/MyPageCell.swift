@@ -8,6 +8,8 @@
 import UIKit
 
 import SnapKit
+import Kingfisher
+import AVFoundation
 
 class MyPageCell: UICollectionViewCell {
     
@@ -37,7 +39,18 @@ class MyPageCell: UICollectionViewCell {
         }
     }
     
-    func configure(with image: UIImage?) {
-        imageView.image = image
-    }
-}
+    func configure(with thumbnailURL: String) {
+          if let url = URL(string: thumbnailURL) {
+              imageView.kf.setImage(with: url) { result in
+                  switch result {
+                  case .success(let value):
+                      print("이미지 로드 성공: \(value.source.url?.absoluteString ?? "")")
+                  case .failure(let error):
+                      print("이미지 로드 실패: \(error.localizedDescription)")
+                  }
+              }
+          } else {
+              print("유효하지 않은 URL: \(thumbnailURL)")
+          }
+      }
+  }

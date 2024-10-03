@@ -23,8 +23,12 @@ final class FirebaseManager {
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     private let disposeBag = DisposeBag()
-    private var ongoingRequests = [String: Bool]()
     private var lastFeed: QueryDocumentSnapshot?
+    
+    // 중복 요청 방지 및 캐싱 관리
+    private var ongoingRequests = [String: Bool]()
+    private var urlCache = NSCache<NSString, NSURL>()
+    private var imageCache = NSCache<NSString, UIImage>()
     
     static let shared = FirebaseManager()
     private init() {}
@@ -195,7 +199,7 @@ final class FirebaseManager {
             }
     }
     
-    // MARK: 이름으로 다른 유저 정보 가져오기
+    // MARK: 다른 유저 정보 가져오기
     func getUserInfoFrom(name: String, completion: @escaping (Result<User, Error>) -> Void) {
         let userRef = db.collection("users").whereField("userName", isEqualTo: name)
         
@@ -211,6 +215,32 @@ final class FirebaseManager {
                     completion(.failure(UserError.none))
                 }
             }
+        }
+    }
+    
+    func getUserInfoFrom(uid: String, completion: @escaping (Result<User, Error>) -> Void) {
+        let userRef = db.collection("users").document(uid)
+        
+        userRef.getDocument { snapshot, error in
+            if let error = error {
+                completion(.failure(error))
+            }
+            guard let snapshot, snapshot.exists else { 
+                completion(.failure(UserError.none))
+                return }
+            do {
+                try completion(.success(snapshot.data(as: User.self)))
+            } catch {
+                completion(.failure(UserError.none))
+            }
+                
+//            snapshot.documents.forEach { document in
+//                if let user = try? document.data(as: User.self) {
+//                    completion(.success(user))
+//                } else {
+//                    completion(.failure(UserError.none))
+//                }
+//            }
         }
     }
     
@@ -297,7 +327,7 @@ final class FirebaseManager {
             }
     }
     // MARK: 포스트 업로드
-    func uploadPost(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?) async {
+    func uploadPost(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?, thumbnail: String) async {
         guard let user = Auth.auth().currentUser else {
             print("로그인이 되지않음")
             return
@@ -313,12 +343,12 @@ final class FirebaseManager {
             let batch = db.batch()
             
             // 비동기로 각각의 미디어 파일을 업로드하고 Firestore 배치에 추가
-//            var urlForThumbnail: URL?
+            //            var urlForThumbnail: URL?
             var mediaReferences: [DocumentReference] = []
             for media in media.enumerated() {
-//                if media.offset == 0 {
-//                    urlForThumbnail = media.element.url
-//                }
+                //                if media.offset == 0 {
+                //                    urlForThumbnail = media.element.url
+                //                }
                 let fileName = media.element.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.element.url.lastPathComponent
                 let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
                 let mediaURL = try await uploadMedia(mediaRef: mediaRef, mediaURL: media.element.url)
@@ -335,7 +365,7 @@ final class FirebaseManager {
             }
             
             // 포스트 데이터를 Firestore에 저장
-            let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: mediaReferences)
+            let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: mediaReferences, thumbnail: thumbnail)
             
             let userRef = db.collection("users").document(user.uid)
             batch.setData(try Firestore.Encoder().encode(post), forDocument: postRef)
@@ -472,6 +502,7 @@ final class FirebaseManager {
         
         let postRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
+//            .limit(to: 10)
             .limit(to: 10)
         
         postRef.getDocuments { [weak self] snapshot, error in
@@ -525,7 +556,10 @@ final class FirebaseManager {
                 let filteredPosts = postWithMedias.filter { post in
                     !blackList.contains(post.post.authorUID)
                 }
-                completion(filteredPosts)
+                let newestFirst = filteredPosts.sorted {
+                    $0.post.creationDate > $1.post.creationDate
+                }
+                completion(newestFirst)
             }
         }
     }
@@ -549,7 +583,7 @@ final class FirebaseManager {
         }
         let postRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
-            .limit(to: 10)
+            .limit(to: 2)
             .start(afterDocument: lastFeed)
         
         postRef.getDocuments { [weak self] snapshot, error in
@@ -658,6 +692,12 @@ final class FirebaseManager {
     
     // gs:// URL을 HTTP/HTTPS로 변환하는 함수
     func fetchImageURL(from gsURL: String, completion: @escaping (URL?) -> Void) {
+        // 이미 캐싱된 URL이 있는지 확인
+        if let cachedURL = urlCache.object(forKey: gsURL as NSString) {
+            completion(cachedURL as URL)
+            return
+        }
+        
         // 이미 요청 중인지 확인
         guard ongoingRequests[gsURL] == nil else {
             print("Request for \(gsURL) is already in progress.")
@@ -682,6 +722,11 @@ final class FirebaseManager {
                 return
             }
             
+            if let url = url {
+                // 변환된 URL 캐싱
+                self.urlCache.setObject(url as NSURL, forKey: gsURL as NSString)
+            }
+            
             // 완료된 URL 반환
             completion(url)
         }
@@ -694,14 +739,20 @@ final class FirebaseManager {
             return
         }
         
+        // 이미 캐싱된 이미지 확인
+        if let cachedImage = imageCache.object(forKey: imageUrl as NSString) {
+            imageView.image = cachedImage
+            return
+        }
+        
         if imageUrl.hasPrefix("gs://") {
             // gs:// URL을 HTTPS로 변환 후 이미지 로드
-            fetchImageURL(from: imageUrl) { httpsURL in
-                guard let httpsURL = httpsURL else {
+            fetchImageURL(from: imageUrl) { [weak self] httpsURL in
+                guard let self = self, let httpsURL = httpsURL else {
                     imageView.image = UIImage(named: "defaultImage")
                     return
                 }
-                self.setImage(with: httpsURL, into: imageView)
+                self.setImage(with: httpsURL, into: imageView, cacheKey: imageUrl)
             }
         } else {
             // HTTP/HTTPS URL 처리
@@ -709,17 +760,26 @@ final class FirebaseManager {
                 imageView.image = UIImage(named: "defaultImage")
                 return
             }
-            setImage(with: url, into: imageView)
+            setImage(with: url, into: imageView, cacheKey: imageUrl)
         }
     }
     
     // Kingfisher로 이미지를 설정하는 함수
-    private func setImage(with url: URL?, into imageView: UIImageView) {
+    private func setImage(with url: URL?, into imageView: UIImageView, cacheKey: String) {
         let options: KingfisherOptionsInfo = [
             .transition(.fade(0.2)), // 부드러운 페이드 애니메이션
             .cacheOriginalImage // 원본 이미지를 캐시
         ]
-        imageView.kf.setImage(with: url, placeholder: UIImage(named: "defaultImage"), options: options)
+        
+        imageView.kf.setImage(with: url, placeholder: UIImage(named: "defaultImage"), options: options) { [weak self] result in
+            switch result {
+            case .success(let value):
+                // 성공적으로 로드된 이미지를 캐시에 저장
+                self?.imageCache.setObject(value.image, forKey: cacheKey as NSString)
+            case .failure(let error):
+                print("Failed to load image: \(error.localizedDescription)")
+            }
+        }
     }
 }
 /*

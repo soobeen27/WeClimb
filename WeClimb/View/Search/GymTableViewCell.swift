@@ -12,6 +12,8 @@ import SnapKit
 
 class GymTableViewCell: UITableViewCell {
     
+    private var currentImageURL: String?
+    
     private let gymImage: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .gray
@@ -76,10 +78,19 @@ class GymTableViewCell: UITableViewCell {
         addressLabel.text = model.address
         
         // Kingfisher로 이미지 로드
-        if let imageUrl = model.profileImage {
+        if let imageUrl = model.profileImage, imageUrl != currentImageURL {
+            currentImageURL = imageUrl
+            gymImage.image = nil // 기존 이미지 제거
             FirebaseManager.shared.loadImage(from: imageUrl, into: gymImage)
-        } else {
+        } else if model.profileImage == nil {
             gymImage.image = UIImage(named: "defaultImage")
         }
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        // 셀 재사용 시 초기화
+        gymImage.image = nil
+        currentImageURL = nil
     }
 }

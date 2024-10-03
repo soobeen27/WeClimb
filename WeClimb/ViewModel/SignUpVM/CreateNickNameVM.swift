@@ -11,26 +11,17 @@ import RxCocoa
 import RxSwift
 
 class CreateNickNameVM {
-    // Input: 닉네임 텍스트 (외부에서 접근할 수 있도록 public)
-    let nicknameInput = PublishSubject<String>()
+    // Input: 닉네임 텍스트
+    let nicknameInput = BehaviorSubject<String>(value: "")
+    private let checkDuplicationSubject = PublishSubject<Void>()
+    let disposeBag = DisposeBag()
+    let uploadResult = PublishSubject<Result<URL, Error>>()
     
-    // 정규화: 공백 제거 및 유효한 문자인지 검사하는 함수 (외부에 노출할 필요 없으므로 private)
-    private func normalizeNickname(_ nickname: String) -> String {
-        let trimmed = nickname.trimmingCharacters(in: .whitespaces)
-        // 한글, 영어, 숫자만 허용하는 정규식
-        let regex = "^[가-힣a-zA-Z0-9]*$"
-        if trimmed.range(of: regex, options: .regularExpression) != nil {
-            return trimmed
-        } else {
-            return ""
-        }
-    }
-    
-    // Output: 닉네임이 유효한지 여부 (2~12글자, 정규식 통과)
+    // Output: 닉네임이 유효한지 여부
     var isNicknameValid: Observable<Bool> {
         return nicknameInput
             .map { [weak self] nickname in
-                guard let self else { return false }
+                guard let self = self else { return false }
                 let normalizedNickname = self.normalizeNickname(nickname)
                 return normalizedNickname.count >= 2 && normalizedNickname.count <= 12
             }
@@ -47,4 +38,43 @@ class CreateNickNameVM {
             }
             .distinctUntilChanged()
     }
+    
+    // Output: 닉네임 중복 여부 (확인 버튼을 눌렀을 때만)
+    var isNicknameDuplicateCheck: Observable<Bool> {
+        return checkDuplicationSubject
+            .withLatestFrom(nicknameInput)
+            .flatMapLatest { nickname in
+                return Observable<Bool>.create { observer in
+                    FirebaseManager.shared.duplicationCheck(with: nickname) { isDuplicate in
+                        observer.onNext(isDuplicate)
+                        observer.onCompleted()
+                    }
+                    return Disposables.create()
+                }
+            }
+    }
+    
+    // 닉네임 중복 체크 실행
+    func checkNicknameDuplication() {
+        checkDuplicationSubject.onNext(())
+    }
+    
+    private func normalizeNickname(_ nickname: String) -> String {
+        let trimmed = nickname.trimmingCharacters(in: .whitespaces)
+        let regex = "^[가-힣a-zA-Z0-9]*$"
+        return trimmed.range(of: regex, options: .regularExpression) != nil ? trimmed : ""
+    }
+    
+    
+    //이미지 업로드
+    func uploadProfileImage(imageUrl: URL) {
+        FirebaseManager.shared.uploadProfileImage(image: imageUrl)
+            .subscribe(onNext: { [weak self] url in
+                self?.uploadResult.onNext(.success(url))
+            }, onError: { [weak self] error in
+                self?.uploadResult.onNext(.failure(error))
+            })
+            .disposed(by: disposeBag)
+    }
 }
+
