@@ -15,6 +15,13 @@ class PrivacyPolicyVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = PrivacyPolicyVM()
     
+    private let logoView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "LogoText")?.withRenderingMode(.alwaysTemplate))
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = UIColor.mainPurple
+        return imageView
+    }()
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "서비스 이용에 동의해\n주세요!"
@@ -130,55 +137,12 @@ class PrivacyPolicyVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         bindViewModel()
-        
         termsTextView.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setNavigationBar()
-    }
-    
-    private func setNavigationBar() {
-        self.navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationItem.hidesBackButton = false
-        navigationItem.largeTitleDisplayMode = .always
-        
-        let imageView = UIImageView(image: UIImage(named: "LogoText")?.withTintColor(UIColor.mainPurple))
-        imageView.contentMode = .scaleAspectFit // 이미지 비율 유지
-        
-        let containerView = UIView()
-        containerView.addSubview(imageView)
-        
-        imageView.snp.makeConstraints {
-            $0.centerX.equalTo(containerView)
-            $0.leading.equalTo(containerView)
-            $0.width.equalTo(120)
-            $0.height.equalTo(40)
-        }
-        
-        if let navigationBar = navigationController?.navigationBar {
-            navigationBar.addSubview(containerView)
-            
-            containerView.snp.makeConstraints {
-                $0.leading.equalTo(navigationBar.safeAreaLayoutGuide.snp.leading).offset(16)
-                $0.bottom.equalTo(navigationBar.safeAreaLayoutGuide.snp.bottom)
-                $0.width.equalTo(120)
-                $0.height.equalTo(40)
-            }
-        }
-        
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground() // 투명한 배경 설정
-        appearance.backgroundColor = .clear // 배경 색상을 투명하게 설정
-        appearance.shadowColor = nil
-        
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
-    }
-    
-    @objc private func backButtonTapped() {
-        navigationController?.popViewController(animated: true)
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
     private func setLayout() {
@@ -186,6 +150,7 @@ class PrivacyPolicyVC: UIViewController {
         self.overrideUserInterfaceStyle = .light
         
         [
+            logoView,
             titleLabel,
             allAgreeCheckBox,
             termsCheckBox1,
@@ -195,9 +160,16 @@ class PrivacyPolicyVC: UIViewController {
             termsTextView,
             confirmButton
         ].forEach { view.addSubview($0) }
+        
+        logoView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
+            $0.leading.equalToSuperview().offset(16)
+            $0.width.equalTo(120)
+            $0.height.equalTo(40)
+        }
     
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(8)
+            $0.top.equalTo(logoView.snp.bottom).offset(8)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
         }

@@ -16,6 +16,13 @@ class PersonalDetailsVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = PersonalDetailsVM()
     
+    private let logoView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "LogoText")?.withRenderingMode(.alwaysTemplate))
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = UIColor.mainPurple
+        return imageView
+    }()
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "정보를 더 알려주세요!"
@@ -82,45 +89,6 @@ class PersonalDetailsVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         setupBindings()
-        setNavigationBar()
-    }
-    
-    private func setNavigationBar() {
-        self.navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationItem.hidesBackButton = false
-        navigationItem.largeTitleDisplayMode = .always
-        
-        let imageView = UIImageView(image: UIImage(named: "LogoText")?.withTintColor(UIColor.mainPurple))
-        imageView.contentMode = .scaleAspectFit // 이미지 비율 유지
-        
-        let containerView = UIView()
-        containerView.addSubview(imageView)
-        
-        imageView.snp.makeConstraints {
-            $0.centerX.equalTo(containerView)
-            $0.leading.equalTo(containerView)
-            $0.width.equalTo(120)
-            $0.height.equalTo(40)
-        }
-        
-        if let navigationBar = navigationController?.navigationBar {
-            navigationBar.addSubview(containerView)
-            
-            containerView.snp.makeConstraints {
-                $0.leading.equalTo(navigationBar.safeAreaLayoutGuide.snp.leading).offset(16)
-                $0.bottom.equalTo(navigationBar.safeAreaLayoutGuide.snp.bottom)
-                $0.width.equalTo(120)
-                $0.height.equalTo(40)
-            }
-        }
-        
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground() // 투명한 배경 설정
-        appearance.backgroundColor = .clear // 배경 색상을 투명하게 설정
-        appearance.shadowColor = nil
-        
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
     
     private func setLayout() {
@@ -128,6 +96,7 @@ class PersonalDetailsVC: UIViewController {
         self.overrideUserInterfaceStyle = .light
         
         [
+            logoView,
             titleLabel,
             titleDetailLabel,
             heightLabel,
@@ -137,10 +106,17 @@ class PersonalDetailsVC: UIViewController {
             confirmButton
         ].forEach { view.addSubview($0) }
         
-        titleLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(62)
-            $0.centerX.equalToSuperview()
+        logoView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
             $0.leading.equalToSuperview().offset(16)
+            $0.width.equalTo(120)
+            $0.height.equalTo(40)
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(logoView.snp.bottom).offset(8)
+            $0.leading.equalToSuperview().offset(16)
+            $0.height.equalTo(40)
         }
         
         titleDetailLabel.snp.makeConstraints {
