@@ -29,6 +29,7 @@ class LoginVC: UIViewController {
     }()
     
     private let disposeBag = DisposeBag()
+    private let tabBarVC = TabBarController()
     
     private let logo: UIImageView = {
         let image = UIImageView()
@@ -84,8 +85,7 @@ class LoginVC: UIViewController {
                     switch result {
                     case .login:
                         print("success")
-                        let tabBarVC = TabBarController()
-                        self.navigationController?.pushViewController(tabBarVC, animated: true)
+                        self.navigationController?.pushViewController(self.tabBarVC, animated: true)
                         self.navigationController?.setNavigationBarHidden(true, animated: true)
                     case .createAccount:
                         // 회원가입 페이지 푸시
@@ -107,8 +107,7 @@ class LoginVC: UIViewController {
                     switch result {
                     case .login:
                         print("success")
-                        let tabBarVC = TabBarController()
-                        self.navigationController?.pushViewController(tabBarVC, animated: true)
+                        self.navigationController?.pushViewController(self.tabBarVC, animated: true)
                         self.navigationController?.setNavigationBarHidden(true, animated: true)
                     case .createAccount:
                         //회원가입 페이지 ㄱㄱ
@@ -248,8 +247,7 @@ extension LoginVC: ASAuthorizationControllerDelegate {
                 switch result {
                 case .login:
                     print("success")
-                    let tabBarVC = TabBarController()
-                    self.navigationController?.pushViewController(tabBarVC, animated: true)
+                    self.navigationController?.pushViewController(self.tabBarVC, animated: true)
                     self.navigationController?.setNavigationBarHidden(true, animated: true)
                 case .createAccount:
                     //회원가입 페이지 ㄱㄱ

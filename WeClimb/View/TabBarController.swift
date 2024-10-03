@@ -11,7 +11,6 @@ import FirebaseAuth
 class TabBarController: UITabBarController {
     
     private let viewModel = MyPageVM()
-    var myPage: UIViewController = UIViewController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
