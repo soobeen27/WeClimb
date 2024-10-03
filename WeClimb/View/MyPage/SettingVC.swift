@@ -118,6 +118,9 @@ class SettingVC: UIViewController {
                 .subscribe(onNext: {
                     print("로그아웃 성공")
                     self?.navigateToLoginVC() // 로그인 화면으로 전환
+                    
+                    let tabBarVC = TabBarController()
+                    self?.navigationController?.setViewControllers([tabBarVC], animated: true)
                 }, onError: { error in
                     print("로그아웃 실패: \(error)")
                 })
@@ -139,6 +142,9 @@ class SettingVC: UIViewController {
                 .subscribe(onNext: {
                     print("회원탈퇴 성공")
                     self?.navigateToLoginVC() // 로그인 화면으로 전환
+                    
+                    let tabBarVC = TabBarController()
+                    self?.navigationController?.setViewControllers([tabBarVC], animated: true)
                 }, onError: { error in
                     print("회원탈퇴 실패: \(error.localizedDescription)")
                 })
