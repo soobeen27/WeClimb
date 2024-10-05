@@ -14,12 +14,13 @@ import RxSwift
 class SFMainFeedVC: UIViewController{
     
     private let disposeBag = DisposeBag()
-    private let viewModel = MainFeedVM()
+    var viewModel = MainFeedVM(shouldFetch: true)
     var isRefresh = false
+    var startingIndex: Int = 0
     
     var currentPost: Post?
     
-    private let collectionView: UICollectionView = {
+    private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0  //셀간 여백 조정(효과없음)
@@ -45,6 +46,7 @@ class SFMainFeedVC: UIViewController{
         setLayout()
         bindCollectionView()
         setupCollectionViewScrollEvent()
+        setupCollectionView()
     }
     
     //MARK: - 네비게이션바, 탭바 세팅
@@ -134,7 +136,6 @@ class SFMainFeedVC: UIViewController{
                 if contentOffset.y >= scrollOffsetThreshold {
                     if let lastIndexPath = self.collectionView.indexPathsForVisibleItems.sorted().last {
                         self.viewModel.isLastCell = true
-                    }
                 } else {
                     self.viewModel.isLastCell = false
                 }
@@ -264,7 +265,7 @@ class SFMainFeedVC: UIViewController{
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             if collectionView.contentOffset.y < -100 {
                 activityIndicator.startAnimating()
-                if !isRefresh {
+                if !isRefresh && viewModel.shouldFetch {
                     viewModel.fetchInitialFeed()
                     isRefresh = true
                 }
@@ -277,3 +278,19 @@ class SFMainFeedVC: UIViewController{
         }
         
     }
+
+extension SFMainFeedVC {
+    func setupCollectionView() {
+        collectionView.reloadData()
+        
+        if !viewModel.shouldFetch {
+            DispatchQueue.main.async {
+                self.collectionView.isPagingEnabled = false
+                let startingIndexPath = IndexPath(row: self.startingIndex, section: 0)
+                self.collectionView.scrollToItem(at: startingIndexPath, at: .top, animated: false)
+                self.collectionView.isPagingEnabled = true
+            }
+        }
+    }
+}
+

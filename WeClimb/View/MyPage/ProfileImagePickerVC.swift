@@ -33,5 +33,24 @@ extension ProfileImagePickerVC: PHPickerViewControllerDelegate {
     // 사용자가 사진이나 비디오를 선택한 후 호출되는 메서드
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true, completion: nil)
+        
+        // 선택된 결과 처리
+        guard let result = results.first else {
+            imageSubject.onNext(nil)
+            return
+        }
+        
+        if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+            result.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
+                guard let self = self else { return }
+                if let selectedImage = image as? UIImage {
+                    self.imageSubject.onNext(selectedImage)  // 선택된 이미지 방출
+                } else {
+                    self.imageSubject.onNext(nil)
+                }
+            }
+        } else {
+            imageSubject.onNext(nil)
+        }
     }
 }
