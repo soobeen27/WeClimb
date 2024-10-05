@@ -29,6 +29,7 @@ class LoginVC: UIViewController {
     }()
     
     private let disposeBag = DisposeBag()
+    private let tabBarVC = TabBarController()
     
     private let logo: UIImageView = {
         let image = UIImageView()
@@ -84,14 +85,13 @@ class LoginVC: UIViewController {
                     switch result {
                     case .login:
                         print("success")
-                        let tabBarVC = TabBarController()
-                        self.navigationController?.pushViewController(tabBarVC, animated: true)
+                        self.navigationController?.pushViewController(self.tabBarVC, animated: true)
                         self.navigationController?.setNavigationBarHidden(true, animated: true)
                     case .createAccount:
                         // 회원가입 페이지 푸시
                         let signUpVC = PrivacyPolicyVC()
                         self.navigationController?.pushViewController(signUpVC, animated: true)
-                        self.navigationController?.setNavigationBarHidden(true, animated: true)
+                        self.navigationController?.setNavigationBarHidden(false, animated: true)
                     }
                 }
             }
@@ -107,8 +107,7 @@ class LoginVC: UIViewController {
                     switch result {
                     case .login:
                         print("success")
-                        let tabBarVC = TabBarController()
-                        self.navigationController?.pushViewController(tabBarVC, animated: true)
+                        self.navigationController?.pushViewController(self.tabBarVC, animated: true)
                         self.navigationController?.setNavigationBarHidden(true, animated: true)
                     case .createAccount:
                         //회원가입 페이지 ㄱㄱ
@@ -159,8 +158,7 @@ class LoginVC: UIViewController {
                 guard let self else { return }
                 print("비회원 로그인 성공")
                 //탭바로 넘어갈 때 네비게이션바 가리기
-                let tabBarVC = TabBarController()
-                self.navigationController?.pushViewController(tabBarVC, animated: true)
+                self.navigationController?.pushViewController(self.tabBarVC, animated: true)
                 self.navigationController?.setNavigationBarHidden(true, animated: true)
             }
             .disposed(by: disposeBag)
@@ -248,14 +246,13 @@ extension LoginVC: ASAuthorizationControllerDelegate {
                 switch result {
                 case .login:
                     print("success")
-                    let tabBarVC = TabBarController()
-                    self.navigationController?.pushViewController(tabBarVC, animated: true)
+                    self.navigationController?.pushViewController(self.tabBarVC, animated: true)
                     self.navigationController?.setNavigationBarHidden(true, animated: true)
                 case .createAccount:
                     //회원가입 페이지 ㄱㄱ
                     let signUpVC = PrivacyPolicyVC()
                     self.navigationController?.pushViewController(signUpVC, animated: true)
-                    self.navigationController?.setNavigationBarHidden(true, animated: true)
+                    self.navigationController?.setNavigationBarHidden(false, animated: true)
                 }
             }
         }

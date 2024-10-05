@@ -16,6 +16,13 @@ class PersonalDetailsVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = PersonalDetailsVM()
     
+    private let logoView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "LogoText")?.withRenderingMode(.alwaysTemplate))
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = UIColor.mainPurple
+        return imageView
+    }()
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "정보를 더 알려주세요!"
@@ -89,6 +96,7 @@ class PersonalDetailsVC: UIViewController {
         self.overrideUserInterfaceStyle = .light
         
         [
+            logoView,
             titleLabel,
             titleDetailLabel,
             heightLabel,
@@ -98,10 +106,17 @@ class PersonalDetailsVC: UIViewController {
             confirmButton
         ].forEach { view.addSubview($0) }
         
-        titleLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(62)
-            $0.centerX.equalToSuperview()
+        logoView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
             $0.leading.equalToSuperview().offset(16)
+            $0.width.equalTo(120)
+            $0.height.equalTo(40)
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(logoView.snp.bottom).offset(8)
+            $0.leading.equalToSuperview().offset(16)
+            $0.height.equalTo(40)
         }
         
         titleDetailLabel.snp.makeConstraints {
@@ -161,7 +176,7 @@ class PersonalDetailsVC: UIViewController {
                         self?.viewModel.heightInput.accept(selectedRange)  // onNext 대신 accept 사용
                     })
                     .disposed(by: self.disposeBag)
-
+                
                 self.present(rangePickerVC, animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
@@ -236,25 +251,41 @@ class PersonalDetailsVC: UIViewController {
         //            })
         //            .disposed(by: disposeBag)
         
-        // heightInput과 armReachInput 결합
-        Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput)
+        confirmButton.rx.tap
+            .withLatestFrom(Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput))
             .subscribe(onNext: { [weak self] newHeight, newArmReach in
                 guard let self = self else { return }
                 
-                // confirmButton 눌렀을 때 두 값 Firebase로 넘기기
-                self.confirmButton.rx.tap
-                    .subscribe(onNext: {
-                        FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
-                            FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach) {
-                                let tabBarController = TabBarController()
-                                self.navigationController?.pushViewController(tabBarController, animated: true)
-                                //탭바로 넘어갈 때 네비게이션바 가리기
-                                self.navigationController?.setNavigationBarHidden(true, animated: true)
-                            }
-                        }
-                    })
-                    .disposed(by: self.disposeBag)
+                FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
+                    FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach) {
+                        let tabBarController = TabBarController()
+                        self.navigationController?.pushViewController(tabBarController, animated: true)
+                        self.navigationController?.setNavigationBarHidden(true, animated: true)
+                    }
+                }
             })
             .disposed(by: disposeBag)
     }
+        
+//        // heightInput과 armReachInput 결합
+//        Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput)
+//            .subscribe(onNext: { [weak self] newHeight, newArmReach in
+//                guard let self = self else { return }
+//                
+//                // confirmButton 눌렀을 때 두 값 Firebase로 넘기기
+//                self.confirmButton.rx.tap
+//                    .subscribe(onNext: {
+//                        FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
+//                            FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach) {
+//                                let tabBarController = TabBarController()
+//                                self.navigationController?.pushViewController(tabBarController, animated: true)
+//                                //탭바로 넘어갈 때 네비게이션바 가리기
+//                                self.navigationController?.setNavigationBarHidden(true, animated: true)
+//                            }
+//                        }
+//                    })
+//                    .disposed(by: self.disposeBag)
+//            })
+//            .disposed(by: disposeBag)
+//    }
 }
