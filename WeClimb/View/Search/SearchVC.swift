@@ -81,6 +81,17 @@ class SearchVC: UIViewController {
         setupKeyboardDismissOnScroll()
     }
     
+    // MARK: - 바인딩 설정
+    private func bind() {
+        bindSegmentControl()
+        bindGymTableViewSelection()
+        bindUserTableViewSelection()
+        bindSearchBar()
+        bindGymData()
+        bindUserData()
+        bindSearchBarFocus()
+    }
+    
     func setupKeyboardDismissOnScroll() {
         gymTableView.rx.willBeginDragging
             .subscribe(onNext: { [weak self] _ in
@@ -90,7 +101,7 @@ class SearchVC: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
-
+        
         userTableView.rx.willBeginDragging
             .subscribe(onNext: { [weak self] _ in
                 if self?.searchController.searchBar.isFirstResponder == true {
@@ -99,7 +110,7 @@ class SearchVC: UIViewController {
             })
             .disposed(by: disposeBag)
     }
- 
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -126,11 +137,11 @@ class SearchVC: UIViewController {
         lastSearchText = searchController.searchBar.text ?? ""
         lastSegmentIndex = segmentedControl.selectedSegmentIndex
     }
-
+    
     
     private func setNavigationBar() {
         // 네비게이션 바 타이틀 설정
-//        view.title = SearchNameSpace.title
+        //        view.title = SearchNameSpace.title
         
         // 탭바 빈 문자열로 설정
         if let tabBarItem = self.tabBarItem {
@@ -160,7 +171,7 @@ class SearchVC: UIViewController {
             } else {
                 $0.top.equalTo(view.safeAreaLayoutGuide)
                 $0.leading.trailing.equalToSuperview().inset(16)
-                $0.height.equalTo(0) 
+                $0.height.equalTo(0)
             }
         }
         
@@ -182,14 +193,32 @@ class SearchVC: UIViewController {
         }
     }
     
-    private func bind() {
+    // MARK: - Segment Control 바인딩
+    private func bindSegmentControl() {
+        // 세그먼트 선택 상태 초기화
         searchViewModel.isSelectGym.accept(lastSegmentIndex == 0)
-        searchViewModel.searchText.accept(lastSearchText)
         
-        // MARK: - Gym TableView 선택 이벤트 처리 - DS
+        // Segmented Control 선택 이벤트 처리
+        segmentedControl.rx.selectedSegmentIndex
+            .subscribe(onNext: { [weak self] index in
+                guard let self = self else { return }
+                self.searchViewModel.isSelectGym.accept(index == 0)
+            })
+            .disposed(by: disposeBag)
+        
+        // Gym/User TableView 선택 바인딩
+        searchViewModel.isSelectGym
+            .bind { [weak self] isSelectGym in
+                self?.gymTableView.isHidden = !isSelectGym
+                self?.userTableView.isHidden = isSelectGym
+            }.disposed(by: disposeBag)
+    }
+    
+    // MARK: - TableView 선택 이벤트 바인딩 (Gym)
+    private func bindGymTableViewSelection() {
         gymTableView.rx.modelSelected(Gym.self)
             .subscribe(onNext: { [weak self] selectedItem in
-                guard let self else { return }
+                guard let self = self else { return }
                 
                 self.onSelectedGym?(selectedItem)
                 
@@ -197,64 +226,80 @@ class SearchVC: UIViewController {
                     let climbingGymVC = ClimbingGymVC()
                     climbingGymVC.configure(with: selectedItem)
                     
-                    navigationController?.navigationBar.prefersLargeTitles = false
+                    self.navigationController?.navigationBar.prefersLargeTitles = false
                     climbingGymVC.navigation()
                     self.navigationController?.pushViewController(climbingGymVC, animated: true)
                 }
-                self.dismiss(animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
-        
-        // MARK: - User TableView 선택 이벤트 처리 - DS
+    }
+    
+    // MARK: - TableView 선택 이벤트 바인딩 (User)
+    private func bindUserTableViewSelection() {
         userTableView.rx.modelSelected(User.self)
             .subscribe(onNext: { [weak self] selectedItem in
-                guard let self else { return }
+                guard let self = self else { return }
+                
+                // 선택한 유저의 인덱스 가져오기
+                guard let selectedIndex = self.userTableView.indexPathForSelectedRow?.row,
+                      let userUID = self.searchViewModel.getUserUID(at: selectedIndex) else {
+                    print("유저 UID를 가져올 수 없습니다.")
+                    return
+                }
+                
                 let userPageVC = UserPageVC()
-//                userPageVC.hidesBottomBarWhenPushed = true
                 userPageVC.configure(with: selectedItem)
-                navigationController?.navigationBar.prefersLargeTitles = false
-//                userPageVC.setNavigation()
+                userPageVC.userUID = userUID
+                
+                self.navigationController?.navigationBar.prefersLargeTitles = false
                 self.navigationController?.pushViewController(userPageVC, animated: true)
             })
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - SearchBar 검색 텍스트 변경 처리
+    private func bindSearchBar() {
+        // 검색바 텍스트 바인딩
+        searchController.searchBar.rx.text.orEmpty
+            .bind(to: searchViewModel.searchText)
+            .disposed(by: disposeBag)
         
-        // MARK: - Gym Data 바인딩 - DS
+        // SearchBar 텍스트 변경에 따라 유저 검색 실행
+        searchViewModel.searchText
+            .distinctUntilChanged()
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+            .filter { !$0.isEmpty }
+            .subscribe(onNext: { [weak self] query in
+                guard let self = self else { return }
+                self.searchViewModel.fetchSearchUsers()  // 검색어에 맞는 유저 검색 실행
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - TableView 데이터 바인딩 (Gym)
+    private func bindGymData() {
         searchViewModel.filteredData
             .bind(to: gymTableView.rx.items(cellIdentifier: GymTableViewCell.className, cellType: GymTableViewCell.self)) { index, model, cell in
                 cell.configure(with: model)
             }
             .disposed(by: disposeBag)
-        
-        // MARK: - User Data 바인딩 - DS
+    }
+    
+    // MARK: - TableView 데이터 바인딩 (User)
+    private func bindUserData() {
         searchViewModel.userFilteredData
             .bind(to: userTableView.rx.items(cellIdentifier: UserTableViewCell.className, cellType: UserTableViewCell.self)) { index, model, cell in
                 cell.configure(with: model)
             }
             .disposed(by: disposeBag)
-        
-        // MARK: - Gym/User TableView 선택 바인딩 - DS
-        searchViewModel.isSelectGym
-            .bind { [weak self] isSelectGym in
-                self?.gymTableView.isHidden = !isSelectGym
-                self?.userTableView.isHidden = isSelectGym
-            }.disposed(by: disposeBag)
-        
-        // MARK: - Segmented Control 선택 이벤트 처리 - DS
-        segmentedControl.rx.selectedSegmentIndex
-            .subscribe { [weak self] index in
-                self?.searchViewModel.isSelectGym.accept(index == 0)
-            }.disposed(by: disposeBag)
-        
-        // MARK: - SearchBar 텍스트 바인딩 - YJ
-        searchController.searchBar.rx.text.orEmpty
-            .bind(to: searchViewModel.searchText)
-            .disposed(by: disposeBag)
-        
-        // MARK: - SearchBar 텍스트 입력 시작 및 종료 이벤트 처리 - YJ
+    }
+    
+    // MARK: - SearchBar 포커스 이벤트 바인딩
+    private func bindSearchBarFocus() {
+        // SearchBar 텍스트 입력 시작 이벤트 처리
         searchController.searchBar.rx.textDidBeginEditing
             .subscribe(onNext: { [weak self] in
                 guard let self = self else { return }
-                // 서치바가 클릭되면 나머지 뷰들을 숨김
                 UIView.animate(withDuration: 0.2, animations: {
                     self.segmentedControl.alpha = 0.0
                 }) { _ in
@@ -265,14 +310,15 @@ class SearchVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
+        // SearchBar 텍스트 입력 종료 이벤트 처리
         searchController.searchBar.rx.textDidEndEditing
             .subscribe(onNext: { [weak self] in
                 guard let self = self else { return }
-                // 서치바에서 나갈 때 나머지 뷰들을 다시 보이게 함
                 UIView.animate(withDuration: 0.2) {
                     self.segmentedControl.alpha = 1.0
                 }
             })
             .disposed(by: disposeBag)
     }
+    
 }
