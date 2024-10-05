@@ -53,7 +53,7 @@ class FeedView : UIView {
         self.viewModel = viewModel
         super.init(frame: frame)
         setLayout()
-        bind()
+        bindCell()
     }
     
     required init?(coder: NSCoder) {
@@ -77,7 +77,6 @@ class FeedView : UIView {
     
     // MARK: - 모든 셀의 비디오를 멈추는 메서드 YJ
     func pauseAllVideo() {
-        
         collectionView.visibleCells     // 현재 화면에 표시되고 있는 셀들 가져오기
             .forEach { cell in          // 각 셀 순회해서 비디오 멈추기
                 if let feedCell = cell as? FeedCell {
@@ -88,7 +87,6 @@ class FeedView : UIView {
     
     // MARK: - 현재 셀의 비디오를 실행시키는 메서드 YJ
     func playAllVideo() {
-        
         collectionView.visibleCells
             .forEach { cell in
                 if let feedCell = cell as? FeedCell {
@@ -97,13 +95,12 @@ class FeedView : UIView {
             }
     }
     
-    private func bind() {
+    private func bindCell() {
         viewModel.cellData
             .bind(to: collectionView.rx.items(
                 cellIdentifier: FeedCell.className, cellType: FeedCell.self)
             ) { row, data, cell in
                 print("data: \(data)")
-                // 셀에 데이터 설정
                 cell.configure(with: data)
                 
                 if self.pageControl.currentPage == row,

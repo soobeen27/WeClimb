@@ -117,7 +117,6 @@ class UploadVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setNavigation()
         textView.delegate = self
         setLayout()
         mediaItemsBind()
@@ -345,7 +344,6 @@ class UploadVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
-    
     private func setLoading() {
         viewModel.isLoading
             .observe(on: MainScheduler.instance)
@@ -513,9 +511,11 @@ extension UploadVC : PHPickerViewControllerDelegate {
             
             self.gymView.selectedLabel.isHidden = false
             self.gymView.nextImageView.isHidden = false
+            self.setNavigation()
         }
     }
 }
+
 // MARK: 업로드 로직
 extension UploadVC {
     private func bindPostButton() {
@@ -602,6 +602,7 @@ extension UploadVC {
     private func initUploadVC() {
         // 새로운 인스턴스 생성
         let newUploadVC = UploadVC()
+        feedView?.pauseAllVideo()
         
         if let tabBarController = tabBarController,
            var viewControllers = tabBarController.viewControllers {
