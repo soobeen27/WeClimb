@@ -8,8 +8,11 @@
 import UIKit
 
 import SnapKit
+import RxSwift
 
 class BlackListCell: UITableViewCell {
+    
+    var disposeBag = DisposeBag()
     
     private let userProfileImage: UIImageView = {
         let imageView = UIImageView()
@@ -21,16 +24,17 @@ class BlackListCell: UITableViewCell {
     
     private let nameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 15)
+        label.textColor = UIColor.label
         return label
     }()
     
     let manageButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("관리", for: .normal)
-        button.setTitleColor(.systemBlue, for: .normal)
-        button.backgroundColor = .darkGray
+        button.setTitle("해제", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .light)
+        button.setTitleColor(UIColor.label, for: .normal)
+        button.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         button.layer.cornerRadius = 8
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.lightGray.cgColor
@@ -39,7 +43,6 @@ class BlackListCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = .black
         configureUI()
     }
     
@@ -48,6 +51,8 @@ class BlackListCell: UITableViewCell {
     }
     
     private func configureUI() {
+        self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        
         [
             userProfileImage,
             nameLabel,
@@ -73,8 +78,21 @@ class BlackListCell: UITableViewCell {
         }
     }
     
-    // 셀에 데이터 설정
-    func configure(icon: UIImage?, name: String) {
-        // 정보들 넣기
+    // 셀에 유저 정보 설정
+    func configure(with user: User) {
+        nameLabel.text = user.userName ?? "Unknown"
+        
+        // Kingfisher 등을 사용해 이미지 로드 (여기서는 기본 이미지 사용)
+        if let profileImageURL = user.profileImage {
+            FirebaseManager.shared.loadImage(from: profileImageURL, into: userProfileImage)
+        } else {
+            userProfileImage.image = UIImage(named: "testStone")
+        }
+    }
+    
+    // 재사용될 때 disposeBag을 새로 만들어줌 (RxSwift의 재사용 문제 해결)
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        disposeBag = DisposeBag()
     }
 }

@@ -173,28 +173,30 @@ final class FirebaseManager {
     
     
     //MARK: 사용자 검색 함수 (User 모델에 맞게 업데이트)
-    func searchUsers(with searchText: String, completion: @escaping ([User]?, Error?) -> Void) {
+    func searchUsers(with searchText: String, completion: @escaping ([User], [String], Error?) -> Void) {
         db.collection("users")
             .whereField("userName", isGreaterThanOrEqualTo: searchText)
             .whereField("userName", isLessThanOrEqualTo: searchText + "\u{f8ff}")
             .getDocuments { (querySnapshot, error) in
                 if let error = error {
                     print("Error getting documents: \(error)")
-                    completion(nil, error)
+                    completion([], [], error)
                 } else if let querySnapshot = querySnapshot {
                     var users: [User] = []
+                    var uids: [String] = []  // UID를 저장하는 별도 배열
                     for document in querySnapshot.documents {
                         do {
                             let user = try document.data(as: User.self)
                             users.append(user)
+                            uids.append(document.documentID)  // UID를 별도의 배열에 저장
                         } catch {
                             print("Error decoding user: \(error)")
                         }
                     }
-                    completion(users, nil)
+                    completion(users, uids, nil)
                 } else {
                     // 에러도 없고, querySnapshot도 없는 경우
-                    completion(nil, nil)
+                    completion([], [], nil)
                 }
             }
     }

@@ -5,6 +5,7 @@
 //  Created by Soo Jang on 8/26/24.
 //
 
+import AVFoundation
 import UIKit
 
 import FirebaseAuth
@@ -36,6 +37,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         Thread.sleep(forTimeInterval: 0.7)
+        
+        // AVAudioSession (무음시에도 소리 출력)
+        do {
+                   try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+                   try AVAudioSession.sharedInstance().setActive(true)
+               } catch {
+                   print("Failed to set audio session category: \(error)")
+               }
         return true
     }
     
