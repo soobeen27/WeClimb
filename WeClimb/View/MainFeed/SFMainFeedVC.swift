@@ -136,14 +136,15 @@ class SFMainFeedVC: UIViewController{
                 if contentOffset.y >= scrollOffsetThreshold {
                     if let lastIndexPath = self.collectionView.indexPathsForVisibleItems.sorted().last {
                         self.viewModel.isLastCell = true
-                } else {
-                    self.viewModel.isLastCell = false
-                }
-                
-                // 현재 보고 있는 첫 번째 셀의 게시물 정보를 업데이트
-                if let visibleIndexPath = self.collectionView.indexPathsForVisibleItems.first {
-                    let post = self.viewModel.posts.value[visibleIndexPath.row]
-                    self.currentPost = post.post // 현재 게시물 정보 저장
+                    } else {
+                        self.viewModel.isLastCell = false
+                    }
+                    
+                    // 현재 보고 있는 첫 번째 셀의 게시물 정보를 업데이트
+                    if let visibleIndexPath = self.collectionView.indexPathsForVisibleItems.first {
+                        let post = self.viewModel.posts.value[visibleIndexPath.row]
+                        self.currentPost = post.post // 현재 게시물 정보 저장
+                    }
                 }
             })
             .disposed(by: disposeBag)
@@ -172,9 +173,9 @@ class SFMainFeedVC: UIViewController{
             self?.reportModal()
         }
         let deleteAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
-               guard let self else { return }
-               self.blockUser(authorUID: post.authorUID)
-           }
+            guard let self else { return }
+            self.blockUser(authorUID: post.authorUID)
+        }
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
         [reportAction, deleteAction, cancelAction]
@@ -252,32 +253,32 @@ class SFMainFeedVC: UIViewController{
         }
     }
 }
-    //MARK: - 컬렉션뷰 델리게이트 설정
-    
-    extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
-        func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-            return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
-        }
-        func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-            innerCollectionViewPlayers(playOrPause: false)
-        }
-        // 스크롤바 위로 땡겼을때 리로딩 JS
-        func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            if collectionView.contentOffset.y < -100 {
-                activityIndicator.startAnimating()
-                if !isRefresh && viewModel.shouldFetch {
-                    viewModel.fetchInitialFeed()
-                    isRefresh = true
-                }
+//MARK: - 컬렉션뷰 델리게이트 설정
+
+extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
+    }
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        innerCollectionViewPlayers(playOrPause: false)
+    }
+    // 스크롤바 위로 땡겼을때 리로딩 JS
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if collectionView.contentOffset.y < -100 {
+            activityIndicator.startAnimating()
+            if !isRefresh && viewModel.shouldFetch {
+                viewModel.fetchInitialFeed()
+                isRefresh = true
             }
         }
-        
-        func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-            activityIndicator.stopAnimating()
-            isRefresh = false
-        }
-        
     }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        activityIndicator.stopAnimating()
+        isRefresh = false
+    }
+    
+}
 
 extension SFMainFeedVC {
     func setupCollectionView() {
@@ -293,4 +294,3 @@ extension SFMainFeedVC {
         }
     }
 }
-
