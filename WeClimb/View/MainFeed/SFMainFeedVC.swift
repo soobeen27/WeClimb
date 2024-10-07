@@ -139,12 +139,12 @@ class SFMainFeedVC: UIViewController{
                     } else {
                         self.viewModel.isLastCell = false
                     }
-                    
+                }
+                
                     // 현재 보고 있는 첫 번째 셀의 게시물 정보를 업데이트
                     if let visibleIndexPath = self.collectionView.indexPathsForVisibleItems.first {
                         let post = self.viewModel.posts.value[visibleIndexPath.row]
                         self.currentPost = post.post // 현재 게시물 정보 저장
-                    }
                 }
             })
             .disposed(by: disposeBag)
