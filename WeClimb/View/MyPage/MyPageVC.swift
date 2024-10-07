@@ -9,8 +9,6 @@ import UIKit
 
 import RxSwift
 import SnapKit
-import FirebaseAuth
-import Kingfisher
 
 class MyPageVC: UIViewController {
     

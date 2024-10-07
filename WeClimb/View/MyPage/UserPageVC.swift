@@ -13,8 +13,7 @@ import SnapKit
 class UserPageVC: UIViewController {
     
     private let disposeBag = DisposeBag()
-    private let viewModel = UserPageVM()
-    private let searchViewModel = SearchViewModel()
+    var viewModel: UserPageVM // 외부에서 주입받기
     
     private var isFollowing = false
     
@@ -167,9 +166,50 @@ class UserPageVC: UIViewController {
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MyPageCell.className)
+        collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
         return collectionView
     }()
+    
+    private let emptyPost: UIView = {
+        let view = UIView()
+        view.isHidden = false
+        
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "no_Post") // 비어 있을 때 보여줄 이미지
+        
+        let label = UILabel()
+        label.text = "게시물이 없습니다."
+        label.textColor = .gray
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 13)
+        
+        [imageView, label]
+            .forEach { view.addSubview($0) }
+        
+        imageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview().offset(-20)
+            $0.width.height.equalTo(120)
+        }
+        
+        label.snp.makeConstraints {
+            $0.top.equalTo(imageView.snp.bottom).offset(8)
+            $0.centerX.equalToSuperview()
+        }
+        
+        return view
+    }()
+    
+    init(viewModel: UserPageVM) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -179,6 +219,15 @@ class UserPageVC: UIViewController {
         setLayout()
         bind()
         setNavigation()
+        bindPost()
+        bindCollectionView()
+        bindEmpty()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationController?.navigationBar.tintColor = .label
     }
     
     func configure(with data: User) {
@@ -270,7 +319,7 @@ class UserPageVC: UIViewController {
     }
 
     private func setLayout() {
-        [profileImage, profileStackView, totalStackView, segmentControl, collectionView]
+        [profileImage, profileStackView, totalStackView, segmentControl, collectionView, emptyPost]
             .forEach{ view.addSubview($0) }
         
         [nameStackView, infoLabel, followFollowingButton]
@@ -320,6 +369,11 @@ class UserPageVC: UIViewController {
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
         }
+        
+        emptyPost.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview().offset(30)
+        }
     }
     
     private func bind() {
@@ -337,6 +391,62 @@ class UserPageVC: UIViewController {
                 print("followFollowingButton tapped")
                 self?.buttonTapped()
             }
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindPost() {
+        viewModel.userMediaPosts
+            .observe(on: MainScheduler.instance)
+            .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { index, mediaPost, cell in
+                if let thumbnailURL = mediaPost.thumbnailURL {
+                    print("유저페이지 썸네일 URL: \(thumbnailURL)")
+                    cell.configure(with: thumbnailURL)
+                } else {
+                    print("썸네일이 없습니다.")
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindEmpty() {
+        viewModel.userMediaPosts
+            .subscribe(onNext: { [weak self] posts in
+                guard let self = self else { return }
+                
+                DispatchQueue.main.async {
+                    if posts.isEmpty {
+                        self.emptyPost.isHidden = false
+                        self.collectionView.isHidden = true
+                    } else {
+                        self.emptyPost.isHidden = true
+                        self.collectionView.isHidden = false
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindCollectionView() {
+        collectionView.rx.itemSelected
+            .subscribe(onNext: { [weak self] indexPath in
+                guard let self = self else { return }
+                
+                let selectedIndex = indexPath.row
+                let allPosts = self.viewModel.userMediaPosts.value
+                
+                let mainFeedVM = MainFeedVM(shouldFetch: false)
+                
+                let userAll = allPosts.map { ($0.post, $0.media) }
+                mainFeedVM.posts.accept(userAll)
+                
+                let mainFeedVC = SFMainFeedVC()
+                mainFeedVC.viewModel = mainFeedVM
+                
+                mainFeedVC.startingIndex = selectedIndex // 선택된 인덱스에서 스크롤 위치 설정
+                print("전달할 인데스: \(mainFeedVC.startingIndex)")
+                
+                self.navigationController?.pushViewController(mainFeedVC, animated: true)
+            })
             .disposed(by: disposeBag)
     }
 }

@@ -564,9 +564,9 @@ extension UploadVC {
                 
                 let gym = self.gymView.selectedLabel.text ?? ""
                 
-                // 썸네일 생성
-                self.viewModel.getThumbnailImage(from: videoURL) { thumbnailImage in
-                    guard let thumbnailImage = thumbnailImage else {
+                // 썸네일 생성 및 업로드
+                self.viewModel.getThumbnailImage(from: videoURL) { thumbnailURL in
+                    guard let thumbnailURL = thumbnailURL else {
                         print("썸네일 생성 실패.")
                         return
                     }
@@ -581,7 +581,8 @@ extension UploadVC {
                                                            position: CGPoint(x: UIScreen.main.bounds.width / 2 - 75,
                                                                              y: UIScreen.main.bounds.height / 2 - 17.5))
                         }
-                        self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailImage)
+                        // 미디어와 함께 업로드
+                        self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailURL)
                             .subscribe(onNext: {
                                 DispatchQueue.main.async {
                                     print("업로드 성공")
@@ -600,7 +601,7 @@ extension UploadVC {
 
     // MARK: - 업로드뷰 초기화 YJ
     private func initUploadVC() {
-        // 새로운 인스턴스 생성
+
         let newUploadVC = UploadVC()
         feedView?.pauseAllVideo()
         

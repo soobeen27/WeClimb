@@ -40,17 +40,11 @@ class MyPageCell: UICollectionViewCell {
     }
     
     func configure(with thumbnailURL: String) {
-          if let url = URL(string: thumbnailURL) {
-              imageView.kf.setImage(with: url) { result in
-                  switch result {
-                  case .success(let value):
-                      print("이미지 로드 성공: \(value.source.url?.absoluteString ?? "")")
-                  case .failure(let error):
-                      print("이미지 로드 실패: \(error.localizedDescription)")
-                  }
-              }
-          } else {
-              print("유효하지 않은 URL: \(thumbnailURL)")
-          }
-      }
-  }
+        print("썸네일 url 확인\(thumbnailURL)")
+        if let url = URL(string: thumbnailURL) {
+            FirebaseManager.shared.loadImage(from: thumbnailURL, into: imageView)
+        } else {
+            print("유효하지 않은 URL: \(thumbnailURL)")
+        }
+    }
+}
