@@ -259,6 +259,8 @@ class UploadVC: UIViewController {
                     self.setSectorButton(with: gymInfo)
                     
                     self.gymView.updateText(with: gymInfo.gymName)
+                    
+                    navigationController.dismiss(animated: true, completion: nil)
                 }
                 self.present(navigationController, animated: true, completion: nil)
             }
