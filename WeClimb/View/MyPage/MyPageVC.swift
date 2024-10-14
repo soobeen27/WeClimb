@@ -9,8 +9,6 @@ import UIKit
 
 import RxSwift
 import SnapKit
-import FirebaseAuth
-import Kingfisher
 
 class MyPageVC: UIViewController {
     
@@ -316,7 +314,8 @@ class MyPageVC: UIViewController {
         }
         
         emptyPost.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.centerX.equalTo(collectionView.snp.centerX)
+            $0.centerY.equalTo(collectionView.snp.centerY).offset(-20)
         }
     }
     
