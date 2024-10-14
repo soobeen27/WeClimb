@@ -49,6 +49,11 @@ class SFMainFeedVC: UIViewController{
         setupCollectionView()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        innerCollectionViewPlayers(playOrPause: false) // 비디오 정지
+    }
+    
     //MARK: - 네비게이션바, 탭바 세팅
     
     private func setNavigationBar() {
