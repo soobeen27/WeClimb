@@ -371,8 +371,8 @@ class UserPageVC: UIViewController {
         }
         
         emptyPost.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.centerY.equalToSuperview().offset(30)
+            $0.centerX.equalTo(collectionView.snp.centerX)
+            $0.centerY.equalTo(collectionView.snp.centerY).offset(-20)
         }
     }
     
