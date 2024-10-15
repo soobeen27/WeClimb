@@ -242,9 +242,13 @@ class SearchVC: UIViewController {
                     return
                 }
                 
-                let userPageVC = UserPageVC()
-                userPageVC.configure(with: selectedItem)
-                userPageVC.userUID = userUID
+//                let userPageVC = UserPageVC()
+//                userPageVC.configure(with: selectedItem)
+//                userPageVC.userUID = userUID
+                let userPageVM = UserPageVM()
+                userPageVM.fetchUserInfo(userName: selectedItem.userName ?? "이름 찾을 수 없음")
+                
+                let userPageVC = UserPageVC(viewModel: userPageVM)
                 
                 self.navigationController?.navigationBar.prefersLargeTitles = false
                 self.navigationController?.pushViewController(userPageVC, animated: true)
