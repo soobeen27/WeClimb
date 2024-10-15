@@ -250,15 +250,6 @@
 				436AEAE92C7DCD1100E0D85A /* MyPageCell.swift */,
 				C4E29C1A2C8874780076BCA6 /* MyPageDetailFeedVC.swift */,
 				436AEAF32C7EEE9900E0D85A /* UserPageVC.swift */,
-				43A79ADB2C85AA7400B960A2 /* SettingVC.swift */,
-				43A79AE32C85C3B800B960A2 /* SettingCell.swift */,
-				435B7E412C8024AB00EB9816 /* EditPageVC.swift */,
-				43A79AC92C81717500B960A2 /* EditPageCell.swift */,
-				C49FC7082C9F1B0E00CD66D9 /* EditNickNameVC.swift */,
-				C49FC70A2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift */,
-				43A79AD92C85930A00B960A2 /* ProfileImagePickerVC.swift */,
-				6B7F76942CA47F1D00B05B3F /* BlackListVC.swift */,
-				6B7F76962CA4A1C200B05B3F /* BlackListCell.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -348,6 +339,22 @@
 			path = ArchiveFolder;
 			sourceTree = "<group>";
 		};
+		C4EC63502CBE18FE00ED49B4 /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+				43A79ADB2C85AA7400B960A2 /* SettingVC.swift */,
+				43A79AE32C85C3B800B960A2 /* SettingCell.swift */,
+				435B7E412C8024AB00EB9816 /* EditPageVC.swift */,
+				43A79AC92C81717500B960A2 /* EditPageCell.swift */,
+				C49FC7082C9F1B0E00CD66D9 /* EditNickNameVC.swift */,
+				C49FC70A2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift */,
+				43A79AD92C85930A00B960A2 /* ProfileImagePickerVC.swift */,
+				6B7F76942CA47F1D00B05B3F /* BlackListVC.swift */,
+				6B7F76962CA4A1C200B05B3F /* BlackListCell.swift */,
+			);
+			path = Setting;
+			sourceTree = "<group>";
+		};
 		F4892BDA2C7C237700C5FF16 = {
 			isa = PBXGroup;
 			children = (
@@ -400,6 +407,7 @@
 				C45DC9D32C80502E00FC4C1D /* MainFeed */,
 				436AEAF22C7EECA300E0D85A /* Search */,
 				436AEAF12C7EEC7900E0D85A /* MyPage */,
+				C4EC63502CBE18FE00ED49B4 /* Setting */,
 				6BC91F912C7CC79300B34083 /* ClimbingGym */,
 				F4892C272C7CC18700C5FF16 /* Upload */,
 			);
