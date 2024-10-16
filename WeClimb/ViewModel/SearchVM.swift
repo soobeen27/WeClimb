@@ -123,11 +123,11 @@ class SearchViewModel {
         }
     }
     
-        func bindSearchText() {
-                searchText
-                    .subscribe(onNext: { [weak self] text in
-                        self?.search(text: text)
-                    })
-                    .disposed(by: disposeBag)
-            }
+    func bindSearchText() {
+        searchText
+            .subscribe(onNext: { [weak self] text in
+                self?.search(text: text)
+            })
+            .disposed(by: disposeBag)
+    }
 }
