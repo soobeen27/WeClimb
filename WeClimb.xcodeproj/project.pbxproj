@@ -320,12 +320,12 @@
 			isa = PBXGroup;
 			children = (
 				C4E29C1C2C898AFB0076BCA6 /* SFMainFeedVC.swift */,
+				91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */,
 				C4E29C1E2C898DC80076BCA6 /* SFCollectionViewCell.swift */,
 				C47A0AF92C8AF1A60068173A /* FeedCommentModalVC.swift */,
 				C47A0B002C9115760068173A /* FeedCommentTabelCell.swift */,
 				C47A0AFC2C90310B0068173A /* FeedReportModalVC.swift */,
 				C47A0AFB2C9019320068173A /* ArchiveFolder */,
-				91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */,
 			);
 			path = MainFeed;
 			sourceTree = "<group>";
