@@ -37,8 +37,7 @@ final class FirebaseManager {
     func updateAccount(with data: String, for field: UserUpdate, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
-        
-        userRef.updateData([field.key : data]) { error in
+                userRef.updateData([field.key : data]) { error in
             if let error = error {
                 print("업데이트 에러!: \(error.localizedDescription)")
                 return
@@ -78,6 +77,7 @@ final class FirebaseManager {
         }
     }
     
+    // MARK: 프로필이미지 업로드
     func uploadProfileImage(image: URL) -> Observable<URL> {
         guard let user = Auth.auth().currentUser else { return Observable.error(UserError.none) }
         let storageRef = self.storage.reference()
@@ -265,6 +265,28 @@ final class FirebaseManager {
                 print("firestore 유저 삭제 오류: \(error)")
             } else {
                 print("firestore 성공적으로 계정 삭제")
+            }
+        }
+    }
+    
+    // MARK: Storage folder 삭제.
+    func deleteStorageFolder(from path: String) {
+        let ref = storage.reference().child(path)
+        
+        ref.listAll { result in
+            switch result {
+            case .success(let list):
+                for fileRef in list.items {
+                    fileRef.delete { error in
+                        if let error = error {
+                            print("error during delete file on storage: \(error)")
+                            return
+                        }
+                        print("storage file deleted successfully!")
+                    }
+                }
+            case .failure(let error):
+                print("getlistAll error :\(error)")
             }
         }
     }
