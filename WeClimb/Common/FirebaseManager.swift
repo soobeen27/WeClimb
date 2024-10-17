@@ -819,43 +819,6 @@ final class FirebaseManager {
             }
             print("Post Reference deleted Successfully!")
         }
-        
-//        postRef.getDocument(as: Post.self) { [weak self] result in
-//            guard let self else { return }
-//            switch result {
-//            case .success(let post):
-//                if let thumbnail = post.thumbnail {
-//                    let thumbRef = self.storage.reference(forURL: thumbnail)
-//                    thumbRef.delete { error in
-//                        if let error = error {
-//                            print("Error - Deleting Thumbnail Image from Storage : \(error)")
-//                            return
-//                        }
-//                        print("Thumbnail Image deleted Successfully")
-//                    }
-//                }
-//                post.medias.forEach { mediaRef in
-//                    mediaRef.getDocument(as: Media.self) { result in
-//                        switch result {
-//                        case .success(let media):
-////                            let fileName = media.url
-//                            let fileRef = self.storage.reference(forURL: media.url)
-//                            fileRef.delete { error in
-//                                if let error = error {
-//                                    print("Error - Deleting media file in Storage : \(error)")
-//                                }
-//                                print("Media file Deleted Successfully!")
-//                            }
-//                        case .failure(let error):
-//                            print("Error - Getting Media : \(error)")
-//                        }
-//                    }
-//                }
-//            case .failure(let error):
-//                print("Error - Getting Post: \(error)")
-//            }
-//        }
-        
         postRef.getDocument { snapshot, error in
             if let error = error {
                 print("Error - Getting Post: \(error)")
