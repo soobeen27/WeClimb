@@ -11,6 +11,7 @@ enum MypageNameSpace {
     static let edit = "프로필 편집"
     static let follow = "팔로우"
     static let following = "팔로잉"
+    static let post = "게시물"
     static let logout = "로그아웃"
     static let close = "닫기"
     
