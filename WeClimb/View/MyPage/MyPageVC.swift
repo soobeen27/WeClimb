@@ -228,6 +228,7 @@ class MyPageVC: UIViewController {
         bindPost()
         bindEmpty()
         bindCollectionView()
+        bindEditProfile()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -419,6 +420,15 @@ class MyPageVC: UIViewController {
             })
             .disposed(by: disposeBag)
     }
+    
+    private func bindEditProfile() {
+        editButton.rx.tap
+          .subscribe(onNext: { [weak self] in
+            let editPageVC = EditPageVC()
+            self?.navigationController?.pushViewController(editPageVC, animated: true)
+          })
+          .disposed(by: disposeBag)
+      }
 }
 
 //extension MyPageVC: UICollectionViewDelegate {
