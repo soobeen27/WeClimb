@@ -115,6 +115,8 @@ class UploadVC: UIViewController {
         return indicator
     }()
     
+    var isCurrentScreenActive: Bool = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         textView.delegate = self
@@ -135,12 +137,15 @@ class UploadVC: UIViewController {
         super.viewDidDisappear(animated)
         
         feedView?.pauseAllVideo()
+        feedView?.isPlaying = true
+        isCurrentScreenActive = false
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         feedView?.playAllVideo()
+        isCurrentScreenActive = true
     }
     
     private func setNavigation() {
@@ -162,7 +167,10 @@ class UploadVC: UIViewController {
     }
     
     @objc private func didEnterForeground() {
-        feedView?.playAllVideo()
+        if isCurrentScreenActive {
+            feedView?.playAllVideo()
+            feedView?.isPlaying = true
+        }
     }
     
     @objc private func didEnterBackground() {
