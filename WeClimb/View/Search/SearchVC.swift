@@ -21,7 +21,7 @@ class SearchVC: UIViewController {
     
     var onSelectedGym: ((Gym) -> Void)?
     
-    private lazy var searchController: UISearchController = {
+    var searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = SearchNameSpace.placeholder
@@ -69,16 +69,36 @@ class SearchVC: UIViewController {
     }
     var nextPush: Bool = true
     
+    // MARK: - 뷰 라이프 사이클
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
         setNavigationBar()
         setSearchController()
         setLayout()
         bind()
         setupKeyboardDismissOnScroll()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        searchController.isActive = true
+        // 검색어와 세그먼트 상태 복원
+        searchController.searchBar.text = lastSearchText
+        segmentedControl.selectedSegmentIndex = lastSegmentIndex
+        searchViewModel.isSelectGym.accept(lastSegmentIndex == 0)
+        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // 검색어와 세그먼트 상태 저장
+        lastSearchText = searchController.searchBar.text ?? ""
+        lastSegmentIndex = segmentedControl.selectedSegmentIndex
+        
+        searchController.isActive = false
     }
     
     // MARK: - 바인딩 설정
@@ -89,7 +109,6 @@ class SearchVC: UIViewController {
         bindSearchBar()
         bindGymData()
         bindUserData()
-        bindSearchBarFocus()
     }
     
     func setupKeyboardDismissOnScroll() {
@@ -111,37 +130,9 @@ class SearchVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        // Large Titles를 사용하지 않도록 설정
-        navigationController?.navigationBar.prefersLargeTitles = false
-        navigationItem.largeTitleDisplayMode = .never
-        
+    private func setNavigationBar() {
         // 네비게이션 타이틀 설정
         navigationItem.title = SearchNameSpace.title
-        
-        // 검색 바가 숨겨지지 않도록 설정
-        navigationItem.hidesSearchBarWhenScrolling = false
-        
-        // 검색어와 세그먼트 상태 복원
-        searchController.searchBar.text = lastSearchText
-        segmentedControl.selectedSegmentIndex = lastSegmentIndex
-        searchViewModel.isSelectGym.accept(lastSegmentIndex == 0)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        // 검색어와 세그먼트 상태 저장
-        lastSearchText = searchController.searchBar.text ?? ""
-        lastSegmentIndex = segmentedControl.selectedSegmentIndex
-    }
-    
-    
-    private func setNavigationBar() {
-        // 네비게이션 바 타이틀 설정
-        //        view.title = SearchNameSpace.title
         
         // 탭바 빈 문자열로 설정
         if let tabBarItem = self.tabBarItem {
@@ -155,16 +146,20 @@ class SearchVC: UIViewController {
     
     private func setSearchController() {
         navigationItem.searchController = searchController
-        navigationItem.hidesSearchBarWhenScrolling = false // 검색바 유지
-        definesPresentationContext = false // 검색바 유지
+        
+        // 검색 바가 숨겨지지 않도록 설정
+        navigationItem.hidesSearchBarWhenScrolling = false
+        definesPresentationContext = false
     }
     
     private func setLayout() {
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        
         [segmentedControl, gymTableView, userTableView]
             .forEach { view.addSubview($0) }
         
         // 상황에 따라 세그먼트 컨트롤의 위치 변경
-        segmentedControl.snp.remakeConstraints {
+        segmentedControl.snp.makeConstraints {
             if ShowSegment {
                 $0.top.equalTo(view.safeAreaLayoutGuide).offset(8)
                 $0.leading.trailing.equalToSuperview().inset(16)
@@ -247,9 +242,13 @@ class SearchVC: UIViewController {
                     return
                 }
                 
-                let userPageVC = UserPageVC()
-                userPageVC.configure(with: selectedItem)
-                userPageVC.userUID = userUID
+//                let userPageVC = UserPageVC()
+//                userPageVC.configure(with: selectedItem)
+//                userPageVC.userUID = userUID
+                let userPageVM = UserPageVM()
+                userPageVM.fetchUserInfo(userName: selectedItem.userName ?? "이름 찾을 수 없음")
+                
+                let userPageVC = UserPageVC(viewModel: userPageVM)
                 
                 self.navigationController?.navigationBar.prefersLargeTitles = false
                 self.navigationController?.pushViewController(userPageVC, animated: true)
@@ -293,32 +292,4 @@ class SearchVC: UIViewController {
             }
             .disposed(by: disposeBag)
     }
-    
-    // MARK: - SearchBar 포커스 이벤트 바인딩
-    private func bindSearchBarFocus() {
-        // SearchBar 텍스트 입력 시작 이벤트 처리
-        searchController.searchBar.rx.textDidBeginEditing
-            .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
-                UIView.animate(withDuration: 0.2, animations: {
-                    self.segmentedControl.alpha = 0.0
-                }) { _ in
-                    UIView.animate(withDuration: 0.6) {
-                        self.segmentedControl.alpha = 1.0
-                    }
-                }
-            })
-            .disposed(by: disposeBag)
-        
-        // SearchBar 텍스트 입력 종료 이벤트 처리
-        searchController.searchBar.rx.textDidEndEditing
-            .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
-                UIView.animate(withDuration: 0.2) {
-                    self.segmentedControl.alpha = 1.0
-                }
-            })
-            .disposed(by: disposeBag)
-    }
-    
 }

@@ -10,11 +10,8 @@ import UIKit
 import RxSwift
 import RxCocoa
 import FirebaseFirestore
-import FirebaseAuth
 
 class MyPageVM {
-    
-    private let disposeBag = DisposeBag()
     
     let userMediaPosts = BehaviorRelay<[(post: Post, media: [Media], thumbnailURL: String?)]>(value: [])
     
