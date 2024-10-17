@@ -123,6 +123,7 @@ class UploadVC: UIViewController {
         setLayout()
         mediaItemsBind()
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
+        setNavigation()
         setGymView()
         setAlert()
         setLoading()
@@ -150,9 +151,6 @@ class UploadVC: UIViewController {
     
     private func setNavigation() {
         navigationItem.title = UploadNameSpace.title
-        
-        let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelButtonTapped))
-        navigationItem.leftBarButtonItem = cancelButton
     }
     
     @objc private func cancelButtonTapped() {
@@ -516,12 +514,16 @@ extension UploadVC : PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         viewModel.mediaItems.accept(results)
         
-        picker.dismiss(animated: true) {
+        picker.dismiss(animated: true)
+        
+        if !results.isEmpty {
             self.viewModel.setMedia()
             
             self.gymView.selectedLabel.isHidden = false
             self.gymView.nextImageView.isHidden = false
-            self.setNavigation()
+            
+            let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelButtonTapped))
+            navigationItem.leftBarButtonItem = cancelButton
         }
     }
 }
