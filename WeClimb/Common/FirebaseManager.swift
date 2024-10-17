@@ -246,51 +246,6 @@ final class FirebaseManager {
         }
     }
     
-    // MARK: 로그인된 계정 삭제
-    func userDelete() {
-        guard let user = Auth.auth().currentUser else { return }
-        
-        user.delete() { error in
-            if let error = error {
-                print("authentication 유저 삭제 오류: \(error)")
-            }
-            else {
-                print("authentication 성공적으로 계정 삭제")
-            }
-        }
-        
-        let userRef = db.collection("users").document(user.uid)
-        userRef.delete() { error in
-            if let error = error {
-                print("firestore 유저 삭제 오류: \(error)")
-            } else {
-                print("firestore 성공적으로 계정 삭제")
-            }
-        }
-    }
-    
-    // MARK: Storage folder 삭제.
-    func deleteStorageFolder(from path: String) {
-        let ref = storage.reference().child(path)
-        
-        ref.listAll { result in
-            switch result {
-            case .success(let list):
-                for fileRef in list.items {
-                    fileRef.delete { error in
-                        if let error = error {
-                            print("error during delete file on storage: \(error)")
-                            return
-                        }
-                        print("storage file deleted successfully!")
-                    }
-                }
-            case .failure(let error):
-                print("getlistAll error :\(error)")
-            }
-        }
-    }
-    
     // MARK: 모든 암장이름 가져오기 (검색용)
     func allGymName(completion: @escaping ([String]) -> Void) {
         db.collection("climbingGyms").getDocuments { snapshot, error in
@@ -805,6 +760,165 @@ final class FirebaseManager {
             }
         }
     }
+    
+    // MARK: 로그인된 계정 삭제
+    func userDelete() {
+        guard let user = Auth.auth().currentUser else { return }
+        
+        user.delete() { error in
+            if let error = error {
+                print("authentication 유저 삭제 오류: \(error)")
+            }
+            else {
+                print("authentication 성공적으로 계정 삭제")
+            }
+        }
+        
+        let userRef = db.collection("users").document(user.uid)
+        userRef.delete() { error in
+            if let error = error {
+                print("firestore 유저 삭제 오류: \(error)")
+            } else {
+                print("firestore 성공적으로 계정 삭제")
+            }
+        }
+    }
+    
+    // MARK: Storage folder 삭제.
+    func deleteStorageFolder(from path: String) {
+        let ref = storage.reference().child(path)
+        
+        ref.listAll { result in
+            switch result {
+            case .success(let list):
+                for fileRef in list.items {
+                    fileRef.delete { error in
+                        if let error = error {
+                            print("error during delete file on storage: \(error)")
+                            return
+                        }
+                        print("storage file deleted successfully!")
+                    }
+                }
+            case .failure(let error):
+                print("getlistAll error :\(error)")
+            }
+        }
+    }
+    
+    // MARK: Post 삭제
+    func deletePost(uid: String) {
+        guard let user = Auth.auth().currentUser else { return }
+        let userRef = db.collection("users").document(user.uid)
+        let postRef = db.collection("posts").document(uid)
+        
+        userRef.updateData(["posts" : FieldValue.arrayRemove([postRef])]) { error in
+            if let error = error {
+                print("Error - Deleting Post Reference: \(error)")
+                return
+            }
+            print("Post Reference deleted Successfully!")
+        }
+        
+//        postRef.getDocument(as: Post.self) { [weak self] result in
+//            guard let self else { return }
+//            switch result {
+//            case .success(let post):
+//                if let thumbnail = post.thumbnail {
+//                    let thumbRef = self.storage.reference(forURL: thumbnail)
+//                    thumbRef.delete { error in
+//                        if let error = error {
+//                            print("Error - Deleting Thumbnail Image from Storage : \(error)")
+//                            return
+//                        }
+//                        print("Thumbnail Image deleted Successfully")
+//                    }
+//                }
+//                post.medias.forEach { mediaRef in
+//                    mediaRef.getDocument(as: Media.self) { result in
+//                        switch result {
+//                        case .success(let media):
+////                            let fileName = media.url
+//                            let fileRef = self.storage.reference(forURL: media.url)
+//                            fileRef.delete { error in
+//                                if let error = error {
+//                                    print("Error - Deleting media file in Storage : \(error)")
+//                                }
+//                                print("Media file Deleted Successfully!")
+//                            }
+//                        case .failure(let error):
+//                            print("Error - Getting Media : \(error)")
+//                        }
+//                    }
+//                }
+//            case .failure(let error):
+//                print("Error - Getting Post: \(error)")
+//            }
+//        }
+        
+        postRef.getDocument { snapshot, error in
+            if let error = error {
+                print("Error - Getting Post: \(error)")
+                return
+            }
+            guard let snapshot, snapshot.exists else {
+                print("Error - Post snapshot doesn't exists")
+                return
+            }
+            do {
+                let post = try snapshot.data(as: Post.self)
+                if let thumbnail = post.thumbnail {
+                    let thumbRef = self.storage.reference(forURL: thumbnail)
+                    thumbRef.delete { error in
+                        if let error = error {
+                            print("Error - Deleting Thumbnail Image from Storage : \(error)")
+                            return
+                        }
+                        print("Thumbnail Image deleted Successfully")
+                    }
+                }
+                post.medias.forEach { mediaRef in
+                    mediaRef.getDocument(as: Media.self) { result in
+                        switch result {
+                        case .success(let media):
+//                            let fileName = media.url
+                            let fileRef = self.storage.reference(forURL: media.url)
+                            fileRef.delete { error in
+                                if let error = error {
+                                    print("Error - Deleting media file in Storage : \(error)")
+                                }
+                                print("Media file Deleted Successfully!")
+                                mediaRef.delete { error in
+                                    if let error = error {
+                                        print("Error - Deleting Media: \(media)")
+                                        return
+                                    }
+                                    print("Media Deleted Successfully")
+                                }
+                                postRef.delete { error in
+                                    if let error = error {
+                                        print("Error - Deleting Post: \(error)")
+                                        return
+                                    }
+                                    print("Post Deleted Successfully!")
+                                }
+                            }
+                        case .failure(let error):
+                            print("Error - Getting Media : \(error)")
+                        }
+                    }
+                }
+                
+            } catch {
+                print("Error - snapshot decoding error")
+            }
+        }
+    }
+    
+    func fileNameFromUrl(urlString: String) -> String {
+        guard let url = URL(string: urlString) else { return "" }
+        return url.lastPathComponent
+    }
 }
 /*
  HTTP 변환 사용 예시
@@ -823,7 +937,6 @@ final class FirebaseManager {
  gymImageView.image = UIImage(named: "defaultImage")
  }
  */
-
 
 extension Firestore {
     func getAllDocuments(from refs: [DocumentReference]) async throws -> [DocumentSnapshot] {
