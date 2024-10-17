@@ -239,6 +239,7 @@ class MyPageVC: UIViewController {
         viewModel.loadUserMediaPosts()
     }
     
+    
     // MARK: - 파이어베이스에 저장된 유저 정보 업데이트
     private func updateUserInfo() {
         FirebaseManager.shared.currentUserInfo { [weak self] (result: Result<User, Error>) in
@@ -276,6 +277,7 @@ class MyPageVC: UIViewController {
         }
     }
     
+    
     // MARK: - 설정 버튼 YJ
     private func setNavigation() {
         let rightBarButton = UIBarButtonItem(
@@ -293,6 +295,7 @@ class MyPageVC: UIViewController {
         //        settingsVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(settingsVC, animated: true)
     }
+    
     
     //MARK: - 레이아웃
     private func setLayout() {
@@ -364,10 +367,14 @@ class MyPageVC: UIViewController {
         }
     }
     
+    
     //MARK: - 바인드
     private func bindPost() {
         viewModel.userMediaPosts
             .observe(on: MainScheduler.instance)
+            .do(onNext: { [weak self] post in
+                self?.postCountLabel.text = "\(post.count)"
+            })
             .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { index, mediaPost, cell in
                 if let thumbnailURL = mediaPost.thumbnailURL {
                     print("썸네일 URL: \(thumbnailURL)")
