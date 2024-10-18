@@ -584,7 +584,7 @@ extension UploadVC {
                     }
                 } else {
                     // 사진 이미지인 경우
-                    self.uploadMedia(media: media, caption: caption, gym: gym, thumbnailURL: "사진 이미지", uploadStatus: .success)
+                    self.uploadMedia(media: media, caption: caption, gym: gym, thumbnailURL: "", uploadStatus: .success)
                 }
             })
             .disposed(by: disposeBag)
