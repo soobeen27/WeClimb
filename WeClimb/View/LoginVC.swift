@@ -87,6 +87,10 @@ class LoginVC: UIViewController {
                         print("success")
                         self.navigationController?.pushViewController(self.tabBarVC, animated: true)
                         self.navigationController?.setNavigationBarHidden(true, animated: true)
+                    case .noName:
+                        let signUpVC = PrivacyPolicyVC()
+                        self.navigationController?.pushViewController(signUpVC, animated: true)
+                        self.navigationController?.setNavigationBarHidden(false, animated: true)
                     case .createAccount:
                         // 회원가입 페이지 푸시
                         let signUpVC = PrivacyPolicyVC()
@@ -109,6 +113,10 @@ class LoginVC: UIViewController {
                         print("success")
                         self.navigationController?.pushViewController(self.tabBarVC, animated: true)
                         self.navigationController?.setNavigationBarHidden(true, animated: true)
+                    case .noName:
+                        let signUpVC = PrivacyPolicyVC()
+                        self.navigationController?.pushViewController(signUpVC, animated: true)
+                        self.navigationController?.setNavigationBarHidden(false, animated: true)
                     case .createAccount:
                         //회원가입 페이지 ㄱㄱ
                         let signUpVC = PrivacyPolicyVC()
@@ -248,6 +256,10 @@ extension LoginVC: ASAuthorizationControllerDelegate {
                     print("success")
                     self.navigationController?.pushViewController(self.tabBarVC, animated: true)
                     self.navigationController?.setNavigationBarHidden(true, animated: true)
+                case .noName:
+                    let signUpVC = PrivacyPolicyVC()
+                    self.navigationController?.pushViewController(signUpVC, animated: true)
+                    self.navigationController?.setNavigationBarHidden(false, animated: true)
                 case .createAccount:
                     //회원가입 페이지 ㄱㄱ
                     let signUpVC = PrivacyPolicyVC()

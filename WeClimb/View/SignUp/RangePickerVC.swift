@@ -19,7 +19,7 @@ class RangePickerVC: UIViewController {
     private let ranges = ["120 ~ 130", "130 ~ 140", "140 ~ 150", "150 ~ 160", "160 ~ 170", "170 ~ 180", "180 ~ 190", "190 ~ 200"]
     
     var selectedRange = PublishRelay<String>()
-
+    
     private let confirmButton: UIButton = {
         let button = UIButton()
         button.setTitle("확인", for: .normal)
@@ -29,6 +29,7 @@ class RangePickerVC: UIViewController {
         return button
     }()
     
+    // MARK: - 라이프 사이클
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
