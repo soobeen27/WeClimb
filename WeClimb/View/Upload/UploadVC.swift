@@ -514,11 +514,11 @@ extension UploadVC : PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         viewModel.mediaItems.accept(results)
         
-        picker.dismiss(animated: true)
+        picker.dismiss(animated: true) {
+            self.viewModel.setMedia()
+        }
         
         if !results.isEmpty {
-            self.viewModel.setMedia()
-            
             self.gymView.selectedLabel.isHidden = false
             self.gymView.nextImageView.isHidden = false
             
@@ -529,6 +529,7 @@ extension UploadVC : PHPickerViewControllerDelegate {
 }
 
 // MARK: 업로드 로직
+//extension UploadVC {
 extension UploadVC {
     private func bindPostButton() {
         postButton.rx.tap
@@ -537,9 +538,8 @@ extension UploadVC {
                 print("버튼 클릭.")
                 
                 // 첫 번째 미디어 가져오기
-                guard let firstFeedItem = self.viewModel.feedRelay.value.first,
-                      let videoURL = firstFeedItem.videoURL else {
-                    print("첫 번째 미디어가 없거나 비디오 URL이 없습니다.")
+                guard let firstFeedItem = self.viewModel.feedRelay.value.first else {
+                    print("첫 번째 미디어가 없습니다.")
                     CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
                     return
                 }
@@ -576,39 +576,44 @@ extension UploadVC {
                 
                 let gym = self.gymView.selectedLabel.text ?? ""
                 
-                // 썸네일 생성 및 업로드
-                self.viewModel.getThumbnailImage(from: videoURL) { thumbnailURL in
-                    guard let thumbnailURL = thumbnailURL else {
-                        print("썸네일 생성 실패.")
-                        return
+                if let videoURL = firstFeedItem.videoURL {
+                    // 비디오 URL로 썸네일 생성
+                    self.viewModel.getThumbnailImage(from: videoURL) { thumbnailURL in
+                        let thumbnail = thumbnailURL ?? ""
+                        self.uploadMedia(media: media, caption: caption, gym: gym, thumbnailURL: thumbnail, uploadStatus: uploadStatus)
                     }
-                    
-                    switch uploadStatus {
-                    case .fail:
-                        CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
-                    case .success:
-                        DispatchQueue.main.async {
-                            CommonManager.shared.showToast(message: "업로드 중입니다.",
-                                                           font: UIFont.systemFont(ofSize: 13),
-                                                           position: CGPoint(x: UIScreen.main.bounds.width / 2 - 75,
-                                                                             y: UIScreen.main.bounds.height / 2 - 17.5))
-                        }
-                        // 미디어와 함께 업로드
-                        self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailURL)
-                            .subscribe(onNext: {
-                                DispatchQueue.main.async {
-                                    print("업로드 성공")
-                                    CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
-                                    self.initUploadVC()
-                                }
-                            }, onError: { error in
-                                print("업로드 실패: \(error.localizedDescription)")
-                            })
-                            .disposed(by: self.disposeBag)
-                    }
+                } else {
+                    // 사진 이미지인 경우
+                    self.uploadMedia(media: media, caption: caption, gym: gym, thumbnailURL: "사진 이미지", uploadStatus: .success)
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func uploadMedia(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String, uploadStatus: UploadStatus) {
+        switch uploadStatus {
+        case .fail:
+            CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
+        case .success:
+            DispatchQueue.main.async {
+                CommonManager.shared.showToast(message: "업로드 중입니다.",
+                                               font: UIFont.systemFont(ofSize: 13),
+                                               position: CGPoint(x: UIScreen.main.bounds.width / 2 - 75,
+                                                                 y: UIScreen.main.bounds.height / 2 - 17.5))
+            }
+
+            self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailURL)
+                .subscribe(onNext: {
+                    DispatchQueue.main.async {
+                        print("업로드 성공")
+                        CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
+                        self.initUploadVC()
+                    }
+                }, onError: { error in
+                    print("업로드 실패: \(error.localizedDescription)")
+                })
+                .disposed(by: disposeBag)
+        }
     }
 
     // MARK: - 업로드뷰 초기화 YJ

@@ -285,7 +285,7 @@ extension UploadVM {
                 print("썸네일이 성공적으로 생성.")
                 let uiImage = UIImage(cgImage: image)
                 
-                if let thumbnailData = uiImage.jpegData(compressionQuality: 0.6) {
+                if let thumbnailData = uiImage.jpegData(compressionQuality: 0.5) {
                     self.uploadThumbnailToFirebase(thumbnailData: thumbnailData) { thumbnailURL in
                         completion(thumbnailURL)
                     }
