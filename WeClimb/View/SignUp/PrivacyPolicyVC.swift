@@ -133,6 +133,7 @@ class PrivacyPolicyVC: UIViewController {
         return textView
     }()
     
+    // MARK: - 라이프 사이클
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
@@ -142,6 +143,12 @@ class PrivacyPolicyVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
+        self.tabBarController?.tabBar.isHidden = true
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
