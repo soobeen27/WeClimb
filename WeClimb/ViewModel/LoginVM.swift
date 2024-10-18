@@ -69,7 +69,7 @@ class LoginVM {
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
         
-        GIDSignIn.sharedInstance.signIn(withPresenting: presenter) { [unowned self] result, error in
+        GIDSignIn.sharedInstance.signIn(withPresenting: presenter) { result, error in
             guard error == nil else {
                 print(#fileID, #function, #line, "- comment")
                 return

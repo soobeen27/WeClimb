@@ -769,9 +769,7 @@ final class FirebaseManager {
             if let error = error {
                 print("authentication 유저 삭제 오류: \(error)")
             }
-            else {
                 print("authentication 성공적으로 계정 삭제")
-            }
         }
         
         let userRef = db.collection("users").document(user.uid)
