@@ -163,9 +163,7 @@ extension UploadVM {
             }
         }
     }
-}
-
-extension UploadVM {
+    
     // MARK: - 비디오 길이를 체크하는 메서드
     func checkVideoDuration(url: URL) async -> Double {
         print("비디오 URL: \(url)")
@@ -196,7 +194,18 @@ extension UploadVM {
                 
                 // 이미지인 경우
                 if item.url.pathExtension == "jpg" || item.url.pathExtension == "png" {
-                    uploadMedia.append((url: item.url, sector: item.sector, grade: item.grade)) // 압축 X
+                    if let image = UIImage(contentsOfFile: item.url.path) {
+                        // 이미지 압축
+                        if let compressedData = image.jpegData(compressionQuality: 0.7) {
+                            let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
+                            do {
+                                try compressedData.write(to: tempImageURL)
+                                uploadMedia.append((url: tempImageURL, sector: item.sector, grade: item.grade))
+                            } catch {
+                                print("이미지 저장 실패: \(error.localizedDescription)")
+                            }
+                        }
+                    }
                     dispatchGroup.leave()
                 } else {
                     // 비디오인 경우
