@@ -266,7 +266,7 @@ class UploadVC: UIViewController {
                     
                     self.gymView.updateText(with: gymInfo.gymName)
                     
-                    navigationController.dismiss(animated: true, completion: nil)
+                    self.dismiss(animated: true, completion: nil)
                 }
                 self.present(navigationController, animated: true, completion: nil)
             }
@@ -333,7 +333,6 @@ class UploadVC: UIViewController {
             $0.top.bottom.equalToSuperview()
             $0.center.equalToSuperview()
             $0.width.equalTo(sectorView)
-            
         }
     }
  
