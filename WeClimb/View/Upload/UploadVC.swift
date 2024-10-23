@@ -115,7 +115,8 @@ class UploadVC: UIViewController {
         return indicator
     }()
     
-    var isCurrentScreenActive: Bool = false
+    private var isCurrentScreenActive: Bool = false
+    private var isUploading = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -528,13 +529,18 @@ extension UploadVC : PHPickerViewControllerDelegate {
 }
 
 // MARK: 업로드 로직
-//extension UploadVC {
 extension UploadVC {
     private func bindPostButton() {
         postButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 guard let self = self else { return }
-                print("버튼 클릭.")
+                
+                if self.isUploading {
+                    print("업로드 중, 업로드 버튼 클릭 무시.")
+                    return
+                }
+                
+                print("업로드 버튼 클릭.")
                 
                 // 첫 번째 미디어 가져오기
                 guard let firstFeedItem = self.viewModel.feedRelay.value.first else {
@@ -556,7 +562,7 @@ extension UploadVC {
                     }
                     return nil
                 }.compactMap { $0 } // nil 제거
-
+                
                 var uploadStatus: UploadStatus = .success
                 var caption: String
                 if self.textView.textColor == .secondaryLabel {
@@ -594,30 +600,33 @@ extension UploadVC {
         case .fail:
             CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
         case .success:
+            isUploading = true
             DispatchQueue.main.async {
                 CommonManager.shared.showToast(message: "업로드 중입니다.",
                                                font: UIFont.systemFont(ofSize: 13),
                                                position: CGPoint(x: UIScreen.main.bounds.width / 2 - 75,
                                                                  y: UIScreen.main.bounds.height / 2 - 17.5))
             }
-
+            
             self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailURL)
                 .subscribe(onNext: {
                     DispatchQueue.main.async {
                         print("업로드 성공")
                         CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
                         self.initUploadVC()
+                        self.isUploading = false
                     }
                 }, onError: { error in
                     print("업로드 실패: \(error.localizedDescription)")
+                    self.isUploading = false
                 })
                 .disposed(by: disposeBag)
         }
     }
-
+    
     // MARK: - 업로드뷰 초기화 YJ
     private func initUploadVC() {
-
+        
         let newUploadVC = UploadVC()
         feedView?.pauseAllVideo()
         
