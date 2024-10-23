@@ -20,6 +20,6 @@ struct User: Codable {
     let comments: [DocumentReference]?
     let followers: [DocumentReference]?
     let following: [DocumentReference]?
+    let snsConsent: Bool?
     var blackList: [String]?
 }
-
