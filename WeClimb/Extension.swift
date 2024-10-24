@@ -157,6 +157,12 @@ extension String {
             return ("갈색", UIColor(red: 187/255, green: 120/255, blue: 58/255, alpha: 1))
         case "하":
             return ("하늘", UIColor(red: 0/255, green: 189/255, blue: 222/255, alpha: 1)) // "파"랑 같은 색
+        case "노검":
+            return ("노랑", UIColor(red: 133/255, green: 125/255, blue: 23/255, alpha: 1))
+        case "초검":
+            return ("초록", UIColor(red: 21/255, green: 114/255, blue: 55/255, alpha: 1))
+        case "파검":
+            return ("파랑", UIColor(red: 6/255, green: 103/255, blue: 121/255, alpha: 1))
         default:
             return ("그 외", UIColor.clear)
         }
