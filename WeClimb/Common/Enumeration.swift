@@ -10,6 +10,7 @@ import Foundation
 //MARK: 로그인 관련 enum
 enum LoginResult {
     case login
+    case noName
     case createAccount
 }
 

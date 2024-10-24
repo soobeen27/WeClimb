@@ -30,6 +30,7 @@ class LoginVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private let tabBarVC = TabBarController()
+    private let signUpVC = PrivacyPolicyVC()
     
     private let logo: UIImageView = {
         let image = UIImageView()
@@ -84,14 +85,12 @@ class LoginVC: UIViewController {
                 self.viewModel.logIn(with: credential, loginType: .google) { result in
                     switch result {
                     case .login:
-                        print("success")
-                        self.navigationController?.pushViewController(self.tabBarVC, animated: true)
-                        self.navigationController?.setNavigationBarHidden(true, animated: true)
+                        self.navigateTabbarView()
+                    case .noName:
+                        self.navigateSignUpView()
                     case .createAccount:
                         // 회원가입 페이지 푸시
-                        let signUpVC = PrivacyPolicyVC()
-                        self.navigationController?.pushViewController(signUpVC, animated: true)
-                        self.navigationController?.setNavigationBarHidden(false, animated: true)
+                        self.navigateSignUpView()
                     }
                 }
             }
@@ -106,14 +105,12 @@ class LoginVC: UIViewController {
                 self.viewModel.logIn(with: credential, loginType: .kakao) { result in
                     switch result {
                     case .login:
-                        print("success")
-                        self.navigationController?.pushViewController(self.tabBarVC, animated: true)
-                        self.navigationController?.setNavigationBarHidden(true, animated: true)
+                        self.navigateTabbarView()
+                    case .noName:
+                        self.navigateSignUpView()
                     case .createAccount:
                         //회원가입 페이지 ㄱㄱ
-                        let signUpVC = PrivacyPolicyVC()
-                        self.navigationController?.pushViewController(signUpVC, animated: true)
-                        self.navigationController?.setNavigationBarHidden(false, animated: true)
+                        self.navigateSignUpView()
                     }
                 }
             }
@@ -150,6 +147,16 @@ class LoginVC: UIViewController {
         super.viewWillAppear(animated)
         //로그인 창으로 돌아왔을때 네비게이션 바 보이기
         navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+    
+    private func navigateSignUpView() {
+        self.navigationController?.pushViewController(signUpVC, animated: true)
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+    
+    private func navigateTabbarView() {
+        self.navigationController?.pushViewController(self.tabBarVC, animated: true)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
     private func buttonTapped() {
@@ -245,14 +252,12 @@ extension LoginVC: ASAuthorizationControllerDelegate {
             viewModel.logIn(with: credential, loginType: .apple) { result in
                 switch result {
                 case .login:
-                    print("success")
-                    self.navigationController?.pushViewController(self.tabBarVC, animated: true)
-                    self.navigationController?.setNavigationBarHidden(true, animated: true)
+                    self.navigateTabbarView()
+                case .noName:
+                    self.navigateSignUpView()
                 case .createAccount:
                     //회원가입 페이지 ㄱㄱ
-                    let signUpVC = PrivacyPolicyVC()
-                    self.navigationController?.pushViewController(signUpVC, animated: true)
-                    self.navigationController?.setNavigationBarHidden(false, animated: true)
+                    self.navigateSignUpView()
                 }
             }
         }
