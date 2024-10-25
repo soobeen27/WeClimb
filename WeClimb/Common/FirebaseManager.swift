@@ -650,7 +650,20 @@ final class FirebaseManager {
     
     
     // MARK: - DS 작업 (유저 신고, HTTP 변환)
-    //     유저 신고내역
+    // sns 수신동의 관련
+    func updateSNSConsent(for userUID: String, consent: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
+        let userRef = db.collection("users").document(userUID)
+        
+        userRef.updateData(["snsConsent": consent]) { error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(()))
+            }
+        }
+    }
+    
+    // 유저 신고내역
     func userReport(content: String, userName: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let userReport: [String: Any] = [
             "content": content,

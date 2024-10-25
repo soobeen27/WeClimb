@@ -56,7 +56,7 @@ class ClimbingGymInfoView: UIView {
     
     // 주차정보 레이블
     private let parkingInfoLabel: UILabel = {
-       let label = UILabel()
+        let label = UILabel()
         label.text = ClimbingGymNameSpace.parkingInfo
         label.font = UIFont.boldSystemFont(ofSize: 17)
         return label
@@ -257,32 +257,56 @@ class ClimbingGymInfoView: UIView {
     }
     
     private func setupDifficultyBarView(from grades: [String]) {
-        // 기존에 추가된 뷰를 모두 제거
+        clearExistingViews() // 기존에 추가된 뷰를 모두 제거
+        
+        let coloredViews = grades.map { createGradeView(for: $0) }
+        
+        addViewsToStackView(coloredViews)
+        
+        // grade가 "B"로 시작하는 경우 containerView를 추가하지 않음
+        if !grades.contains(where: { $0.hasPrefix("B") }) {
+            addContainerView()
+        } else {
+            addDifficultyBarViewWithoutContainer()
+        }
+    }
+    
+    private func clearExistingViews() {
         difficultyBarView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-
-        // 각 grade 문자열을 색상으로 변환하여 UIView 생성
-        let coloredViews = grades.map { grade -> UIView in
+    }
+    
+    private func createGradeView(for grade: String) -> UIView {
+        if grade.hasPrefix("B") {
+            let label = UILabel()
+            label.text = grade
+            label.textColor = .label
+            label.textAlignment = .center
+            label.layer.borderColor = UIColor.lightGray.cgColor
+            label.layer.borderWidth = 1
+            label.layer.cornerRadius = 8
+            return label
+        } else {
             let color = grade.colorInfo.color
             let colorView = UIView()
             colorView.backgroundColor = color
             return colorView
         }
-        
-        // 생성한 UIView들을 스택뷰에 추가
-        for colorView in coloredViews {
-            difficultyBarView.addArrangedSubview(colorView)
-            colorView.snp.makeConstraints {
-                $0.width.equalTo(difficultyBarView.snp.width).multipliedBy(1.0 / CGFloat(coloredViews.count))
+    }
+    
+    private func addViewsToStackView(_ views: [UIView]) {
+        for view in views {
+            difficultyBarView.addArrangedSubview(view)
+            view.snp.makeConstraints {
+                $0.width.equalTo(difficultyBarView.snp.width).multipliedBy(1.0 / CGFloat(views.count))
                 $0.height.equalTo(difficultyBarView.snp.height)
             }
         }
-        
         difficultyBarView.spacing = 0
-
-        // 기존 containerView가 있다면 제거
+    }
+    
+    private func addContainerView() {
         self.subviews.filter { $0.tag == 100 }.forEach { $0.removeFromSuperview() }
         
-        // containerView 생성
         let containerView = UIView()
         containerView.tag = 100
         containerView.layer.borderWidth = 1
@@ -290,23 +314,26 @@ class ClimbingGymInfoView: UIView {
         containerView.layer.cornerRadius = 4
         containerView.clipsToBounds = true
         
-        // difficultyBarView를 containerView에 추가
         containerView.addSubview(difficultyBarView)
         
-        // containerView를 self에 추가
         self.addSubview(containerView)
         
-        // containerView 레이아웃 설정
         containerView.snp.makeConstraints {
             $0.top.equalTo(difficultyLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(20)
         }
         
-        // difficultyBarView 레이아웃 설정
         difficultyBarView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
-
+    
+    private func addDifficultyBarViewWithoutContainer() {
+        difficultyBarView.snp.makeConstraints {
+            $0.top.equalTo(difficultyLabel.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.height.equalTo(20)
+        }
+    }
 }
