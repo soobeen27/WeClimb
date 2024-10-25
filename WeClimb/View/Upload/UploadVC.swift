@@ -348,6 +348,7 @@ class UploadVC: UIViewController {
                                                title: "알림",
                                                message: "1분 미만 비디오를 업로드해주세요.",
                                                includeCancel: true)
+                initUploadVC()
             })
             .disposed(by: disposeBag)
     }
