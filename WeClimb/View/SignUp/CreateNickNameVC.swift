@@ -76,6 +76,7 @@ class CreateNickNameVC: UIViewController {
         return button
     }()
     
+    // MARK: - 라이프 사이클
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
