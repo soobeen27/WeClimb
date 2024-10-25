@@ -14,7 +14,11 @@ import Kingfisher
 
 class SFCollectionViewCell: UICollectionViewCell {
     
+    private let likeViewModel = LikeViewModel()
     var disposeBag = DisposeBag()
+    
+    let postUID = UUID().uuidString
+    let postType: Like = .post
     
     var medias: [Media] = []
     
@@ -174,6 +178,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         return stackView
     }()
     
+    
     // MARK: - 초기화 및 레이아웃 설정
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -192,11 +197,14 @@ class SFCollectionViewCell: UICollectionViewCell {
         feedUserNameLabel.text = nil
         feedProfileAddressLabel.text = nil
         feedCaptionLabel.text = nil
-        likeButtonCounter.text = nil
+//        likeButtonCounter.text = nil
+        likeButtonCounter.text = "0"
         feedUserProfileImage.image = nil
         pageControl.currentPage = 0
         medias = []
+        setLikeButton()
     }
+    
     
     // MARK: - UI 구성
     private func setupUI() {
@@ -219,10 +227,10 @@ class SFCollectionViewCell: UICollectionViewCell {
             .forEach {
                 feedProfileStackView.addArrangedSubview($0)
             }
-//        [likeButton, likeButtonCounter]
-//            .forEach {
-//                likeStackView.addArrangedSubview($0)
-//            }
+        [likeButton, likeButtonCounter]
+            .forEach {
+                likeStackView.addArrangedSubview($0)
+            }
 //        [commentButton, commentButtonCounter]
 //            .forEach {
 //                commentStackView.addArrangedSubview($0)
@@ -243,6 +251,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     func pauseVideo(cell: SFFeedCell) {
         cell.player?.pause() // 비디오 정지
     }
+    
     
     // MARK: - 레이아웃 설정
     private func setLayout() {
@@ -286,16 +295,16 @@ class SFCollectionViewCell: UICollectionViewCell {
 //        dDayLabel.snp.makeConstraints {
 //            $0.size.equalTo(CGSize(width: 45, height: 20))
 //        }
-//        likeStackView.snp.makeConstraints {
-//            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.57)
-//            $0.trailing.equalToSuperview().inset(10)
-//        }
-//        likeButton.imageView?.snp.makeConstraints {
-//            $0.size.equalTo(CGSize(width: 35, height: 30))
-//        }
-//        likeButton.snp.makeConstraints {
-//            $0.size.equalTo(CGSize(width: 35, height: 35))
-//        }
+        likeStackView.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.57)
+            $0.trailing.equalToSuperview().inset(10)
+        }
+        likeButton.imageView?.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 35, height: 30))
+        }
+        likeButton.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 35, height: 35))
+        }
 //        commentStackView.snp.makeConstraints {
 //            $0.top.equalTo(likeStackView.snp.bottom).offset(20)
 //            $0.trailing.equalToSuperview().inset(10)
@@ -308,6 +317,7 @@ class SFCollectionViewCell: UICollectionViewCell {
 //            $0.size.equalTo(CGSize(width: 35, height: 35))
 //        }
     }
+    
     
     // MARK: - configure 메서드
     func configure(with post: Post, media: [Media]) {
@@ -367,8 +377,27 @@ class SFCollectionViewCell: UICollectionViewCell {
         //        }
     }
     
+    
+    //MARK: - 좋아요 버튼 세팅
+    private func setLikeButton() {
+        likeButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                likeViewModel.likePost(uid: postUID, type: postType)
+            })
+            .disposed(by: disposeBag)
+        
+        likeViewModel.likeList
+            .subscribe(onNext: { [weak self] likeList in
+                guard let self = self else { return }
+                likeButtonCounter.text =  "\(likeList.count)"
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    
     // MARK: - 버튼 그림자 모드
-    func addShadow(to view: UIView) {
+    private func addShadow(to view: UIView) {
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 1, height: 1)
         view.layer.shadowOpacity = 0.5
