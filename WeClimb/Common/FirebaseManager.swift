@@ -37,7 +37,7 @@ final class FirebaseManager {
     func updateAccount(with data: String, for field: UserUpdate, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         let userRef = db.collection("users").document(user.uid)
-                userRef.updateData([field.key : data]) { error in
+        userRef.updateData([field.key : data]) { error in
             if let error = error {
                 print("업데이트 에러!: \(error.localizedDescription)")
                 return
@@ -227,7 +227,7 @@ final class FirebaseManager {
             if let error = error {
                 completion(.failure(error))
             }
-            guard let snapshot, snapshot.exists else { 
+            guard let snapshot, snapshot.exists else {
                 completion(.failure(UserError.none))
                 return }
             do {
@@ -235,14 +235,14 @@ final class FirebaseManager {
             } catch {
                 completion(.failure(UserError.none))
             }
-                
-//            snapshot.documents.forEach { document in
-//                if let user = try? document.data(as: User.self) {
-//                    completion(.success(user))
-//                } else {
-//                    completion(.failure(UserError.none))
-//                }
-//            }
+            
+            //            snapshot.documents.forEach { document in
+            //                if let user = try? document.data(as: User.self) {
+            //                    completion(.success(user))
+            //                } else {
+            //                    completion(.failure(UserError.none))
+            //                }
+            //            }
         }
     }
     
@@ -481,7 +481,7 @@ final class FirebaseManager {
         
         let postRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
-//            .limit(to: 10)
+        //            .limit(to: 10)
             .limit(to: 10)
         
         postRef.getDocuments { [weak self] snapshot, error in
@@ -762,22 +762,27 @@ final class FirebaseManager {
     }
     
     // MARK: 로그인된 계정 삭제
-    func userDelete() {
+    func userDelete(completion: @escaping (Error?) -> Void) {
         guard let user = Auth.auth().currentUser else { return }
         
-        user.delete() { error in
+        user.delete() { [weak self] error in
+            guard let self else { return }
             if let error = error {
                 print("authentication 유저 삭제 오류: \(error)")
+                completion(error)
+                return
             }
-                print("authentication 성공적으로 계정 삭제")
-        }
-        
-        let userRef = db.collection("users").document(user.uid)
-        userRef.delete() { error in
-            if let error = error {
-                print("firestore 유저 삭제 오류: \(error)")
-            } else {
-                print("firestore 성공적으로 계정 삭제")
+            print("authentication 성공적으로 계정 삭제")
+            
+            let userRef = self.db.collection("users").document(user.uid)
+            userRef.delete() { error in
+                if let error = error {
+                    print("firestore 유저 삭제 오류: \(error)")
+                    completion(error)
+                } else {
+                    completion(nil)
+                    print("firestore 성공적으로 계정 삭제")
+                }
             }
         }
     }
@@ -816,62 +821,12 @@ final class FirebaseManager {
                 return
             }
             print("Post Reference deleted Successfully!")
-        }
-        postRef.getDocument { snapshot, error in
-            if let error = error {
-                print("Error - Getting Post: \(error)")
-                return
-            }
-            guard let snapshot, snapshot.exists else {
-                print("Error - Post snapshot doesn't exists")
-                return
-            }
-            do {
-                let post = try snapshot.data(as: Post.self)
-                if let thumbnail = post.thumbnail {
-                    let thumbRef = self.storage.reference(forURL: thumbnail)
-                    thumbRef.delete { error in
-                        if let error = error {
-                            print("Error - Deleting Thumbnail Image from Storage : \(error)")
-                            return
-                        }
-                        print("Thumbnail Image deleted Successfully")
-                    }
+            postRef.delete { error in
+                if let error = error {
+                    print("Error - Deleting Post: \(error)")
+                    return
                 }
-                post.medias.forEach { mediaRef in
-                    mediaRef.getDocument(as: Media.self) { result in
-                        switch result {
-                        case .success(let media):
-//                            let fileName = media.url
-                            let fileRef = self.storage.reference(forURL: media.url)
-                            fileRef.delete { error in
-                                if let error = error {
-                                    print("Error - Deleting media file in Storage : \(error)")
-                                }
-                                print("Media file Deleted Successfully!")
-                                mediaRef.delete { error in
-                                    if let error = error {
-                                        print("Error - Deleting Media: \(media)")
-                                        return
-                                    }
-                                    print("Media Deleted Successfully")
-                                }
-                                postRef.delete { error in
-                                    if let error = error {
-                                        print("Error - Deleting Post: \(error)")
-                                        return
-                                    }
-                                    print("Post Deleted Successfully!")
-                                }
-                            }
-                        case .failure(let error):
-                            print("Error - Getting Media : \(error)")
-                        }
-                    }
-                }
-                
-            } catch {
-                print("Error - snapshot decoding error")
+                print("Post Deleted Succssfully")
             }
         }
     }

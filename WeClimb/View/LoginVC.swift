@@ -274,5 +274,4 @@ extension LoginVC: ASAuthorizationControllerDelegate {
         // Handle error.
         print("Sign in with Apple errored: \(error)")
     }
-    
 }

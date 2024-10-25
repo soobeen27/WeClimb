@@ -1,75 +1,38 @@
 //
-//  LoginVM.swift
+//  SNSAuth.swift
 //  WeClimb
 //
-//  Created by Soobeen Jang on 9/4/24.
+//  Created by Soobeen Jang on 10/21/24.
 //
 
+import AuthenticationServices
 import Foundation
 
-import FirebaseCore
-import FirebaseAuth
-import FirebaseFirestore
-import GoogleSignIn
 import CryptoKit
-import AuthenticationServices
-import KakaoSDKCommon
+import FirebaseAuth
+import FirebaseCore
+import GoogleSignIn
 import KakaoSDKAuth
+import KakaoSDKCommon
 import KakaoSDKUser
 
-class LoginVM {
-    
-    private let db = Firestore.firestore()
+class SNSAuthVM {
     
     var currentNonce: String?
-    
-    func updateAccount(with data: String, for field: UserUpdate, completion:  @escaping () -> Void) {
+
+    func reAuthenticate(with credential: AuthCredential, completion: @escaping (Error?) -> Void) {
         guard let user = Auth.auth().currentUser else { return }
-        let userRef = db.collection("users").document(user.uid)
         
-        userRef.updateData([field.key : data]) { error in
+        user.reauthenticate(with: credential) { result, error in
             if let error = error {
-                print("업데이트 에러!: \(error.localizedDescription)")
+                completion(error)
                 return
             }
-            completion()
+            print("ReAurhentication Succeed!")
+            completion(nil)
         }
     }
     
-    func logIn(with credential: AuthCredential, loginType: LoginType, completion: @escaping (LoginResult) -> Void) {
-        Auth.auth().signIn(with: credential) { authResult, error in
-            if let error = error {
-                print("로그인 에러!: \(error.localizedDescription)")
-                return
-            }
-            if let user = authResult?.user {
-                let tokenRef = self.db.collection("users").document(user.uid)
-                tokenRef.getDocument { document, error in
-                    if let document = document, document.exists {
-                        if let userData = document.data(), let userName = userData["userName"] as? String {
-                            if userName.isEmpty {
-                                completion(.noName) // 닉네임이 비어 있으면 noName 처리
-                            } else {
-                                completion(.login)
-                            }
-                        } else {
-                            completion(.noName) // 유저가 존재하지만 userName 필드가 없을 경우에도 noName 처리
-                        }
-                    } else {
-                        do {
-                            //                            try tokenRef.setData(from: User(userUID: user.uid, lastModified: Date(), loginType: loginType.string,
-                            //                                                            registrationDate: Date(), userName: nil, userRole: "user", armReach: nil,
-                            //                                                            height: nil, followers: nil, following: nil, profileImage: nil))
-                            try tokenRef.setData(from: User(userName: nil, profileImage: nil, registerationDate: Date(), lastModified: Date(), userRole: "user", armReach: nil, height: nil, posts: nil, comments: nil, followers: nil, following: nil, blackList: nil))
-                            completion(.createAccount)
-                        } catch {
-                            print("setData Error: \(error)")
-                        }
-                    }
-                }
-            }
-        }
-    }
     //MARK: 구글 로그인
     func googleLogin(presenter: UIViewController, completion: @escaping (AuthCredential) -> Void) {
         guard let clientID = FirebaseApp.app()?.options.clientID else { return }
@@ -96,7 +59,6 @@ class LoginVM {
         }
     }
     
-    //MARK: 카카오 로그인
     func kakaoLogin(completion: @escaping (AuthCredential) -> Void) {
         fetchKakaoOpenIDToken() { idToken in
             guard let idToken = idToken else { return }
@@ -118,7 +80,7 @@ class LoginVM {
             UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
                 if let error = error {
                     print(error)
-                } 
+                }
                 else {
                     print("loginWithKakaoTalk() success.")
                     completion(oauthToken?.idToken)
@@ -138,7 +100,6 @@ class LoginVM {
         }
     }
     
-    //MARK: apple 로그인
     func appleLogin(delegate: ASAuthorizationControllerDelegate, provider: ASAuthorizationControllerPresentationContextProviding) {
         let nonce = randomNonceString()
         currentNonce = nonce
