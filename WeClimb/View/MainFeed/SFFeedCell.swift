@@ -66,7 +66,7 @@ class SFFeedCell: UICollectionViewCell {
         imageView.image = nil
         playerLayer?.removeFromSuperlayer()
         player = nil // 플레이어 해제
-         playerLayer = nil // 레이어 해제
+        playerLayer = nil // 레이어 해제
         playButton.isHidden = true
         self.media = media
         if url.pathExtension == "mp4" {
@@ -84,37 +84,26 @@ class SFFeedCell: UICollectionViewCell {
     
     private func loadVideo(from media: Media) {
         guard let videoURL = URL(string: media.url) else { return }
-        let cacheKey = "\(media.mediaUID).mp4" // 예: userUID 또는 postID
-        
-        downloadAndCacheVideo(with: videoURL, cacheKey: cacheKey) { [weak self] cachedURL in
-            guard let cachedURL = cachedURL,
-                  let self
-            else {
-                print("비디오 다운로드 또는 캐싱 실패")
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self.player = AVPlayer(url: cachedURL)
-                self.playerLayer = AVPlayerLayer(player: self.player)
-                self.playerLayer?.frame = self.contentView.bounds
-                self.playerLayer?.videoGravity = .resizeAspect
-                if let playerLayer = self.playerLayer {
-                    self.contentView.layer.addSublayer(playerLayer)
-                }
-                self.setupPlayButton()
-                self.isVideo = true
-                self.playButton.isHidden = false
-                self.contentView.bringSubviewToFront(self.playButton)
-//                self.player?.seek(to: .zero)
-//                self.player?.play()
-//                self.playVideo()
-            }
+        let playerItem = AVPlayerItem(url: videoURL)
+        playerItem.preferredForwardBufferDuration = 0.5
+        player = AVPlayer(playerItem: playerItem)
+        playerLayer = AVPlayerLayer(player: player)
+        playerLayer?.frame = contentView.bounds
+        playerLayer?.videoGravity = .resizeAspect
+        if let playerLayer = playerLayer {
+            contentView.layer.addSublayer(playerLayer)
         }
+        
+        setupPlayButton()
+        self.isVideo = true
+        self.playButton.isHidden = false
+        self.contentView.bringSubviewToFront(self.playButton)
     }
+    
     func setupPlayButton() {
         playButton.addTarget(self, action: #selector(playButtonTapped), for: .touchUpInside)
-     }
+    }
+    
     @objc func playButtonTapped() {
         player?.play()
         playButton.isHidden = true
@@ -124,10 +113,11 @@ class SFFeedCell: UICollectionViewCell {
                                                name: .AVPlayerItemDidPlayToEndTime,
                                                object: player?.currentItem)
     }
+    
     @objc func playerDidFinishPlaying() {
         playButton.isHidden = false
         self.contentView.bringSubviewToFront(self.playButton)
-        player?.seek(to: .zero) // 비디오 끝나면 처음으로 돌려놓기
+        player?.seek(to: .zero)
     }
     
     func stopVideo() {
@@ -137,42 +127,13 @@ class SFFeedCell: UICollectionViewCell {
             player?.pause()
         }
     }
+    
     func playVideo() {
         print("Play")
 
         player?.seek(to: .zero)
         player?.play()
         playButton.isHidden = true
-
     }
-    func downloadAndCacheVideo(with url: URL, cacheKey: String, completion: @escaping (URL?) -> Void) {
-        let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        let fileURL = cacheDirectory.appendingPathComponent(cacheKey)
-        
-        // 이미 캐싱된 파일이 있는지 확인
-        if FileManager.default.fileExists(atPath: fileURL.path) {
-            completion(fileURL)
-            return
-        }
-        
-        // URLSession을 사용하여 비디오 파일 다운로드
-        let task = URLSession.shared.downloadTask(with: url) { localURL, response, error in
-            guard let localURL = localURL, error == nil else {
-                completion(nil)
-                return
-            }
-            
-            do {
-                // 파일을 캐시 디렉토리에 저장
-                try FileManager.default.moveItem(at: localURL, to: fileURL)
-                completion(fileURL)
-            } catch {
-                print("파일 저장 에러: \(error)")
-                completion(nil)
-            }
-        }
-        task.resume()
-    }
-    
 }
 
