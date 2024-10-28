@@ -19,14 +19,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        if let currentUser = Auth.auth().currentUser {
-            print("User already logged in with UID: \(currentUser.uid), navigating to main feed.")
-            window.rootViewController = TabBarController()
+        
+        if Auth.auth().currentUser != nil {
+            FirebaseManager.shared.currentUserInfo { result in
+                switch result {
+                case .success(let user):
+                    if let userName = user.userName, !userName.isEmpty {
+                        window.rootViewController = TabBarController()
+                    } else {
+                        window.rootViewController = UINavigationController(rootViewController: LoginVC())
+                    }
+                case .failure(let error):
+                    print("유저 정보를 가져오는 데 실패했습니다: \(error)")
+                    window.rootViewController = UINavigationController(rootViewController: LoginVC())
+                }
+                window.makeKeyAndVisible()
+                self.window = window
+            }
         } else {
+            // 사용자가 로그인되어 있지 않으면 LoginVC로 이동
             window.rootViewController = UINavigationController(rootViewController: LoginVC())
+            window.makeKeyAndVisible()
+            self.window = window
         }
-        window.makeKeyAndVisible()
-        self.window = window
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
