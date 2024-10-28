@@ -499,7 +499,7 @@ final class FirebaseManager {
                         self.lastFeed = lastDocument
                     }
                     
-                    var posts = documents.compactMap {
+                    let posts = documents.compactMap {
                         do {
                             return try $0.data(as: Post.self)
                         } catch {
@@ -550,7 +550,7 @@ final class FirebaseManager {
                         self.lastFeed = lastDocument
                     }
                     
-                    var posts = documents.compactMap {
+                    let posts = documents.compactMap {
                         do {
                             return try $0.data(as: Post.self)
                         } catch {
