@@ -8,10 +8,11 @@
 import AVKit
 import PhotosUI
 
+import FirebaseAuth
+import FirebaseStorage
 import LightCompressor
 import RxRelay
 import RxSwift
-import FirebaseStorage
 
 class UploadVM {
     let mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
@@ -163,9 +164,7 @@ extension UploadVM {
             }
         }
     }
-}
-
-extension UploadVM {
+    
     // MARK: - 비디오 길이를 체크하는 메서드
     func checkVideoDuration(url: URL) async -> Double {
         print("비디오 URL: \(url)")
@@ -196,7 +195,18 @@ extension UploadVM {
                 
                 // 이미지인 경우
                 if item.url.pathExtension == "jpg" || item.url.pathExtension == "png" {
-                    uploadMedia.append((url: item.url, sector: item.sector, grade: item.grade)) // 압축 X
+                    if let image = UIImage(contentsOfFile: item.url.path) {
+                        // 이미지 압축
+                        if let compressedData = image.jpegData(compressionQuality: 0.7) {
+                            let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
+                            do {
+                                try compressedData.write(to: tempImageURL)
+                                uploadMedia.append((url: tempImageURL, sector: item.sector, grade: item.grade))
+                            } catch {
+                                print("이미지 저장 실패: \(error.localizedDescription)")
+                            }
+                        }
+                    }
                     dispatchGroup.leave()
                 } else {
                     // 비디오인 경우
@@ -267,7 +277,7 @@ extension UploadVM {
     }
     
     func getThumbnailImage(from videoURL: URL, completion: @escaping (String?) -> Void) {
-        print("썸네일 이미지 생성 중")
+         print("썸네일 이미지 생성 중")
         
         let asset = AVAsset(url: videoURL)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
@@ -285,8 +295,14 @@ extension UploadVM {
                 print("썸네일이 성공적으로 생성.")
                 let uiImage = UIImage(cgImage: image)
                 
-                if let thumbnailData = uiImage.jpegData(compressionQuality: 0.6) {
-                    self.uploadThumbnailToFirebase(thumbnailData: thumbnailData) { thumbnailURL in
+                if let thumbnailData = uiImage.jpegData(compressionQuality: 0.5) {
+                    guard let userUUID = Auth.auth().currentUser?.uid else {
+                        print("사용자 UUID를 가져올 수 없습니다.")
+                        completion(nil)
+                        return
+                    }
+                    print("userUUID 확인용: \(userUUID)")
+                    self.uploadThumbnailToFirebase(thumbnailData: thumbnailData, userUUID: userUUID) { thumbnailURL in
                         completion(thumbnailURL)
                     }
                 } else {
@@ -300,9 +316,9 @@ extension UploadVM {
     }
     
     // Firebase에 썸네일 업로드
-    private func uploadThumbnailToFirebase(thumbnailData: Data, completion: @escaping (String?) -> Void) {
-        let storageRef = Storage.storage().reference().child("thumbnails/\(UUID().uuidString).jpg")
-        
+    private func uploadThumbnailToFirebase(thumbnailData: Data, userUUID: String, completion: @escaping (String?) -> Void) {
+        let storageRef = Storage.storage().reference().child("users/\(userUUID)/thumbnails/\(UUID().uuidString).jpg")
+
         storageRef.putData(thumbnailData, metadata: nil) { metadata, error in
             if let error = error {
                 print("썸네일 업로드 실패: \(error.localizedDescription)")
