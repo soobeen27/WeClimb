@@ -7,6 +7,7 @@
 
 import UIKit
 
+import Kingfisher
 import RxCocoa
 import RxSwift
 import SnapKit
@@ -39,11 +40,12 @@ class EditPageVC: UIViewController {
         tableView.register(EditPageCell.self, forCellReuseIdentifier: EditPageCell.className)
         tableView.separatorInset.left = 0
         //        tableView.separatorStyle = .none
-        tableView.rowHeight = 60
+        tableView.rowHeight = 50
         return tableView
     }()
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         setColor()
         setNavigation()
         setLayout()
@@ -79,7 +81,7 @@ class EditPageVC: UIViewController {
         tableView.snp.makeConstraints {
             $0.top.equalTo(profileImage.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(119)
+            $0.height.equalTo(99)
         }
     }
     
@@ -94,8 +96,6 @@ class EditPageVC: UIViewController {
             }
         }
     }
-    
-    
     
     private func bind() {
         editPageViewModel.items
@@ -132,32 +132,21 @@ class EditPageVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
-    
     // MARK: - 파이어베이스에 저장된 유저 정보 업데이트
     private func updateProfileImage() {
         FirebaseManager.shared.currentUserInfo { [weak self] (result: Result<User, Error>) in
             DispatchQueue.main.async {
-                if case .success(let user) = result {
-                    // Firebase Storage에서 이미지 로드
-                    if let profileImageUrl = user.profileImage, let url = URL(string: profileImageUrl) {
-                        URLSession.shared.dataTask(with: url) { data, response, error in
-                            if let error = error {
-                                print("이미지를 로드하는 데 실패했습니다: \(error.localizedDescription)")
-                                return
-                            }
-                            
-                            // 데이터가 유효한지 확인 후, UIImage로 변환
-                            if let data = data, let image = UIImage(data: data) {
-                                DispatchQueue.main.async {
-                                    self?.profileImage.image = image
-                                }
-                            } else {
-                                print("이미지 데이터가 유효하지 않습니다.")
-                            }
-                        }.resume()
-                    } else {
-                        print("프로필 이미지 URL이 없습니다.")
-                    }
+                if case .success(let user) = result,
+                   let profileImageUrl = user.profileImage,
+                   let url = URL(string: profileImageUrl) {
+                    self?.profileImage.kf.setImage(with: url, placeholder: UIImage(named: "testStone"), options: nil, completionHandler: { result in
+                        switch result {
+                        case .success(let value):
+                            print("이미지 로드 성공: \(value.source)")
+                        case .failure(let error):
+                            print("이미지 로드 실패: \(error.localizedDescription)")
+                        }
+                    })
                 } else {
                     print("유저 정보를 가져오는 데 실패했습니다.")
                 }
@@ -179,7 +168,6 @@ class EditPageVC: UIViewController {
                 self.profileImagePicker.presentImagePicker(from: self)
             })
             .disposed(by: disposeBag)
-        
         
         // 이미지 선택 후 ViewModel에 이미지 전달
         profileImagePicker.imageObservable
@@ -208,7 +196,7 @@ class EditPageVC: UIViewController {
     
     // UIImage를 로컬 URL로 변환하는 함수
     func saveImageToLocal(_ image: UIImage) -> URL? {
-        guard let data = image.jpegData(compressionQuality: 0.8) else {
+        guard let data = image.jpegData(compressionQuality: 0.5) else {
             print("이미지 데이터 변환 실패")
             return nil
         }
