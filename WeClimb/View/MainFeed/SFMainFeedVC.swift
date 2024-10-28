@@ -18,7 +18,7 @@ class SFMainFeedVC: UIViewController{
     var isRefresh = false
     var startingIndex: Int = 0
     
-//    var currentPost: Post?
+    //    var currentPost: Post?
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -61,24 +61,24 @@ class SFMainFeedVC: UIViewController{
         self.navigationController?.navigationBar.shadowImage = UIImage()
         self.navigationController?.navigationBar.isTranslucent = true
         
-//        let rightBarButton = UIBarButtonItem(
-//            image: UIImage(systemName: "ellipsis"),
-//            style: .plain,
-//            target: self,
-//            action: #selector(self.rightButtonTapped)
-//        )
+        //        let rightBarButton = UIBarButtonItem(
+        //            image: UIImage(systemName: "ellipsis"),
+        //            style: .plain,
+        //            target: self,
+        //            action: #selector(self.rightButtonTapped)
+        //        )
         navigationController?.navigationBar.tintColor = .white
-//        navigationItem.rightBarButtonItem = rightBarButton
+        //        navigationItem.rightBarButtonItem = rightBarButton
     }
     
-//    @objc private func rightButtonTapped() {
-//        guard let currentPost = currentPost else {
-//            print("현재 보고 있는 게시물이 없습니다.")
-//            return
-//        }
-//        
-//        actionSheet(for: currentPost)
-//    }
+    //    @objc private func rightButtonTapped() {
+    //        guard let currentPost = currentPost else {
+    //            print("현재 보고 있는 게시물이 없습니다.")
+    //            return
+    //        }
+    //
+    //        actionSheet(for: currentPost)
+    //    }
     
     private func setTabBar(){
         if let tabBar = self.tabBarController?.tabBar {
@@ -102,25 +102,58 @@ class SFMainFeedVC: UIViewController{
         collectionView.addSubview(activityIndicator)
     }
     // MARK
+    //    private func bindCollectionView() {
+    //        viewModel.posts
+    //            .bind(to: collectionView.rx
+    //                .items(cellIdentifier: SFCollectionViewCell.className,
+    //                       cellType: SFCollectionViewCell.self)) { index, post, cell in
+    //
+    //                cell.configure(with: post.post, media: post.media)
+    //                cell.commentButton.rx.tap
+    //                    .bind { [weak self] in
+    //                        guard let self else { return }
+    ////                        self.showCommentModal(for: post.post)
+    //                    }
+    //                    .disposed(by: cell.disposeBag)
+    //            }
+    //                       .disposed(by: disposeBag)
+    //
+    //        collectionView.rx.modelSelected((post: Post, media: [Media]).self)
+    //            .subscribe(onNext: { [weak self] post in
+    ////                self?.showCommentModal(for: post.post)
+    //            })
+    //            .disposed(by: disposeBag)
+    //
+    //        collectionView.rx.setDelegate(self)
+    //            .disposed(by: disposeBag)
+    //    }
     private func bindCollectionView() {
         viewModel.posts
-            .bind(to: collectionView.rx
+            .asDriver()
+            .drive(collectionView.rx
                 .items(cellIdentifier: SFCollectionViewCell.className,
                        cellType: SFCollectionViewCell.self)) { index, post, cell in
                 
-                cell.configure(with: post.post, media: post.media)
+                cell.configure(with: post)
                 cell.commentButton.rx.tap
-                    .bind { [weak self] in
+                    .asSignal().emit(onNext: { [weak self] in
                         guard let self else { return }
-//                        self.showCommentModal(for: post.post)
-                    }
+                        self.showCommentModal(for: post)
+                    })
                     .disposed(by: cell.disposeBag)
             }
                        .disposed(by: disposeBag)
+//        
+//        collectionView.rx.modelSelected((post: Post, media: [Media]).self)
+//            .subscribe(onNext: { [weak self] post in
+////                self?.showCommentModal(for: post)
+//            })
+//            .disposed(by: disposeBag)
         
-        collectionView.rx.modelSelected((post: Post, media: [Media]).self)
-            .subscribe(onNext: { [weak self] post in
-//                self?.showCommentModal(for: post.post)
+        collectionView.rx.modelSelected(Post.self)
+            .asDriver()
+            .drive(onNext: { [weak self] post in
+                self?.showCommentModal(for: post)
             })
             .disposed(by: disposeBag)
         
@@ -130,7 +163,8 @@ class SFMainFeedVC: UIViewController{
     
     private func setupCollectionViewScrollEvent() {
         collectionView.rx.contentOffset
-            .subscribe(onNext: { [weak self] contentOffset in
+            .asDriver()
+            .drive(onNext: { [weak self] contentOffset in
                 guard let self else { return }
                 
                 let scrollViewHeight = self.collectionView.frame.size.height
@@ -139,18 +173,18 @@ class SFMainFeedVC: UIViewController{
                 
                 // 스크롤이 마지막 셀에 도달했는지 확인
                 if contentOffset.y >= scrollOffsetThreshold {
-                    if let lastIndexPath = self.collectionView.indexPathsForVisibleItems.sorted().last {
+                    if self.collectionView.indexPathsForVisibleItems.sorted().last != nil {
                         self.viewModel.isLastCell = true
                     } else {
                         self.viewModel.isLastCell = false
                     }
                 }
                 
-                    // 현재 보고 있는 첫 번째 셀의 게시물 정보를 업데이트
-                    if let visibleIndexPath = self.collectionView.indexPathsForVisibleItems.first {
-                        let post = self.viewModel.posts.value[visibleIndexPath.row]
-//                        self.currentPost = post.post // 현재 게시물 정보 저장
-                }
+                // 현재 보고 있는 첫 번째 셀의 게시물 정보를 업데이트
+//                if let visibleIndexPath = self.collectionView.indexPathsForVisibleItems.first {
+//                    let post = self.viewModel.posts.value[visibleIndexPath.row]
+//                    //                        self.currentPost = post.post // 현재 게시물 정보 저장
+//                }
             })
             .disposed(by: disposeBag)
     }
@@ -202,25 +236,24 @@ class SFMainFeedVC: UIViewController{
         presentModal(modalVC: modalVC)
     }
     // MARK: - 신고하기 및 댓글 모달 표시
-//    private func showActionSheet(for post: Post) {
-//        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-//        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
-//            self?.reportModal()
-//        }
-//        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
-//        
-//        [reportAction, cancelAction].forEach {
-//            actionSheet.addAction($0)
-//        }
-//        
-//        self.present(actionSheet, animated: true, completion: nil)
-//    }
+    //    private func showActionSheet(for post: Post) {
+    //        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    //        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
+    //            self?.reportModal()
+    //        }
+    //        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+    //
+    //        [reportAction, cancelAction].forEach {
+    //            actionSheet.addAction($0)
+    //        }
+    //
+    //        self.present(actionSheet, animated: true, completion: nil)
+    //    }
     
-//    private func showCommentModal(for post: Post) {
-//        //        let modalVC = FeedCommentModalVC()
-//        //        presentModal(modalVC: modalVC)
-//        print("기능없음")
-//    }
+    private func showCommentModal(for post: Post) {
+        let modalVC = FeedCommentModalVC()
+        presentModal(modalVC: modalVC)
+    }
     
     func innerCollectionViewPlayers(playOrPause: Bool) {
         // 현재 보이는 셀을 가져옴
