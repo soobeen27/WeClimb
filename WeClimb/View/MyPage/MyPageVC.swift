@@ -324,11 +324,18 @@ class MyPageVC: UIViewController {
         viewModel.userMediaPosts
             .observe(on: MainScheduler.instance)
             .bind(to: collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { index, mediaPost, cell in
-                if let thumbnailURL = mediaPost.thumbnailURL {
-                    print("썸네일 URL: \(thumbnailURL)")
+
+                if let thumbnailURL = mediaPost.thumbnailURL, !thumbnailURL.isEmpty {
+                    print("유저페이지 썸네일 URL: \(thumbnailURL)")
                     cell.configure(with: thumbnailURL)
                 } else {
                     print("썸네일이 없습니다.")
+                    if let firstMediaURL = mediaPost.media.first?.url {
+                        print("첫 번째 이미지 URL: \(firstMediaURL)")
+                        cell.configure(with: firstMediaURL)
+                    } else {
+                        print("미디어가 없습니다.")
+                    }
                 }
             }
             .disposed(by: disposeBag)
