@@ -51,7 +51,7 @@ class FeedReportModalVC: UIViewController {
         tableView.separatorColor = UIColor.systemGray3.withAlphaComponent(0.5)
         tableView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
     }
-    
+     
     //현재 유저 정보를 가져와 닉네임 설정 - DS
     func fetchUserInfo() {
         FirebaseManager.shared.currentUserInfo { [weak self] result in
@@ -94,7 +94,7 @@ extension FeedReportModalVC: UITableViewDelegate, UITableViewDataSource {
         return FeedNameSpace.reportReasons.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell { 
         let cell = UITableViewCell(style: .default, reuseIdentifier: Identifiers.reportTableViewCell)
 //        let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.reportTableViewCell, for:indexPath)
         
@@ -121,6 +121,13 @@ extension FeedReportModalVC: UITableViewDelegate, UITableViewDataSource {
             case .failure(let error):
                 print("신고 전송 중 오류 발생: \(error.localizedDescription)")
             }
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            CommonManager.shared.showAlert(from: self,
+                                           title: "알림",
+                                           message: "신고 완료")
         }
     }
 }
