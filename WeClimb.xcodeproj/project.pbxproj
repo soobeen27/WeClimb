@@ -48,7 +48,7 @@
 		6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */; };
 		6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */; };
 		6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */; };
-		6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */; };
+		6BC91F932C7CC81400B34083 /* DifficultyCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F922C7CC81400B34083 /* DifficultyCollectionViewCell.swift */; };
 		6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */; };
 		6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F972C7EEA3F00B34083 /* GoogleSignIn */; };
 		6BC91F9A2C7EEA5A00B34083 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F992C7EEA5A00B34083 /* GoogleSignInSwift */; };
@@ -158,7 +158,7 @@
 		6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionDetailTableViewCell.swift; sourceTree = "<group>"; };
 		6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDeatilGymVC.swift; sourceTree = "<group>"; };
 		6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDetailGymVM.swift; sourceTree = "<group>"; };
-		6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTableViewCell.swift; sourceTree = "<group>"; };
+		6BC91F922C7CC81400B34083 /* DifficultyCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyCollectionViewCell.swift; sourceTree = "<group>"; };
 		6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVM.swift; sourceTree = "<group>"; };
 		6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6BC91FB22C7F016A00B34083 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
@@ -310,7 +310,7 @@
 				F4892C1B2C7C988A00C5FF16 /* ClimbingGymVC.swift */,
 				6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */,
 				6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */,
-				6BC91F922C7CC81400B34083 /* SectionTableViewCell.swift */,
+				6BC91F922C7CC81400B34083 /* DifficultyCollectionViewCell.swift */,
 				6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */,
 			);
 			path = ClimbingGym;
@@ -635,7 +635,7 @@
 				C4E29C1B2C8874780076BCA6 /* MyPageDetailFeedVC.swift in Sources */,
 				91F71CDF2C88A3C400405778 /* LoginVM.swift in Sources */,
 				6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */,
-				6BC91F932C7CC81400B34083 /* SectionTableViewCell.swift in Sources */,
+				6BC91F932C7CC81400B34083 /* DifficultyCollectionViewCell.swift in Sources */,
 				C47A0AFF2C9038990068173A /* FeedNameSpace.swift in Sources */,
 				F4892C1C2C7C988B00C5FF16 /* ClimbingGymVC.swift in Sources */,
 				91AF25632C8D771A002283BD /* Gym.swift in Sources */,

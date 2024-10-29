@@ -19,22 +19,23 @@ class ClimbingGymVM {
     let isDataLoaded = BehaviorRelay<Bool>(value: false)
     
     let gymData = BehaviorRelay<Gym?>(value: nil)
-    let sectorNames = BehaviorRelay<[String]>(value: [])
-    let items = BehaviorRelay<[Item]>(value: [])
+    let grades = BehaviorRelay<[String]>(value: [])
+    let items = BehaviorRelay<[String]>(value: [])
     let selectedSegment = BehaviorRelay<Int>(value: 0)
     let itemSelected = PublishSubject<IndexPath>()
     
-    var onItemSelected: (([DetailItem]) -> Void)?
+//    var onItemSelected: (([DetailItem]) -> Void)?
     
     init() {
         setupBindings()
     }
     
     private func setupBindings() {
-        Observable.combineLatest(selectedSegment, sectorNames)
-                .map { selectedIndex, sectors in
+        
+        Observable.combineLatest(selectedSegment, grades)
+                .map { selectedIndex, grades in
                     if selectedIndex == 0 {
-                        return sectors.map { Item(name: $0) }
+                        return selectedIndex == 0 ? grades : []
                     } else {
                         return []
                     }
@@ -42,27 +43,26 @@ class ClimbingGymVM {
                 .bind(to: items)
                 .disposed(by: disposeBag)
         
-        itemSelected
-            .withLatestFrom(items) { ($0, $1) }
-            .subscribe(onNext: { [weak self] (indexPath, items) in
+//        itemSelected
+//            .withLatestFrom(items) { ($0, $1) }
+//            .subscribe(onNext: { [weak self] (indexPath, items) in
+//                guard let self else { return }
+//                
+//                let selectedItem = items[indexPath.row]
+//                
+////                // 선택된 Item으로부터 DetailItem 생성 및 전달
+////                let detailItems = self.createDetailItems(from: selectedItem)
+//                
+////                self.onItemSelected?(detailItems)
+//            })
+//            .disposed(by: disposeBag)
+        
+        grades
+            .subscribe(onNext: { [weak self] grades in
                 guard let self else { return }
                 
-                let selectedItem = items[indexPath.row]
-                
-                // 선택된 Item으로부터 DetailItem 생성 및 전달
-                let detailItems = self.createDetailItems(from: selectedItem)
-                
-                self.onItemSelected?(detailItems)
-            })
-            .disposed(by: disposeBag)
-        
-        sectorNames
-            .subscribe(onNext: { [weak self] sectors in
-                guard let self = self else { return }
-                
                 let selectedIndex = self.selectedSegment.value
-                let items = selectedIndex == 0 ? sectors.map { Item(name: $0) } : []
-                self.items.accept(items)
+                self.items.accept(selectedIndex == 0 ? grades : [])
             })
             .disposed(by: disposeBag)
     }
@@ -70,7 +70,7 @@ class ClimbingGymVM {
     func setGymInfo(gymName: String) {
         // 이미 요청된 Gym이면 중복 요청 방지
         guard !requestedGymNames.contains(gymName) else {
-            print("Gym info for \(gymName) is already being fetched.")
+            print("이미 암장 정보를 불러오는 중")
             return
         }
 
@@ -86,20 +86,20 @@ class ClimbingGymVM {
             
             DispatchQueue.main.async {
                 self.gymData.accept(gym)
-                // 섹터 이름을 가져와서 sectorNames에 저장
-                let sectorNames = gym.sector.components(separatedBy: ", ")
-                self.sectorNames.accept(sectorNames)
+                
+                let sectorNames = gym.grade.components(separatedBy: ", ")
+                self.grades.accept(sectorNames)
                 
                 self.isDataLoaded.accept(true)
             }
         }
     }
     
-    // 선택된 Item에서 DetailItem 생성
-    private func createDetailItems(from item: Item) -> [DetailItem] {
-        return [
-            DetailItem(image: UIImage(named: "testImage"), description: "\(item.name) 파랑보라", videoCount: item.itemCount),
-            DetailItem(image: UIImage(named: "testImage"), description: "\(item.name) 파랑보라", videoCount: item.itemCount),
-        ]
-    }
+//    // 선택된 Item에서 DetailItem 생성
+//    private func createDetailItems(from item: Item) -> [DetailItem] {
+//        return [
+//            DetailItem(image: UIImage(named: "testImage"), description: "\(item.name) 파랑보라", videoCount: item.itemCount),
+//            DetailItem(image: UIImage(named: "testImage"), description: "\(item.name) 파랑보라", videoCount: item.itemCount),
+//        ]
+//    }
 }
