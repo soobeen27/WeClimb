@@ -496,6 +496,24 @@ final class FirebaseManager {
             return Disposables.create()
         }
     }
+  
+  func fetchLikeList(uid: String, completion: @escaping ([String]) -> Void) {
+    let postRef = db.collection("posts").document(uid)
+    postRef.getDocument { document, error in
+      if let error = error {
+        print(#file, #function, #line,"\(error)")
+          return
+      }
+      guard let document, document.exists else { return }
+      if let like = document.get("like") as? [String] {
+        completion(like)
+      } else {
+        completion([])
+        print("Error - while Fetching Like List")
+      }
+      
+    }
+  }
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
     func feedFirst(completion: @escaping ([Post]?) -> Void) {

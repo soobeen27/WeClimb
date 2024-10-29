@@ -14,6 +14,7 @@ import RxSwift
 class SFMainFeedVC: UIViewController{
     
     private let disposeBag = DisposeBag()
+    
     var viewModel = MainFeedVM(shouldFetch: true)
     var isRefresh = false
     var startingIndex: Int = 0
@@ -54,6 +55,7 @@ class SFMainFeedVC: UIViewController{
         innerCollectionViewPlayers(playOrPause: false) // 비디오 정지
     }
     
+    
     //MARK: - 네비게이션바, 탭바 세팅
     
     private func setNavigationBar() {
@@ -89,6 +91,7 @@ class SFMainFeedVC: UIViewController{
             //            tabBar.backgroundColor = UIColor(hex: "#0B1013")
         }
     }
+    
     
     //MARK: - 컬렉션뷰 & 레이아웃 설정
     private func setCollectionView() {
@@ -204,6 +207,7 @@ class SFMainFeedVC: UIViewController{
         }
     }
     
+    
     //MARK: - 더보기 액션 시트
     private func actionSheet(for post: Post) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -224,17 +228,21 @@ class SFMainFeedVC: UIViewController{
         self.present(actionSheet, animated: true, completion: nil)
     }
     
+    
     //MARK: - 신고하기 모달 시트
     private func reportModal() {
         let modalVC = FeedReportModalVC()
         presentModal(modalVC: modalVC)
     }
     
+    
     //MARK: - 댓글 모달 시트
     private func commentModal() {
         let modalVC = FeedCommentModalVC()
         presentModal(modalVC: modalVC)
     }
+    
+    
     // MARK: - 신고하기 및 댓글 모달 표시
     //    private func showActionSheet(for post: Post) {
     //        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -275,6 +283,8 @@ class SFMainFeedVC: UIViewController{
             }
         }
     }
+    
+    
     //MARK: - 차단하기 관련 메서드
     private func blockUser(authorUID: String) {
         FirebaseManager.shared.addBlackList(blockedUser: authorUID) { [weak self] success in
@@ -290,6 +300,8 @@ class SFMainFeedVC: UIViewController{
         }
     }
 }
+
+
 //MARK: - 컬렉션뷰 델리게이트 설정
 
 extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {

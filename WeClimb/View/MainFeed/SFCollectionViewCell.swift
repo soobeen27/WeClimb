@@ -11,12 +11,18 @@ import SnapKit
 import RxCocoa
 import RxSwift
 import Kingfisher
+import FirebaseAuth
 
 class SFCollectionViewCell: UICollectionViewCell {
     
+    private let likeViewModel = LikeViewModel()
     var disposeBag = DisposeBag()
     
+//    var postUID = UUID().uuidString
+    let postType: Like = .post
+    
     var medias: [Media] = []
+    var post: Post?
     
     let pauseVide: ((SFFeedCell) -> Void)? = nil
     
@@ -131,6 +137,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     private let likeButtonCounter: UILabel = {
         let label = UILabel()
+        label.text = FeedNameSpace.likeCount
         label.font = .systemFont(ofSize: 13, weight: .medium)
         label.textColor = .white
         label.textAlignment = .center
@@ -181,12 +188,14 @@ class SFCollectionViewCell: UICollectionViewCell {
         return stackView
     }()
     
+    
     // MARK: - 초기화 및 레이아웃 설정
     override init(frame: CGRect) {
         super.init(frame: frame)
-        likeButton.configureHeartButton()
         setupUI()
         setLayout()
+        setLikeButton()
+        getLike()
     }
     
     required init?(coder: NSCoder) {
@@ -199,11 +208,14 @@ class SFCollectionViewCell: UICollectionViewCell {
         feedUserNameLabel.text = nil
         feedProfileAddressLabel.text = nil
         feedCaptionLabel.text = nil
-        likeButtonCounter.text = nil
+//        likeButtonCounter.text = nil
+        likeButtonCounter.text = "0"
         feedUserProfileImage.image = nil
         pageControl.currentPage = 0
         medias = []
+        setLikeButton()
     }
+    
     
     // MARK: - UI 구성
     private func setupUI() {
@@ -249,6 +261,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     func pauseVideo(cell: SFFeedCell) {
         cell.player?.pause() // 비디오 정지
     }
+    
     
     // MARK: - 레이아웃 설정
     private func setLayout() {
@@ -311,6 +324,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    
     // MARK: - configure 메서드
     func configure(with post: Post) {
         FirebaseManager.shared.getUserInfoFrom(uid: post.authorUID) { [weak self] result in
@@ -331,6 +345,7 @@ class SFCollectionViewCell: UICollectionViewCell {
                 print(error)
             }
         }
+        self.post = post
         Task {
             medias = try await FirebaseManager.shared.fetchMedias(for: post)
             if medias.count > 0 {
@@ -347,8 +362,48 @@ class SFCollectionViewCell: UICollectionViewCell {
         feedCaptionLabel.text = post.caption
     }
     
+    func getLike() {
+        guard let postUID = post?.postUID else  { return }
+        FirebaseManager.shared.fetchLikeList(uid: postUID) { [weak self] likeList in
+            guard let self else { return }
+            self.likeViewModel.likeList.accept(likeList)
+            print(likeList)
+        }
+    }
+    
+    //MARK: - 좋아요 버튼 세팅
+    private func setLikeButton() {
+        print("Setting LikeButton")
+        guard let user = Auth.auth().currentUser else { return }
+        likeButton.rx.tap
+            .asSignal().emit(onNext: { [weak self] in
+                guard let self = self else { return }
+                let postUID = self.medias[medias.startIndex].postRef.documentID
+                likeViewModel.likePost(uid: postUID, type: postType)
+            })
+            .disposed(by: disposeBag)
+        
+        likeViewModel.likeList
+            .asDriver()
+            .drive(onNext: { [weak self] likeList in
+                guard let self else { return }
+                likeButtonCounter.text =  "\(likeList.count)"
+                if likeList.contains([user.uid]) {
+                    self.likeButton.isActivated = true
+                }  else {
+                    self.likeButton.isActivated = false
+                }
+                self.likeButton.configureHeartButton()
+                print("isActivated: \(self.likeButton.isActivated)")
+                print("like list: \(likeList)")
+                
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    
     // MARK: - 버튼 그림자 모드
-    func addShadow(to view: UIView) {
+    private func addShadow(to view: UIView) {
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 1, height: 1)
         view.layer.shadowOpacity = 0.5

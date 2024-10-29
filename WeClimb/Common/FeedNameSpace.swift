@@ -39,4 +39,7 @@ enum FeedNameSpace {
         commentTest2,
         commentTest3
     ]
+    
+    static let likeCount = "0"
+    static let commentCount = "0"
 }

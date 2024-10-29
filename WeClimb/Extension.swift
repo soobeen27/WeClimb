@@ -36,6 +36,16 @@ extension UIButton {
         static var isActivated = "isActivated"
     }
     
+//    var isActivated: Bool {
+//        get {
+//            return objc_getAssociatedObject(self, &AssociatedKeys.isActivated) as? Bool ?? false
+//        }
+//        set {
+//            objc_setAssociatedObject(self, &AssociatedKeys.isActivated, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+//            updateImage()
+//        }
+//    }
+//    
     var isActivated: Bool {
         get {
             return objc_getAssociatedObject(self, &AssociatedKeys.isActivated) as? Bool ?? false
