@@ -464,6 +464,38 @@ final class FirebaseManager {
             return Disposables.create()
         }
     }
+
+    func likeCancel(from uid: String, type: Like) -> Observable<[String]> {
+        return Observable<[String]>.create { [weak self] observer in
+            guard let user = Auth.auth().currentUser, let self else {
+                observer.onError(UserError.none)
+                return Disposables.create()
+            }
+            let contentRef = self.db.collection(type.string).document(uid)
+            contentRef.updateData(["like" : FieldValue.arrayRemove([user.uid])]) { error in
+                if let error = error {
+                    print("좋아요 실행중 오류: \(error)")
+                    observer.onError(error)
+                }
+                contentRef.getDocument { document, error in
+                    if let error = error {
+                        print("좋아요 목록 가져오는 중 에러: \(error)")
+                        observer.onError(error)
+                    }
+                    guard let document, document.exists else {
+                        observer.onError(UserError.none)
+                        return
+                    }
+                    guard let likeList = document.get("like") as? [String] else {
+                        print("라이크 없음")
+                        return
+                    }
+                    observer.onNext(likeList)
+                }
+            }
+            return Disposables.create()
+        }
+    }
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
     func feedFirst(completion: @escaping ([Post]?) -> Void) {
