@@ -37,7 +37,7 @@ struct Comment: Codable {
     let commentUID: String
     let authorUID: String
     let content: String
-    let creationDate: Date;
+    let creationDate: Date
     let like: [String]?
     let postRef: DocumentReference
 }

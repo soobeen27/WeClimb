@@ -18,10 +18,14 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LogoImage" translatesAutoresizingMaskIntoConstraints="NO" id="yIJ-rS-MoD">
-                                <rect key="frame" x="135" y="334" width="123" height="120"/>
+                                <rect key="frame" x="135" y="329.66666666666669" width="123" height="120"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="120" id="GgH-Fh-7dE"/>
+                                    <constraint firstAttribute="width" constant="123" id="UHF-Pt-EF3"/>
+                                </constraints>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LogoText" translatesAutoresizingMaskIntoConstraints="NO" id="ePv-cy-wnm">
-                                <rect key="frame" x="113" y="456" width="167" height="62"/>
+                                <rect key="frame" x="113" y="453.66666666666669" width="167" height="62.000000000000057"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="62" id="Rkm-hW-t1Z"/>
                                 </constraints>
@@ -30,11 +34,9 @@
                         <viewLayoutGuide key="safeArea" id="exa-lS-8NF"/>
                         <color key="backgroundColor" name="BackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="yIJ-rS-MoD" firstAttribute="leading" secondItem="exa-lS-8NF" secondAttribute="leading" constant="135" id="618-23-V7Q"/>
-                            <constraint firstItem="ePv-cy-wnm" firstAttribute="top" secondItem="yIJ-rS-MoD" secondAttribute="bottom" constant="2" id="GGG-T3-vfK"/>
+                            <constraint firstItem="ePv-cy-wnm" firstAttribute="centerY" secondItem="yIJ-rS-MoD" secondAttribute="bottom" constant="35" id="GGG-T3-vfK"/>
                             <constraint firstItem="yIJ-rS-MoD" firstAttribute="centerX" secondItem="ePv-cy-wnm" secondAttribute="centerX" id="IPo-m8-h6v"/>
-                            <constraint firstItem="exa-lS-8NF" firstAttribute="bottom" secondItem="ePv-cy-wnm" secondAttribute="bottom" constant="300" id="TMk-uq-Zpw"/>
-                            <constraint firstItem="yIJ-rS-MoD" firstAttribute="top" secondItem="exa-lS-8NF" secondAttribute="top" constant="275" id="nBP-N9-BOv"/>
+                            <constraint firstItem="exa-lS-8NF" firstAttribute="centerY" secondItem="ePv-cy-wnm" secondAttribute="top" constant="-15" id="TMk-uq-Zpw"/>
                             <constraint firstItem="yIJ-rS-MoD" firstAttribute="centerX" secondItem="UFg-eg-5s8" secondAttribute="centerX" id="paM-F5-wR2"/>
                             <constraint firstItem="ePv-cy-wnm" firstAttribute="leading" secondItem="exa-lS-8NF" secondAttribute="leading" constant="113" id="ygd-aT-vUc"/>
                         </constraints>

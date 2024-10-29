@@ -9,11 +9,14 @@ import SafariServices
 import UIKit
 
 import RxSwift
+import AuthenticationServices
+import FirebaseAuth
 
 class SettingVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private let viewModel = SettingVM()
+    private let snsAuthVM = SNSAuthVM()
     
     private var datas: [SettingItem] = [
         //        SettingItem(section: .notifications, titles: [SettingNameSpace.notifications]),
@@ -86,7 +89,6 @@ class SettingVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
-    
     // MARK: - 웹 페이지 열기 YJ
     private func openWeb(urlString: String) {
         guard let url = URL(string: urlString) else { return }
@@ -134,19 +136,68 @@ class SettingVC: UIViewController {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let deleteAction = UIAlertAction(title: SettingNameSpace.accountRemove, style: .destructive) { [weak self] _ in
-            self?.viewModel.deleteUser()
-                .observe(on: MainScheduler.instance)
-                .subscribe(onNext: {
-                    print("회원탈퇴 성공")
-                    self?.navigateToLoginVC() // 로그인 화면으로 전환
-                }, onError: { error in
-                    print("회원탈퇴 실패: \(error.localizedDescription)")
-                })
-                .disposed(by: self?.disposeBag ?? DisposeBag())
+//            self?.viewModel.deleteUser()
+//                .observe(on: MainScheduler.instance)
+//                .subscribe(onNext: {
+//                    print("회원탈퇴 성공")
+//                    self?.navigateToLoginVC() // 로그인 화면으로 전환
+//                }, onError: { error in
+//                    print("회원탈퇴 실패: \(error.localizedDescription)")
+//                })
+//                .disposed(by: self?.disposeBag ?? DisposeBag())
+            guard let self else { return }
+            self.reAuth { result in
+                if result {
+                    FirebaseManager.shared.userDelete { error in
+                        if let error = error {
+                            print("Error - Deleting User: \(error)")
+                            return
+                        }
+                        print("User Deleted Successfully")
+                        self.navigateToLoginVC()
+                    }
+                } else {
+                    CommonManager.shared.showAlert(from: self, title: "회원 탈퇴에 실패하였습니다.", message: "회원 탈퇴를 위해 재로그인 해주세요.")
+                }
+            }
         }
         let closeAction = UIAlertAction(title: "Close", style: .cancel)
         [deleteAction, closeAction].forEach { actionSheet.addAction($0) }
         present(actionSheet, animated: true)
+    }
+    
+    func reAuth(completion: @escaping (Bool) -> Void) {
+        let loginType = viewModel.checkLoginType()
+        switch loginType {
+        case .apple:
+            snsAuthVM.appleLogin(delegate: self, provider: self)
+        case .google:
+            snsAuthVM.googleLogin(presenter: self) { [weak self] credential in
+                guard let self else { return}
+                self.snsAuthVM.reAuthenticate(with: credential) { error in
+                    if let error = error {
+                        print("Error - reAuth Google: \(error)")
+                        completion(false)
+                        return
+                    }
+                    completion(true)
+                }
+            }
+        case .kakao:
+            snsAuthVM.kakaoLogin { [weak self] credential in
+                guard let self else { return }
+                self.snsAuthVM.reAuthenticate(with: credential) { error in
+                    if let error = error {
+                        print("Error - reAuth Kakao: \(error)")
+                        completion(false)
+                    }
+                    completion(true)
+                }
+            }
+        case .none:
+            print("Error - unknown while reAuth")
+            completion(false)
+        }
     }
     
     
@@ -199,5 +250,47 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
     // 헤더 높이
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 40
+    }
+}
+
+// MARK: Apple Login ReAuth
+extension SettingVC: ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
+    }
+}
+
+extension SettingVC: ASAuthorizationControllerDelegate {
+        func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+            if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+                guard let nonce = snsAuthVM.currentNonce else {
+                    fatalError("Invalid state: A login callback was received, but no login request was sent.")
+                }
+                guard let appleIDToken = appleIDCredential.identityToken else {
+                    print("Unable to fetch identity token")
+                    return
+                }
+                guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                    print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
+                    return
+                }
+                // Initialize a Firebase credential, including the user's full name.
+                let credential = OAuthProvider.appleCredential(withIDToken: idTokenString,
+                                                               rawNonce: nonce,
+                                                               fullName: appleIDCredential.fullName)
+                // 파이어베이스 재인증
+                snsAuthVM.reAuthenticate(with: credential, completion: { error in
+                    if let error = error {
+                        print("Error - firebase reAuthenticate while deleting Account : \(error)")
+                        return
+                    }
+                    print("Apple ReAuth Succeed!")
+                })
+            }
+        }
+    
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        // Handle error.
+        print("Sign in with Apple errored: \(error)")
     }
 }
