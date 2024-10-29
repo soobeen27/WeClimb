@@ -12,12 +12,9 @@ import RxSwift
 
 class MainFeedVM {
     private let disposeBag = DisposeBag()
-    
-//    let posts = PublishSubject<[(post: Post, media: [Media])]>() // 포스트 데이터 스트림
-    var posts = BehaviorRelay<[(post: Post, media: [Media])]>(value: [])
-//    var posts: [(post: Post, media: [Media])] = []
+    var posts = BehaviorRelay<[Post]>(value: [])
     var isLastCell = false
-    var shouldFetch: Bool 
+    var shouldFetch: Bool
     
     init(shouldFetch: Bool) {
         self.shouldFetch = shouldFetch
@@ -30,12 +27,7 @@ class MainFeedVM {
     func fetchInitialFeed() {
         FirebaseManager.shared.feedFirst { [weak self] fetchedPosts in
             guard let self, let fetchedPosts = fetchedPosts else { return }
-//            print("******************************\(fetchedPosts)********************************************")
             self.posts.accept(fetchedPosts)
-            self.posts.value.forEach {
-                print($0.post.creationDate)
-            }
-//            self.posts = fetchedPosts
         }
     }
     
@@ -49,9 +41,25 @@ class MainFeedVM {
             }
             
             self.posts.accept(loadedPosts)
-//            fetchedPosts.forEach {
-//                self.posts.append($0)
-//            }
+        }
+    }
+    
+    func fetchMyPosts() {
+        FirebaseManager.shared.currentUserInfo { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let user):
+                guard let posts = user.posts else { return }
+                FirebaseManager.shared.postsFrom(postRefs: posts)
+                    .subscribe(onNext: { data in
+                        self.posts.accept(data)
+                    }, onError: { error in
+                        print("Error - while getting posts: \(error)")
+                    })
+                    .disposed(by: disposeBag)
+            case .failure(let error):
+                print("Error - while getting User Info")
+            }
         }
     }
 }

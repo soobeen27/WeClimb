@@ -88,7 +88,6 @@ class SearchVC: UIViewController {
         searchController.searchBar.text = lastSearchText
         segmentedControl.selectedSegmentIndex = lastSegmentIndex
         searchViewModel.isSelectGym.accept(lastSegmentIndex == 0)
-        
     }
     
     override func viewWillDisappear(_ animated: Bool) {

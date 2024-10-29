@@ -211,7 +211,7 @@ class SFCollectionViewCell: UICollectionViewCell {
 //            .forEach {
 //                self.addSubview($0)
 //        }
-        [collectionView, pageControl, feedProfileStackView, feedCaptionLabel]
+        [collectionView, feedProfileStackView, feedCaptionLabel]
             .forEach {
                 self.addSubview($0)
             }
@@ -249,10 +249,6 @@ class SFCollectionViewCell: UICollectionViewCell {
         collectionView.snp.makeConstraints {
             $0.width.equalToSuperview()
             $0.height.equalTo(collectionView.snp.width).multipliedBy(16.0/9.0)
-        }
-        pageControl.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(collectionView.snp.bottom).offset(-40)
         }
         feedProfileStackView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.76)
@@ -310,7 +306,63 @@ class SFCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - configure 메서드
-    func configure(with post: Post, media: [Media]) {
+//    func configure(with post: Post, media: [Media]) {
+//        FirebaseManager.shared.getUserInfoFrom(uid: post.authorUID) { [weak self] result in
+//            guard let self else { return }
+//            switch result {
+//            case.success(let user):
+//                if let imageUrlString = user.profileImage {
+//                    if let imageUrl = URL(string: imageUrlString) {
+//                        self.feedUserProfileImage.kf.setImage(with: imageUrl)
+//                    }
+//                } else {
+//                    self.feedUserProfileImage.image = UIImage(named: "testStone")
+//                }
+//                DispatchQueue.main.async {
+//                    self.feedUserNameLabel.text = user.userName
+//                }
+//            case .failure(let error):
+//                print(error)
+//            }
+//        }
+//        feedCaptionLabel.text = post.caption
+//        pageControl.numberOfPages = media.count
+//        pageControl.currentPage = 0
+//        medias = media
+//        collectionView.reloadData()
+//        
+//        // media 배열을 순회하며 각 Media 객체의 정보를 사용
+//        //        if let firstMedia = media.first {
+//        //            // 첫 번째 미디어의 URL을 사용하여 이미지 로드
+//        //            if let mediaURL = URL(string: firstMedia.url) {
+//        //                feedImage.kf.setImage(with: mediaURL, placeholder: UIImage(named: "placeholder"))
+//        //            }
+//        //
+//        //            // 섹터 및 등급 정보를 사용할 수 있다면 UI 업데이트
+//        //            if let sector = firstMedia.sector {
+//        //                sectorLabel.text = "\(sector)"
+//        //            }
+//        //
+//        //            if let grade = firstMedia.grade {
+//        //                levelLabel.text = "\(grade)"
+//        //            }
+//        
+//        // profileImage, media를 표시하는 추가 설정 필요
+//        
+//        //            // 일단 임시로 그냥 뷰에 박아놓음 - DS
+//        //            guard let gymName = post.gym else { return }
+//        //
+//        //            // FirebaseManager에서 gym 정보를 받아와서 처리
+//        //            FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
+//        //                guard let self = self, let gym = gym, let profileImageURL = gym.profileImage,
+//        //                      let url = URL(string: profileImageURL) else { return }
+//        //
+//        //                // 프로필 이미지가 있으면 Kingfisher로 로드
+//        //                self.feedUserProfileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"))
+//        //            }
+//        //        }
+//    }
+    func configure(with post: Post) {
         FirebaseManager.shared.getUserInfoFrom(uid: post.authorUID) { [weak self] result in
             guard let self else { return }
             switch result {
@@ -329,42 +381,20 @@ class SFCollectionViewCell: UICollectionViewCell {
                 print(error)
             }
         }
+        Task {
+            medias = try await FirebaseManager.shared.fetchMedias(for: post)
+            if medias.count > 0 {
+                self.addSubview(pageControl)
+                pageControl.snp.makeConstraints {
+                    $0.centerX.equalToSuperview()
+                    $0.bottom.equalTo(collectionView.snp.bottom).offset(-40)
+                }
+                pageControl.numberOfPages = medias.count
+                pageControl.currentPage = 0
+            }
+            collectionView.reloadData()
+        }
         feedCaptionLabel.text = post.caption
-        pageControl.numberOfPages = media.count
-        pageControl.currentPage = 0
-        medias = media
-        collectionView.reloadData()
-        
-        // media 배열을 순회하며 각 Media 객체의 정보를 사용
-        //        if let firstMedia = media.first {
-        //            // 첫 번째 미디어의 URL을 사용하여 이미지 로드
-        //            if let mediaURL = URL(string: firstMedia.url) {
-        //                feedImage.kf.setImage(with: mediaURL, placeholder: UIImage(named: "placeholder"))
-        //            }
-        //
-        //            // 섹터 및 등급 정보를 사용할 수 있다면 UI 업데이트
-        //            if let sector = firstMedia.sector {
-        //                sectorLabel.text = "\(sector)"
-        //            }
-        //
-        //            if let grade = firstMedia.grade {
-        //                levelLabel.text = "\(grade)"
-        //            }
-        
-        // profileImage, media를 표시하는 추가 설정 필요
-        
-        //            // 일단 임시로 그냥 뷰에 박아놓음 - DS
-        //            guard let gymName = post.gym else { return }
-        //
-        //            // FirebaseManager에서 gym 정보를 받아와서 처리
-        //            FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
-        //                guard let self = self, let gym = gym, let profileImageURL = gym.profileImage,
-        //                      let url = URL(string: profileImageURL) else { return }
-        //
-        //                // 프로필 이미지가 있으면 Kingfisher로 로드
-        //                self.feedUserProfileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"))
-        //            }
-        //        }
     }
     
     // MARK: - 버튼 그림자 모드
