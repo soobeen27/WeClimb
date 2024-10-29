@@ -79,7 +79,11 @@ class ClimbingGymVC: UIViewController {
         
         viewModel.items
             .bind(to: difficultyCollectionView.rx.items(cellIdentifier: DifficultyCollectionViewCell.className, cellType: DifficultyCollectionViewCell.self)) { row, item, cell in
-                cell.configure(with: item)
+                let gradeColor = item
+                
+                if let logoImage = UIImage(named: "LogoOrange") {
+                    cell.configure(with: gradeColor, holdImage: logoImage)
+                }
             }
             .disposed(by: disposeBag)
         

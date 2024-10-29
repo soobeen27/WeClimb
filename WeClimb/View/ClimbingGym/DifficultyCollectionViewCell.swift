@@ -11,7 +11,13 @@ import SnapKit
 
 class DifficultyCollectionViewCell: UICollectionViewCell {
  
-    let iconImage = UIImageView()
+    private let holdImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 10
+        return imageView
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -24,18 +30,19 @@ class DifficultyCollectionViewCell: UICollectionViewCell {
     
     private func setLayout() {
         [
-            iconImage
+            holdImageView
         ].forEach { contentView.addSubview($0) }
         
-        iconImage.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(contentView.snp.width)
+        holdImageView.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview().inset(10)
+            $0.leading.trailing.equalToSuperview().inset(10)
         }
     }
     
-    func configure(with grade: String) {
-        contentView.backgroundColor = grade.colorInfo.color.withAlphaComponent(0.6)
+    func configure(with grade: String, holdImage: UIImage) {
+        contentView.backgroundColor = grade.colorInfo.color.withAlphaComponent(0.8)
         contentView.layer.cornerRadius = 16
+        
+        holdImageView.image = holdImage
     }
-    
 }
