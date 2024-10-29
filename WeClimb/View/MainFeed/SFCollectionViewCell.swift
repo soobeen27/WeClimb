@@ -11,16 +11,18 @@ import SnapKit
 import RxCocoa
 import RxSwift
 import Kingfisher
+import FirebaseAuth
 
 class SFCollectionViewCell: UICollectionViewCell {
     
     private let likeViewModel = LikeViewModel()
     var disposeBag = DisposeBag()
     
-    let postUID = UUID().uuidString
+//    var postUID = UUID().uuidString
     let postType: Like = .post
     
     var medias: [Media] = []
+    var post: Post?
     
     let pauseVide: ((SFFeedCell) -> Void)? = nil
     
@@ -128,6 +130,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     private let likeButtonCounter: UILabel = {
         let label = UILabel()
+        label.text = FeedNameSpace.likeCount
         label.font = .systemFont(ofSize: 13, weight: .medium)
         label.textColor = .white
         label.textAlignment = .center
@@ -182,9 +185,10 @@ class SFCollectionViewCell: UICollectionViewCell {
     // MARK: - 초기화 및 레이아웃 설정
     override init(frame: CGRect) {
         super.init(frame: frame)
-        likeButton.configureHeartButton()
         setupUI()
         setLayout()
+        setLikeButton()
+        getLike()
     }
     
     required init?(coder: NSCoder) {
@@ -219,7 +223,7 @@ class SFCollectionViewCell: UICollectionViewCell {
 //            .forEach {
 //                self.addSubview($0)
 //        }
-        [collectionView, feedProfileStackView, feedCaptionLabel]
+        [collectionView, feedProfileStackView, feedCaptionLabel, likeStackView]
             .forEach {
                 self.addSubview($0)
             }
@@ -391,6 +395,7 @@ class SFCollectionViewCell: UICollectionViewCell {
                 print(error)
             }
         }
+        self.post = post
         Task {
             medias = try await FirebaseManager.shared.fetchMedias(for: post)
             if medias.count > 0 {
@@ -407,20 +412,41 @@ class SFCollectionViewCell: UICollectionViewCell {
         feedCaptionLabel.text = post.caption
     }
     
+    func getLike() {
+        guard let postUID = post?.postUID else  { return }
+        FirebaseManager.shared.fetchLikeList(uid: postUID) { [weak self] likeList in
+            guard let self else { return }
+            self.likeViewModel.likeList.accept(likeList)
+            print(likeList)
+        }
+    }
     
     //MARK: - 좋아요 버튼 세팅
     private func setLikeButton() {
+        print("Setting LikeButton")
+        guard let user = Auth.auth().currentUser else { return }
         likeButton.rx.tap
-            .subscribe(onNext: { [weak self] in
+            .asSignal().emit(onNext: { [weak self] in
                 guard let self = self else { return }
+                let postUID = self.medias[medias.startIndex].postRef.documentID
                 likeViewModel.likePost(uid: postUID, type: postType)
             })
             .disposed(by: disposeBag)
         
         likeViewModel.likeList
-            .subscribe(onNext: { [weak self] likeList in
-                guard let self = self else { return }
+            .asDriver()
+            .drive(onNext: { [weak self] likeList in
+                guard let self else { return }
                 likeButtonCounter.text =  "\(likeList.count)"
+                if likeList.contains([user.uid]) {
+                    self.likeButton.isActivated = true
+                }  else {
+                    self.likeButton.isActivated = false
+                }
+                self.likeButton.configureHeartButton()
+                print("isActivated: \(self.likeButton.isActivated)")
+                print("like list: \(likeList)")
+                
             })
             .disposed(by: disposeBag)
     }
