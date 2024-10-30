@@ -464,7 +464,7 @@ final class FirebaseManager {
             return Disposables.create()
         }
     }
-
+    
     func likeCancel(from uid: String, type: Like) -> Observable<[String]> {
         return Observable<[String]>.create { [weak self] observer in
             guard let user = Auth.auth().currentUser, let self else {
@@ -496,24 +496,34 @@ final class FirebaseManager {
             return Disposables.create()
         }
     }
-  
-  func fetchLikeList(uid: String, completion: @escaping ([String]) -> Void) {
-    let postRef = db.collection("posts").document(uid)
-    postRef.getDocument { document, error in
-      if let error = error {
-        print(#file, #function, #line,"\(error)")
-          return
-      }
-      guard let document, document.exists else { return }
-      if let like = document.get("like") as? [String] {
-        completion(like)
-      } else {
-        completion([])
-        print("Error - while Fetching Like List")
-      }
-      
+    func fetchLike(from uid: String, type: Like) -> Observable<[String]> {
+        return Observable<[String]>.create { [weak self] observer in
+            guard let self else { 
+                observer.onError(CommonError.noSelf)
+                return Disposables.create()
+            }
+            let contentRef = self.db.collection(type.string).document(uid)
+            contentRef.getDocument { document, error in
+                if let error = error {
+                    print("좋아요 목록 가져오는 중 에러: \(error)")
+                    observer.onError(error)
+                    return
+                }
+                guard let document, document.exists else {
+                    observer.onError(UserError.none)
+                    return
+                }
+                guard let likeList = document.get("like") as? [String] else {
+                    print("라이크 없음")
+                    return
+                }
+                observer.onNext(likeList)
+                
+            }
+            return Disposables.create()
+        }
     }
-  }
+    
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
     func feedFirst(completion: @escaping ([Post]?) -> Void) {
@@ -615,7 +625,7 @@ final class FirebaseManager {
             }
         }
     }
-
+    
     func fetchMedias(for post: Post) async throws -> [Media] {
         // medias의 DocumentReference들을 한 번에 가져오기 위한 batch 작업
         var mediaRefs: [DocumentReference] = post.medias

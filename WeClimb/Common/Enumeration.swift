@@ -105,3 +105,7 @@ enum UploadStatus {
     case fail
     case success
 }
+
+enum CommonError: Error {
+    case noSelf
+}

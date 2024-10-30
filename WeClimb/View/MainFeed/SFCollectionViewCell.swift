@@ -195,7 +195,6 @@ class SFCollectionViewCell: UICollectionViewCell {
         setupUI()
         setLayout()
         setLikeButton()
-        getLike()
     }
     
     required init?(coder: NSCoder) {
@@ -360,15 +359,19 @@ class SFCollectionViewCell: UICollectionViewCell {
             collectionView.reloadData()
         }
         feedCaptionLabel.text = post.caption
+        fetchLike()
     }
     
-    func getLike() {
+    func fetchLike() {
         guard let postUID = post?.postUID else  { return }
-        FirebaseManager.shared.fetchLikeList(uid: postUID) { [weak self] likeList in
-            guard let self else { return }
-            self.likeViewModel.likeList.accept(likeList)
-            print(likeList)
-        }
+        FirebaseManager.shared.fetchLike(from: postUID, type: .post)
+            .subscribe(onNext: { [weak self] likeList in
+                guard let self else { return }
+                self.likeViewModel.likeList.accept(likeList)
+            }, onError: { error in
+                print("Error - \(#file) \(#function) \(#line) : \(error)")
+            })
+            .disposed(by: disposeBag)
     }
     
     //MARK: - 좋아요 버튼 세팅
@@ -379,7 +382,7 @@ class SFCollectionViewCell: UICollectionViewCell {
             .asSignal().emit(onNext: { [weak self] in
                 guard let self = self else { return }
                 let postUID = self.medias[medias.startIndex].postRef.documentID
-                likeViewModel.likePost(uid: postUID, type: postType)
+                likeViewModel.likePost(myUID: user.uid, postUID: postUID, type: postType)
             })
             .disposed(by: disposeBag)
         
