@@ -13,13 +13,22 @@ import RxSwift
 class MainFeedVM {
     private let disposeBag = DisposeBag()
     var posts = BehaviorRelay<[Post]>(value: [])
-    var isLastCell = false
+//    var isLastCell = false
+    var isLastCell = BehaviorRelay<Bool>(value: false)
     var shouldFetch: Bool
     
     init(shouldFetch: Bool) {
         self.shouldFetch = shouldFetch
         if shouldFetch {
             fetchInitialFeed()
+            isLastCell
+                .subscribe(onNext: { [weak self] shouldLoad in
+                    guard let self else { return }
+                    if shouldLoad {
+                        self.fetchMoreFeed()
+                    }
+            })
+            .disposed(by: disposeBag)
         }
     }
     
@@ -58,7 +67,7 @@ class MainFeedVM {
                     })
                     .disposed(by: disposeBag)
             case .failure(let error):
-                print("Error - while getting User Info")
+                print("Error - while getting User Info: \(error)")
             }
         }
     }

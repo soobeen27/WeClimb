@@ -21,15 +21,28 @@ class SFMainFeedVC: UIViewController{
     
     //    var currentPost: Post?
     
+//    private lazy var collectionView: UICollectionView = {
+//        let layout = UICollectionViewFlowLayout()
+//        layout.scrollDirection = .vertical
+//        layout.minimumLineSpacing = 0  //셀간 여백 조정(효과없음)
+//        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+//        collectionView.backgroundColor = UIColor(hex: "#0B1013")
+//        collectionView.showsVerticalScrollIndicator = false
+//        
+//        return UICollectionView(frame: .zero, collectionViewLayout: layout) //레이아웃을 반환
+//    }()
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 0  //셀간 여백 조정(효과없음)
+        layout.minimumLineSpacing = 0  // 셀 간 여백 조정
+
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = UIColor(hex: "#0B1013")
+        collectionView.showsVerticalScrollIndicator = false
         
-        return UICollectionView(frame: .zero, collectionViewLayout: layout) //레이아웃을 반환
+        return collectionView
     }()
+
     
     private lazy var activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
@@ -177,9 +190,9 @@ class SFMainFeedVC: UIViewController{
                 // 스크롤이 마지막 셀에 도달했는지 확인
                 if contentOffset.y >= scrollOffsetThreshold {
                     if self.collectionView.indexPathsForVisibleItems.sorted().last != nil {
-                        self.viewModel.isLastCell = true
+                        self.viewModel.isLastCell.accept(true)
                     } else {
-                        self.viewModel.isLastCell = false
+                        self.viewModel.isLastCell.accept(false)
                     }
                 }
                 

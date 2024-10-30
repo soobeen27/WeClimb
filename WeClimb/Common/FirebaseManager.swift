@@ -536,11 +536,11 @@ final class FirebaseManager {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
                         .whereField("authorUID", notIn: blackList)
-                        .limit(to: 10)
+                        .limit(to: 5)
                 } else {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
-                        .limit(to: 10)
+                        .limit(to: 5)
                 }
                 postRef.getDocuments { snapshot, error in
                     if let error = error {
@@ -585,12 +585,12 @@ final class FirebaseManager {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
                         .whereField("authorUID", notIn: blackList)
-                        .limit(to: 10)
+                        .limit(to: 5)
                         .start(afterDocument: lastFeed)
                 } else {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
-                        .limit(to: 10)
+                        .limit(to: 5)
                         .start(afterDocument: lastFeed)
                 }
                 postRef.getDocuments { snapshot, error in
