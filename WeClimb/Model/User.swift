@@ -18,8 +18,8 @@ struct User: Codable {
     let height: String?
     let posts: [DocumentReference]?
     let comments: [DocumentReference]?
-    let followers: [DocumentReference]?
-    let following: [DocumentReference]?
+    let followers: [String]?
+    let following: [String]?
     let snsConsent: Bool?
     var blackList: [String]?
 }

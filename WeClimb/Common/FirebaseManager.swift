@@ -651,6 +651,47 @@ final class FirebaseManager {
         return medias
     }
     
+    //MARK: 팔로우 팔로잉
+    func following(targetUID: String) -> Single<[String]>{
+        return Single.create { [weak self] single in
+            guard let self else {
+                single(.failure(CommonError.noSelf))
+                return Disposables.create()
+            }
+            guard let user = Auth.auth().currentUser else {
+                single(.failure(UserError.logout))
+                return Disposables.create()
+            }
+            let batch = self.db.batch()
+            
+            let userRef = self.db.collection("users").document(user.uid)
+            let targetRef = self.db.collection("users").document(targetUID)
+            
+            batch.updateData(["following" : FieldValue.arrayUnion([targetUID])], forDocument: userRef)
+            batch.updateData(["followers" : FieldValue.arrayUnion([user.uid])], forDocument: targetRef)
+            
+            batch.commit { error in
+                if let error = error {
+                    print("Error - following: \(error)")
+                }
+                userRef.getDocument { snapshot, error in
+                    if let error = error {
+                        print("Error - \(#file) \(#function) \(#line)")
+                    }
+                    guard let snapshot, snapshot.exists else {
+                        print("유저 도큐멘트 존재 x")
+                        return
+                    }
+                    guard let document = snapshot.data(),
+                          let followList = document["follow"] as? [String]
+                    else { return }
+                    single(.success(followList))
+                }
+            }
+            return Disposables.create()
+        }
+    }
+    
     
     
     
