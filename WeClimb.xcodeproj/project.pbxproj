@@ -66,6 +66,8 @@
 		6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCF42D92C942C22000EF20B /* UserTableViewCell.swift */; };
 		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
+		917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */; };
+		917DA89E2CD4B0A0006FF6B9 /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 917DA89D2CD4B0A0006FF6B9 /* RxBlocking */; };
 		91995F202CA4A24100BCC004 /* SFFeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */; };
 		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
@@ -116,6 +118,16 @@
 		F4892C422C8038B500C5FF16 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F4892C412C8038B500C5FF16 /* RxSwift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		917DA8982CD4AE13006FF6B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F4892BDB2C7C237700C5FF16 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F4892BE22C7C237700C5FF16;
+			remoteInfo = WeClimb;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		043942922C86BCF000AA0D9D /* FirebaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseModel.swift; sourceTree = "<group>"; };
 		435B7E412C8024AB00EB9816 /* EditPageVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = EditPageVC.swift; sourceTree = "<group>"; tabWidth = 4; };
@@ -165,6 +177,9 @@
 		6BCF42D92C942C22000EF20B /* UserTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTableViewCell.swift; sourceTree = "<group>"; };
 		916D64CF2C848A540064B766 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		916D64D22C848BE00064B766 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
+		917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeClimbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeClimbTests.swift; sourceTree = "<group>"; };
+		917DA89F2CD4B340006FF6B9 /* WeClimb.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = WeClimb.xctestplan; sourceTree = "<group>"; };
 		91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFFeedCell.swift; sourceTree = "<group>"; };
 		91AF25602C8C15FC002283BD /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
 		91AF25622C8D771A002283BD /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
@@ -214,11 +229,19 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		917DA8912CD4AE13006FF6B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F4892BE02C7C237700C5FF16 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				6BC91FA12C7EEACF00B34083 /* KakaoSDKCommon in Frameworks */,
+				917DA89E2CD4B0A0006FF6B9 /* RxBlocking in Frameworks */,
 				6BC91FAE2C7EEB4E00B34083 /* FirebaseFunctions in Frameworks */,
 				43EC6AD72C9171AA004A2E2F /* LightCompressor in Frameworks */,
 				6BC91FAC2C7EEB4E00B34083 /* FirebaseFirestore in Frameworks */,
@@ -314,6 +337,14 @@
 			path = Feed;
 			sourceTree = "<group>";
 		};
+		917DA8952CD4AE13006FF6B9 /* WeClimbTests */ = {
+			isa = PBXGroup;
+			children = (
+				917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */,
+			);
+			path = WeClimbTests;
+			sourceTree = "<group>";
+		};
 		C45DC9D32C80502E00FC4C1D /* MainFeed */ = {
 			isa = PBXGroup;
 			children = (
@@ -346,11 +377,13 @@
 		F4892BDA2C7C237700C5FF16 = {
 			isa = PBXGroup;
 			children = (
+				917DA89F2CD4B340006FF6B9 /* WeClimb.xctestplan */,
 				F4892C212C7C9DC700C5FF16 /* CodingConvention.md */,
 				F4892C072C7C249300C5FF16 /* .gitignore */,
 				F4892C022C7C23D400C5FF16 /* CodeConvention.md */,
 				F4892C002C7C23CE00C5FF16 /* CommitConvention.md */,
 				F4892BE52C7C237700C5FF16 /* WeClimb */,
+				917DA8952CD4AE13006FF6B9 /* WeClimbTests */,
 				F4892BE42C7C237700C5FF16 /* Products */,
 				F4892C402C8038B500C5FF16 /* Frameworks */,
 			);
@@ -360,6 +393,7 @@
 			isa = PBXGroup;
 			children = (
 				F4892BE32C7C237700C5FF16 /* WeClimb.app */,
+				917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -480,6 +514,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		917DA8932CD4AE13006FF6B9 /* WeClimbTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 917DA89C2CD4AE13006FF6B9 /* Build configuration list for PBXNativeTarget "WeClimbTests" */;
+			buildPhases = (
+				917DA8902CD4AE13006FF6B9 /* Sources */,
+				917DA8912CD4AE13006FF6B9 /* Frameworks */,
+				917DA8922CD4AE13006FF6B9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				917DA8992CD4AE13006FF6B9 /* PBXTargetDependency */,
+			);
+			name = WeClimbTests;
+			productName = WeClimbTests;
+			productReference = 917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		F4892BE22C7C237700C5FF16 /* WeClimb */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F4892BF72C7C237900C5FF16 /* Build configuration list for PBXNativeTarget "WeClimb" */;
@@ -511,6 +563,7 @@
 				6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */,
 				F4892C412C8038B500C5FF16 /* RxSwift */,
 				43EC6AD62C9171AA004A2E2F /* LightCompressor */,
+				917DA89D2CD4B0A0006FF6B9 /* RxBlocking */,
 			);
 			productName = WeClimb;
 			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
@@ -526,6 +579,10 @@
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
+					917DA8932CD4AE13006FF6B9 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = F4892BE22C7C237700C5FF16;
+					};
 					F4892BE22C7C237700C5FF16 = {
 						CreatedOnToolsVersion = 15.4;
 					};
@@ -554,11 +611,19 @@
 			projectRoot = "";
 			targets = (
 				F4892BE22C7C237700C5FF16 /* WeClimb */,
+				917DA8932CD4AE13006FF6B9 /* WeClimbTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		917DA8922CD4AE13006FF6B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F4892BE12C7C237700C5FF16 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -576,6 +641,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		917DA8902CD4AE13006FF6B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F4892BDF2C7C237700C5FF16 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -668,6 +741,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		917DA8992CD4AE13006FF6B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F4892BE22C7C237700C5FF16 /* WeClimb */;
+			targetProxy = 917DA8982CD4AE13006FF6B9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		F4892BF12C7C237900C5FF16 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -680,6 +761,50 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		917DA89A2CD4AE13006FF6B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 72GVCX2P2A;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = soobeenJang.WeClimbTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WeClimb.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WeClimb";
+			};
+			name = Debug;
+		};
+		917DA89B2CD4AE13006FF6B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 72GVCX2P2A;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = soobeenJang.WeClimbTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WeClimb.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WeClimb";
+			};
+			name = Release;
+		};
 		F4892BF52C7C237900C5FF16 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 6BC91FB22C7F016A00B34083 /* Config.xcconfig */;
@@ -718,6 +843,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_TESTING_SEARCH_PATHS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -782,6 +908,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTING_SEARCH_PATHS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -886,6 +1013,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		917DA89C2CD4AE13006FF6B9 /* Build configuration list for PBXNativeTarget "WeClimbTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				917DA89A2CD4AE13006FF6B9 /* Debug */,
+				917DA89B2CD4AE13006FF6B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F4892BDE2C7C237700C5FF16 /* Build configuration list for PBXProject "WeClimb" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1030,6 +1166,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		917DA89D2CD4B0A0006FF6B9 /* RxBlocking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4892BFD2C7C23AC00C5FF16 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxBlocking;
 		};
 		F4892BFB2C7C239900C5FF16 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;

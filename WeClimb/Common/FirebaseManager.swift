@@ -651,40 +651,49 @@ final class FirebaseManager {
         return medias
     }
     
-    //MARK: 팔로우 팔로잉
-    func following(targetUID: String) -> Single<[String]>{
+    //MARK: 팔로우, 언팔
+    /// 팔로우, 언팔로우
+    /// - Parameters:
+    ///   - myUID: 로그인되어있는 계정 uid
+    ///   - targetUID: 팔로우, 언팔할 계정 uid
+    /// - Returns: 팔로우, 언팔 후 로그인된 계정이 팔로우하고 있는 배열
+    func follow(myUID: String, targetUID: String) -> Single<[String]>{
         return Single.create { [weak self] single in
             guard let self else {
                 single(.failure(CommonError.noSelf))
                 return Disposables.create()
             }
-            guard let user = Auth.auth().currentUser else {
-                single(.failure(UserError.logout))
-                return Disposables.create()
-            }
-            let batch = self.db.batch()
             
-            let userRef = self.db.collection("users").document(user.uid)
+            let myRef = self.db.collection("users").document(myUID)
             let targetRef = self.db.collection("users").document(targetUID)
             
-            batch.updateData(["following" : FieldValue.arrayUnion([targetUID])], forDocument: userRef)
-            batch.updateData(["followers" : FieldValue.arrayUnion([user.uid])], forDocument: targetRef)
-            
-            batch.commit { error in
-                if let error = error {
-                    print("Error - following: \(error)")
+            self.db.runTransaction { (transaction, errorPointer) -> [String]? in
+                let userSnapshot: DocumentSnapshot
+                do {
+                    userSnapshot = try transaction.getDocument(myRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    single(.failure(fetchError as Error))
+                    return nil
                 }
-                userRef.getDocument { snapshot, error in
-                    if let error = error {
-                        print("Error - \(#file) \(#function) \(#line)")
-                    }
-                    guard let snapshot, snapshot.exists else {
-                        print("유저 도큐멘트 존재 x")
-                        return
-                    }
-                    guard let document = snapshot.data(),
-                          let followList = document["follow"] as? [String]
-                    else { return }
+                var currentFollowList = userSnapshot.data()?["following"] as? [String] ?? []
+                
+                if currentFollowList.contains([targetUID]) {
+                    transaction.updateData(["following": FieldValue.arrayRemove([targetUID])], forDocument: myRef)
+                    transaction.updateData(["followers" : FieldValue.arrayRemove([myUID])], forDocument: targetRef)
+                    currentFollowList.removeAll { $0 == targetUID }
+                } else {
+                    transaction.updateData(["following": FieldValue.arrayUnion([targetUID])], forDocument: myRef)
+                    transaction.updateData(["followers" : FieldValue.arrayUnion([myUID])], forDocument: targetRef)
+                    currentFollowList.append(targetUID)
+                }
+                return currentFollowList
+            } completion: { (object, error) in
+                if let error = error {
+                    print("Error : \(error) ", #file, #function, #line)
+                    single(.failure(error))
+                    return
+                } else if let followList = object as? [String] {
                     single(.success(followList))
                 }
             }

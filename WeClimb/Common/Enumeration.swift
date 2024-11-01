@@ -109,3 +109,7 @@ enum UploadStatus {
 enum CommonError: Error {
     case noSelf
 }
+
+enum GetDocumentError: Error {
+    case noField
+}
