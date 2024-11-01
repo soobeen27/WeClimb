@@ -432,70 +432,51 @@ final class FirebaseManager {
     }
     
     //MARK: 좋아요
-    // uid로 부터
-    func like(from uid: String, type: Like) -> Observable<[String]> {
-        return Observable<[String]>.create { [weak self] observer in
-            guard let user = Auth.auth().currentUser, let self else {
-                observer.onError(UserError.none)
+    /// 좋아요
+    /// - Parameters:
+    ///   - myUID: 로그인된 계정 uid
+    ///   - targetUID: 좋아요 누를 포스트 or 댓글 uid
+    ///   - type: 포스트 or 댓글
+    /// - Returns: 좋아요 누른 uid array
+    func like(myUID: String, targetUID: String, type: Like) -> Single<[String]> {
+        return Single.create(subscribe: { [weak self] single in
+            guard let self else {
+                single(.failure(CommonError.noSelf))
                 return Disposables.create()
             }
-            let contentRef = self.db.collection(type.string).document(uid)
-            contentRef.updateData(["like" : FieldValue.arrayUnion([user.uid])]) { error in
-                if let error = error {
-                    print("좋아요 실행중 오류: \(error)")
-                    observer.onError(error)
+            let targetRef = self.db.collection(type.string).document(targetUID)
+            self.db.runTransaction { transaction, errorPointer in
+                let postSnapshot: DocumentSnapshot
+                do {
+                    postSnapshot = try transaction.getDocument(targetRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    single(.failure(fetchError as Error))
+                    return nil
                 }
-                contentRef.getDocument { document, error in
-                    if let error = error {
-                        print("좋아요 목록 가져오는 중 에러: \(error)")
-                        observer.onError(error)
-                    }
-                    guard let document, document.exists else {
-                        observer.onError(UserError.none)
-                        return
-                    }
-                    guard let likeList = document.get("like") as? [String] else {
-                        print("라이크 없음")
-                        return
-                    }
-                    observer.onNext(likeList)
+                var currentLikeList = postSnapshot.data()?["like"] as? [String] ?? []
+                
+                if currentLikeList.contains([myUID]) {
+                    transaction.updateData(["like" : FieldValue.arrayRemove([myUID])], forDocument: targetRef)
+                    currentLikeList.removeAll { $0 == myUID }
+                } else {
+                    transaction.updateData(["like" : FieldValue.arrayUnion([myUID])], forDocument: targetRef)
+                    currentLikeList.append(myUID)
+                }
+                return currentLikeList
+            } completion: { object, error in
+                if let error = error {
+                    print("Error : \(error) ", #file, #function, #line)
+                    single(.failure(error))
+                    return
+                } else if let likeList = object as? [String] {
+                    single(.success(likeList))
                 }
             }
             return Disposables.create()
-        }
+        })
     }
     
-    func likeCancel(from uid: String, type: Like) -> Observable<[String]> {
-        return Observable<[String]>.create { [weak self] observer in
-            guard let user = Auth.auth().currentUser, let self else {
-                observer.onError(UserError.none)
-                return Disposables.create()
-            }
-            let contentRef = self.db.collection(type.string).document(uid)
-            contentRef.updateData(["like" : FieldValue.arrayRemove([user.uid])]) { error in
-                if let error = error {
-                    print("좋아요 실행중 오류: \(error)")
-                    observer.onError(error)
-                }
-                contentRef.getDocument { document, error in
-                    if let error = error {
-                        print("좋아요 목록 가져오는 중 에러: \(error)")
-                        observer.onError(error)
-                    }
-                    guard let document, document.exists else {
-                        observer.onError(UserError.none)
-                        return
-                    }
-                    guard let likeList = document.get("like") as? [String] else {
-                        print("라이크 없음")
-                        return
-                    }
-                    observer.onNext(likeList)
-                }
-            }
-            return Disposables.create()
-        }
-    }
     func fetchLike(from uid: String, type: Like) -> Observable<[String]> {
         return Observable<[String]>.create { [weak self] observer in
             guard let self else { 
@@ -518,7 +499,6 @@ final class FirebaseManager {
                     return
                 }
                 observer.onNext(likeList)
-                
             }
             return Disposables.create()
         }
@@ -628,7 +608,7 @@ final class FirebaseManager {
     
     func fetchMedias(for post: Post) async throws -> [Media] {
         // medias의 DocumentReference들을 한 번에 가져오기 위한 batch 작업
-        var mediaRefs: [DocumentReference] = post.medias
+        let mediaRefs: [DocumentReference] = post.medias
         var medias: [Media] = []
         
         guard !mediaRefs.isEmpty else {
