@@ -113,3 +113,10 @@ enum CommonError: Error {
 enum GetDocumentError: Error {
     case noField
 }
+
+// MARK: Feed Type
+enum FeedType {
+    case mainFeed
+    case myPage
+    case userPage
+}

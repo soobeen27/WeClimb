@@ -15,22 +15,11 @@ class SFMainFeedVC: UIViewController{
     
     private let disposeBag = DisposeBag()
     
-    var viewModel = MainFeedVM(shouldFetch: true)
+    var viewModel: MainFeedVM
     var isRefresh = false
-    var startingIndex: Int = 0
+    var startingIndex: Int
+    private let feedType: FeedType
     
-    //    var currentPost: Post?
-    
-//    private lazy var collectionView: UICollectionView = {
-//        let layout = UICollectionViewFlowLayout()
-//        layout.scrollDirection = .vertical
-//        layout.minimumLineSpacing = 0  //셀간 여백 조정(효과없음)
-//        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-//        collectionView.backgroundColor = UIColor(hex: "#0B1013")
-//        collectionView.showsVerticalScrollIndicator = false
-//        
-//        return UICollectionView(frame: .zero, collectionViewLayout: layout) //레이아웃을 반환
-//    }()
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -61,6 +50,7 @@ class SFMainFeedVC: UIViewController{
         setupCollectionViewScrollEvent()
         setupCollectionView()
         buttonBind()
+        feedLoading()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -68,32 +58,30 @@ class SFMainFeedVC: UIViewController{
         innerCollectionViewPlayers(playOrPause: false) // 비디오 정지
     }
     
+    init(viewModel: MainFeedVM, startingIndex: Int = 0, feedType: FeedType) {
+        self.viewModel = viewModel
+        self.feedType = feedType
+        self.startingIndex = startingIndex
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func feedLoading() {
+        if feedType == .mainFeed {
+            viewModel.mainFeed()
+        }
+    }
     
     //MARK: - 네비게이션바, 탭바 세팅
-    
     private func setNavigationBar() {
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         self.navigationController?.navigationBar.shadowImage = UIImage()
         self.navigationController?.navigationBar.isTranslucent = true
-        
-        //        let rightBarButton = UIBarButtonItem(
-        //            image: UIImage(systemName: "ellipsis"),
-        //            style: .plain,
-        //            target: self,
-        //            action: #selector(self.rightButtonTapped)
-        //        )
         navigationController?.navigationBar.tintColor = .white
-        //        navigationItem.rightBarButtonItem = rightBarButton
     }
-    
-    //    @objc private func rightButtonTapped() {
-    //        guard let currentPost = currentPost else {
-    //            print("현재 보고 있는 게시물이 없습니다.")
-    //            return
-    //        }
-    //
-    //        actionSheet(for: currentPost)
-    //    }
     
     private func setTabBar(){
         if let tabBar = self.tabBarController?.tabBar {
@@ -104,7 +92,6 @@ class SFMainFeedVC: UIViewController{
             //            tabBar.backgroundColor = UIColor(hex: "#0B1013")
         }
     }
-    
     
     //MARK: - 컬렉션뷰 & 레이아웃 설정
     private func setCollectionView() {
@@ -126,28 +113,15 @@ class SFMainFeedVC: UIViewController{
                        cellType: SFCollectionViewCell.self)) { index, post, cell in
                 
                 cell.configure(with: post)
-                cell.commentButton.rx.tap
-                    .asSignal().emit(onNext: { [weak self] in
-                        guard let self else { return }
-                        self.showCommentModal(for: post)
-                    })
-                    .disposed(by: cell.disposeBag)
+//                cell.commentButton.rx.tap
+//                    .asSignal().emit(onNext: { [weak self] in
+//                        guard let self else { return }
+//                        self.showCommentModal(for: post)
+//                    })
+//                    .disposed(by: cell.disposeBag)
             }
-                       .disposed(by: disposeBag)
-//        
-//        collectionView.rx.modelSelected((post: Post, media: [Media]).self)
-//            .subscribe(onNext: { [weak self] post in
-////                self?.showCommentModal(for: post)
-//            })
-//            .disposed(by: disposeBag)
-        
-//        collectionView.rx.modelSelected(Post.self)
-//            .asDriver()
-//            .drive(onNext: { [weak self] post in
-//                self?.showCommentModal(for: post)
-//            })
-//            .disposed(by: disposeBag)
-        
+            .disposed(by: disposeBag)
+
         collectionView.rx.setDelegate(self)
             .disposed(by: disposeBag)
     }
@@ -170,72 +144,38 @@ class SFMainFeedVC: UIViewController{
                         self.viewModel.isLastCell.accept(false)
                     }
                 }
-                
-                // 현재 보고 있는 첫 번째 셀의 게시물 정보를 업데이트
-//                if let visibleIndexPath = self.collectionView.indexPathsForVisibleItems.first {
-//                    let post = self.viewModel.posts.value[visibleIndexPath.row]
-//                    //                        self.currentPost = post.post // 현재 게시물 정보 저장
-//                }
             })
             .disposed(by: disposeBag)
     }
     
     private func buttonBind() {
-//        let buttonTaps = collectionView.rx
-//            .itemSelected
-//            .flatMapLatest { [weak self] indexPath -> Signal<Post?> in
-//                print("it's called")
-//                guard let self, let cell = self.collectionView.cellForItem(at: indexPath) as? SFCollectionViewCell else {
-//                    return .empty()
-//                }
-//                return cell.reportDeleteButtonTapBind
-//            }
-//            .asSignal(onErrorSignalWith: .empty())
-//        
-//        let input = MainFeedVM.Input(reportDeleteButtonTap: buttonTaps)
-//        let output = viewModel.transform(input: input)
-//        
-//        output.presentReport
-//            .emit(onNext: { [weak self] post in
-//                guard let self, let post else { return }
-//                self.actionSheet(for: post)
-//            })
-//            .disposed(by: disposeBag)
         collectionView.rx
-            .itemSelected
-            .compactMap { [weak self] indexPath -> (Driver<Post?>, Driver<Post?>)? in
-                guard let self, let cell = self.collectionView.cellForItem(at: indexPath) as?
-                        SFCollectionViewCell else {
-                    return nil
-                }
-                return (cell.reportDeleteButtonTap, cell.commentButtonTap)
-            }
-            .subscribe(onNext: { [weak self] (reportButtonTap, commentButtonTap) in
-                guard let self else { return }
+            .willDisplayCell
+            .subscribe(onNext: { [weak self] (cell, indexPath) in
+                guard let self, let sfCell = cell as? SFCollectionViewCell else { return }
                 
-                let input = MainFeedVM.Input(reportDeleteButtonTap: reportButtonTap, commentButtonTap: commentButtonTap)
+                let input = MainFeedVM.Input(
+                    reportDeleteButtonTap: sfCell.reportDeleteButtonTap,
+                    commentButtonTap: sfCell.commentButtonTap
+                )
+                
                 let output = self.viewModel.transform(input: input)
                 
-                output.presentReport.drive(onNext: { post in
-                    guard let post else { return }
+                output.presentReport.drive(onNext: { [weak self] post in
+                    guard let self = self, let post else { return }
                     self.actionSheet(for: post)
                 })
-                .disposed(by: self.disposeBag)
-                
-                output.presentComment.drive(onNext: { post in
-                    guard let post else { return }
+                .disposed(by: sfCell.disposeBag) // 각 셀에 disposeBag을 추가하여 관리
+
+                output.presentComment.drive(onNext: { [weak self] post in
+                    guard let self = self, let post else { return }
                     self.showCommentModal(for: post)
                 })
-                .disposed(by: self.disposeBag)
+                .disposed(by: sfCell.disposeBag) // 각 셀에 disposeBag을 추가하여 관리
             })
             .disposed(by: disposeBag)
     }
-    
-    // 마지막 셀 도달 시 처리할 이벤트 함수
-    func onLastCellReached() {
-        print("마지막 셀에 도달!")
-        viewModel.fetchMoreFeed()
-    }
+
     
     private func setLayout() {
         view.addSubview(collectionView)
@@ -250,29 +190,51 @@ class SFMainFeedVC: UIViewController{
     //MARK: - 더보기 액션 시트
     private func actionSheet(for post: Post) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
-            self?.reportModal()
-        }
-        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
-            guard let self else { return }
-            self.blockUser(authorUID: post.authorUID)
-        }
-        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
-        
-        [reportAction, deleteAction, cancelAction]
-            .forEach {
-                actionSheet.addAction($0)
+        if feedType == .myPage {
+            let deleteAction = UIAlertAction(title: "게시물 삭제하기", style: .destructive) { [weak self] _ in
+                guard let self else { return }
+                self.viewModel.deletePost(uid: post.postUID)
+                    .asDriver(onErrorDriveWith: .empty())
+                    .drive(onNext: { _ in
+                        CommonManager.shared.showAlert(from: self, title: "알림", message: "게시물이 삭제되었습니다.") {
+                            self.navigationController?.popViewController(animated: true)
+                        }
+                    })
+                    .disposed(by: self.disposeBag)
             }
-        
+            let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+            
+            [deleteAction, cancelAction]
+                .forEach {
+                    actionSheet.addAction($0)
+                }
+        } else {
+            let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
+    //            self?.reportModal()
+                let modalVC = FeedReportModalVC()
+                self?.presentModal(modalVC: modalVC)
+            }
+            let blockAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
+                guard let self else { return }
+                self.blockUser(authorUID: post.authorUID)
+            }
+            let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+            
+            [reportAction, blockAction, cancelAction]
+                .forEach {
+                    actionSheet.addAction($0)
+                }
+        }
+
         self.present(actionSheet, animated: true, completion: nil)
     }
-    
+
     
     //MARK: - 신고하기 모달 시트
-    private func reportModal() {
-        let modalVC = FeedReportModalVC()
-        presentModal(modalVC: modalVC)
-    }
+//    private func reportModal() {
+//        let modalVC = FeedReportModalVC()
+//        presentModal(modalVC: modalVC)
+//    }
     
     // MARK: - 신고하기 및 댓글 모달 표시
     private func showCommentModal(for post: Post) {
@@ -332,7 +294,11 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if collectionView.contentOffset.y < -100 {
             activityIndicator.startAnimating()
-            if !isRefresh && viewModel.shouldFetch {
+//            if !isRefresh && viewModel.shouldFetch {
+//                viewModel.fetchInitialFeed()
+//                isRefresh = true
+//            }
+            if feedType == .mainFeed {
                 viewModel.fetchInitialFeed()
                 isRefresh = true
             }
@@ -341,7 +307,9 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         activityIndicator.stopAnimating()
-        isRefresh = false
+        if feedType == .mainFeed {
+            isRefresh = false
+        }
     }
     
 }
@@ -349,8 +317,8 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
 extension SFMainFeedVC {
     func setupCollectionView() {
         collectionView.reloadData()
-        
-        if !viewModel.shouldFetch {
+//        if !viewModel.shouldFetch {
+        if feedType != .mainFeed {
             DispatchQueue.main.async {
                 self.collectionView.isPagingEnabled = false
                 let startingIndexPath = IndexPath(row: self.startingIndex, section: 0)

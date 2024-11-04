@@ -858,27 +858,59 @@ final class FirebaseManager {
     }
     
     // MARK: Post 삭제
-    func deletePost(uid: String) {
-        guard let user = Auth.auth().currentUser else { return }
-        let userRef = db.collection("users").document(user.uid)
-        let postRef = db.collection("posts").document(uid)
-        
-        userRef.updateData(["posts" : FieldValue.arrayRemove([postRef])]) { error in
-            if let error = error {
-                print("Error - Deleting Post Reference: \(error)")
-                return
-            }
-            print("Post Reference deleted Successfully!")
-            postRef.delete { error in
-                if let error = error {
-                    print("Error - Deleting Post: \(error)")
-                    return
-                }
-                print("Post Deleted Succssfully")
+//    func deletePost(uid: String) {
+//        guard let user = Auth.auth().currentUser else { return }
+//        let userRef = db.collection("users").document(user.uid)
+//        let postRef = db.collection("posts").document(uid)
+//        
+//        userRef.updateData(["posts" : FieldValue.arrayRemove([postRef])]) { error in
+//            if let error = error {
+//                print("Error - Deleting Post Reference: \(error)")
+//                return
+//            }
+//            print("Post Reference deleted Successfully!")
+//            postRef.delete { error in
+//                if let error = error {
+//                    print("Error - Deleting Post: \(error)")
+//                    return
+//                }
+//                print("Post Deleted Succssfully")
+//            }
+//        }
+//    }
+
+    func deletePost(uid: String) -> Single<Void> {
+        guard let user = Auth.auth().currentUser else { 
+            return Single.create {
+                $0(.failure(UserError.logout))
+                return Disposables.create()
             }
         }
+        return Single.create { [weak self] single in
+            guard let self else { return Disposables.create() }
+            let userRef = self.db.collection("users").document(user.uid)
+            let postRef = self.db.collection("posts").document(uid)
+            
+            userRef.updateData(["posts" : FieldValue.arrayRemove([postRef])]) { error in
+                if let error = error {
+                    print("Error - Deleting Post Reference: \(error)")
+                    single(.failure(error))
+                    return
+                }
+                print("Post Reference deleted Successfully!")
+                postRef.delete { error in
+                    if let error = error {
+                        print("Error - Deleting Post: \(error)")
+                        single(.failure(error))
+                        return
+                    }
+                    single(.success(()))
+                }
+            }
+            return Disposables.create()
+        }
     }
-    
+
     func fileNameFromUrl(urlString: String) -> String {
         guard let url = URL(string: urlString) else { return "" }
         return url.lastPathComponent

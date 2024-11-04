@@ -59,7 +59,6 @@ class SFCollectionViewCell: UICollectionViewCell {
                 self?.post
             }
             .asDriver(onErrorDriveWith: .empty())
-            
     }
     
     var commentButtonTap: Driver<Post?> {
@@ -232,24 +231,25 @@ class SFCollectionViewCell: UICollectionViewCell {
         likeButtonCounter.text = "0"
         feedUserProfileImage.image = nil
         pageControl.currentPage = 0
+        post = nil
         medias = []
         setLikeButton()
     }
 
-    private func showActionSheet(for post: Post) {
-        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
-//            self?.reportModal()
-        }
-        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
-        
-        [reportAction, cancelAction].forEach {
-            actionSheet.addAction($0)
-        }
+//    private func showActionSheet(for post: Post) {
+//        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
+////            self?.reportModal()
+//        }
+//        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+//        
+//        [reportAction, cancelAction].forEach {
+//            actionSheet.addAction($0)
+//        }
         
 //        self.present(actionSheet, animated: true, completion: nil)
         
-    }
+//    }
     // MARK: - UI 구성
     private func setupUI() {
         [

@@ -434,15 +434,16 @@ class UserPageVC: UIViewController {
                 let selectedIndex = indexPath.row
                 let allPosts = self.viewModel.posts.value
 
-                let mainFeedVM = MainFeedVM(shouldFetch: false)
+//                let mainFeedVM = MainFeedVM(shouldFetch: false)
+                let mainFeedVM = MainFeedVM()
 
                 mainFeedVM.posts.accept(allPosts)
 
-                let mainFeedVC = SFMainFeedVC()
-                mainFeedVC.viewModel = mainFeedVM
+                let mainFeedVC = SFMainFeedVC(viewModel: mainFeedVM, startingIndex: selectedIndex, feedType: .userPage)
+//                mainFeedVC.viewModel = mainFeedVM
 
-                mainFeedVC.startingIndex = selectedIndex
-                print("전달할 인데스: \(mainFeedVC.startingIndex)")
+//                mainFeedVC.startingIndex = selectedIndex
+//                print("전달할 인데스: \(mainFeedVC.startingIndex)")
 
                 self.navigationController?.pushViewController(mainFeedVC, animated: true)
             })
