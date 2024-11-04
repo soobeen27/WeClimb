@@ -191,7 +191,7 @@ class SFMainFeedVC: UIViewController{
     private func actionSheet(for post: Post) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         if feedType == .myPage {
-            let deleteAction = UIAlertAction(title: "게시물 삭제하기", style: .destructive) { [weak self] _ in
+            let deleteAction = UIAlertAction(title: "삭제 하기", style: .destructive) { [weak self] _ in
                 guard let self else { return }
                 self.viewModel.deletePost(uid: post.postUID)
                     .asDriver(onErrorDriveWith: .empty())
