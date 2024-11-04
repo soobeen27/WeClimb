@@ -11,6 +11,16 @@ import RxCocoa
 import RxSwift
 
 class MainFeedVM {
+    struct Input {
+        let reportDeleteButtonTap: Driver<Post?>
+        let commentButtonTap: Driver<Post?>
+    }
+    
+    struct Output {
+        let presentReport: Driver<Post?>
+        let presentComment: Driver<Post?>
+    }
+    
     private let disposeBag = DisposeBag()
     var posts = BehaviorRelay<[Post]>(value: [])
 //    var isLastCell = false
@@ -30,6 +40,10 @@ class MainFeedVM {
             })
             .disposed(by: disposeBag)
         }
+    }
+    
+    func transform(input: Input) -> Output {
+        return Output(presentReport: input.reportDeleteButtonTap, presentComment: input.commentButtonTap)
     }
     
     // 피드 데이터 초기 로드

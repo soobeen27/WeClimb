@@ -52,6 +52,26 @@ class SFCollectionViewCell: UICollectionViewCell {
         return button
     }()
     
+    var reportDeleteButtonTap: Driver<Post?> {
+        print("rdbutton clicked")
+        return reportDeleteButton.rx.tap
+            .map { [weak self] in
+                self?.post
+            }
+            .asDriver(onErrorDriveWith: .empty())
+            
+    }
+    
+    var commentButtonTap: Driver<Post?> {
+        print("comment button tapped")
+        return commentButton.rx.tap
+            .map { [weak self] in
+                self?.post
+            }
+            .asDriver(onErrorDriveWith: .empty())
+    }
+    
+    
     private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
         //        pageControl.numberOfPages = images.count
@@ -215,15 +235,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         medias = []
         setLikeButton()
     }
-    
-    func bindReportDeleteButton() {
-        reportDeleteButton.rx.tap
-            .asSignal()
-            .emit(onNext: {
-                
-            })
-            .disposed(by: disposeBag)
-    }
+
     private func showActionSheet(for post: Post) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
