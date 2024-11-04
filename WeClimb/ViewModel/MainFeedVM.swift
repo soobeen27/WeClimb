@@ -24,22 +24,6 @@ class MainFeedVM {
     private let disposeBag = DisposeBag()
     var posts = BehaviorRelay<[Post]>(value: [])
     var isLastCell = BehaviorRelay<Bool>(value: false)
-//    var shouldFetch: Bool
-//    
-//    init(shouldFetch: Bool) {
-//        self.shouldFetch = shouldFetch
-//        if shouldFetch {
-//            fetchInitialFeed()
-//            isLastCell
-//                .subscribe(onNext: { [weak self] shouldLoad in
-//                    guard let self else { return }
-//                    if shouldLoad {
-//                        self.fetchMoreFeed()
-//                    }
-//            })
-//            .disposed(by: disposeBag)
-//        }
-//    }
     
     func transform(input: Input) -> Output {
         return Output(presentReport: input.reportDeleteButtonTap, 

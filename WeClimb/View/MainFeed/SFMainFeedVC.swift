@@ -7,6 +7,7 @@
 
 import UIKit
 
+import FirebaseAuth
 import SnapKit
 import RxCocoa
 import RxSwift
@@ -189,44 +190,66 @@ class SFMainFeedVC: UIViewController{
     
     //MARK: - 더보기 액션 시트
     private func actionSheet(for post: Post) {
-        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        if feedType == .myPage {
-            let deleteAction = UIAlertAction(title: "삭제하기", style: .destructive) { [weak self] _ in
-                guard let self else { return }
-                self.viewModel.deletePost(uid: post.postUID)
-                    .asDriver(onErrorDriveWith: .empty())
-                    .drive(onNext: { _ in
-                        CommonManager.shared.showAlert(from: self, title: "알림", message: "게시물이 삭제되었습니다.") {
-                            self.navigationController?.popViewController(animated: true)
-                        }
-                    })
-                    .disposed(by: self.disposeBag)
+        var actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        guard let user = Auth.auth().currentUser else { return }
+        
+        switch feedType {
+        case .mainFeed:
+            if post.authorUID == user.uid {
+                actionSheet = deleteActionSheet(post: post)
+            } else {
+                actionSheet = reportBlockActionSheet(post: post)
             }
-            let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
-            
-            [deleteAction, cancelAction]
-                .forEach {
-                    actionSheet.addAction($0)
-                }
-        } else {
-            let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
-    //            self?.reportModal()
-                let modalVC = FeedReportModalVC()
-                self?.presentModal(modalVC: modalVC)
-            }
-            let blockAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
-                guard let self else { return }
-                self.blockUser(authorUID: post.authorUID)
-            }
-            let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
-            
-            [reportAction, blockAction, cancelAction]
-                .forEach {
-                    actionSheet.addAction($0)
-                }
+        case .myPage:
+            actionSheet = deleteActionSheet(post: post)
+        case .userPage:
+            actionSheet = reportBlockActionSheet(post: post)
         }
-
+        
         self.present(actionSheet, animated: true, completion: nil)
+    }
+    
+    private func deleteActionSheet(post: Post) -> UIAlertController {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let deleteAction = UIAlertAction(title: "삭제하기", style: .destructive) { [weak self] _ in
+            guard let self else { return }
+            self.viewModel.deletePost(uid: post.postUID)
+                .asDriver(onErrorDriveWith: .empty())
+                .drive(onNext: { _ in
+                    CommonManager.shared.showAlert(from: self, title: "알림", message: "게시물이 삭제되었습니다.") {
+                        self.navigationController?.popViewController(animated: true)
+                    }
+                })
+                .disposed(by: self.disposeBag)
+        }
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+        
+        [deleteAction, cancelAction]
+            .forEach {
+                actionSheet.addAction($0)
+            }
+        return actionSheet
+    }
+    
+    private func reportBlockActionSheet(post: Post) -> UIAlertController {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
+//            self?.reportModal()
+            let modalVC = FeedReportModalVC()
+            self?.presentModal(modalVC: modalVC)
+        }
+        let blockAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
+            guard let self else { return }
+            self.blockUser(authorUID: post.authorUID)
+        }
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+        
+        [reportAction, blockAction, cancelAction]
+            .forEach {
+                actionSheet.addAction($0)
+            }
+        return actionSheet
     }
 
     
