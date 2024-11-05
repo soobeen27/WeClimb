@@ -9,8 +9,21 @@ import UIKit
 
 import SnapKit
 import Kingfisher
+import RxSwift
+import RxCocoa
+import FirebaseAuth
+import FirebaseFirestore
 
 class CommentCell: UITableViewCell {
+    
+    private let db = Firestore.firestore()
+    let post: Post
+    
+    private let likeVM = LikeViewModel()
+    private var commentVM: CommentVM?
+    var disposeBag = DisposeBag()
+    
+    let postType: Like = .comment
     
     private let commentProfileImage: UIImageView = {
         let image = UIImageView()
@@ -112,6 +125,8 @@ class CommentCell: UITableViewCell {
     
     //MARK: - configure
     func configure(userImageString: String, userName: String, userComment: String, likeCounter: Int) {
+        self.commentVM = CommentVM(post: post)
+        
         if userImageString == "" {
             commentProfileImage.image = UIImage(named: "testStone")
         } else {
@@ -122,5 +137,26 @@ class CommentCell: UITableViewCell {
         commentUser.text = userName
         commentLabel.text = userComment
         likeButtonCounter.text = String(likeCounter)
+    }
+    
+    
+    //MARK: - 좋아요 버튼 세팅
+    private func setLikeButton() {
+        print("Setting LikeButton")
+        guard let user = Auth.auth().currentUser else { return }
+        
+        likeButton.rx.tap
+            .asSignal().emit(onNext: { [weak self] in
+                guard let self = self else { return }
+                let postUid = self.post.postUID
+                let commentUID = UUID().uuidString
+                let commentRef = db.collection("posts")
+                    .document(postUid)
+                    .collection("comments")
+                    .document(commentUID)
+                
+                likeVM.likeComment(myUID: user.uid, CommentUID: commentRef, type: postType)
+            })
+            .disposed(by: disposeBag)
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 import FirebaseCore
 import FirebaseFirestore
 import RxSwift
@@ -25,7 +26,7 @@ class CommentVM {
     }
     
     // MARK: 댓글달기
-    func addComment(userUID: String,fromPostUid postUid: String, content: String) {
+    func addComment(userUID: String, fromPostUid postUid: String, content: String) {
         let commentUID = UUID().uuidString
         let postRef = db.collection("posts").document(postUid)
         let userRef = self.db.collection("users").document(userUID)
@@ -47,31 +48,31 @@ class CommentVM {
     }
     
     // MARK: 특정 포스트의 댓글 가져오기
-//    func fetchComments(postUID: String, postOwner: String, completion: @escaping ([Comment]?) -> Void) {
-//        let postRef = db.collection("users").document(postOwner).collection("posts").document(postUID).collection("comments")
-//        
-//        postRef.getDocuments { snapshot, error in
-//            if let error = error {
-//                print("댓글 가져오기 오류: \(error)")
-//                completion(nil)
-//                return
-//            }
-//            guard let documents = snapshot?.documents else {
-//                completion(nil)
-//                return
-//            }
-//            let comments: [Comment] = documents.compactMap { document in
-//                do {
-//                    return try document.data(as: Comment.self)
-//                } catch {
-//                    return nil
-//                }
-//            }
-//            let sortedComments = comments.sorted { $0.creationDate > $1.creationDate }
-//            
-//            completion(sortedComments)
-//        }
-//    }
+    //    func fetchComments(postUID: String, postOwner: String, completion: @escaping ([Comment]?) -> Void) {
+    //        let postRef = db.collection("users").document(postOwner).collection("posts").document(postUID).collection("comments")
+    //
+    //        postRef.getDocuments { snapshot, error in
+    //            if let error = error {
+    //                print("댓글 가져오기 오류: \(error)")
+    //                completion(nil)
+    //                return
+    //            }
+    //            guard let documents = snapshot?.documents else {
+    //                completion(nil)
+    //                return
+    //            }
+    //            let comments: [Comment] = documents.compactMap { document in
+    //                do {
+    //                    return try document.data(as: Comment.self)
+    //                } catch {
+    //                    return nil
+    //                }
+    //            }
+    //            let sortedComments = comments.sorted { $0.creationDate > $1.creationDate }
+    //
+    //            completion(sortedComments)
+    //        }
+    //    }
     func bindComments() {
         fetchComments(postUID: post.postUID, postOwner: post.authorUID)
             .subscribe(onSuccess: { [weak self] comments in
@@ -87,11 +88,11 @@ class CommentVM {
     func fetchComments(postUID: String, postOwner: String) -> Single<[Comment]> {
         return Single.create { [weak self] single in
             guard let self else { return Disposables.create() }
-//            let postRef = self.db.collection("posts")
-//                .document(postUID)
-//                .collection("posts")
-//                .document(postUID)
-//                .collection("comments")
+            //            let postRef = self.db.collection("posts")
+            //                .document(postUID)
+            //                .collection("posts")
+            //                .document(postUID)
+            //                .collection("comments")
             let commentsRef = self.db.collection("posts")
                 .document(postUID)
                 .collection("comments")

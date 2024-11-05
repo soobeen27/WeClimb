@@ -419,7 +419,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         FirebaseManager.shared.fetchLike(from: postUID, type: .post)
             .subscribe(onNext: { [weak self] likeList in
                 guard let self else { return }
-                self.likeViewModel.likeList.accept(likeList)
+                self.likeViewModel.postLikeList.accept(likeList)
             }, onError: { error in
                 print("Error - \(#file) \(#function) \(#line) : \(error)")
             })
@@ -438,7 +438,7 @@ class SFCollectionViewCell: UICollectionViewCell {
             })
             .disposed(by: disposeBag)
         
-        likeViewModel.likeList
+        likeViewModel.postLikeList
             .asDriver()
             .drive(onNext: { [weak self] likeList in
                 guard let self else { return }
