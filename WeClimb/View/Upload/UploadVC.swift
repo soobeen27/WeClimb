@@ -16,7 +16,9 @@ import SnapKit
 class UploadVC: UIViewController {
     
     private lazy var viewModel: UploadVM = {
-        return UploadVM()
+        let viewModel = UploadVM()
+        viewModel.viewController = self
+        return viewModel
     }()
     
     private let disposeBag = DisposeBag()
@@ -100,13 +102,46 @@ class UploadVC: UIViewController {
         return textView
     }()
     
-    private let postButton: UIButton = {
+    private lazy var postButton: UIButton = {
         let button = UIButton()
         button.setTitle(UploadNameSpace.post, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
         button.backgroundColor = .mainPurple // 앱 틴트 컬러
         button.layer.cornerRadius = 10
+        button.clipsToBounds = true
+        
+        button.addSubview(basicpProgressBar)
+        button.addSubview(progressLoading)
+        button.addSubview(progressBar)
         return button
+    }()
+
+    let basicpProgressBar: UIProgressView = {
+        let progressBar = UIProgressView(progressViewStyle: .default)
+        progressBar.tintColor = .mainPurple
+        progressBar.trackTintColor = .clear
+        progressBar.isHidden = true
+        progressBar.layer.zPosition = 2
+        progressBar.alpha = 1.0
+        return progressBar
+    }()
+    
+    let progressBar: UIProgressView = {
+        let progressBar = UIProgressView(progressViewStyle: .default)
+        progressBar.tintColor = UIColor.mainPurple
+        progressBar.trackTintColor = .clear
+        progressBar.isHidden = true
+        progressBar.layer.zPosition = 1
+        progressBar.alpha = 1.0
+        return progressBar
+    }()
+
+    private lazy var progressLoading: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.hidesWhenStopped = true
+        indicator.layer.zPosition = 3
+        indicator.color = .white
+        return indicator
     }()
     
     private lazy var loadingIndicator: UIActivityIndicatorView = {
@@ -423,6 +458,26 @@ class UploadVC: UIViewController {
                 view.addSubview($0)
             }
         
+        basicpProgressBar.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(-12)
+            $0.width.equalToSuperview().multipliedBy(0.6)
+            $0.top.equalToSuperview()
+            $0.height.equalToSuperview()
+        }
+        
+        progressBar.snp.makeConstraints {
+            $0.leading.equalToSuperview()
+            $0.trailing.equalToSuperview().offset(12)
+            $0.top.equalToSuperview()
+            $0.height.equalToSuperview()
+        }
+        
+        progressLoading.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.height.equalToSuperview().inset(3)
+        }
+        
         scrollView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.left.right.equalToSuperview()
@@ -533,6 +588,19 @@ extension UploadVC : PHPickerViewControllerDelegate {
 extension UploadVC {
     private func bindPostButton() {
         postButton.rx.tap
+            .do(onNext: { [weak self] in
+                guard let self = self else { return }
+                
+                self.postButton.backgroundColor = UIColor.systemGray6
+                self.postButton.setTitle("", for: .normal)
+                
+                self.basicpProgressBar.isHidden = false
+                self.basicpProgressBar.alpha = 1.0
+                self.progressBar.isHidden = false
+                self.progressBar.alpha = 1.0
+                self.progressLoading.isHidden = false
+                self.progressLoading.startAnimating()
+            })
             .subscribe(onNext: { [weak self] in
                 guard let self = self else { return }
                 
@@ -582,6 +650,12 @@ extension UploadVC {
                 
                 let gym = self.gymView.selectedLabel.text ?? ""
                 
+                DispatchQueue.main.async {
+                    UIView.animate(withDuration: 15) {
+                        self.basicpProgressBar.setProgress(1.0, animated: true)
+                    }
+                }
+                
                 if let videoURL = firstFeedItem.videoURL {
                     // 비디오 URL로 썸네일 생성
                     self.viewModel.getThumbnailImage(from: videoURL) { thumbnailURL in
@@ -602,26 +676,23 @@ extension UploadVC {
             CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
         case .success:
             isUploading = true
-            DispatchQueue.main.async {
-                CommonManager.shared.showToast(message: "업로드 중입니다.",
-                                               font: UIFont.systemFont(ofSize: 13),
-                                               position: CGPoint(x: UIScreen.main.bounds.width / 2 - 75,
-                                                                 y: UIScreen.main.bounds.height / 2 - 17.5))
-            }
             
-            self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailURL)
-                .subscribe(onNext: {
-                    DispatchQueue.main.async {
-                        print("업로드 성공")
-                        CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
-                        self.initUploadVC()
+            DispatchQueue.global().async {
+                self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailURL)
+                    .subscribe(onNext: {
+                        DispatchQueue.main.async {
+                            print("업로드 성공")
+                            CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
+                            self.initUploadVC()
+                            self.isUploading = false
+                            self.progressLoading.stopAnimating()
+                        }
+                    }, onError: { error in
+                        print("업로드 실패: \(error.localizedDescription)")
                         self.isUploading = false
-                    }
-                }, onError: { error in
-                    print("업로드 실패: \(error.localizedDescription)")
-                    self.isUploading = false
-                })
-                .disposed(by: disposeBag)
+                    })
+                    .disposed(by: self.disposeBag)
+            }
         }
     }
     
