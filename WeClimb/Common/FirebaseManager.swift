@@ -33,6 +33,13 @@ final class FirebaseManager {
     static let shared = FirebaseManager()
     private init() {}
     
+    //MARK: 현재 유저 uid
+    func currentUserUID() -> String {
+        guard let user = Auth.auth().currentUser else {
+            return ""
+        }
+        return user.uid
+    }
     // MARK: 유저 정보 업데이트
     func updateAccount(with data: String, for field: UserUpdate, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser else { return }

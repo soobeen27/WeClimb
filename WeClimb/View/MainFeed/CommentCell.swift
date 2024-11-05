@@ -8,8 +8,9 @@
 import UIKit
 
 import SnapKit
+import Kingfisher
 
-class FeedCommentCell: UITableViewCell {
+class CommentCell: UITableViewCell {
     
     private let commentProfileImage: UIImageView = {
         let image = UIImageView()
@@ -110,10 +111,16 @@ class FeedCommentCell: UITableViewCell {
     
     
     //MARK: - configure
-    func configure(userImage: UIImage, userName: String, userComment: String, likeCounter: String) {
-        commentProfileImage.image = userImage
+    func configure(userImageString: String, userName: String, userComment: String, likeCounter: Int) {
+        if userImageString == "" {
+            commentProfileImage.image = UIImage(named: "testStone")
+        } else {
+            let imageURL = URL(string: userImageString)
+            commentProfileImage.kf.setImage(with: imageURL)
+        }
+        
         commentUser.text = userName
         commentLabel.text = userComment
-        likeButtonCounter.text = likeCounter
+        likeButtonCounter.text = String(likeCounter)
     }
 }

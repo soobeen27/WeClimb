@@ -261,7 +261,7 @@ class SFMainFeedVC: UIViewController{
     
     // MARK: - 신고하기 및 댓글 모달 표시
     private func showCommentModal(for post: Post) {
-        let modalVC = FeedCommentModalVC()
+        let modalVC = CommentModalVC(viewModel: CommentVM(post: post))
         presentModal(modalVC: modalVC)
     }
     
