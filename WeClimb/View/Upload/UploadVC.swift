@@ -15,6 +15,8 @@ import SnapKit
 
 class UploadVC: UIViewController {
     
+    var gymInfo: Gym?
+    
     private lazy var viewModel: UploadVM = {
         let viewModel = UploadVM()
         viewModel.viewController = self
@@ -31,13 +33,13 @@ class UploadVC: UIViewController {
         return scroll
     }()
     
-    let gymView = UploadOptionView(symbolImage: UIImage(systemName: "figure.climbing") ?? UIImage(), optionText: UploadNameSpace.selectGym, showSelectedLabel: true)
+    let gymView = UploadOptionView(symbolImage: UIImage(systemName: "figure.climbing") ?? UIImage(), optionText: UploadNameSpace.gym, showSelectedLabel: true)
     private let sectorView = UploadOptionView(symbolImage: UIImage(systemName: "flag") ?? UIImage(), optionText: UploadNameSpace.selectSector, showSelectedLabel: false)
     
     private lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [selectedMediaView, callPHPickerButton, gradeButton, textView, gymView, sectorView, loadingIndicator]
+        [selectedMediaView, callPHPickerButton, gradeButton, textView, gymView, sectorView, loadingIndicator, gymView, gymLabel]
             .forEach {
                 view.addSubview($0)
             }
@@ -67,6 +69,17 @@ class UploadVC: UIViewController {
             }
             .disposed(by: disposeBag)
         return button
+    }()
+    
+    let gymLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16, weight: .bold)
+        label.textColor = .label
+        label.textAlignment = .center
+        label.numberOfLines = 1
+        label.layer.zPosition = 1
+        label.font = .systemFont(ofSize: 17)
+        return label
     }()
     
     private let gradeButton: UIButton = {
@@ -154,7 +167,6 @@ class UploadVC: UIViewController {
     private var isUploading = false
     
     private var isClimbingVideo: Bool
-    var gymInfo: Gym?
     
     init(isClimbingVideo: Bool) {
         self.isClimbingVideo = isClimbingVideo
@@ -172,7 +184,6 @@ class UploadVC: UIViewController {
         mediaItemsBind()
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
         setNavigation()
-//        setGymView()
         setAlert()
         setLoading()
         setNotifications()
@@ -180,6 +191,7 @@ class UploadVC: UIViewController {
         bindPostButton()
         self.viewModel.feedRelay.accept([])
         self.viewModel.cellData.accept([])
+        print("짐인포: \(String(describing: gymInfo))")
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -500,6 +512,12 @@ class UploadVC: UIViewController {
             $0.edges.equalTo(scrollView.contentLayoutGuide)
             $0.width.equalTo(scrollView.frameLayoutGuide)
             $0.bottom.equalTo(postButton.snp.top)
+        }
+        
+        gymLabel.snp.makeConstraints {
+            $0.top.equalTo(gymView.snp.top)
+            $0.height.equalTo(gymView.snp.height)
+            $0.trailing.equalTo(gymView.snp.trailing).offset(-16)
         }
         
         selectedMediaView.snp.makeConstraints {

@@ -93,14 +93,14 @@ class GymSelectVC: UIViewController {
                 searchVC.ShowSegment = false
                 searchVC.nextPush = false
                 searchVC.onSelectedGym = { gymInfo in
-                    self.gymInfo = gymInfo // 선택한 gymInfo 저장
+                    self.gymInfo = gymInfo 
                     self.uploadVC.setgradeButton(with: gymInfo)
                     self.uploadVC.setSectorButton(with: gymInfo)
                     
                     self.uploadVC.gymInfo = gymInfo
                     
                     self.uploadVC.gymView.isUserInteractionEnabled = true
-                    self.uploadVC.gymView.updateText(with: gymInfo.gymName)
+                    self.uploadVC.gymLabel.text = gymInfo.gymName
                     
                     self.gymButton.setTitle(gymInfo.gymName, for: .normal)
                     self.okButton.isEnabled = true
