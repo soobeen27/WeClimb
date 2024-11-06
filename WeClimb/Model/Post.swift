@@ -29,6 +29,7 @@ struct Post: Codable {
     let gym: String?
     let medias: [DocumentReference]
     let thumbnail: String?
+    let commentCount: Int?
 //    let medias: [Media]?
 }
 

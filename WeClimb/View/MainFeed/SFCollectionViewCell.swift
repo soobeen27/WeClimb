@@ -411,6 +411,7 @@ class SFCollectionViewCell: UICollectionViewCell {
             collectionView.reloadData()
         }
         feedCaptionLabel.text = post.caption
+        commentButtonCounter.text = String(post.commentCount ?? 0)
         fetchLike()
     }
     
