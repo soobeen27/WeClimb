@@ -109,3 +109,14 @@ enum UploadStatus {
 enum CommonError: Error {
     case noSelf
 }
+
+enum GetDocumentError: Error {
+    case noField
+}
+
+// MARK: Feed Type
+enum FeedType {
+    case mainFeed
+    case myPage
+    case userPage
+}

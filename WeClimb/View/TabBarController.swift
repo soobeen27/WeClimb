@@ -19,7 +19,8 @@ class TabBarController: UITabBarController {
     }
     
     private func setView() {
-        let sfMainFeedVC = UINavigationController(rootViewController: SFMainFeedVC())
+//        let sfMainFeedVC = UINavigationController(rootViewController: SFMainFeedVC())
+        let sfMainFeedVC = UINavigationController(rootViewController: SFMainFeedVC(viewModel: MainFeedVM(), startingIndex: 0, feedType: .mainFeed))
         let searchVC = UINavigationController(rootViewController: SearchVC())
         
         // 선택된 아이템 색상 설정

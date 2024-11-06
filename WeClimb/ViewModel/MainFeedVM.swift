@@ -11,16 +11,36 @@ import RxCocoa
 import RxSwift
 
 class MainFeedVM {
+    struct Input {
+        let reportDeleteButtonTap: Driver<Post?>
+        let commentButtonTap: Driver<Post?>
+    }
+    
+    struct Output {
+        let presentReport: Driver<Post?>
+        let presentComment: Driver<Post?>
+    }
+    
     private let disposeBag = DisposeBag()
     var posts = BehaviorRelay<[Post]>(value: [])
-    var isLastCell = false
-    var shouldFetch: Bool
+    var isLastCell = BehaviorRelay<Bool>(value: false)
     
-    init(shouldFetch: Bool) {
-        self.shouldFetch = shouldFetch
-        if shouldFetch {
-            fetchInitialFeed()
-        }
+    func transform(input: Input) -> Output {
+        return Output(presentReport: input.reportDeleteButtonTap, 
+                      presentComment: input.commentButtonTap)
+    }
+    
+    func mainFeed() {
+        fetchInitialFeed()
+        isLastCell
+            .subscribe(onNext: { [weak self] shouldLoad in
+                guard let self else { return }
+                if shouldLoad {
+                    self.fetchMoreFeed()
+                }
+        })
+        .disposed(by: disposeBag)
+        
     }
     
     // 피드 데이터 초기 로드
@@ -32,7 +52,7 @@ class MainFeedVM {
     }
     
     // 추가 데이터 로드
-    func fetchMoreFeed() {
+    private func fetchMoreFeed() {
         FirebaseManager.shared.feedLoading { [weak self] fetchedPosts in
             guard let self, let fetchedPosts = fetchedPosts else { return }
             var loadedPosts = self.posts.value
@@ -58,8 +78,12 @@ class MainFeedVM {
                     })
                     .disposed(by: disposeBag)
             case .failure(let error):
-                print("Error - while getting User Info")
+                print("Error - while getting User Info: \(error)")
             }
         }
+    }
+    
+    func deletePost(uid: String) -> Single<Void> {
+        return FirebaseManager.shared.deletePost(uid: uid)
     }
 }

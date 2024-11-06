@@ -14,9 +14,11 @@ class CommonManager {
     
     // MARK: - 알럿 YJ
     // (파라미터 순서 → 사용할 뷰컨트롤러, 타이틀, 메세지, 취소 버튼 유무?)
-    func showAlert(from viewController: UIViewController, title: String, message: String, includeCancel: Bool = false) {
+    func showAlert(from viewController: UIViewController, title: String, message: String, includeCancel: Bool = false, completion: (() -> Void)? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "확인", style: .default) {_ in 
+            completion?()
+        })
         
         // 취소 버튼을 추가할 경우
         if includeCancel {

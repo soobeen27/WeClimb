@@ -432,70 +432,51 @@ final class FirebaseManager {
     }
     
     //MARK: 좋아요
-    // uid로 부터
-    func like(from uid: String, type: Like) -> Observable<[String]> {
-        return Observable<[String]>.create { [weak self] observer in
-            guard let user = Auth.auth().currentUser, let self else {
-                observer.onError(UserError.none)
+    /// 좋아요
+    /// - Parameters:
+    ///   - myUID: 로그인된 계정 uid
+    ///   - targetUID: 좋아요 누를 포스트 or 댓글 uid
+    ///   - type: 포스트 or 댓글
+    /// - Returns: 좋아요 누른 uid array
+    func like(myUID: String, targetUID: String, type: Like) -> Single<[String]> {
+        return Single.create(subscribe: { [weak self] single in
+            guard let self else {
+                single(.failure(CommonError.noSelf))
                 return Disposables.create()
             }
-            let contentRef = self.db.collection(type.string).document(uid)
-            contentRef.updateData(["like" : FieldValue.arrayUnion([user.uid])]) { error in
-                if let error = error {
-                    print("좋아요 실행중 오류: \(error)")
-                    observer.onError(error)
+            let targetRef = self.db.collection(type.string).document(targetUID)
+            self.db.runTransaction { transaction, errorPointer in
+                let postSnapshot: DocumentSnapshot
+                do {
+                    postSnapshot = try transaction.getDocument(targetRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    single(.failure(fetchError as Error))
+                    return nil
                 }
-                contentRef.getDocument { document, error in
-                    if let error = error {
-                        print("좋아요 목록 가져오는 중 에러: \(error)")
-                        observer.onError(error)
-                    }
-                    guard let document, document.exists else {
-                        observer.onError(UserError.none)
-                        return
-                    }
-                    guard let likeList = document.get("like") as? [String] else {
-                        print("라이크 없음")
-                        return
-                    }
-                    observer.onNext(likeList)
+                var currentLikeList = postSnapshot.data()?["like"] as? [String] ?? []
+                
+                if currentLikeList.contains([myUID]) {
+                    transaction.updateData(["like" : FieldValue.arrayRemove([myUID])], forDocument: targetRef)
+                    currentLikeList.removeAll { $0 == myUID }
+                } else {
+                    transaction.updateData(["like" : FieldValue.arrayUnion([myUID])], forDocument: targetRef)
+                    currentLikeList.append(myUID)
+                }
+                return currentLikeList
+            } completion: { object, error in
+                if let error = error {
+                    print("Error : \(error) ", #file, #function, #line)
+                    single(.failure(error))
+                    return
+                } else if let likeList = object as? [String] {
+                    single(.success(likeList))
                 }
             }
             return Disposables.create()
-        }
+        })
     }
     
-    func likeCancel(from uid: String, type: Like) -> Observable<[String]> {
-        return Observable<[String]>.create { [weak self] observer in
-            guard let user = Auth.auth().currentUser, let self else {
-                observer.onError(UserError.none)
-                return Disposables.create()
-            }
-            let contentRef = self.db.collection(type.string).document(uid)
-            contentRef.updateData(["like" : FieldValue.arrayRemove([user.uid])]) { error in
-                if let error = error {
-                    print("좋아요 실행중 오류: \(error)")
-                    observer.onError(error)
-                }
-                contentRef.getDocument { document, error in
-                    if let error = error {
-                        print("좋아요 목록 가져오는 중 에러: \(error)")
-                        observer.onError(error)
-                    }
-                    guard let document, document.exists else {
-                        observer.onError(UserError.none)
-                        return
-                    }
-                    guard let likeList = document.get("like") as? [String] else {
-                        print("라이크 없음")
-                        return
-                    }
-                    observer.onNext(likeList)
-                }
-            }
-            return Disposables.create()
-        }
-    }
     func fetchLike(from uid: String, type: Like) -> Observable<[String]> {
         return Observable<[String]>.create { [weak self] observer in
             guard let self else { 
@@ -518,7 +499,6 @@ final class FirebaseManager {
                     return
                 }
                 observer.onNext(likeList)
-                
             }
             return Disposables.create()
         }
@@ -536,11 +516,11 @@ final class FirebaseManager {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
                         .whereField("authorUID", notIn: blackList)
-                        .limit(to: 10)
+                        .limit(to: 5)
                 } else {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
-                        .limit(to: 10)
+                        .limit(to: 5)
                 }
                 postRef.getDocuments { snapshot, error in
                     if let error = error {
@@ -585,12 +565,12 @@ final class FirebaseManager {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
                         .whereField("authorUID", notIn: blackList)
-                        .limit(to: 10)
+                        .limit(to: 5)
                         .start(afterDocument: lastFeed)
                 } else {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
-                        .limit(to: 10)
+                        .limit(to: 5)
                         .start(afterDocument: lastFeed)
                 }
                 postRef.getDocuments { snapshot, error in
@@ -628,7 +608,7 @@ final class FirebaseManager {
     
     func fetchMedias(for post: Post) async throws -> [Media] {
         // medias의 DocumentReference들을 한 번에 가져오기 위한 batch 작업
-        var mediaRefs: [DocumentReference] = post.medias
+        let mediaRefs: [DocumentReference] = post.medias
         var medias: [Media] = []
         
         guard !mediaRefs.isEmpty else {
@@ -649,6 +629,56 @@ final class FirebaseManager {
         }
         
         return medias
+    }
+    
+    //MARK: 팔로우, 언팔
+    /// 팔로우, 언팔로우
+    /// - Parameters:
+    ///   - myUID: 로그인되어있는 계정 uid
+    ///   - targetUID: 팔로우, 언팔할 계정 uid
+    /// - Returns: 팔로우, 언팔 후 로그인된 계정이 팔로우하고 있는 배열
+    func follow(myUID: String, targetUID: String) -> Single<[String]>{
+        return Single.create { [weak self] single in
+            guard let self else {
+                single(.failure(CommonError.noSelf))
+                return Disposables.create()
+            }
+            
+            let myRef = self.db.collection("users").document(myUID)
+            let targetRef = self.db.collection("users").document(targetUID)
+            
+            self.db.runTransaction { (transaction, errorPointer) -> [String]? in
+                let userSnapshot: DocumentSnapshot
+                do {
+                    userSnapshot = try transaction.getDocument(myRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    single(.failure(fetchError as Error))
+                    return nil
+                }
+                var currentFollowList = userSnapshot.data()?["following"] as? [String] ?? []
+                
+                if currentFollowList.contains([targetUID]) {
+                    transaction.updateData(["following": FieldValue.arrayRemove([targetUID])], forDocument: myRef)
+                    transaction.updateData(["followers" : FieldValue.arrayRemove([myUID])], forDocument: targetRef)
+                    currentFollowList.removeAll { $0 == targetUID }
+                } else {
+                    transaction.updateData(["following": FieldValue.arrayUnion([targetUID])], forDocument: myRef)
+                    transaction.updateData(["followers" : FieldValue.arrayUnion([myUID])], forDocument: targetRef)
+                    currentFollowList.append(targetUID)
+                }
+                return currentFollowList
+            } completion: { (object, error) in
+                if let error = error {
+                    print("Error : \(error) ", #file, #function, #line)
+                    single(.failure(error))
+                    return
+                } else if let followList = object as? [String] {
+                    single(.success(followList))
+                }
+            }
+            return Disposables.create()
+        }
     }
     
     
@@ -828,27 +858,59 @@ final class FirebaseManager {
     }
     
     // MARK: Post 삭제
-    func deletePost(uid: String) {
-        guard let user = Auth.auth().currentUser else { return }
-        let userRef = db.collection("users").document(user.uid)
-        let postRef = db.collection("posts").document(uid)
-        
-        userRef.updateData(["posts" : FieldValue.arrayRemove([postRef])]) { error in
-            if let error = error {
-                print("Error - Deleting Post Reference: \(error)")
-                return
-            }
-            print("Post Reference deleted Successfully!")
-            postRef.delete { error in
-                if let error = error {
-                    print("Error - Deleting Post: \(error)")
-                    return
-                }
-                print("Post Deleted Succssfully")
+//    func deletePost(uid: String) {
+//        guard let user = Auth.auth().currentUser else { return }
+//        let userRef = db.collection("users").document(user.uid)
+//        let postRef = db.collection("posts").document(uid)
+//        
+//        userRef.updateData(["posts" : FieldValue.arrayRemove([postRef])]) { error in
+//            if let error = error {
+//                print("Error - Deleting Post Reference: \(error)")
+//                return
+//            }
+//            print("Post Reference deleted Successfully!")
+//            postRef.delete { error in
+//                if let error = error {
+//                    print("Error - Deleting Post: \(error)")
+//                    return
+//                }
+//                print("Post Deleted Succssfully")
+//            }
+//        }
+//    }
+
+    func deletePost(uid: String) -> Single<Void> {
+        guard let user = Auth.auth().currentUser else { 
+            return Single.create {
+                $0(.failure(UserError.logout))
+                return Disposables.create()
             }
         }
+        return Single.create { [weak self] single in
+            guard let self else { return Disposables.create() }
+            let userRef = self.db.collection("users").document(user.uid)
+            let postRef = self.db.collection("posts").document(uid)
+            
+            userRef.updateData(["posts" : FieldValue.arrayRemove([postRef])]) { error in
+                if let error = error {
+                    print("Error - Deleting Post Reference: \(error)")
+                    single(.failure(error))
+                    return
+                }
+                print("Post Reference deleted Successfully!")
+                postRef.delete { error in
+                    if let error = error {
+                        print("Error - Deleting Post: \(error)")
+                        single(.failure(error))
+                        return
+                    }
+                    single(.success(()))
+                }
+            }
+            return Disposables.create()
+        }
     }
-    
+
     func fileNameFromUrl(urlString: String) -> String {
         guard let url = URL(string: urlString) else { return "" }
         return url.lastPathComponent
