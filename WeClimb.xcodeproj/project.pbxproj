@@ -65,6 +65,7 @@
 		6BC91FB02C7EEB4E00B34083 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */; };
 		6BC91FB32C7F016A00B34083 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */; };
 		6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCF42D92C942C22000EF20B /* UserTableViewCell.swift */; };
+		912613292CD8FE1300CD5E74 /* CommentVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912613282CD8FE1300CD5E74 /* CommentVM.swift */; };
 		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
 		917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */; };
@@ -73,6 +74,7 @@
 		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
 		91BFA9332C91962F0044D5AD /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BFA9322C91962F0044D5AD /* Post.swift */; };
+		91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F566CD2CDB566700485F79 /* CommentCellVM.swift */; };
 		91F71CDF2C88A3C400405778 /* LoginVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CDE2C88A3C400405778 /* LoginVM.swift */; };
 		91F71CE12C89835700405778 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CE02C89835700405778 /* FirebaseManager.swift */; };
 		91F71CE32C89844900405778 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CE22C89844900405778 /* User.swift */; };
@@ -81,10 +83,10 @@
 		C43197902CAAC3FD00029E3C /* ProfileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C431978F2CAAC3FD00029E3C /* ProfileManager.swift */; };
 		C440789E2CA319B200B747A6 /* GuestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C440789D2CA319B200B747A6 /* GuestVC.swift */; };
 		C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C45DC9D42C80519100FC4C1D /* FeedModel.swift */; };
-		C47A0AFA2C8AF1A60068173A /* FeedCommentModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0AF92C8AF1A60068173A /* FeedCommentModalVC.swift */; };
+		C47A0AFA2C8AF1A60068173A /* CommentModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0AF92C8AF1A60068173A /* CommentModalVC.swift */; };
 		C47A0AFD2C90310B0068173A /* FeedReportModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0AFC2C90310B0068173A /* FeedReportModalVC.swift */; };
 		C47A0AFF2C9038990068173A /* FeedNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0AFE2C9038990068173A /* FeedNameSpace.swift */; };
-		C47A0B012C9115760068173A /* FeedCommentTabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0B002C9115760068173A /* FeedCommentTabelCell.swift */; };
+		C47A0B012C9115760068173A /* CommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47A0B002C9115760068173A /* CommentCell.swift */; };
 		C49FC7092C9F1B0E00CD66D9 /* EditNickNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49FC7082C9F1B0E00CD66D9 /* EditNickNameVC.swift */; };
 		C49FC70B2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49FC70A2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift */; };
 		C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49FC70C2CA265B300CD66D9 /* PersonalDetailsVM.swift */; };
@@ -177,6 +179,7 @@
 		6BC91FB22C7F016A00B34083 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		6BC91FB52C7F16D800B34083 /* WeClimb.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeClimb.entitlements; sourceTree = "<group>"; };
 		6BCF42D92C942C22000EF20B /* UserTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTableViewCell.swift; sourceTree = "<group>"; };
+		912613282CD8FE1300CD5E74 /* CommentVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = CommentVM.swift; sourceTree = "<group>"; tabWidth = 4; };
 		916D64CF2C848A540064B766 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		916D64D22C848BE00064B766 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
 		917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeClimbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -186,6 +189,7 @@
 		91AF25602C8C15FC002283BD /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
 		91AF25622C8D771A002283BD /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
 		91BFA9322C91962F0044D5AD /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
+		91F566CD2CDB566700485F79 /* CommentCellVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentCellVM.swift; sourceTree = "<group>"; };
 		91F71CDE2C88A3C400405778 /* LoginVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVM.swift; sourceTree = "<group>"; };
 		91F71CE02C89835700405778 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
 		91F71CE22C89844900405778 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -194,10 +198,10 @@
 		C431978F2CAAC3FD00029E3C /* ProfileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManager.swift; sourceTree = "<group>"; };
 		C440789D2CA319B200B747A6 /* GuestVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = GuestVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C45DC9D42C80519100FC4C1D /* FeedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedModel.swift; sourceTree = "<group>"; };
-		C47A0AF92C8AF1A60068173A /* FeedCommentModalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCommentModalVC.swift; sourceTree = "<group>"; };
+		C47A0AF92C8AF1A60068173A /* CommentModalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentModalVC.swift; sourceTree = "<group>"; };
 		C47A0AFC2C90310B0068173A /* FeedReportModalVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = FeedReportModalVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C47A0AFE2C9038990068173A /* FeedNameSpace.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = FeedNameSpace.swift; sourceTree = "<group>"; tabWidth = 4; };
-		C47A0B002C9115760068173A /* FeedCommentTabelCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = FeedCommentTabelCell.swift; sourceTree = "<group>"; tabWidth = 4; };
+		C47A0B002C9115760068173A /* CommentCell.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = CommentCell.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C49FC7082C9F1B0E00CD66D9 /* EditNickNameVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = EditNickNameVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C49FC70A2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = EditPersonalDetailsVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		C49FC70C2CA265B300CD66D9 /* PersonalDetailsVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = PersonalDetailsVM.swift; sourceTree = "<group>"; tabWidth = 4; };
@@ -353,8 +357,8 @@
 				C4E29C1C2C898AFB0076BCA6 /* SFMainFeedVC.swift */,
 				91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */,
 				C4E29C1E2C898DC80076BCA6 /* SFCollectionViewCell.swift */,
-				C47A0AF92C8AF1A60068173A /* FeedCommentModalVC.swift */,
-				C47A0B002C9115760068173A /* FeedCommentTabelCell.swift */,
+				C47A0AF92C8AF1A60068173A /* CommentModalVC.swift */,
+				C47A0B002C9115760068173A /* CommentCell.swift */,
 				C47A0AFC2C90310B0068173A /* FeedReportModalVC.swift */,
 			);
 			path = MainFeed;
@@ -473,6 +477,8 @@
 				91F71CDE2C88A3C400405778 /* LoginVM.swift */,
 				6B16C0EC2C9AE121004249AF /* UserPageVM.swift */,
 				91FF42CB2CC5F37C003D9279 /* SNSAuthVM.swift */,
+				912613282CD8FE1300CD5E74 /* CommentVM.swift */,
+				91F566CD2CDB566700485F79 /* CommentCellVM.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -688,11 +694,12 @@
 				C43197902CAAC3FD00029E3C /* ProfileManager.swift in Sources */,
 				F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */,
 				43A79ADC2C85AA7400B960A2 /* SettingVC.swift in Sources */,
-				C47A0AFA2C8AF1A60068173A /* FeedCommentModalVC.swift in Sources */,
+				C47A0AFA2C8AF1A60068173A /* CommentModalVC.swift in Sources */,
 				43E883532CA27BFE00EF7469 /* CommonManager.swift in Sources */,
 				43A79AE62C86CEFE00B960A2 /* SettingNameSpace.swift in Sources */,
 				6B2815462C8572A800BE1D40 /* ClimbingGym.swift in Sources */,
 				F4892C3E2C7EFD4700C5FF16 /* UploadVC.swift in Sources */,
+				912613292CD8FE1300CD5E74 /* CommentVM.swift in Sources */,
 				C47A0AFD2C90310B0068173A /* FeedReportModalVC.swift in Sources */,
 				F4892C1A2C7C984A00C5FF16 /* SearchVC.swift in Sources */,
 				43A79ACA2C81717500B960A2 /* EditPageCell.swift in Sources */,
@@ -712,6 +719,7 @@
 				F4892C1C2C7C988B00C5FF16 /* ClimbingGymVC.swift in Sources */,
 				91AF25632C8D771A002283BD /* Gym.swift in Sources */,
 				43A79AD62C853EC100B960A2 /* EditModel.swift in Sources */,
+				91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */,
 				436AEAF02C7EE63C00E0D85A /* SearchNameSpace.swift in Sources */,
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */,
@@ -730,7 +738,7 @@
 				C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */,
 				91FF42CC2CC5F37C003D9279 /* SNSAuthVM.swift in Sources */,
 				6B7F76992CA4A8E900B05B3F /* BlackListVM.swift in Sources */,
-				C47A0B012C9115760068173A /* FeedCommentTabelCell.swift in Sources */,
+				C47A0B012C9115760068173A /* CommentCell.swift in Sources */,
 				91995F202CA4A24100BCC004 /* SFFeedCell.swift in Sources */,
 				F4892C0E2C7C27BE00C5FF16 /* ExampleCommon.swift in Sources */,
 				43EC6ACB2C8B5026004A2E2F /* FeedCellModel.swift in Sources */,

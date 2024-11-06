@@ -15,11 +15,8 @@ import FirebaseAuth
 
 class SFCollectionViewCell: UICollectionViewCell {
     
-    private let likeViewModel = LikeViewModel()
+    private var likeViewModel: LikeViewModel?
     var disposeBag = DisposeBag()
-    
-    //    var postUID = UUID().uuidString
-    let postType: Like = .post
     
     var medias: [Media] = []
     var post: Post?
@@ -69,6 +66,8 @@ class SFCollectionViewCell: UICollectionViewCell {
             }
             .asDriver(onErrorDriveWith: .empty())
     }
+    
+    
     
     
     private lazy var pageControl: UIPageControl = {
@@ -214,7 +213,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         setupUI()
         setLayout()
-        setLikeButton()
+//        setLikeButton()
     }
     
     required init?(coder: NSCoder) {
@@ -378,6 +377,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     // MARK: - configure 메서드
     func configure(with post: Post) {
+        likeViewModel = LikeViewModel(post: post)
         FirebaseManager.shared.getUserInfoFrom(uid: post.authorUID) { [weak self] result in
             guard let self else { return }
             switch result {
@@ -410,8 +410,11 @@ class SFCollectionViewCell: UICollectionViewCell {
             }
             collectionView.reloadData()
         }
+        
         feedCaptionLabel.text = post.caption
+        commentButtonCounter.text = String(post.commentCount ?? 0)
         fetchLike()
+        setLikeButton()
     }
     
     func fetchLike() {
@@ -419,7 +422,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         FirebaseManager.shared.fetchLike(from: postUID, type: .post)
             .subscribe(onNext: { [weak self] likeList in
                 guard let self else { return }
-                self.likeViewModel.likeList.accept(likeList)
+                self.likeViewModel?.postLikeList.accept(likeList)
             }, onError: { error in
                 print("Error - \(#file) \(#function) \(#line) : \(error)")
             })
@@ -434,11 +437,12 @@ class SFCollectionViewCell: UICollectionViewCell {
             .asSignal().emit(onNext: { [weak self] in
                 guard let self = self else { return }
                 let postUID = self.medias[medias.startIndex].postRef.documentID
-                likeViewModel.likePost(myUID: user.uid, postUID: postUID, type: postType)
+//                likeViewModel?.likePost(myUID: user.uid, postUID: postUID)
+                likeViewModel?.likePost(myUID: user.uid)
             })
             .disposed(by: disposeBag)
         
-        likeViewModel.likeList
+        likeViewModel?.postLikeList
             .asDriver()
             .drive(onNext: { [weak self] likeList in
                 guard let self else { return }

@@ -33,6 +33,13 @@ final class FirebaseManager {
     static let shared = FirebaseManager()
     private init() {}
     
+    //MARK: 현재 유저 uid
+    func currentUserUID() -> String {
+        guard let user = Auth.auth().currentUser else {
+            return ""
+        }
+        return user.uid
+    }
     // MARK: 유저 정보 업데이트
     func updateAccount(with data: String, for field: UserUpdate, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser else { return }
@@ -106,10 +113,8 @@ final class FirebaseManager {
                     }
                 }
             }
-            
             return Disposables.create()
         }
-        
     }
     //  MARK: 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
     func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
@@ -235,7 +240,6 @@ final class FirebaseManager {
             } catch {
                 completion(.failure(UserError.none))
             }
-            
             //            snapshot.documents.forEach { document in
             //                if let user = try? document.data(as: User.self) {
             //                    completion(.success(user))
@@ -344,7 +348,7 @@ final class FirebaseManager {
             }
             
             // 포스트 데이터를 Firestore에 저장
-            let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: mediaReferences, thumbnail: thumbnail)
+            let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: mediaReferences, thumbnail: thumbnail, commentCount: nil)
             
             let userRef = db.collection("users").document(user.uid)
             batch.setData(try Firestore.Encoder().encode(post), forDocument: postRef)
@@ -377,9 +381,7 @@ final class FirebaseManager {
             }
         }
     }
-    
-    
-    
+
     // MARK: 댓글달기
     func addComment(fromPostUid postUid: String, content: String) {
         guard let user = Auth.auth().currentUser else {
@@ -444,7 +446,7 @@ final class FirebaseManager {
                 single(.failure(CommonError.noSelf))
                 return Disposables.create()
             }
-            let targetRef = self.db.collection(type.string).document(targetUID)
+            let targetRef = self.db.collection("posts").document(targetUID)
             self.db.runTransaction { transaction, errorPointer in
                 let postSnapshot: DocumentSnapshot
                 do {

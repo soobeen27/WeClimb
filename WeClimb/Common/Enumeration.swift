@@ -112,6 +112,7 @@ enum CommonError: Error {
 
 enum GetDocumentError: Error {
     case noField
+    case failDecoding
 }
 
 // MARK: Feed Type

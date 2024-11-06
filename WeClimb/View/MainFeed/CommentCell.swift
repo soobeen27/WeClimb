@@ -8,8 +8,13 @@
 import UIKit
 
 import SnapKit
+import Kingfisher
+import RxSwift
+import RxCocoa
 
-class FeedCommentCell: UITableViewCell {
+class CommentCell: UITableViewCell {
+    
+    var disposeBag = DisposeBag()
     
     private let commentProfileImage: UIImageView = {
         let image = UIImageView()
@@ -59,7 +64,7 @@ class FeedCommentCell: UITableViewCell {
         stackView.spacing = 0
         return stackView
     }()
-    
+        
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -69,6 +74,14 @@ class FeedCommentCell: UITableViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        commentProfileImage.image = nil
+        commentUser.text = nil
+        commentLabel.text = nil
+        likeButtonCounter.text = nil
     }
     
     
@@ -110,10 +123,46 @@ class FeedCommentCell: UITableViewCell {
     
     
     //MARK: - configure
-    func configure(userImage: UIImage, userName: String, userComment: String, likeCounter: String) {
-        commentProfileImage.image = userImage
-        commentUser.text = userName
-        commentLabel.text = userComment
-        likeButtonCounter.text = likeCounter
+    func configure(commentCellVM: CommentCellVM) {
+        if let profileString = commentCellVM.user.profileImage {
+            let imageURL = URL(string: profileString)
+            commentProfileImage.kf.setImage(with: imageURL)
+        } else {
+            commentProfileImage.image = UIImage(named: "testStone")
+        }
+        commentUser.text = commentCellVM.user.userName ?? "탈퇴한 회원"
+        commentLabel.text = commentCellVM.comment.content
+        
+        commentCellVM.commentLikeList
+            .asDriver()
+            .drive(onNext: { [weak self] likeList in
+                guard let self else { return }
+                self.likeButtonCounter.text = String(likeList.count)
+            })
+            .disposed(by: disposeBag)
+        
+        let myUID = FirebaseManager.shared.currentUserUID()
+
+        likeButton.rx.tap
+            .asSignal().emit(onNext: { [weak self] in
+                guard let self = self else { return }
+
+                commentCellVM.likeComment(myUID: myUID)
+            })
+            .disposed(by: disposeBag)
+        
+        commentCellVM.commentLikeList
+            .asDriver()
+            .drive(onNext: { [weak self] likeList in
+                guard let self else { return }
+                self.likeButtonCounter.text = String(likeList.count)
+                if likeList.contains([myUID]) {
+                    self.likeButton.isActivated = true
+                }  else {
+                    self.likeButton.isActivated = false
+                }
+                self.likeButton.configureHeartButton()
+            })
+            .disposed(by: disposeBag)
     }
 }
