@@ -31,7 +31,7 @@ class UploadVC: UIViewController {
         return scroll
     }()
     
-    private let gymView = UploadOptionView(symbolImage: UIImage(systemName: "figure.climbing") ?? UIImage(), optionText: UploadNameSpace.selectGym, showSelectedLabel: true)
+    let gymView = UploadOptionView(symbolImage: UIImage(systemName: "figure.climbing") ?? UIImage(), optionText: UploadNameSpace.selectGym, showSelectedLabel: true)
     private let sectorView = UploadOptionView(symbolImage: UIImage(systemName: "flag") ?? UIImage(), optionText: UploadNameSpace.selectSector, showSelectedLabel: false)
     
     private lazy var contentView: UIView = {
@@ -153,6 +153,18 @@ class UploadVC: UIViewController {
     private var isCurrentScreenActive: Bool = false
     private var isUploading = false
     
+    private var isClimbingVideo: Bool
+    var gymInfo: Gym?
+    
+    init(isClimbingVideo: Bool) {
+        self.isClimbingVideo = isClimbingVideo
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         textView.delegate = self
@@ -160,7 +172,7 @@ class UploadVC: UIViewController {
         mediaItemsBind()
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
         setNavigation()
-        setGymView()
+//        setGymView()
         setAlert()
         setLoading()
         setNotifications()
@@ -270,47 +282,47 @@ class UploadVC: UIViewController {
         }
     }
     
-    private func setGymView() {
-        viewModel.cellData
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                guard let self = self else { return }
-                if self.viewModel.cellData.value.isEmpty {
-                    self.gymView.isUserInteractionEnabled = false
-                } else {
-                    self.gymView.isUserInteractionEnabled = true
-                }
-            })
-            .disposed(by: disposeBag)
-        
-        let gymTapGesture = UITapGestureRecognizer()
-        gymView.addGestureRecognizer(gymTapGesture)
-        
-        gymTapGesture.rx.event
-            .observe(on: MainScheduler.instance)
-            .bind { [weak self] _ in
-                guard let self = self else { return }
-                // 화면 전환
-                let searchVC = SearchVC()
-                let navigationController = UINavigationController(rootViewController: searchVC)
-                navigationController.modalPresentationStyle = .pageSheet
-                searchVC.ShowSegment = false // 세그먼트 컨트롤 숨기기
-                searchVC.nextPush = false
-                searchVC.onSelectedGym = { gymInfo in
-                    self.setgradeButton(with: gymInfo)
-                    self.setSectorButton(with: gymInfo)
-                    
-                    self.gymView.updateText(with: gymInfo.gymName)
-                    
-                    self.dismiss(animated: true, completion: nil)
-                }
-                self.present(navigationController, animated: true, completion: nil)
-            }
-            .disposed(by: disposeBag)
-    }
+//    private func setGymView() {
+//        viewModel.cellData
+//            .observe(on: MainScheduler.instance)
+//            .subscribe(onNext: { [weak self] _ in
+//                guard let self = self else { return }
+//                if self.viewModel.cellData.value.isEmpty {
+//                    self.gymView.isUserInteractionEnabled = false
+//                } else {
+//                    self.gymView.isUserInteractionEnabled = true
+//                }
+//            })
+//            .disposed(by: disposeBag)
+//        
+//        let gymTapGesture = UITapGestureRecognizer()
+//        gymView.addGestureRecognizer(gymTapGesture)
+//        
+//        gymTapGesture.rx.event
+//            .observe(on: MainScheduler.instance)
+//            .bind { [weak self] _ in
+//                guard let self = self else { return }
+//                // 화면 전환
+//                let searchVC = SearchVC()
+//                let navigationController = UINavigationController(rootViewController: searchVC)
+//                navigationController.modalPresentationStyle = .pageSheet
+//                searchVC.ShowSegment = false // 세그먼트 컨트롤 숨기기
+//                searchVC.nextPush = false
+//                searchVC.onSelectedGym = { gymInfo in
+//                    self.setgradeButton(with: gymInfo)
+//                    self.setSectorButton(with: gymInfo)
+//                    
+//                    self.gymView.updateText(with: gymInfo.gymName)
+//                    
+//                    self.dismiss(animated: true, completion: nil)
+//                }
+//                self.present(navigationController, animated: true, completion: nil)
+//            }
+//            .disposed(by: disposeBag)
+//    }
     
     // MARK: - 선택한 암장 기준으로 난이도 버튼 세팅 YJ
-    private func setgradeButton(with gymInfo: Gym) {
+    func setgradeButton(with gymInfo: Gym) {
         self.viewModel.optionSelectedGym(gymInfo)
         
         let grade = gymInfo.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
@@ -341,7 +353,7 @@ class UploadVC: UIViewController {
     }
     
     // MARK: - 선택한 암장 기준으로 섹터 버튼 세팅 YJ
-    private func setSectorButton(with gymInfo: Gym) {
+    func setSectorButton(with gymInfo: Gym) {
         self.viewModel.optionSelectedGym(gymInfo)
         
         let sectors = gymInfo.sector.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
@@ -698,32 +710,32 @@ extension UploadVC {
     
     // MARK: - 업로드뷰 초기화 YJ
     private func initUploadVC() {
-        
-        let newUploadVC = UploadVC()
-        feedView?.pauseAllVideo()
-        
-        if let tabBarController = tabBarController,
-           var viewControllers = tabBarController.viewControllers {
-            
-            let newUploadNavVC = UINavigationController(rootViewController: newUploadVC)
-            newUploadNavVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
-            
-            viewControllers[2] = newUploadNavVC   // 기존 탭바2에 세로운 인스턴스 삽입
-            
-            tabBarController.setViewControllers(viewControllers, animated: false) // 변경된 뷰를 탭 바에 설정
-            tabBarController.selectedIndex = 2    // 새로 생성한 곳으로 전환
-        }
-        
-        setNavigation()
-        textView.delegate = self
-        setLayout()
-        mediaItemsBind()
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
-        setGymView()
-        setAlert()
-        setLoading()
-        setNotifications()
-        setUIMenu()
-        bindPostButton()
+//        
+//        let newUploadVC = UploadVC()
+//        feedView?.pauseAllVideo()
+//        
+//        if let tabBarController = tabBarController,
+//           var viewControllers = tabBarController.viewControllers {
+//            
+//            let newUploadNavVC = UINavigationController(rootViewController: newUploadVC)
+//            newUploadNavVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
+//            
+//            viewControllers[2] = newUploadNavVC   // 기존 탭바2에 세로운 인스턴스 삽입
+//            
+//            tabBarController.setViewControllers(viewControllers, animated: false) // 변경된 뷰를 탭 바에 설정
+//            tabBarController.selectedIndex = 2    // 새로 생성한 곳으로 전환
+//        }
+//        
+//        setNavigation()
+//        textView.delegate = self
+//        setLayout()
+//        mediaItemsBind()
+//        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
+//        setGymView()
+//        setAlert()
+//        setLoading()
+//        setNotifications()
+//        setUIMenu()
+//        bindPostButton()
     }
 }
