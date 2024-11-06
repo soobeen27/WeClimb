@@ -11,19 +11,10 @@ import SnapKit
 import Kingfisher
 import RxSwift
 import RxCocoa
-import FirebaseAuth
-import FirebaseFirestore
 
 class CommentCell: UITableViewCell {
     
-    private let db = Firestore.firestore()
-    let post: Post
-    
-    private let likeVM = LikeViewModel()
-    private var commentVM: CommentVM?
     var disposeBag = DisposeBag()
-    
-    let postType: Like = .comment
     
     private let commentProfileImage: UIImageView = {
         let image = UIImageView()
@@ -73,7 +64,7 @@ class CommentCell: UITableViewCell {
         stackView.spacing = 0
         return stackView
     }()
-    
+        
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -83,6 +74,14 @@ class CommentCell: UITableViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        commentProfileImage.image = nil
+        commentUser.text = nil
+        commentLabel.text = nil
+        likeButtonCounter.text = nil
     }
     
     
@@ -124,38 +123,45 @@ class CommentCell: UITableViewCell {
     
     
     //MARK: - configure
-    func configure(userImageString: String, userName: String, userComment: String, likeCounter: Int) {
-        self.commentVM = CommentVM(post: post)
-        
-        if userImageString == "" {
-            commentProfileImage.image = UIImage(named: "testStone")
-        } else {
-            let imageURL = URL(string: userImageString)
+    func configure(commentCellVM: CommentCellVM) {
+        if let profileString = commentCellVM.user.profileImage {
+            let imageURL = URL(string: profileString)
             commentProfileImage.kf.setImage(with: imageURL)
+        } else {
+            commentProfileImage.image = UIImage(named: "testStone")
         }
+        commentUser.text = commentCellVM.user.userName ?? "탈퇴한 회원"
+        commentLabel.text = commentCellVM.comment.content
         
-        commentUser.text = userName
-        commentLabel.text = userComment
-        likeButtonCounter.text = String(likeCounter)
-    }
-    
-    
-    //MARK: - 좋아요 버튼 세팅
-    private func setLikeButton() {
-        print("Setting LikeButton")
-        guard let user = Auth.auth().currentUser else { return }
+        commentCellVM.commentLikeList
+            .asDriver()
+            .drive(onNext: { [weak self] likeList in
+                guard let self else { return }
+                self.likeButtonCounter.text = String(likeList.count)
+            })
+            .disposed(by: disposeBag)
         
+        let myUID = FirebaseManager.shared.currentUserUID()
+
         likeButton.rx.tap
             .asSignal().emit(onNext: { [weak self] in
                 guard let self = self else { return }
-                let postUid = self.post.postUID
-                let commentUID = UUID().uuidString
-                let commentRef = db.collection("posts")
-                    .document(postUid)
-                    .collection("comments")
-                    .document(commentUID)
-                
-                likeVM.likeComment(myUID: user.uid, CommentUID: commentRef, type: postType)
+
+                commentCellVM.likeComment(myUID: myUID)
+            })
+            .disposed(by: disposeBag)
+        
+        commentCellVM.commentLikeList
+            .asDriver()
+            .drive(onNext: { [weak self] likeList in
+                guard let self else { return }
+                self.likeButtonCounter.text = String(likeList.count)
+                if likeList.contains([myUID]) {
+                    self.likeButton.isActivated = true
+                }  else {
+                    self.likeButton.isActivated = false
+                }
+                self.likeButton.configureHeartButton()
             })
             .disposed(by: disposeBag)
     }

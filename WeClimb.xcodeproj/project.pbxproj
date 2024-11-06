@@ -73,6 +73,7 @@
 		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
 		91BFA9332C91962F0044D5AD /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BFA9322C91962F0044D5AD /* Post.swift */; };
+		91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F566CD2CDB566700485F79 /* CommentCellVM.swift */; };
 		91F71CDF2C88A3C400405778 /* LoginVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CDE2C88A3C400405778 /* LoginVM.swift */; };
 		91F71CE12C89835700405778 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CE02C89835700405778 /* FirebaseManager.swift */; };
 		91F71CE32C89844900405778 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CE22C89844900405778 /* User.swift */; };
@@ -186,6 +187,7 @@
 		91AF25602C8C15FC002283BD /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
 		91AF25622C8D771A002283BD /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
 		91BFA9322C91962F0044D5AD /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
+		91F566CD2CDB566700485F79 /* CommentCellVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentCellVM.swift; sourceTree = "<group>"; };
 		91F71CDE2C88A3C400405778 /* LoginVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVM.swift; sourceTree = "<group>"; };
 		91F71CE02C89835700405778 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
 		91F71CE22C89844900405778 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -474,6 +476,7 @@
 				6B16C0EC2C9AE121004249AF /* UserPageVM.swift */,
 				91FF42CB2CC5F37C003D9279 /* SNSAuthVM.swift */,
 				912613282CD8FE1300CD5E74 /* CommentVM.swift */,
+				91F566CD2CDB566700485F79 /* CommentCellVM.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -713,6 +716,7 @@
 				F4892C1C2C7C988B00C5FF16 /* ClimbingGymVC.swift in Sources */,
 				91AF25632C8D771A002283BD /* Gym.swift in Sources */,
 				43A79AD62C853EC100B960A2 /* EditModel.swift in Sources */,
+				91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */,
 				436AEAF02C7EE63C00E0D85A /* SearchNameSpace.swift in Sources */,
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */,

@@ -446,7 +446,7 @@ final class FirebaseManager {
                 single(.failure(CommonError.noSelf))
                 return Disposables.create()
             }
-            let targetRef = self.db.collection(type.string).document(targetUID)
+            let targetRef = self.db.collection("posts").document(targetUID)
             self.db.runTransaction { transaction, errorPointer in
                 let postSnapshot: DocumentSnapshot
                 do {
