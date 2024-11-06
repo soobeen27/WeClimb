@@ -162,7 +162,7 @@ class CommentModalVC: UIViewController {
                 FirebaseManager.shared.getUserInfoFrom(uid: item.authorUID) { result in
                     switch result {
                     case .success(let user):
-                        cell.configure(userImageString: user.profileImage ?? "", userName: user.userName ?? "", userComment: item.content, likeCounter: item.like?.count ?? 0)
+                      cell.configure(userImageString: user.profileImage ?? "", userName: user.userName ?? "", userComment: item.content, likeCounter: item.like?.count ?? 0)
                     case .failure(let error):
                         print("Error - :\(error)")
                     }
