@@ -11,11 +11,12 @@ import RxSwift
 import RxCocoa
 import Kingfisher
 
-class CommentModalVC: UIViewController {
+class CommentModalVC: UIViewController, UIScrollViewDelegate {
     
     private var viewModel: CommentVM
     
     let disposeBag = DisposeBag()
+    private var lastContentOffset: CGPoint = .zero
     
     private let tableView: UITableView = {
         let tableView = UITableView()
@@ -64,6 +65,7 @@ class CommentModalVC: UIViewController {
         setTableView()
         setLayout()
         submitButtonBind()
+        setKeyboard()
     }
     
     private func setTableView() {
@@ -84,6 +86,8 @@ class CommentModalVC: UIViewController {
                     }
                 }
             }.disposed(by: disposeBag)
+        tableView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
     }
     
     private func submitButtonBind() {
@@ -99,6 +103,47 @@ class CommentModalVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    private func setKeyboard() {
+//        tableView.keyboardDismissMode = .interactive
+        NotificationCenter.default.rx.notification(UIResponder.keyboardWillShowNotification)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { [weak self] notification in
+                guard let userInfo = notification.userInfo,
+                      let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+                      let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
+                      let curveValue = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
+                      let self
+                else { return }
+                let animationOption = UIView.AnimationOptions(rawValue: curveValue << 16)
+                
+                UIView.animate(withDuration: duration, delay: 0, options: animationOption) {
+                    self.commentTextField.snp.updateConstraints {
+                        $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom).offset(-keyboardFrame.height + 10)
+                        self.view.layoutIfNeeded()
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
+        NotificationCenter.default.rx.notification(UIResponder.keyboardWillHideNotification)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { [weak self] notification in
+                guard let userInfo = notification.userInfo,
+                      let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
+                      let curveValue = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
+                      let self
+                else { return }
+                let animationOption = UIView.AnimationOptions(rawValue: curveValue << 16)
+
+                UIView.animate(withDuration: duration, delay: 0, options: animationOption) {
+                    self.commentTextField.snp.updateConstraints {
+                        $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom).offset(-10)
+                        self.view.layoutIfNeeded()
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
@@ -130,5 +175,16 @@ class CommentModalVC: UIViewController {
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(commentTextField.snp.top).offset(-10) // 텍스트 필드 위에 위치
         }
+    }
+}
+
+extension CommentModalVC: UITableViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let currentOffset = scrollView.contentOffset.y
+        
+        if currentOffset + 30 < lastContentOffset.y {
+            self.view.endEditing(true)
+        }
+        lastContentOffset = scrollView.contentOffset
     }
 }
