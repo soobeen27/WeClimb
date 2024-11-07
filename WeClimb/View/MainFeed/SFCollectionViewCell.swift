@@ -436,9 +436,10 @@ class SFCollectionViewCell: UICollectionViewCell {
         likeButton.rx.tap
             .asSignal().emit(onNext: { [weak self] in
                 guard let self = self else { return }
-                let postUID = self.medias[medias.startIndex].postRef.documentID
+//                let postUID = self.medias[medias.startIndex].postRef.documentID
 //                likeViewModel?.likePost(myUID: user.uid, postUID: postUID)
                 likeViewModel?.likePost(myUID: user.uid)
+                self.likeButton.isActivated.toggle()
             })
             .disposed(by: disposeBag)
         
