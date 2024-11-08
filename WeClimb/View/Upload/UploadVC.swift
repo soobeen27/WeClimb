@@ -616,6 +616,7 @@ extension UploadVC : PHPickerViewControllerDelegate {
 
 // MARK: 업로드 로직
 extension UploadVC {
+    // MARK: - 업로드 버튼과 비디오 압축 처리
     private func bindPostButton() {
         postButton.rx.tap
             .do(onNext: { [weak self] in
