@@ -22,24 +22,52 @@ class ClimbingGymVC: UIViewController {
     private let headerView = GymHeaderView()
     
     // MARK: - 컬렉션 뷰 구성 - DS
-    lazy var difficultyCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        let itemsPerRow: CGFloat = 3
-        let horizontalInsets: CGFloat = 32
-        let itemSpacing: CGFloat = 16
-        
-        let totalSpacing = horizontalInsets + ((itemsPerRow - 1) * itemSpacing)
-        let width = (UIScreen.main.bounds.width - totalSpacing) / itemsPerRow
-        
-        layout.sectionInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
-        layout.minimumLineSpacing = itemSpacing
-        layout.minimumInteritemSpacing = itemSpacing
-        layout.itemSize = CGSize(width: width, height: width)
-        
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .clear
-        collectionView.showsVerticalScrollIndicator = false
-        return collectionView
+    private let difficultyTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = .clear
+        tableView.showsVerticalScrollIndicator = true
+        tableView.clipsToBounds = true
+        tableView.separatorStyle = .singleLine
+        tableView.separatorColor = UIColor.label.withAlphaComponent(0.2)
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 32, bottom: 0, right: 32)
+        tableView.rowHeight = 64
+        tableView.register(DifficultyTableViewCell.self, forCellReuseIdentifier: DifficultyTableViewCell.className)
+        return tableView
+    }()
+    
+    // MARK: - 난이도 색상 구분 - DS
+    private let easyLabel: UILabel = {
+        let label = UILabel()
+        label.text = "EASY"
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textColor = .gray
+        return label
+    }()
+    
+    private let hardLabel: UILabel = {
+        let label = UILabel()
+        label.text = "HARD"
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textColor = .gray
+        return label
+    }()
+    
+    private let colorStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.alignment = .fill
+        stackView.distribution = .fillEqually
+        stackView.spacing = 2
+        return stackView
+    }()
+    
+    private let countStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.alignment = .fill
+        stackView.distribution = .fillEqually
+        stackView.spacing = 2
+        return stackView
     }()
     
     // MARK: - 라이프사이클 - DS
@@ -47,9 +75,8 @@ class ClimbingGymVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         bindSectionData()
+        bindData()
         actions()
-
-        difficultyCollectionView.register(DifficultyCollectionViewCell.self, forCellWithReuseIdentifier: DifficultyCollectionViewCell.className)
     }
     
     func configure(with gym: Gym) {
@@ -78,40 +105,67 @@ class ClimbingGymVC: UIViewController {
             .disposed(by: disposeBag)
         
         viewModel.items
-            .bind(to: difficultyCollectionView.rx.items(cellIdentifier: DifficultyCollectionViewCell.className, cellType: DifficultyCollectionViewCell.self)) { row, item, cell in
-                let gradeColor = item
-                
-                if let logoImage = UIImage(named: "LogoOrange") {
-                    cell.configure(with: gradeColor, holdImage: logoImage)
-                }
+            .bind(to: difficultyTableView.rx.items(cellIdentifier: DifficultyTableViewCell.className, cellType: DifficultyTableViewCell.self)) { row, item, cell in
+                cell.configure(with: item.color, problemCount: item.problemCount, feedCount: item.feedCount)
             }
             .disposed(by: disposeBag)
         
-        difficultyCollectionView.rx.itemSelected
+        difficultyTableView.rx.itemSelected
             .bind(to: viewModel.itemSelected)
             .disposed(by: disposeBag)
     }
     
-        private func setupInitialUI() {
-            let initialSegmentIndex = viewModel.selectedSegment.value
-            headerView.segmentControl.selectedSegmentIndex = initialSegmentIndex
-            updateSegmentControlUI(selectedIndex: initialSegmentIndex)
-        }
+    private func bindData() {
+        viewModel.items
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] items in
+                guard let self else { return }
+                
+                self.colorStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+                self.countStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+                
+                for item in items {
+                    let colorView = UIView()
+                    colorView.backgroundColor = item.color
+                    colorView.layer.cornerRadius = 2
+                    colorView.clipsToBounds = true
+                    self.colorStackView.addArrangedSubview(colorView)
+                    
+                    let countLabel = UILabel()
+                    countLabel.text = "\(item.problemCount)"
+                    countLabel.font = UIFont.systemFont(ofSize: 10)
+                    countLabel.textColor = .gray
+                    countLabel.textAlignment = .center
+                    self.countStackView.addArrangedSubview(countLabel)
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func setupInitialUI() {
+        let initialSegmentIndex = viewModel.selectedSegment.value
+        headerView.segmentControl.selectedSegmentIndex = initialSegmentIndex
+        updateSegmentControlUI(selectedIndex: initialSegmentIndex)
+    }
     
     private func updateSegmentControlUI(selectedIndex: Int) {
         if selectedIndex == 1 {
-            difficultyCollectionView.isHidden = true
+            difficultyTableView.isHidden = true
             climbingGymInfoView.isHidden = false
+            easyLabel.isHidden = true
+            hardLabel.isHidden = true
         } else {
-            difficultyCollectionView.isHidden = false
+            difficultyTableView.isHidden = false
             climbingGymInfoView.isHidden = true
+            easyLabel.isHidden = false
+            hardLabel.isHidden = false
         }
     }
     
-    // MARK: - 세그먼트 컨트롤 및 버튼 액션 설정 - DS
+    // MARK: - 세그먼트 컨트롤 및 버튼 액션 설정
     private func actions() {
         headerView.followButton.addAction(UIAction { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
             self.headerView.followButton.isHidden = true
             if self.headerView.followButton.title(for: .normal) == ClimbingGymNameSpace.follow {
                 self.headerView.followButton.setTitle(ClimbingGymNameSpace.unFollow, for: .normal)
@@ -139,15 +193,19 @@ class ClimbingGymVC: UIViewController {
         }, for: .valueChanged)
     }
     
-    // MARK: - 레이아웃 설정 - DS
+    // MARK: - 레이아웃 설정
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         climbingGymInfoView.isHidden = true
         
         [
             headerView,
-            difficultyCollectionView,
-            climbingGymInfoView
+            difficultyTableView,
+            climbingGymInfoView,
+            easyLabel,
+            hardLabel,
+            colorStackView,
+            countStackView
         ].forEach { view.addSubview($0) }
         
         headerView.snp.makeConstraints {
@@ -155,10 +213,32 @@ class ClimbingGymVC: UIViewController {
             $0.leading.trailing.equalToSuperview()
         }
         
-        difficultyCollectionView.snp.makeConstraints {
-            $0.top.equalTo(headerView.snp.bottom)
-            $0.leading.equalToSuperview()
-            $0.trailing.equalToSuperview()
+        easyLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(16)
+            $0.top.equalTo(headerView.snp.bottom).offset(8)
+        }
+        
+        hardLabel.snp.makeConstraints {
+            $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalTo(headerView.snp.bottom).offset(8)
+        }
+        
+        colorStackView.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(16)
+            $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalTo(easyLabel.snp.bottom).offset(4)
+            $0.height.equalTo(16)
+        }
+        
+        countStackView.snp.makeConstraints {
+            $0.leading.trailing.equalTo(colorStackView)
+            $0.top.equalTo(colorStackView.snp.bottom).offset(4)
+            $0.height.equalTo(16)
+        }
+        
+        difficultyTableView.snp.makeConstraints {
+            $0.top.equalTo(countStackView.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
         
