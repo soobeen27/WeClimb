@@ -29,6 +29,10 @@ class UploadVM {
     private var currentPageIndex = 0
     
     var shouldUpdateUI: Bool = true
+    
+    // 순환 참조 방지
+    weak var viewController: UploadVC?
+    var completedMediaCount = 0
 }
 
 extension UploadVM {
@@ -197,7 +201,7 @@ extension UploadVM {
                 if item.url.pathExtension == "jpg" || item.url.pathExtension == "png" {
                     if let image = UIImage(contentsOfFile: item.url.path) {
                         // 이미지 압축
-                        if let compressedData = image.jpegData(compressionQuality: 0.7) {
+                        if let compressedData = image.jpegData(compressionQuality: 0.6) {
                             let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
                             do {
                                 try compressedData.write(to: tempImageURL)
@@ -233,15 +237,17 @@ extension UploadVM {
     
     // MARK: - 비디오를 압축하는 메서드
     func compressVideo(inputURL: URL, completion: @escaping (URL?) -> Void) {
+        
         let videoCompressor = LightCompressor()
         
+        let totalMediaCount = Float(feedRelay.value.count)        
         // 압축 작업 설정
         _ = videoCompressor.compressVideo(videos: [
             .init(
                 source: inputURL,
                 destination: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("mp4"),
                 configuration: .init(
-                    quality: VideoQuality.very_high, // 비디오 품질
+                    quality: VideoQuality.medium, // 비디오 품질
                     videoBitrateInMbps: 2, // 비트레이트
                     disableAudio: false, // 오디오
                     keepOriginalResolution: false, // 원본 해상도 변경
@@ -252,16 +258,27 @@ extension UploadVM {
         progressQueue: .main,
         progressHandler: { progress in
             DispatchQueue.main.async { [unowned self] in
-                // Handle progress- "\(String(format: "%.0f", progress.fractionCompleted * 100))%"
+                let currentProgress = Float(progress.fractionCompleted) / totalMediaCount
+                let overallProgress = (Float(completedMediaCount) + currentProgress) / totalMediaCount
+                
+                UIView.animate(withDuration: 5) {
+                    self.viewController?.progressBar.setProgress(overallProgress, animated: true)
+                }
             }},
-                                          
             completion: {[weak self] result in
-            guard self != nil else { return }
+            guard let self = self else { return }
             
             switch result {
                 
             case .onSuccess(_, let path):
                 print("비디오 압축 완료: \(path)")
+                self.completedMediaCount += 1
+                DispatchQueue.main.async { [unowned self] in
+                    let allProgress = Float(self.completedMediaCount) / totalMediaCount
+                    UIView.animate(withDuration: 5) {
+                        self.viewController?.progressBar.setProgress(allProgress, animated: true)
+                    }
+                }
                 completion(path)
             case .onStart:
                 print("압축 시작")
@@ -273,7 +290,6 @@ extension UploadVM {
                 completion(nil)
             }
         })
-        // compression.cancel = true
     }
     
     func getThumbnailImage(from videoURL: URL, completion: @escaping (String?) -> Void) {

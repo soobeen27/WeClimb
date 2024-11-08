@@ -105,3 +105,19 @@ enum UploadStatus {
     case fail
     case success
 }
+
+enum CommonError: Error {
+    case noSelf
+}
+
+enum GetDocumentError: Error {
+    case noField
+    case failDecoding
+}
+
+// MARK: Feed Type
+enum FeedType {
+    case mainFeed
+    case myPage
+    case userPage
+}

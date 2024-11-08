@@ -19,7 +19,8 @@ class TabBarController: UITabBarController {
     }
     
     private func setView() {
-        let sfMainFeedVC = UINavigationController(rootViewController: SFMainFeedVC())
+//        let sfMainFeedVC = UINavigationController(rootViewController: SFMainFeedVC())
+        let sfMainFeedVC = UINavigationController(rootViewController: SFMainFeedVC(viewModel: MainFeedVM(), startingIndex: 0, feedType: .mainFeed))
         let searchVC = UINavigationController(rootViewController: SearchVC())
         
         // 선택된 아이템 색상 설정
@@ -41,7 +42,7 @@ class TabBarController: UITabBarController {
             myPageVC = UINavigationController(rootViewController: MyPageVC())
             myPageVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "person"), selectedImage: nil)
             
-            uploadVC = UINavigationController(rootViewController: UploadVC())
+            uploadVC = UINavigationController(rootViewController: GymSelectVC())
             uploadVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
         } else {
             myPageVC = UINavigationController(rootViewController: GuestVC())

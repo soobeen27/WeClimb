@@ -33,6 +33,13 @@ final class FirebaseManager {
     static let shared = FirebaseManager()
     private init() {}
     
+    //MARK: 현재 유저 uid
+    func currentUserUID() -> String {
+        guard let user = Auth.auth().currentUser else {
+            return ""
+        }
+        return user.uid
+    }
     // MARK: 유저 정보 업데이트
     func updateAccount(with data: String, for field: UserUpdate, completion: @escaping () -> Void) {
         guard let user = Auth.auth().currentUser else { return }
@@ -106,10 +113,8 @@ final class FirebaseManager {
                     }
                 }
             }
-            
             return Disposables.create()
         }
-        
     }
     //  MARK: 닉네임 중복 체크, 중복일 시 true 리턴 중복값 아니면 false 리턴
     func duplicationCheck(with name: String, completion: @escaping (Bool) -> Void) {
@@ -235,7 +240,6 @@ final class FirebaseManager {
             } catch {
                 completion(.failure(UserError.none))
             }
-            
             //            snapshot.documents.forEach { document in
             //                if let user = try? document.data(as: User.self) {
             //                    completion(.success(user))
@@ -344,7 +348,7 @@ final class FirebaseManager {
             }
             
             // 포스트 데이터를 Firestore에 저장
-            let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: mediaReferences, thumbnail: thumbnail)
+            let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: mediaReferences, thumbnail: thumbnail, commentCount: nil)
             
             let userRef = db.collection("users").document(user.uid)
             batch.setData(try Firestore.Encoder().encode(post), forDocument: postRef)
@@ -377,9 +381,7 @@ final class FirebaseManager {
             }
         }
     }
-    
-    
-    
+
     // MARK: 댓글달기
     func addComment(fromPostUid postUid: String, content: String) {
         guard let user = Auth.auth().currentUser else {
@@ -432,38 +434,78 @@ final class FirebaseManager {
     }
     
     //MARK: 좋아요
-    // uid로 부터
-    func like(from uid: String, type: Like) -> Observable<[String]> {
+    /// 좋아요
+    /// - Parameters:
+    ///   - myUID: 로그인된 계정 uid
+    ///   - targetUID: 좋아요 누를 포스트 or 댓글 uid
+    ///   - type: 포스트 or 댓글
+    /// - Returns: 좋아요 누른 uid array
+    func like(myUID: String, targetUID: String, type: Like) -> Single<[String]> {
+        return Single.create(subscribe: { [weak self] single in
+            guard let self else {
+                single(.failure(CommonError.noSelf))
+                return Disposables.create()
+            }
+            let targetRef = self.db.collection("posts").document(targetUID)
+            self.db.runTransaction { transaction, errorPointer in
+                let postSnapshot: DocumentSnapshot
+                do {
+                    postSnapshot = try transaction.getDocument(targetRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    single(.failure(fetchError as Error))
+                    return nil
+                }
+                var currentLikeList = postSnapshot.data()?["like"] as? [String] ?? []
+                
+                if currentLikeList.contains([myUID]) {
+                    transaction.updateData(["like" : FieldValue.arrayRemove([myUID])], forDocument: targetRef)
+                    currentLikeList.removeAll { $0 == myUID }
+                } else {
+                    transaction.updateData(["like" : FieldValue.arrayUnion([myUID])], forDocument: targetRef)
+                    currentLikeList.append(myUID)
+                }
+                return currentLikeList
+            } completion: { object, error in
+                if let error = error {
+                    print("Error : \(error) ", #file, #function, #line)
+                    single(.failure(error))
+                    return
+                } else if let likeList = object as? [String] {
+                    single(.success(likeList))
+                }
+            }
+            return Disposables.create()
+        })
+    }
+    
+    func fetchLike(from uid: String, type: Like) -> Observable<[String]> {
         return Observable<[String]>.create { [weak self] observer in
-            guard let user = Auth.auth().currentUser, let self else {
-                observer.onError(UserError.none)
+            guard let self else { 
+                observer.onError(CommonError.noSelf)
                 return Disposables.create()
             }
             let contentRef = self.db.collection(type.string).document(uid)
-            contentRef.updateData(["like" : FieldValue.arrayUnion([user.uid])]) { error in
+            contentRef.getDocument { document, error in
                 if let error = error {
-                    print("좋아요 실행중 오류: \(error)")
+                    print("좋아요 목록 가져오는 중 에러: \(error)")
                     observer.onError(error)
+                    return
                 }
-                contentRef.getDocument { document, error in
-                    if let error = error {
-                        print("좋아요 목록 가져오는 중 에러: \(error)")
-                        observer.onError(error)
-                    }
-                    guard let document, document.exists else {
-                        observer.onError(UserError.none)
-                        return
-                    }
-                    guard let likeList = document.get("like") as? [String] else {
-                        print("라이크 없음")
-                        return
-                    }
-                    observer.onNext(likeList)
+                guard let document, document.exists else {
+                    observer.onError(UserError.none)
+                    return
                 }
+                guard let likeList = document.get("like") as? [String] else {
+                    print("라이크 없음")
+                    return
+                }
+                observer.onNext(likeList)
             }
             return Disposables.create()
         }
     }
+    
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
     func feedFirst(completion: @escaping ([Post]?) -> Void) {
@@ -476,11 +518,11 @@ final class FirebaseManager {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
                         .whereField("authorUID", notIn: blackList)
-                        .limit(to: 10)
+                        .limit(to: 5)
                 } else {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
-                        .limit(to: 10)
+                        .limit(to: 5)
                 }
                 postRef.getDocuments { snapshot, error in
                     if let error = error {
@@ -525,12 +567,12 @@ final class FirebaseManager {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
                         .whereField("authorUID", notIn: blackList)
-                        .limit(to: 10)
+                        .limit(to: 5)
                         .start(afterDocument: lastFeed)
                 } else {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
-                        .limit(to: 10)
+                        .limit(to: 5)
                         .start(afterDocument: lastFeed)
                 }
                 postRef.getDocuments { snapshot, error in
@@ -566,164 +608,9 @@ final class FirebaseManager {
         }
     }
     
-//    func feedFirst(completion: @escaping ([(post: Post, media: [Media])]?) -> Void) {
-//        var blackList: [String] = []
-//        currentUserInfo { result in
-//            switch result {
-//            case .success(let user):
-//                if let black = user.blackList {
-//                    blackList = black
-//                }
-//            case .failure(let error):
-//                print("유저 정보 가져오는 중 에러: \(error)")
-//            }
-//        }
-//        
-//        let postRef = db.collection("posts")
-//            .order(by: "creationDate", descending: true)
-//        //            .limit(to: 10)
-//            .limit(to: 10)
-//        
-//        postRef.getDocuments { [weak self] snapshot, error in
-//            guard let self else { return }
-//            
-//            if let error = error {
-//                print("피드 가져오는중 에러: \(error)")
-//                completion(nil)
-//                return
-//            }
-//            
-//            guard let documents = snapshot?.documents else {
-//                print("현재 피드가 없음")
-//                completion(nil)
-//                return
-//            }
-//            
-//            if let lastDocument = documents.last {
-//                self.lastFeed = lastDocument
-//            }
-//            
-//            var posts = documents.compactMap {
-//                do {
-//                    return try $0.data(as: Post.self)
-//                } catch {
-//                    return nil
-//                }
-//            }
-//            
-//            // Post에 있는 Media DocumentReference들을 비동기적으로 배치로 가져오기
-//            Task {
-//                var postWithMedias: [(post: Post, media: [Media])] = []
-//                let lock = NSLock() // 동시성 제어용 Lock
-//                
-//                try await withThrowingTaskGroup(of: (Post, [Media]).self) { group in
-//                    for post in posts {
-//                        group.addTask {
-//                            // 각 Post에 해당하는 Media 문서들을 배치로 가져오기
-//                            let medias = try await self.fetchMedias(for: post)
-//                            return (post, medias)
-//                        }
-//                    }
-//                    
-//                    // TaskGroup 내에서 동시성 관리
-//                    for try await (post, medias) in group {
-//                        lock.lock() // 스레드 안전하게 배열에 추가
-//                        postWithMedias.append((post: post, media: medias))
-//                        lock.unlock()
-//                    }
-//                }
-//                let filteredPosts = postWithMedias.filter { post in
-//                    !blackList.contains(post.post.authorUID)
-//                }
-//                let newestFirst = filteredPosts.sorted {
-//                    $0.post.creationDate > $1.post.creationDate
-//                }
-//                completion(newestFirst)
-//            }
-//        }
-//    }
-//    
-    //    // MARK: feedFirst 이후에 피드를 더 가져오기
-//    func feedLoading(completion: @escaping ([(post: Post, media: [Media])]?) -> Void) {
-//        var blackList: [String] = []
-//        currentUserInfo { result in
-//            switch result {
-//            case .success(let user):
-//                if let black = user.blackList {
-//                    blackList = black
-//                }
-//            case .failure(let error):
-//                print("유저 정보 가져오는 중 에러: \(error)")
-//            }
-//        }
-//        guard let lastFeed = lastFeed else {
-//            print("초기 피드가 존재하지 않음")
-//            return
-//        }
-//        let postRef = db.collection("posts")
-//            .order(by: "creationDate", descending: true)
-//            .limit(to: 2)
-//            .start(afterDocument: lastFeed)
-//        
-//        postRef.getDocuments { [weak self] snapshot, error in
-//            guard let self else { return }
-//            
-//            if let error = error {
-//                print("피드 가져오는중 에러: \(error)")
-//                completion(nil)
-//                return
-//            }
-//            
-//            guard let documents = snapshot?.documents else {
-//                print("현재 피드가 없음")
-//                completion(nil)
-//                return
-//            }
-//            
-//            if let lastDocument = documents.last {
-//                self.lastFeed = lastDocument
-//            }
-//            
-//            let posts = documents.compactMap {
-//                do {
-//                    return try $0.data(as: Post.self)
-//                } catch {
-//                    return nil
-//                }
-//            }
-//            
-//            // Post에 있는 Media DocumentReference들을 비동기적으로 배치로 가져오기
-//            Task {
-//                var postWithMedias: [(post: Post, media: [Media])] = []
-//                let lock = NSLock() // 동시성 제어용 Lock
-//                
-//                try await withThrowingTaskGroup(of: (Post, [Media]).self) { group in
-//                    for post in posts {
-//                        group.addTask {
-//                            // 각 Post에 해당하는 Media 문서들을 배치로 가져오기
-//                            let medias = try await self.fetchMedias(for: post)
-//                            return (post, medias)
-//                        }
-//                    }
-//                    
-//                    // TaskGroup 내에서 동시성 관리
-//                    for try await (post, medias) in group {
-//                        lock.lock() // 스레드 안전하게 배열에 추가
-//                        postWithMedias.append((post: post, media: medias))
-//                        lock.unlock()
-//                    }
-//                }
-//                let filteredPosts = postWithMedias.filter { post in
-//                    !blackList.contains(post.post.authorUID)
-//                }
-//                completion(filteredPosts)
-//            }
-//        }
-//    }
-    
     func fetchMedias(for post: Post) async throws -> [Media] {
         // medias의 DocumentReference들을 한 번에 가져오기 위한 batch 작업
-        var mediaRefs: [DocumentReference] = post.medias
+        let mediaRefs: [DocumentReference] = post.medias
         var medias: [Media] = []
         
         guard !mediaRefs.isEmpty else {
@@ -744,6 +631,56 @@ final class FirebaseManager {
         }
         
         return medias
+    }
+    
+    //MARK: 팔로우, 언팔
+    /// 팔로우, 언팔로우
+    /// - Parameters:
+    ///   - myUID: 로그인되어있는 계정 uid
+    ///   - targetUID: 팔로우, 언팔할 계정 uid
+    /// - Returns: 팔로우, 언팔 후 로그인된 계정이 팔로우하고 있는 배열
+    func follow(myUID: String, targetUID: String) -> Single<[String]>{
+        return Single.create { [weak self] single in
+            guard let self else {
+                single(.failure(CommonError.noSelf))
+                return Disposables.create()
+            }
+            
+            let myRef = self.db.collection("users").document(myUID)
+            let targetRef = self.db.collection("users").document(targetUID)
+            
+            self.db.runTransaction { (transaction, errorPointer) -> [String]? in
+                let userSnapshot: DocumentSnapshot
+                do {
+                    userSnapshot = try transaction.getDocument(myRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    single(.failure(fetchError as Error))
+                    return nil
+                }
+                var currentFollowList = userSnapshot.data()?["following"] as? [String] ?? []
+                
+                if currentFollowList.contains([targetUID]) {
+                    transaction.updateData(["following": FieldValue.arrayRemove([targetUID])], forDocument: myRef)
+                    transaction.updateData(["followers" : FieldValue.arrayRemove([myUID])], forDocument: targetRef)
+                    currentFollowList.removeAll { $0 == targetUID }
+                } else {
+                    transaction.updateData(["following": FieldValue.arrayUnion([targetUID])], forDocument: myRef)
+                    transaction.updateData(["followers" : FieldValue.arrayUnion([myUID])], forDocument: targetRef)
+                    currentFollowList.append(targetUID)
+                }
+                return currentFollowList
+            } completion: { (object, error) in
+                if let error = error {
+                    print("Error : \(error) ", #file, #function, #line)
+                    single(.failure(error))
+                    return
+                } else if let followList = object as? [String] {
+                    single(.success(followList))
+                }
+            }
+            return Disposables.create()
+        }
     }
     
     
@@ -923,27 +860,59 @@ final class FirebaseManager {
     }
     
     // MARK: Post 삭제
-    func deletePost(uid: String) {
-        guard let user = Auth.auth().currentUser else { return }
-        let userRef = db.collection("users").document(user.uid)
-        let postRef = db.collection("posts").document(uid)
-        
-        userRef.updateData(["posts" : FieldValue.arrayRemove([postRef])]) { error in
-            if let error = error {
-                print("Error - Deleting Post Reference: \(error)")
-                return
-            }
-            print("Post Reference deleted Successfully!")
-            postRef.delete { error in
-                if let error = error {
-                    print("Error - Deleting Post: \(error)")
-                    return
-                }
-                print("Post Deleted Succssfully")
+//    func deletePost(uid: String) {
+//        guard let user = Auth.auth().currentUser else { return }
+//        let userRef = db.collection("users").document(user.uid)
+//        let postRef = db.collection("posts").document(uid)
+//        
+//        userRef.updateData(["posts" : FieldValue.arrayRemove([postRef])]) { error in
+//            if let error = error {
+//                print("Error - Deleting Post Reference: \(error)")
+//                return
+//            }
+//            print("Post Reference deleted Successfully!")
+//            postRef.delete { error in
+//                if let error = error {
+//                    print("Error - Deleting Post: \(error)")
+//                    return
+//                }
+//                print("Post Deleted Succssfully")
+//            }
+//        }
+//    }
+
+    func deletePost(uid: String) -> Single<Void> {
+        guard let user = Auth.auth().currentUser else { 
+            return Single.create {
+                $0(.failure(UserError.logout))
+                return Disposables.create()
             }
         }
+        return Single.create { [weak self] single in
+            guard let self else { return Disposables.create() }
+            let userRef = self.db.collection("users").document(user.uid)
+            let postRef = self.db.collection("posts").document(uid)
+            
+            userRef.updateData(["posts" : FieldValue.arrayRemove([postRef])]) { error in
+                if let error = error {
+                    print("Error - Deleting Post Reference: \(error)")
+                    single(.failure(error))
+                    return
+                }
+                print("Post Reference deleted Successfully!")
+                postRef.delete { error in
+                    if let error = error {
+                        print("Error - Deleting Post: \(error)")
+                        single(.failure(error))
+                        return
+                    }
+                    single(.success(()))
+                }
+            }
+            return Disposables.create()
+        }
     }
-    
+
     func fileNameFromUrl(urlString: String) -> String {
         guard let url = URL(string: urlString) else { return "" }
         return url.lastPathComponent
