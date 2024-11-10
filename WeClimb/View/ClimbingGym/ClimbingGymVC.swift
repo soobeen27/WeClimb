@@ -77,11 +77,13 @@ class ClimbingGymVC: UIViewController {
     }
     
     private func navigateToClimbingDetailGymVC(with difficulty: String) {
-        // gymUID와 difficulty 값을 기반으로 ClimbingDetailGymVC에 전달
-//        print("선택된 난이도: \(difficulty)")
+        //        print("선택된 난이도: \(difficulty)")
         guard let gymData = gymData else { return }
+        
         let detailViewModel = ClimbingDetailGymVM(gym: gymData, difficulty: difficulty)
         let climbingDetailGymVC = ClimbingDetailGymVC(viewModel: detailViewModel)
+        
+        climbingDetailGymVC.configure(with: gymData.gymName, difficulty: difficulty)
         
         navigationController?.pushViewController(climbingDetailGymVC, animated: true)
     }

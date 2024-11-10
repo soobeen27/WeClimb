@@ -40,11 +40,25 @@ class ClimbingDetailGymVC: UIViewController {
         return label
     }()
     
+    private let difficultyTitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        return label
+    }()
+    
+    private let difficultyColorView: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 6
+        view.clipsToBounds = true
+        view.backgroundColor = .clear
+        return view
+    }()
+    
     private let filterByHoldButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("홀드", for: .normal)
         button.setTitleColor(.label, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.titleLabel?.font = .boldSystemFont(ofSize: 12)
         button.backgroundColor = .lightGray
         button.layer.cornerRadius = 10
         return button
@@ -54,7 +68,7 @@ class ClimbingDetailGymVC: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("키", for: .normal)
         button.setTitleColor(.label, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.titleLabel?.font = .boldSystemFont(ofSize: 12)
         button.backgroundColor = .lightGray
         button.layer.cornerRadius = 8
         return button
@@ -64,7 +78,7 @@ class ClimbingDetailGymVC: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("팔길이", for: .normal)
         button.setTitleColor(.label, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.titleLabel?.font = .boldSystemFont(ofSize: 12)
         button.backgroundColor = .lightGray
         button.layer.cornerRadius = 8
         return button
@@ -95,7 +109,7 @@ class ClimbingDetailGymVC: UIViewController {
         
         viewModel.output.logoImageURL
             .drive(onNext: { [weak self] url in
-                guard let self = self else { return }
+                guard let self else { return }
                 FirebaseManager.shared.loadImage(from: url.absoluteString, into: self.logoImageView)
             })
             .disposed(by: disposeBag)
@@ -113,6 +127,8 @@ class ClimbingDetailGymVC: UIViewController {
         [
             logoImageView,
             gymNameLabel,
+            difficultyTitleLabel,
+            difficultyColorView,
             filterByHoldButton,
             filterByHeightButton,
             filterByArmLengthButton,
@@ -126,13 +142,24 @@ class ClimbingDetailGymVC: UIViewController {
         }
         
         gymNameLabel.snp.makeConstraints {
-            $0.centerY.equalTo(logoImageView)
+            $0.top.equalTo(logoImageView).offset(16)
             $0.leading.equalTo(logoImageView.snp.trailing).offset(10)
             $0.trailing.lessThanOrEqualToSuperview().offset(-16)
         }
         
+        difficultyTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(gymNameLabel.snp.bottom).offset(8)
+            $0.leading.equalTo(gymNameLabel)
+        }
+        
+        difficultyColorView.snp.makeConstraints {
+            $0.centerY.equalTo(difficultyTitleLabel)
+            $0.leading.equalTo(difficultyTitleLabel.snp.trailing).offset(4)
+            $0.width.height.equalTo(14)
+        }
+        
         filterByArmLengthButton.snp.makeConstraints {
-            $0.top.equalTo(logoImageView.snp.bottom).offset(10)
+            $0.top.equalTo(difficultyColorView.snp.bottom).offset(24)
             $0.trailing.equalToSuperview().offset(-16)
             $0.height.equalTo(24)
             $0.width.equalTo(48)
@@ -158,5 +185,13 @@ class ClimbingDetailGymVC: UIViewController {
             $0.trailing.equalToSuperview().offset(-16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
+    }
+    func configure(with gymName: String, difficulty: String) {
+        gymNameLabel.text = gymName
+        
+        // 난이도에 따라 색상 설정
+        let colorInfo = difficulty.colorInfo
+        difficultyTitleLabel.text = "난이도 "
+        difficultyColorView.backgroundColor = colorInfo.color
     }
 }
