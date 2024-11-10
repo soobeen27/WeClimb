@@ -23,7 +23,7 @@ class BlackListVM {
             switch result {
             case .success(let user):
                 print("현재 유저 정보: \(user)") // 유저 정보가 제대로 오는지 확인
-                guard let blackList = user.blackList else {
+                guard let blackList = user.blackList, let _ = user.blackList?.first else {
                     print("차단된 목록이 없습니다.")
                     return
                 }

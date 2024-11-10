@@ -502,7 +502,7 @@ final class FirebaseManager {
             switch result {
             case .success(let user):
                 let postRef: Query
-                if let blackList = user.blackList {
+                if let blackList = user.blackList, let _ = user.blackList?.first {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
                         .whereField("authorUID", notIn: blackList)
@@ -551,7 +551,7 @@ final class FirebaseManager {
             case .success(let user):
                 guard let lastFeed else { return }
                 let postRef: Query
-                if let blackList = user.blackList {
+                if let blackList = user.blackList, let _ = user.blackList?.first {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
                         .whereField("authorUID", notIn: blackList)
