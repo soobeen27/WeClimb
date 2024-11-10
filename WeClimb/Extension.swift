@@ -177,4 +177,8 @@ extension String {
             return ("그 외", UIColor.clear)
         }
     }
+    
+    var getGradeArray: [String] {
+        return self.components(separatedBy: ", ")
+    }
 }

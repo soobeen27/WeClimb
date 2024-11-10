@@ -27,6 +27,11 @@ class CommentVM {
     }
     
     // MARK: 댓글달기
+    /// 댓글 다는 함수임
+    /// - Parameters:
+    ///   - userUID: 로그인된 유저 유아이디;
+    ///   - postUid: 댓글 달려는 포스트 유아이디
+    ///   - content: 댓글 내용
     func addComment(userUID: String, fromPostUid postUid: String, content: String) {
         let commentUID = UUID().uuidString
         let postRef = db.collection("posts").document(postUid)
@@ -105,7 +110,7 @@ class CommentVM {
             guard let self else { return }
             let data = snapshot?.data()?["like"] as? [String] ?? []
             self.commentLikeList.accept(data)
-        }
+        } 
     }
     
     func likeComment(myUID: String, postUID: String, commentUID: String) {

@@ -47,7 +47,7 @@ extension UploadVM {
         if buttonType == "grade" {
             feedItem.grade = optionText
         } else if buttonType == "sector" {
-            feedItem.sector = optionText
+            feedItem.hold = optionText
         }
 
         currentFeedItems[currentPageIndex] = feedItem
@@ -189,10 +189,10 @@ extension UploadVM {
 }
 
 extension UploadVM {
-    func upload(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String) -> Observable<Void> {
+    func upload(media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String) -> Observable<Void> {
         return Observable.create { observer in
             let dispatchGroup = DispatchGroup()
-            var uploadMedia: [(url: URL, sector: String?, grade: String?)] = []
+            var uploadMedia: [(url: URL, hold: String?, grade: String?)] = []
             
             for item in media {
                 dispatchGroup.enter()
@@ -205,7 +205,7 @@ extension UploadVM {
                             let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
                             do {
                                 try compressedData.write(to: tempImageURL)
-                                uploadMedia.append((url: tempImageURL, sector: item.sector, grade: item.grade))
+                                uploadMedia.append((url: tempImageURL, hold: item.hold, grade: item.grade))
                             } catch {
                                 print("이미지 저장 실패: \(error.localizedDescription)")
                             }
@@ -216,7 +216,7 @@ extension UploadVM {
                     // 비디오인 경우
                     self.compressVideo(inputURL: item.url) { compressedURL in
                         if let compressedURL = compressedURL {
-                            uploadMedia.append((url: compressedURL, sector: item.sector, grade: item.grade))
+                            uploadMedia.append((url: compressedURL, hold: item.hold, grade: item.grade))
                         }
                         dispatchGroup.leave()
                     }
@@ -225,7 +225,8 @@ extension UploadVM {
             
             dispatchGroup.notify(queue: .main) {
                 Task { [uploadMedia, caption, gym] in
-                    await FirebaseManager.shared.uploadPost(media: uploadMedia, caption: caption, gym: gym, thumbnail: thumbnailURL)
+                    let myUID = FirebaseManager.shared.currentUserUID()
+                    await FirebaseManager.shared.uploadPost(myUID: myUID, media: uploadMedia, caption: caption, gym: gym, thumbnail: thumbnailURL)
                     observer.onNext(())
                     observer.onCompleted()
                 }

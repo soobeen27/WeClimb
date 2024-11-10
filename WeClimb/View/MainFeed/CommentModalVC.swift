@@ -26,6 +26,14 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
         tableView.register(CommentCell.self, forCellReuseIdentifier: CommentCell.className)
         return tableView
     }()
+    
+    private let profileImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.layer.cornerRadius = 20
+        imageView.layer.masksToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
 
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -35,17 +43,28 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
         return label
     }()
     
-    private let commentTextField: UITextField = {
+    private lazy var commentTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "댓글을 입력하세요..."
-        textField.borderStyle = .roundedRect
+        textField.placeholder = "댓글 추가.."
+        textField.layer.cornerRadius = 20
+        textField.layer.masksToBounds = true
+        textField.backgroundColor = UIColor.secondarySystemFill
         textField.font = UIFont.systemFont(ofSize: 14)
+        
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: textField.frame.height))
+        textField.leftView = paddingView
+        textField.leftViewMode = .always
+        textField.rightView = paddingView
+        textField.rightViewMode = .always
         return textField
     }()
     
     private let submitButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("전송", for: .normal)
+        button.setTitleColor(UIColor.white , for: .normal)
+        button.layer.cornerRadius = 20
+        button.layer.masksToBounds = true
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .bold)
         return button
     }()
@@ -66,6 +85,8 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
         setLayout()
         submitButtonBind()
         setKeyboard()
+        setTextField()
+        setProfileImageView()
     }
     
     private func setTableView() {
@@ -87,6 +108,38 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
                 }
             }.disposed(by: disposeBag)
         tableView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
+    }
+    
+    private func setProfileImageView() {
+        FirebaseManager.shared.currentUserInfo { [weak self] result in
+            switch result {
+            case .success(let user):
+                if let imageString = user.profileImage {
+                    let imageURL = URL(string: imageString)
+                    self?.profileImageView.kf.setImage(with: imageURL)
+                } else {
+                    self?.profileImageView.image = UIImage(named: "testStone")
+                }
+            case .failure(let error):
+                print("Error - \(#file) \(#function)")
+            }
+        }
+    }
+    
+    private func setTextField() {
+        commentTextField.rx.text
+            .asDriver()
+            .drive(onNext: { [weak self] text in
+                guard let self else { return }
+                if let text, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    self.submitButton.isEnabled = true
+                    self.submitButton.backgroundColor = .systemBlue
+                } else {
+                    self.submitButton.isEnabled = false
+                    self.submitButton.backgroundColor = nil
+                }
+            })
             .disposed(by: disposeBag)
     }
     
@@ -118,7 +171,8 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
                 
                 UIView.animate(withDuration: duration, delay: 0, options: animationOption) {
                     self.commentTextField.snp.updateConstraints {
-                        $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom).offset(-keyboardFrame.height + 10)
+//                        $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom).offset(-keyboardFrame.height + 10)
+                        $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom).inset(keyboardFrame.height - 10)
                         self.view.layoutIfNeeded()
                     }
                 }
@@ -137,6 +191,7 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
                 UIView.animate(withDuration: duration, delay: 0, options: animationOption) {
                     self.commentTextField.snp.updateConstraints {
                         $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom).offset(-10)
+//                        $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
                         self.view.layoutIfNeeded()
                     }
                 }
@@ -147,7 +202,7 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
-        [titleLabel, commentTextField, submitButton, tableView].forEach {
+        [titleLabel, commentTextField, submitButton, tableView, profileImageView].forEach {
             view.addSubview($0)
         }
         
@@ -155,16 +210,23 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
             $0.top.equalToSuperview().offset(20)
             $0.centerX.equalToSuperview()
         }
+        profileImageView.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(8)
+            $0.trailing.equalTo(commentTextField.snp.leading).offset(-8)
+            $0.centerY.equalTo(commentTextField) // 텍스트 필드와 수직 정렬
+            $0.size.equalTo(40)
+        }
         
         commentTextField.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(16) // 왼쪽 여백 추가
+            $0.leading.equalTo(profileImageView.snp.trailing).offset(8)
             $0.trailing.equalTo(submitButton.snp.leading).offset(-8) // 버튼과의 간격 설정
             $0.height.equalTo(40) // 텍스트 필드 높이 설정
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-10) // 하단에 고정
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-10)
+//            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
         
         submitButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16) // 오른쪽 여백 추가
+            $0.trailing.equalToSuperview().inset(8) // 오른쪽 여백 추가
             $0.centerY.equalTo(commentTextField) // 텍스트 필드와 수직 정렬
             $0.width.equalTo(50) // 버튼 너비 설정
             $0.height.equalTo(40) // 버튼 높이 설정

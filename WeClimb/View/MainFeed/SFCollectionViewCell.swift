@@ -223,6 +223,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         disposeBag = DisposeBag()
+        likeViewModel = nil
         feedUserNameLabel.text = nil
         feedProfileAddressLabel.text = nil
         feedCaptionLabel.text = nil
@@ -413,6 +414,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         
         feedCaptionLabel.text = post.caption
         commentButtonCounter.text = String(post.commentCount ?? 0)
+        likeButton.configureHeartButton()
         fetchLike()
         setLikeButton()
     }
@@ -432,31 +434,33 @@ class SFCollectionViewCell: UICollectionViewCell {
     //MARK: - 좋아요 버튼 세팅
     private func setLikeButton() {
         print("Setting LikeButton")
-        guard let user = Auth.auth().currentUser else { return }
+        guard let user = Auth.auth().currentUser,
+              let likeViewModel
+        else { return }
+//        if likeViewModel.postLikeList.value.contains([user.uid]) {
+//            self.likeButton.isActivated = true
+//        }  else {
+//            self.likeButton.isActivated = false
+//        }
+//        self.likeButton.configureHeartButton()
         likeButton.rx.tap
             .asSignal().emit(onNext: { [weak self] in
                 guard let self = self else { return }
-//                let postUID = self.medias[medias.startIndex].postRef.documentID
-//                likeViewModel?.likePost(myUID: user.uid, postUID: postUID)
-                likeViewModel?.likePost(myUID: user.uid)
-                self.likeButton.isActivated.toggle()
+                likeViewModel.likePost(myUID: user.uid)
             })
             .disposed(by: disposeBag)
         
-        likeViewModel?.postLikeList
+        likeViewModel.postLikeList
             .asDriver()
             .drive(onNext: { [weak self] likeList in
                 guard let self else { return }
-                likeButtonCounter.text =  "\(likeList.count)"
+                self.likeButtonCounter.text =  "\(likeList.count)"
+                print("LikeList: \(likeList)")
                 if likeList.contains([user.uid]) {
                     self.likeButton.isActivated = true
                 }  else {
                     self.likeButton.isActivated = false
                 }
-                self.likeButton.configureHeartButton()
-                print("isActivated: \(self.likeButton.isActivated)")
-                print("like list: \(likeList)")
-                
             })
             .disposed(by: disposeBag)
     }
