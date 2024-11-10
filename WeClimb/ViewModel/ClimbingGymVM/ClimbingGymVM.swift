@@ -11,31 +11,56 @@ import RxCocoa
 import RxSwift
 
 class ClimbingGymVM {
+    struct Input {
+        let segmentSelected: PublishRelay<Int>
+        let difficultySelected: PublishRelay<IndexPath>
+    }
+    
+    struct Output {
+        let gymData: Driver<Gym?>
+        let isDataLoaded: Driver<Bool>
+        let items: Driver<[(color: UIColor, grade: String)]>
+        let grades: Driver<[String]>
+        let selectedSegment: Driver<Int>
+    }
+
+    let input: Input
+    let output: Output
     
     private let disposeBag = DisposeBag()
     private var requestedGymNames = Set<String>()
     
-    let isDataLoaded = BehaviorRelay<Bool>(value: false)
-    let gymData = BehaviorRelay<Gym?>(value: nil)
-    
-    let grades = BehaviorRelay<[String]>(value: [])
-    let items = BehaviorRelay<[(color: UIColor, grade: String)]>(value: [])
-    
-    let selectedSegment = BehaviorRelay<Int>(value: 0)
-    let itemSelected = PublishSubject<IndexPath>()
+    private let isDataLoadedRelay = BehaviorRelay<Bool>(value: false)
+    private let gymDataRelay = BehaviorRelay<Gym?>(value: nil)
+    private let gradesRelay = BehaviorRelay<[String]>(value: [])
+    private let itemsRelay = BehaviorRelay<[(color: UIColor, grade: String)]>(value: [])
+    private let selectedSegmentRelay = BehaviorRelay<Int>(value: 0)  // 초기값 0
     
     init() {
-        setupBindings()
-    }
-    
-    private func setupBindings() {
-        selectedSegment
+        let segmentSelected = PublishRelay<Int>()
+        let difficultySelected = PublishRelay<IndexPath>()
+        
+        input = Input(segmentSelected: segmentSelected, difficultySelected: difficultySelected)
+        
+        output = Output(
+            gymData: gymDataRelay.asDriver(),
+            isDataLoaded: isDataLoadedRelay.asDriver(),
+            items: itemsRelay.asDriver(),
+            grades: gradesRelay.asDriver(),
+            selectedSegment: selectedSegmentRelay.asDriver()
+        )
+        
+        segmentSelected
+            .bind(to: selectedSegmentRelay)
+            .disposed(by: disposeBag)
+        
+        segmentSelected
             .subscribe(onNext: { [weak self] index in
-                guard let self else { return }
+                guard let self = self else { return }
                 if index == 0 {
                     self.updateItems()
                 } else {
-                    self.items.accept([])
+                    self.itemsRelay.accept([])
                 }
             })
             .disposed(by: disposeBag)
@@ -48,36 +73,33 @@ class ClimbingGymVM {
         }
         
         requestedGymNames.insert(gymName)
-        isDataLoaded.accept(false)
+        isDataLoadedRelay.accept(false)
         
         FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
             guard let self = self, let gym = gym else {
-                self?.isDataLoaded.accept(true)
+                self?.isDataLoadedRelay.accept(true)
                 return
             }
             
             DispatchQueue.main.async {
-                self.gymData.accept(gym)
+                self.gymDataRelay.accept(gym)
                 
                 let sectorNames = gym.grade.components(separatedBy: ", ")
-                self.grades.accept(sectorNames)
+                self.gradesRelay.accept(sectorNames)
                 
                 self.updateItems()
                 
-                self.isDataLoaded.accept(true)
+                self.isDataLoadedRelay.accept(true)
             }
         }
     }
     
     private func updateItems() {
-        let updatedItems = grades.value.map { gradeString -> (color: UIColor, grade: String) in
+        let updatedItems = gradesRelay.value.map { gradeString -> (color: UIColor, grade: String) in
             let color = gradeString.colorInfo.color
-            // let problemCount = 0  // 암장 문제 개수 (추후 데이터로 업데이트 예정)
-            // let feedCount = 0  // 메인피드에서 받아올 문제 개수 (추후 데이터로 업데이트 예정)
-            return (color: color, grade: gradeString) // 기본값으로 문제 및 피드 개수 설정
+            return (color: color, grade: gradeString)
         }
         
-        items.accept(updatedItems)
+        itemsRelay.accept(updatedItems)
     }
-
 }

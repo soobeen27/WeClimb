@@ -13,6 +13,18 @@ import RxSwift
 
 class ClimbingDetailGymVC: UIViewController {
     
+    private let viewModel: ClimbingDetailGymVM
+    private let disposeBag = DisposeBag()
+    
+    init(viewModel: ClimbingDetailGymVM) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     private let logoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .lightGray
@@ -73,6 +85,28 @@ class ClimbingDetailGymVC: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         setLayout()
+        bindViewModel()
+    }
+    
+    private func bindViewModel() {
+        viewModel.output.gymName
+            .drive(gymNameLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        viewModel.output.logoImageURL
+            .drive(onNext: { [weak self] url in
+                guard let self = self else { return }
+                FirebaseManager.shared.loadImage(from: url.absoluteString, into: self.logoImageView)
+            })
+            .disposed(by: disposeBag)
+        
+//        viewModel.output.problemThumbnails
+//            .drive(thumbnailCollectionView.rx.items) { collectionView, row, url in
+//                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: IndexPath(row: row, section: 0)) as! ThumbnailCell
+//                FirebaseManager.shared.loadImage(from: url.absoluteString, into: cell.imageView)
+//                return cell
+//            }
+//            .disposed(by: disposeBag)
     }
     
     private func setLayout() {

@@ -176,12 +176,9 @@ class ClimbingGymInfoView: UIView {
     }
     
     private func bindViewModel() {
-        guard let viewModel else { return }
-        
-        viewModel.gymData
-            .compactMap { $0 }
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [ weak self] gym in
+        viewModel?.output.gymData
+            .drive(onNext: { [weak self] gym in
+                guard let gym else { return }
                 self?.updateView(with: gym)
             })
             .disposed(by: disposeBag)

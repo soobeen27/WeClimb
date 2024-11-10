@@ -16,7 +16,7 @@ class ClimbingGymVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = ClimbingGymVM()
     private let climbingGymInfoView = ClimbingGymInfoView()
-    private let climbingDetailGymVC = ClimbingDetailGymVC()
+//    private let climbingDetailGymVC = ClimbingDetailGymVC()
     private var gymData: Gym?
     
     // MARK: - 공통 헤더 뷰 - DS
@@ -67,76 +67,98 @@ class ClimbingGymVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         bindSectionData()
-        bindData()
         actions()
     }
     
     func configure(with gym: Gym) {
+        self.gymData = gym
         viewModel.setGymInfo(gymName: gym.gymName)
         climbingGymInfoView.viewModel = viewModel
     }
     
-    private func navigateGymDetailView() {
-        self.navigationController?.pushViewController(climbingDetailGymVC, animated: true)
+    private func navigateToClimbingDetailGymVC(with difficulty: String) {
+        // gymUID와 difficulty 값을 기반으로 ClimbingDetailGymVC에 전달
+//        print("선택된 난이도: \(difficulty)")
+        guard let gymData = gymData else { return }
+        let detailViewModel = ClimbingDetailGymVM(gym: gymData, difficulty: difficulty)
+        let climbingDetailGymVC = ClimbingDetailGymVC(viewModel: detailViewModel)
+        
+        navigationController?.pushViewController(climbingDetailGymVC, animated: true)
     }
     
     // MARK: - 데이터 바인딩 - DS
     private func bindSectionData() {
-        viewModel.gymData
-            .compactMap { $0 }
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] gym in
+        viewModel.output.gymData
+            .drive(onNext: { [weak self] gym in
                 guard let self else { return }
-                self.headerView.configure(with: gym)
+                if let gym {
+                    self.headerView.configure(with: gym)
+                }
             })
             .disposed(by: disposeBag)
         
-        viewModel.isDataLoaded
+        viewModel.output.isDataLoaded
             .filter { $0 }
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                self.setupInitialUI()
+            .drive(onNext: { [weak self] _ in
+                self?.setupInitialUI()
             })
             .disposed(by: disposeBag)
         
-        viewModel.items
-            .bind(to: difficultyTableView.rx.items(cellIdentifier: DifficultyTableViewCell.className, cellType: DifficultyTableViewCell.self)) { row, item, cell in
+        viewModel.output.items
+            .drive(difficultyTableView.rx.items(cellIdentifier: DifficultyTableViewCell.className, cellType: DifficultyTableViewCell.self)) { row, item, cell in
                 cell.configure(with: item.color, grade: item.grade)
             }
             .disposed(by: disposeBag)
         
-        difficultyTableView.rx.itemSelected
-            .subscribe(onNext: { [ weak self ] item in
-                self?.navigateGymDetailView()
-            })
-            .disposed(by: disposeBag)
-    }
-    
-    private func bindData() {
-        viewModel.items
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] items in
+        viewModel.output.items
+            .drive(onNext: { [weak self] items in
                 guard let self else { return }
                 
                 self.colorStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-                
-                for item in items {
+                items.forEach { item in
                     let colorView = UIView()
                     colorView.backgroundColor = item.color
                     colorView.layer.cornerRadius = 2
-                    colorView.clipsToBounds = true
                     self.colorStackView.addArrangedSubview(colorView)
-                    
                 }
             })
             .disposed(by: disposeBag)
+        
+        difficultyTableView.rx.modelSelected((UIColor, String).self) // 셀 모델 직접 구독
+            .subscribe(onNext: { [weak self] model in
+                guard let self = self else { return }
+                // 페이지 전환 로직 실행
+                self.navigateToClimbingDetailGymVC(with: model.1) // model.1: 선택된 난이도
+            })
+            .disposed(by: disposeBag)
+        
+        // Input 이벤트
+        difficultyTableView.rx.itemSelected
+            .bind(to: viewModel.input.difficultySelected)
+            .disposed(by: disposeBag)
+        
+        headerView.segmentControl.rx.value
+            .bind(to: viewModel.input.segmentSelected)
+            .disposed(by: disposeBag)
     }
     
+    private func configureActions() {
+           headerView.followButton.addAction(UIAction { [weak self] _ in
+               guard let self else { return }
+               self.headerView.followButton.isHidden.toggle()
+               // follow 버튼 토글 로직 추가
+           }, for: .touchUpInside)
+       }
+       
     private func setupInitialUI() {
-        let initialSegmentIndex = viewModel.selectedSegment.value
-        headerView.segmentControl.selectedSegmentIndex = initialSegmentIndex
-        updateSegmentControlUI(selectedIndex: initialSegmentIndex)
+        // ViewModel의 selectedSegment를 UI에 반영
+        viewModel.output.selectedSegment
+            .drive(onNext: { [weak self] initialSegmentIndex in
+                guard let self else { return }
+                self.headerView.segmentControl.selectedSegmentIndex = initialSegmentIndex
+                self.updateSegmentControlUI(selectedIndex: initialSegmentIndex)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func updateSegmentControlUI(selectedIndex: Int) {
@@ -178,7 +200,7 @@ class ClimbingGymVC: UIViewController {
             guard let self else { return }
             
             let selectedIndex = self.headerView.segmentControl.selectedSegmentIndex
-            self.viewModel.selectedSegment.accept(selectedIndex)
+            self.viewModel.input.segmentSelected.accept(selectedIndex)
             
             self.updateSegmentControlUI(selectedIndex: selectedIndex)
         }, for: .valueChanged)
