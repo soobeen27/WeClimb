@@ -1,5 +1,5 @@
 //
-//  DifficultyTableViewCell.swift
+//  gradeTableViewCell.swift
 //  WeClimb
 //
 //  Created by 머성이 on 8/26/24.
@@ -9,7 +9,7 @@ import UIKit
 
 import SnapKit
 
-class DifficultyTableViewCell: UITableViewCell {
+class gradeTableViewCell: UITableViewCell {
     
     private let gradeColorView: UIView = {
         let view = UIView()

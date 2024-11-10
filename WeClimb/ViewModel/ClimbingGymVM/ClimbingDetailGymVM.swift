@@ -23,7 +23,7 @@ class ClimbingDetailGymVM {
     
     let output: Output
     
-    init(gym: Gym, difficulty: String) {
+    init(gym: Gym, grade: String) {
         // Output 정의
         output = Output(
             gymName: gymNameRelay.asDriver(),
@@ -44,11 +44,11 @@ class ClimbingDetailGymVM {
         }
         
         // 문제 썸네일 가져오기
-//        fetchProblems(for: gym, difficulty: difficulty)
+//        fetchProblems(for: gym, grade: grade)
     }
     
-//    private func fetchProblems(for gym: Gym, difficulty: String) {
-//        FirebaseManager.shared.fetchProblems(for: gym.gymName, difficulty: difficulty) { [weak self] urls in
+//    private func fetchProblems(for gym: Gym, grade: String) {
+//        FirebaseManager.shared.fetchProblems(for: gym.gymName, grade: grade) { [weak self] urls in
 //            self?.problemThumbnailsRelay.accept(urls)
 //        }
 //    }

@@ -23,7 +23,7 @@ class ClimbingGymVC: UIViewController {
     private let headerView = GymHeaderView()
     
     // MARK: - 테이블 뷰 구성 - DS
-    private let difficultyTableView: UITableView = {
+    private let gradeTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .clear
         tableView.showsVerticalScrollIndicator = true
@@ -32,7 +32,7 @@ class ClimbingGymVC: UIViewController {
         tableView.separatorColor = UIColor.label.withAlphaComponent(0.2)
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 32, bottom: 0, right: 32)
         tableView.rowHeight = 64
-        tableView.register(DifficultyTableViewCell.self, forCellReuseIdentifier: DifficultyTableViewCell.className)
+        tableView.register(gradeTableViewCell.self, forCellReuseIdentifier: gradeTableViewCell.className)
         return tableView
     }()
     
@@ -76,14 +76,14 @@ class ClimbingGymVC: UIViewController {
         climbingGymInfoView.viewModel = viewModel
     }
     
-    private func navigateToClimbingDetailGymVC(with difficulty: String) {
-        //        print("선택된 난이도: \(difficulty)")
+    private func navigateToClimbingDetailGymVC(with grade: String) {
+        //        print("선택된 난이도: \(grade)")
         guard let gymData = gymData else { return }
         
-        let detailViewModel = ClimbingDetailGymVM(gym: gymData, difficulty: difficulty)
+        let detailViewModel = ClimbingDetailGymVM(gym: gymData, grade: grade)
         let climbingDetailGymVC = ClimbingDetailGymVC(viewModel: detailViewModel)
         
-        climbingDetailGymVC.configure(with: gymData.gymName, difficulty: difficulty)
+        climbingDetailGymVC.configure(with: gymData.gymName, grade: grade)
         
         navigationController?.pushViewController(climbingDetailGymVC, animated: true)
     }
@@ -107,7 +107,7 @@ class ClimbingGymVC: UIViewController {
             .disposed(by: disposeBag)
         
         viewModel.output.items
-            .drive(difficultyTableView.rx.items(cellIdentifier: DifficultyTableViewCell.className, cellType: DifficultyTableViewCell.self)) { row, item, cell in
+            .drive(gradeTableView.rx.items(cellIdentifier: gradeTableViewCell.className, cellType: gradeTableViewCell.self)) { row, item, cell in
                 cell.configure(with: item.color, grade: item.grade)
             }
             .disposed(by: disposeBag)
@@ -126,7 +126,7 @@ class ClimbingGymVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        difficultyTableView.rx.modelSelected((UIColor, String).self) // 셀 모델 직접 구독
+        gradeTableView.rx.modelSelected((UIColor, String).self) // 셀 모델 직접 구독
             .subscribe(onNext: { [weak self] model in
                 guard let self = self else { return }
                 // 페이지 전환 로직 실행
@@ -135,8 +135,8 @@ class ClimbingGymVC: UIViewController {
             .disposed(by: disposeBag)
         
         // Input 이벤트
-        difficultyTableView.rx.itemSelected
-            .bind(to: viewModel.input.difficultySelected)
+        gradeTableView.rx.itemSelected
+            .bind(to: viewModel.input.gradeSelected)
             .disposed(by: disposeBag)
         
         headerView.segmentControl.rx.value
@@ -165,12 +165,12 @@ class ClimbingGymVC: UIViewController {
     
     private func updateSegmentControlUI(selectedIndex: Int) {
         if selectedIndex == 1 {
-            difficultyTableView.isHidden = true
+            gradeTableView.isHidden = true
             climbingGymInfoView.isHidden = false
             easyLabel.isHidden = true
             hardLabel.isHidden = true
         } else {
-            difficultyTableView.isHidden = false
+            gradeTableView.isHidden = false
             climbingGymInfoView.isHidden = true
             easyLabel.isHidden = false
             hardLabel.isHidden = false
@@ -215,7 +215,7 @@ class ClimbingGymVC: UIViewController {
         
         [
             headerView,
-            difficultyTableView,
+            gradeTableView,
             climbingGymInfoView,
             easyLabel,
             hardLabel,
@@ -245,7 +245,7 @@ class ClimbingGymVC: UIViewController {
             $0.height.equalTo(16)
         }
         
-        difficultyTableView.snp.makeConstraints {
+        gradeTableView.snp.makeConstraints {
             $0.top.equalTo(colorStackView.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)

@@ -13,7 +13,7 @@ import RxSwift
 class ClimbingGymVM {
     struct Input {
         let segmentSelected: PublishRelay<Int>
-        let difficultySelected: PublishRelay<IndexPath>
+        let gradeSelected: PublishRelay<IndexPath>
     }
     
     struct Output {
@@ -38,9 +38,9 @@ class ClimbingGymVM {
     
     init() {
         let segmentSelected = PublishRelay<Int>()
-        let difficultySelected = PublishRelay<IndexPath>()
+        let gradeSelected = PublishRelay<IndexPath>()
         
-        input = Input(segmentSelected: segmentSelected, difficultySelected: difficultySelected)
+        input = Input(segmentSelected: segmentSelected, gradeSelected: gradeSelected)
         
         output = Output(
             gymData: gymDataRelay.asDriver(),

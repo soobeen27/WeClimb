@@ -40,13 +40,19 @@ class ClimbingDetailGymVC: UIViewController {
         return label
     }()
     
-    private let difficultyTitleLabel: UILabel = {
+    private let gradeTitleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
         return label
     }()
     
-    private let difficultyColorView: UIView = {
+    private let gradeLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        return label
+    }()
+    
+    private let gradeColorView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 6
         view.clipsToBounds = true
@@ -127,8 +133,9 @@ class ClimbingDetailGymVC: UIViewController {
         [
             logoImageView,
             gymNameLabel,
-            difficultyTitleLabel,
-            difficultyColorView,
+            gradeTitleLabel,
+            gradeLabel,
+            gradeColorView,
             filterByHoldButton,
             filterByHeightButton,
             filterByArmLengthButton,
@@ -147,19 +154,24 @@ class ClimbingDetailGymVC: UIViewController {
             $0.trailing.lessThanOrEqualToSuperview().offset(-16)
         }
         
-        difficultyTitleLabel.snp.makeConstraints {
+        gradeTitleLabel.snp.makeConstraints {
             $0.top.equalTo(gymNameLabel.snp.bottom).offset(8)
             $0.leading.equalTo(gymNameLabel)
         }
         
-        difficultyColorView.snp.makeConstraints {
-            $0.centerY.equalTo(difficultyTitleLabel)
-            $0.leading.equalTo(difficultyTitleLabel.snp.trailing).offset(4)
+        gradeLabel.snp.makeConstraints {
+            $0.centerY.equalTo(gradeTitleLabel)
+            $0.leading.equalTo(gradeTitleLabel.snp.trailing).offset(4)
+        }
+        
+        gradeColorView.snp.makeConstraints {
+            $0.centerY.equalTo(gradeTitleLabel)
+            $0.leading.equalTo(gradeTitleLabel.snp.trailing).offset(4)
             $0.width.height.equalTo(14)
         }
         
         filterByArmLengthButton.snp.makeConstraints {
-            $0.top.equalTo(difficultyColorView.snp.bottom).offset(24)
+            $0.top.equalTo(gradeColorView.snp.bottom).offset(24)
             $0.trailing.equalToSuperview().offset(-16)
             $0.height.equalTo(24)
             $0.width.equalTo(48)
@@ -186,12 +198,20 @@ class ClimbingDetailGymVC: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
-    func configure(with gymName: String, difficulty: String) {
+    func configure(with gymName: String, grade: String) {
         gymNameLabel.text = gymName
+        gradeTitleLabel.text = "난이도 "
         
         // 난이도에 따라 색상 설정
-        let colorInfo = difficulty.colorInfo
-        difficultyTitleLabel.text = "난이도 "
-        difficultyColorView.backgroundColor = colorInfo.color
+        let colorInfo = grade.colorInfo
+        let convertedGrade = grade.colorTextChange()
+        if grade.colorInfo.color != .clear {
+            gradeColorView.backgroundColor = grade.colorInfo.color
+            gradeLabel.isHidden = true
+        } else {
+            gradeColorView.backgroundColor = .clear
+            gradeLabel.isHidden = false
+            gradeLabel.text = convertedGrade
+        }
     }
 }
