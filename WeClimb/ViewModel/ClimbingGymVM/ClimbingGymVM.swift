@@ -19,7 +19,7 @@ class ClimbingGymVM {
     let gymData = BehaviorRelay<Gym?>(value: nil)
     
     let grades = BehaviorRelay<[String]>(value: [])
-    let items = BehaviorRelay<[(color: UIColor, problemCount: Int, feedCount: Int)]>(value: [])
+    let items = BehaviorRelay<[(color: UIColor, grade: String)]>(value: [])
     
     let selectedSegment = BehaviorRelay<Int>(value: 0)
     let itemSelected = PublishSubject<IndexPath>()
@@ -70,13 +70,14 @@ class ClimbingGymVM {
     }
     
     private func updateItems() {
-        let updatedItems = grades.value.map { gradeString -> (color: UIColor, problemCount: Int, feedCount: Int) in
+        let updatedItems = grades.value.map { gradeString -> (color: UIColor, grade: String) in
             let color = gradeString.colorInfo.color
-            let problemCount = 0  // 암장 문제 개수 (추후 데이터로 업데이트 예정)
-            let feedCount = 0  // 메인피드에서 받아올 문제 개수 (추후 데이터로 업데이트 예정)
-            return (color: color, problemCount: problemCount, feedCount: feedCount)
+            // let problemCount = 0  // 암장 문제 개수 (추후 데이터로 업데이트 예정)
+            // let feedCount = 0  // 메인피드에서 받아올 문제 개수 (추후 데이터로 업데이트 예정)
+            return (color: color, grade: gradeString) // 기본값으로 문제 및 피드 개수 설정
         }
         
         items.accept(updatedItems)
     }
+
 }

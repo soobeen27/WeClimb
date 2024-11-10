@@ -177,4 +177,26 @@ extension String {
             return ("그 외", UIColor.clear)
         }
     }
+    
+    func colorTextChange() -> String {
+        let colorMap: [String: String] = [
+            "빨": "빨강",
+            "주": "주황",
+            "노": "노랑",
+            "초": "초록",
+            "파": "파랑",
+            "남": "남색",
+            "보": "보라",
+            "검": "검정",
+            "흰": "흰색",
+            "회": "회색",
+            "핑": "핑크",
+            "갈": "갈색",
+            "하": "하늘",
+            "노검": "노랑검정",
+            "초검": "초록검정",
+            "파검": "파랑검정",
+        ]
+        return colorMap[self] ?? self
+    }
 }

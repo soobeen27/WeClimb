@@ -18,11 +18,11 @@ class DifficultyTableViewCell: UITableViewCell {
         return view
     }()
     
-    private let problemCountLabel: UILabel = {
+    private let gradeLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = .label
-        label.textAlignment = .center
+        label.textAlignment = .left
         return label
     }()
     
@@ -30,14 +30,6 @@ class DifficultyTableViewCell: UITableViewCell {
         let imageView = UIImageView(image: UIImage(systemName: "chevron.right"))
         imageView.tintColor = .label
         return imageView
-    }()
-    
-    private let feedCountLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.textColor = .label
-        label.textAlignment = .right
-        return label
     }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -54,9 +46,8 @@ class DifficultyTableViewCell: UITableViewCell {
         
         [
             gradeColorView,
-            problemCountLabel,
-            arrowImageView,
-            feedCountLabel
+            gradeLabel,
+            arrowImageView
         ].forEach { contentView.addSubview($0) }
         
         gradeColorView.snp.makeConstraints {
@@ -65,13 +56,8 @@ class DifficultyTableViewCell: UITableViewCell {
             $0.width.height.equalTo(24)
         }
         
-        problemCountLabel.snp.makeConstraints {
+        gradeLabel.snp.makeConstraints {
             $0.leading.equalTo(gradeColorView.snp.trailing).offset(8)
-            $0.centerY.equalToSuperview()
-        }
-        
-        feedCountLabel.snp.makeConstraints {
-            $0.trailing.equalTo(arrowImageView.snp.leading).offset(-8)
             $0.centerY.equalToSuperview()
         }
         
@@ -81,9 +67,9 @@ class DifficultyTableViewCell: UITableViewCell {
         }
     }
     
-    func configure(with color: UIColor, problemCount: Int, feedCount: Int) {
+    func configure(with color: UIColor, grade: String) {
         gradeColorView.backgroundColor = color
-        problemCountLabel.text = "\(problemCount) 문제"  // 암장 문제 개수
-        feedCountLabel.text = "\(feedCount)"  // 메인피드 정보 받아오기
+        let convertedGrade = grade.colorTextChange()
+        gradeLabel.text = "\(convertedGrade) 문제"
     }
 }

@@ -439,6 +439,7 @@ class SFCollectionViewCell: UICollectionViewCell {
                 let postUID = self.medias[medias.startIndex].postRef.documentID
 //                likeViewModel?.likePost(myUID: user.uid, postUID: postUID)
                 likeViewModel?.likePost(myUID: user.uid)
+                self.likeButton.isActivated.toggle()
             })
             .disposed(by: disposeBag)
         
