@@ -147,8 +147,10 @@ extension String {
             return ("주황", UIColor(red: 253/255, green: 150/255, blue: 68/255, alpha: 1))
         case "노":
             return ("노랑", UIColor(red: 255/255, green: 235/255, blue: 26/255, alpha: 1))
+        case "연":
+            return ("연두", UIColor(red: 30/255, green: 212/255, blue: 90/255, alpha: 1))
         case "초":
-            return ("초록", UIColor(red: 30/255, green: 212/255, blue: 90/255, alpha: 1))
+            return ("초록", UIColor(red: 26/255, green: 120/255, blue: 14/255, alpha: 1))
         case "파":
             return ("파랑", UIColor(red: 0/255, green: 189/255, blue: 222/255, alpha: 1))
         case "남":
@@ -183,6 +185,7 @@ extension String {
             "빨": "빨강",
             "주": "주황",
             "노": "노랑",
+            "연": "연두",
             "초": "초록",
             "파": "파랑",
             "남": "남색",

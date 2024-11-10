@@ -16,12 +16,13 @@ class ClimbingGymVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = ClimbingGymVM()
     private let climbingGymInfoView = ClimbingGymInfoView()
+    private let climbingDetailGymVC = ClimbingDetailGymVC()
     private var gymData: Gym?
     
     // MARK: - 공통 헤더 뷰 - DS
     private let headerView = GymHeaderView()
     
-    // MARK: - 컬렉션 뷰 구성 - DS
+    // MARK: - 테이블 뷰 구성 - DS
     private let difficultyTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .clear
@@ -61,15 +62,6 @@ class ClimbingGymVC: UIViewController {
         return stackView
     }()
     
-//    private let countStackView: UIStackView = {
-//        let stackView = UIStackView()
-//        stackView.axis = .horizontal
-//        stackView.alignment = .fill
-//        stackView.distribution = .fillEqually
-//        stackView.spacing = 2
-//        return stackView
-//    }()
-    
     // MARK: - 라이프사이클 - DS
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,6 +74,10 @@ class ClimbingGymVC: UIViewController {
     func configure(with gym: Gym) {
         viewModel.setGymInfo(gymName: gym.gymName)
         climbingGymInfoView.viewModel = viewModel
+    }
+    
+    private func navigateGymDetailView() {
+        self.navigationController?.pushViewController(climbingDetailGymVC, animated: true)
     }
     
     // MARK: - 데이터 바인딩 - DS
@@ -111,7 +107,9 @@ class ClimbingGymVC: UIViewController {
             .disposed(by: disposeBag)
         
         difficultyTableView.rx.itemSelected
-            .bind(to: viewModel.itemSelected)
+            .subscribe(onNext: { [ weak self ] item in
+                self?.navigateGymDetailView()
+            })
             .disposed(by: disposeBag)
     }
     
@@ -122,7 +120,6 @@ class ClimbingGymVC: UIViewController {
                 guard let self else { return }
                 
                 self.colorStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-//                self.countStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
                 
                 for item in items {
                     let colorView = UIView()
@@ -131,12 +128,6 @@ class ClimbingGymVC: UIViewController {
                     colorView.clipsToBounds = true
                     self.colorStackView.addArrangedSubview(colorView)
                     
-//                    let countLabel = UILabel()
-//                    countLabel.text = "\(item.problemCount)"
-//                    countLabel.font = UIFont.systemFont(ofSize: 10)
-//                    countLabel.textColor = .gray
-//                    countLabel.textAlignment = .center
-//                    self.countStackView.addArrangedSubview(countLabel)
                 }
             })
             .disposed(by: disposeBag)
@@ -229,12 +220,6 @@ class ClimbingGymVC: UIViewController {
             $0.top.equalTo(easyLabel.snp.bottom).offset(4)
             $0.height.equalTo(16)
         }
-        
-//        countStackView.snp.makeConstraints {
-//            $0.leading.trailing.equalTo(colorStackView)
-//            $0.top.equalTo(colorStackView.snp.bottom).offset(4)
-//            $0.height.equalTo(16)
-//        }
         
         difficultyTableView.snp.makeConstraints {
             $0.top.equalTo(colorStackView.snp.bottom).offset(8)
