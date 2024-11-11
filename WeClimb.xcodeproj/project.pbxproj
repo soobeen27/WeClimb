@@ -76,6 +76,7 @@
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
 		91BFA9332C91962F0044D5AD /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BFA9322C91962F0044D5AD /* Post.swift */; };
 		91DC7D242CE0C721004CB66D /* GradeNamespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DC7D232CE0C721004CB66D /* GradeNamespace.swift */; };
+		91E21D112CE20017003269DD /* Hold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E21D102CE20017003269DD /* Hold.swift */; };
 		91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F566CD2CDB566700485F79 /* CommentCellVM.swift */; };
 		91F71CDF2C88A3C400405778 /* LoginVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CDE2C88A3C400405778 /* LoginVM.swift */; };
 		91F71CE12C89835700405778 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F71CE02C89835700405778 /* FirebaseManager.swift */; };
@@ -193,6 +194,7 @@
 		91AF25622C8D771A002283BD /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
 		91BFA9322C91962F0044D5AD /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		91DC7D232CE0C721004CB66D /* GradeNamespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeNamespace.swift; sourceTree = "<group>"; };
+		91E21D102CE20017003269DD /* Hold.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hold.swift; sourceTree = "<group>"; };
 		91F566CD2CDB566700485F79 /* CommentCellVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentCellVM.swift; sourceTree = "<group>"; };
 		91F71CDE2C88A3C400405778 /* LoginVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVM.swift; sourceTree = "<group>"; };
 		91F71CE02C89835700405778 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
@@ -505,6 +507,7 @@
 				43E883522CA27BFE00EF7469 /* CommonManager.swift */,
 				C431978F2CAAC3FD00029E3C /* ProfileManager.swift */,
 				91DC7D232CE0C721004CB66D /* GradeNamespace.swift */,
+				91E21D102CE20017003269DD /* Hold.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -756,6 +759,7 @@
 				6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */,
 				6B7F76952CA47F1D00B05B3F /* BlackListVC.swift in Sources */,
 				91F71CE32C89844900405778 /* User.swift in Sources */,
+				91E21D112CE20017003269DD /* Hold.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

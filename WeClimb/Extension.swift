@@ -237,27 +237,3 @@ extension String {
         return colorMap[self] ?? self
     }
 }
-
-extension UIImage {
-    
-    enum HoldColor: String {
-        case black = "LogoBlack"
-        case blue = "LogoBlue"
-        case other = "LogoOther"
-        case gray = "LogoGray"
-        case green = "LogoGreen"
-        case mint = "LogoMint"
-        case orange = "LogoOrange"
-        case pink = "LogoPink"
-        case purple = "LogoPurple"
-        case white = "LogoWhite"
-        case yellow = "LogoYellow"
-    }
-    
-    /// 홀드 이미지를 반환하는 메소드
-    /// - Parameter color: 홀드 색을 설정
-    /// - Returns: optional UIImage 타입으로 홀드 이미지를 반환
-    static func holdImgae(_ color: HoldColor) -> UIImage? {
-        return UIImage(named: color.rawValue)
-    }
-}
