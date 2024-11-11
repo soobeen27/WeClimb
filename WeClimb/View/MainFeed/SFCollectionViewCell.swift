@@ -66,10 +66,7 @@ class SFCollectionViewCell: UICollectionViewCell {
             }
             .asDriver(onErrorDriveWith: .empty())
     }
-    
-    
-    
-    
+
     private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
         //        pageControl.numberOfPages = images.count
@@ -236,20 +233,6 @@ class SFCollectionViewCell: UICollectionViewCell {
         setLikeButton()
     }
 
-//    private func showActionSheet(for post: Post) {
-//        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-//        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
-////            self?.reportModal()
-//        }
-//        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
-//        
-//        [reportAction, cancelAction].forEach {
-//            actionSheet.addAction($0)
-//        }
-        
-//        self.present(actionSheet, animated: true, completion: nil)
-        
-//    }
     // MARK: - UI 구성
     private func setupUI() {
         [
@@ -437,15 +420,8 @@ class SFCollectionViewCell: UICollectionViewCell {
         guard let user = Auth.auth().currentUser,
               let likeViewModel
         else { return }
-//        if likeViewModel.postLikeList.value.contains([user.uid]) {
-//            self.likeButton.isActivated = true
-//        }  else {
-//            self.likeButton.isActivated = false
-//        }
-//        self.likeButton.configureHeartButton()
         likeButton.rx.tap
-            .asSignal().emit(onNext: { [weak self] in
-                guard let self = self else { return }
+            .asSignal().emit(onNext: {
                 likeViewModel.likePost(myUID: user.uid)
             })
             .disposed(by: disposeBag)
