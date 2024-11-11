@@ -25,6 +25,7 @@ extension UIColor {
     }
     
     static let mainPurple = UIColor(hex: "#512BBB")
+
 }
 
 
@@ -230,5 +231,30 @@ extension String {
             "파검": "파랑검정",
         ]
         return colorMap[self] ?? self
+    var getGradeArray: [String] {
+        return self.components(separatedBy: ", ")
+    }
+}
+
+extension UIImage {
+    enum HoldColor: String {
+        case black = "LogoBlack"
+        case blue = "LogoBlue"
+        case other = "LogoOther"
+        case gray = "LogoGray"
+        case green = "LogoGreen"
+        case mint = "LogoMint"
+        case orange = "LogoOrange"
+        case pink = "LogoPink"
+        case purple = "LogoPurple"
+        case white = "LogoWhite"
+        case yellow = "LogoYellow"
+    }
+    
+    /// 홀드 이미지를 반환하는 메소드
+    /// - Parameter color: 홀드 색을 설정
+    /// - Returns: optional UIImage 타입으로 홀드 이미지를 반환
+    static func holdImgae(_ color: HoldColor) -> UIImage? {
+        return UIImage(named: color.rawValue)
     }
 }

@@ -460,12 +460,12 @@ class UploadVC: UIViewController {
                         .withTintColor(feedItem.grade?.colorInfo.color ?? UIColor.clear , renderingMode: .alwaysOriginal), for: .normal)
                 }
                 
-                if feedItem.sector == nil || feedItem.sector?.isEmpty == true {
+                if feedItem.hold == nil || feedItem.hold?.isEmpty == true {
                     self.sectorButton.setTitle("선택", for: .normal)
                     self.sectorButton.setImage(UIImage(systemName: "chevron.right"), for: .normal)
                     self.sectorButton.imageView?.tintColor = .secondaryLabel
                 } else {
-                    self.sectorButton.setTitle(feedItem.sector, for: .normal)
+                    self.sectorButton.setTitle(feedItem.hold, for: .normal)
                     self.sectorButton.setImage(nil, for: .normal)
                 }
             }
@@ -649,16 +649,16 @@ extension UploadVC {
                     return
                 }
                 
-                let media = self.viewModel.feedRelay.value.compactMap { feedItem -> (url: URL, sector: String?, grade: String?)? in
+                let media = self.viewModel.feedRelay.value.compactMap { feedItem -> (url: URL, hold: String?, grade: String?)? in
                     // 비디오가 있는 경우
                     if let videoURL = feedItem.videoURL {
                         print("비디오 URL: \(videoURL)")
-                        return (url: videoURL, sector: feedItem.sector, grade: feedItem.grade)
+                        return (url: videoURL, hold: feedItem.hold, grade: feedItem.grade)
                     }
                     // 이미지가 있는 경우
                     if let imageURL = feedItem.imageURL {
                         print("이미지 URL: \(imageURL)")
-                        return (url: imageURL, sector: feedItem.sector, grade: feedItem.grade)
+                        return (url: imageURL, hold: feedItem.hold, grade: feedItem.grade)
                     }
                     return nil
                 }.compactMap { $0 } // nil 제거
@@ -701,7 +701,7 @@ extension UploadVC {
             .disposed(by: disposeBag)
     }
     
-    private func uploadMedia(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String, uploadStatus: UploadStatus) {
+    private func uploadMedia(media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String, uploadStatus: UploadStatus) {
         switch uploadStatus {
         case .fail:
             CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")

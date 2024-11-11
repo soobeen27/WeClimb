@@ -7,17 +7,30 @@
 
 import XCTest
 import RxBlocking
+import RxSwift
+import Firebase
 @testable import WeClimb
 
 final class WeClimbTests: XCTestCase {
+    
+    var db: Firestore!
+    var disposeBag: DisposeBag!
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         try super.setUpWithError()
+        if FirebaseApp.app() == nil {
+            FirebaseApp.configure()
+        }
+
+        db = Firestore.firestore()
+        disposeBag = DisposeBag()
     }
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
+        db = nil
+        disposeBag = nil
         try super.tearDownWithError()
     }
 

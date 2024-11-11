@@ -29,6 +29,7 @@ class SFMainFeedVC: UIViewController{
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = UIColor(hex: "#0B1013")
         collectionView.showsVerticalScrollIndicator = false
+        collectionView.scrollsToTop = false
         
         return collectionView
     }()
@@ -163,13 +164,13 @@ class SFMainFeedVC: UIViewController{
                 let output = self.viewModel.transform(input: input)
                 
                 output.presentReport.drive(onNext: { [weak self] post in
-                    guard let self = self, let post else { return }
+                    guard let self, let post else { return }
                     self.actionSheet(for: post)
                 })
                 .disposed(by: sfCell.disposeBag) // 각 셀에 disposeBag을 추가하여 관리
 
                 output.presentComment.drive(onNext: { [weak self] post in
-                    guard let self = self, let post else { return }
+                    guard let self, let post else { return }
                     self.showCommentModal(for: post)
                 })
                 .disposed(by: sfCell.disposeBag) // 각 셀에 disposeBag을 추가하여 관리
@@ -317,10 +318,6 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if collectionView.contentOffset.y < -100 {
             activityIndicator.startAnimating()
-//            if !isRefresh && viewModel.shouldFetch {
-//                viewModel.fetchInitialFeed()
-//                isRefresh = true
-//            }
             if feedType == .mainFeed {
                 viewModel.fetchInitialFeed()
                 isRefresh = true
