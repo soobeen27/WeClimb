@@ -60,33 +60,21 @@ class ClimbingDetailGymVC: UIViewController {
         return view
     }()
     
-    private let filterByHoldButton: UIButton = {
+    private let filterButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("홀드", for: .normal)
+        button.setTitle("  필터", for: .normal)
         button.setTitleColor(.label, for: .normal)
         button.titleLabel?.font = .boldSystemFont(ofSize: 12)
-        button.backgroundColor = .lightGray
-        button.layer.cornerRadius = 10
-        return button
-    }()
-    
-    private let filterByHeightButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("키", for: .normal)
-        button.setTitleColor(.label, for: .normal)
-        button.titleLabel?.font = .boldSystemFont(ofSize: 12)
-        button.backgroundColor = .lightGray
+        button.backgroundColor = .clear
         button.layer.cornerRadius = 8
-        return button
-    }()
-    
-    private let filterByArmLengthButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("팔길이", for: .normal)
-        button.setTitleColor(.label, for: .normal)
-        button.titleLabel?.font = .boldSystemFont(ofSize: 12)
-        button.backgroundColor = .lightGray
-        button.layer.cornerRadius = 8
+        button.layer.borderWidth = 1
+        button.layer.borderColor = UIColor.lightGray.cgColor
+        
+        let symbolConfig = UIImage.SymbolConfiguration(pointSize: 14, weight: .regular)
+        let symbolImage = UIImage(systemName: "line.3.horizontal.decrease.circle", withConfiguration: symbolConfig)
+        button.setImage(symbolImage, for: .normal)
+        button.tintColor = .label
+        
         return button
     }()
     
@@ -106,6 +94,7 @@ class ClimbingDetailGymVC: UIViewController {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         setLayout()
         bindViewModel()
+        setupActions()
     }
     
     private func bindViewModel() {
@@ -120,13 +109,13 @@ class ClimbingDetailGymVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-//        viewModel.output.problemThumbnails
-//            .drive(thumbnailCollectionView.rx.items) { collectionView, row, url in
-//                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: IndexPath(row: row, section: 0)) as! ThumbnailCell
-//                FirebaseManager.shared.loadImage(from: url.absoluteString, into: cell.imageView)
-//                return cell
-//            }
-//            .disposed(by: disposeBag)
+        //        viewModel.output.problemThumbnails
+        //            .drive(thumbnailCollectionView.rx.items) { collectionView, row, url in
+        //                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: IndexPath(row: row, section: 0)) as! ThumbnailCell
+        //                FirebaseManager.shared.loadImage(from: url.absoluteString, into: cell.imageView)
+        //                return cell
+        //            }
+        //            .disposed(by: disposeBag)
     }
     
     private func setLayout() {
@@ -136,9 +125,7 @@ class ClimbingDetailGymVC: UIViewController {
             gradeTitleLabel,
             gradeLabel,
             gradeColorView,
-            filterByHoldButton,
-            filterByHeightButton,
-            filterByArmLengthButton,
+            filterButton,
             thumbnailCollectionView,
         ].forEach { view.addSubview($0) }
         
@@ -170,34 +157,31 @@ class ClimbingDetailGymVC: UIViewController {
             $0.width.height.equalTo(14)
         }
         
-        filterByArmLengthButton.snp.makeConstraints {
+        filterButton.snp.makeConstraints {
             $0.top.equalTo(gradeColorView.snp.bottom).offset(24)
             $0.trailing.equalToSuperview().offset(-16)
             $0.height.equalTo(24)
-            $0.width.equalTo(48)
-        }
-        
-        filterByHeightButton.snp.makeConstraints {
-            $0.centerY.equalTo(filterByArmLengthButton)
-            $0.trailing.equalTo(filterByArmLengthButton.snp.leading).offset(-10)
-            $0.height.equalTo(24)
-            $0.width.equalTo(32)
-        }
-        
-        filterByHoldButton.snp.makeConstraints {
-            $0.centerY.equalTo(filterByArmLengthButton)
-            $0.trailing.equalTo(filterByHeightButton.snp.leading).offset(-10)
-            $0.height.equalTo(24)
-            $0.width.equalTo(40)
+            $0.width.equalTo(60)
         }
         
         thumbnailCollectionView.snp.makeConstraints {
-            $0.top.equalTo(filterByArmLengthButton.snp.bottom).offset(10)
+            $0.top.equalTo(filterButton.snp.bottom).offset(10)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
+    
+    private func setupActions() {
+        filterButton.rx.tap
+            .bind { [weak self] in
+                guard let self else { return }
+                let climbingFilterVC = ClimbingFilterVC()
+                self.presentCustomHeightModal(modalVC: climbingFilterVC, height: 576)
+            }
+            .disposed(by: disposeBag)
+    }
+    
     func configure(with gymName: String, grade: String) {
         gymNameLabel.text = gymName
         gradeTitleLabel.text = "난이도 "
