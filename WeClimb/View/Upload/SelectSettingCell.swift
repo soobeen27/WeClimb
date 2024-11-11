@@ -14,9 +14,7 @@ class SelectSettingCell: UICollectionViewCell {
     private let colorView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 15
-        view.layer.masksToBounds = true
         view.backgroundColor = .clear
-        view.layer.borderWidth = 0.1
         view.layer.borderColor = UIColor.secondarySystemBackground.cgColor
         return view
     }()
@@ -43,6 +41,14 @@ class SelectSettingCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        colorView.backgroundColor = .clear
+        colorView.layer.contents = nil
+        titleLabel.text = nil
     }
     
     private func setLayout() {
@@ -75,11 +81,20 @@ class SelectSettingCell: UICollectionViewCell {
         }
     }
 
-    func configure(grade: String) {
-
-        titleLabel.text = grade.colorInfo.text
+    func configure(item: Any) {
         
-        let colorInfo = grade.colorInfo
-        colorView.backgroundColor = colorInfo.color
+        if let grade = item as? String {
+            
+            titleLabel.text = grade.colorInfo.text
+            let colorInfo = grade.colorInfo
+            colorView.backgroundColor = colorInfo.color
+            
+        } else if let hold = item as? Hold {
+            
+            titleLabel.text = hold.koreanHold
+            if let image = hold.image(color: hold) {
+                colorView.layer.contents = image.cgImage
+            }
+        }
     }
 }

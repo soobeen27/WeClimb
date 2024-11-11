@@ -39,8 +39,6 @@ class UploadVM {
     
     var gymRelay = BehaviorRelay<Gym?>(value: nil)
     var gradeDataRelay: BehaviorRelay<[String]> = BehaviorRelay(value: [])
-    var holdDataRelay: BehaviorRelay<[Gym]> = BehaviorRelay(value: [])
-    
 }
 
 extension UploadVM {
@@ -70,30 +68,11 @@ extension UploadVM {
         currentPageIndex = pageIndex
     }
     
-//    // MARK: - 선택한 암장 정보 저장 YJ
-//    func optionSelectedGym(_ gymInfo: Gym) {
-//        let gymName = gymInfo.gymName
-//        var feedItems = feedRelay.value  // feedRelay의 값을 받아온다
-//
-//        // feedRelay의 모든 항목의 gym 속성을 업데이트
-//        for index in feedItems.indices {
-//            feedItems[index].gym = gymName
-//        }
-//
-//        shouldUpdateUI = false  // UI 업데이트 방지
-//        feedRelay.accept(feedItems)  // 변경된 값을 feedRelay에 반영
-//
-//        print("Updated feedRelay/gym: \(feedRelay.value)")
-//    }
-    
     func updateGymData(_ gym: Gym) {
         self.gymRelay.accept(gym)
         
         let gradeParts = gym.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
         gradeDataRelay.accept(gradeParts)
-        print("데이터 테스트: \(gradeParts)")
-        
-        // holdDataRelay.accept(holdData)
     }
 }
 
