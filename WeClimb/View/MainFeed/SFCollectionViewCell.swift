@@ -18,7 +18,8 @@ class SFCollectionViewCell: UICollectionViewCell {
     private var likeViewModel: LikeViewModel?
     var disposeBag = DisposeBag()
     
-    var medias: [Media] = []
+//    var medias: [Media] = []
+    var medias: [Media]?
     var post: Post?
     
     let pauseVide: ((SFFeedCell) -> Void)? = nil
@@ -229,7 +230,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         feedUserProfileImage.image = nil
         pageControl.currentPage = 0
         post = nil
-        medias = []
+        medias = nil
         setLikeButton()
     }
 
@@ -383,6 +384,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         self.post = post
         Task {
             medias = try await FirebaseManager.shared.fetchMedias(for: post)
+            guard let medias else { return }
             if medias.count > 0 {
                 self.addSubview(pageControl)
                 pageControl.snp.makeConstraints {
@@ -454,6 +456,7 @@ class SFCollectionViewCell: UICollectionViewCell {
 // MARK: CollectionView Setting
 extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard let medias else { return 0}
         return medias.count
     }
     
@@ -461,6 +464,7 @@ extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDele
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SFFeedCell.className, for: indexPath) as? SFFeedCell else {
             return UICollectionViewCell()
         }
+        guard let medias else { return cell }
         let currentMedia = medias[indexPath.row]
         cell.configure(with: currentMedia)
         return cell
