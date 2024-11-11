@@ -1,0 +1,85 @@
+//
+//  SelectSettingCell.swift
+//  WeClimb
+//
+//  Created by 강유정 on 11/12/24.
+//
+
+import UIKit
+
+import SnapKit
+
+class SelectSettingCell: UICollectionViewCell {
+    
+    private let colorView: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 15
+        view.layer.masksToBounds = true
+        view.backgroundColor = .clear
+        view.layer.borderWidth = 0.1
+        view.layer.borderColor = UIColor.secondarySystemBackground.cgColor
+        return view
+    }()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 13)
+        label.textAlignment = .center
+        label.textColor = .black
+        return label
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        layer.cornerRadius = 23
+        layer.borderColor = UIColor.lightGray.cgColor
+//        layer.borderWidth = 1.0
+        clipsToBounds = true
+        
+        setLayout()
+        setColor()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setLayout() {
+        [colorView, titleLabel]
+            .forEach {
+                contentView.addSubview($0)
+            }
+        
+        colorView.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalToSuperview().offset(10)
+            $0.width.equalTo(30)
+            $0.height.equalTo(30)
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.centerY.equalTo(colorView)
+            $0.trailing.equalToSuperview().offset(-12)
+        }
+    }
+    
+    private func setColor() {
+        contentView.backgroundColor = UIColor {
+            switch $0.userInterfaceStyle {
+            case .dark:
+                return UIColor.secondarySystemBackground
+            default:
+                return UIColor.white
+            }
+        }
+    }
+
+    func configure(grade: String) {
+
+        titleLabel.text = grade.colorInfo.text
+        
+        let colorInfo = grade.colorInfo
+        colorView.backgroundColor = colorInfo.color
+    }
+}

@@ -205,7 +205,7 @@ extension String {
         case "파검":
             return ("파랑", UIColor(red: 6/255, green: 103/255, blue: 121/255, alpha: 1))
         default:
-            return ("그 외", UIColor.clear)
+            return ("기타", UIColor.clear)
         }
     }
     

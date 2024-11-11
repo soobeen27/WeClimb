@@ -13,6 +13,7 @@ import FirebaseStorage
 import LightCompressor
 import RxRelay
 import RxSwift
+import RxCocoa
 
 class UploadVM {
     let mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
@@ -30,9 +31,16 @@ class UploadVM {
     
     var shouldUpdateUI: Bool = true
     
-    // 순환 참조 방지
-    weak var viewController: UploadVC?
     var completedMediaCount = 0
+    private let compressionProgressRelay = BehaviorRelay<Float>(value: 0.0)
+    var compressionProgress: Driver<Float> {
+        return compressionProgressRelay.asDriver()
+    }
+    
+    var gymRelay = BehaviorRelay<Gym?>(value: nil)
+    var gradeDataRelay: BehaviorRelay<[String]> = BehaviorRelay(value: [])
+    var holdDataRelay: BehaviorRelay<[Gym]> = BehaviorRelay(value: [])
+    
 }
 
 extension UploadVM {
@@ -62,19 +70,30 @@ extension UploadVM {
         currentPageIndex = pageIndex
     }
     
-    // MARK: - 선택한 암장 정보 저장 YJ
-    func optionSelectedGym(_ gymInfo: Gym) {
-        let gymName = gymInfo.gymName
+//    // MARK: - 선택한 암장 정보 저장 YJ
+//    func optionSelectedGym(_ gymInfo: Gym) {
+//        let gymName = gymInfo.gymName
+//        var feedItems = feedRelay.value  // feedRelay의 값을 받아온다
+//
+//        // feedRelay의 모든 항목의 gym 속성을 업데이트
+//        for index in feedItems.indices {
+//            feedItems[index].gym = gymName
+//        }
+//
+//        shouldUpdateUI = false  // UI 업데이트 방지
+//        feedRelay.accept(feedItems)  // 변경된 값을 feedRelay에 반영
+//
+//        print("Updated feedRelay/gym: \(feedRelay.value)")
+//    }
+    
+    func updateGymData(_ gym: Gym) {
+        self.gymRelay.accept(gym)
         
-        var feedItem = feedRelay.value
+        let gradeParts = gym.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+        gradeDataRelay.accept(gradeParts)
+        print("데이터 테스트: \(gradeParts)")
         
-        // feedRelay의 모든 항목의 gym 속성을 업데이트
-        for index in feedItem.indices {
-            feedItem[index].gym = gymName
-        }
-        shouldUpdateUI = false
-        feedRelay.accept(feedItem)
-        print("feedRelay/gym: \(feedRelay)")
+        // holdDataRelay.accept(holdData)
     }
 }
 
@@ -128,7 +147,7 @@ extension UploadVM {
                                 self.showAlert.accept(())
                                 print("비디오가 너무 깁니다. 알람을 보냅니다.")
                                     } else {
-                                        models[index] = FeedCellModel(imageURL: nil, videoURL: tempVideoURL)
+                                        models[index] = FeedCellModel(imageURL: nil, videoURL: tempVideoURL, gym: self.gymRelay.value?.gymName)
                                     }
                                     group.leave()
                                 }
@@ -147,7 +166,7 @@ extension UploadVM {
                                 if let data = uiImage.jpegData(compressionQuality: 1) {
                                     do {
                                         try data.write(to: tempImageURL)
-                                        models[index] = FeedCellModel(imageURL: tempImageURL, videoURL: nil)
+                                        models[index] = FeedCellModel(imageURL: tempImageURL, videoURL: nil, gym: self.gymRelay.value?.gymName)
                                     } catch {
                                         print("이미지 저장 실패: \(error.localizedDescription)")
                                     }
@@ -189,7 +208,7 @@ extension UploadVM {
 }
 
 extension UploadVM {
-    func upload(media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String) -> Observable<Void> {
+    func upload(media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String) -> Driver<Void> {
         return Observable.create { observer in
             let dispatchGroup = DispatchGroup()
             var uploadMedia: [(url: URL, hold: String?, grade: String?)] = []
@@ -227,6 +246,7 @@ extension UploadVM {
                 Task { [uploadMedia, caption, gym] in
                     let myUID = FirebaseManager.shared.currentUserUID()
                     await FirebaseManager.shared.uploadPost(myUID: myUID, media: uploadMedia, caption: caption, gym: gym, thumbnail: thumbnailURL)
+                    
                     observer.onNext(())
                     observer.onCompleted()
                 }
@@ -234,6 +254,7 @@ extension UploadVM {
             
             return Disposables.create()
         }
+        .asDriver(onErrorDriveWith: Driver.empty())
     }
     
     // MARK: - 비디오를 압축하는 메서드
@@ -241,7 +262,8 @@ extension UploadVM {
         
         let videoCompressor = LightCompressor()
         
-        let totalMediaCount = Float(feedRelay.value.count)        
+        let totalMediaCount = Float(feedRelay.value.count)
+        
         // 압축 작업 설정
         _ = videoCompressor.compressVideo(videos: [
             .init(
@@ -258,28 +280,18 @@ extension UploadVM {
         ],
         progressQueue: .main,
         progressHandler: { progress in
-            DispatchQueue.main.async { [unowned self] in
-                let currentProgress = Float(progress.fractionCompleted) / totalMediaCount
-                let overallProgress = (Float(completedMediaCount) + currentProgress) / totalMediaCount
-                
-                UIView.animate(withDuration: 5) {
-                    self.viewController?.progressBar.setProgress(overallProgress, animated: true)
-                }
-            }},
-            completion: {[weak self] result in
+            let currentProgress = Float(progress.fractionCompleted) / totalMediaCount
+            let overallProgress = (Float(self.completedMediaCount) + currentProgress) / totalMediaCount
+            
+            self.compressionProgressRelay.accept(overallProgress)
+        },
+                                          completion: { [weak self] result in
             guard let self = self else { return }
             
             switch result {
-                
             case .onSuccess(_, let path):
                 print("비디오 압축 완료: \(path)")
                 self.completedMediaCount += 1
-                DispatchQueue.main.async { [unowned self] in
-                    let allProgress = Float(self.completedMediaCount) / totalMediaCount
-                    UIView.animate(withDuration: 5) {
-                        self.viewController?.progressBar.setProgress(allProgress, animated: true)
-                    }
-                }
                 completion(path)
             case .onStart:
                 print("압축 시작")
@@ -294,7 +306,7 @@ extension UploadVM {
     }
     
     func getThumbnailImage(from videoURL: URL, completion: @escaping (String?) -> Void) {
-         print("썸네일 이미지 생성 중")
+        print("썸네일 이미지 생성 중")
         
         let asset = AVAsset(url: videoURL)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
@@ -355,4 +367,3 @@ extension UploadVM {
         }
     }
 }
-

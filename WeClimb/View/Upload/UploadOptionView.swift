@@ -91,7 +91,7 @@ class UploadOptionView : UIView {
             $0.leading.equalTo(symbolImageView.snp.trailing).offset(8)
         }
         
-        if showSelectedLabel {
+        if !showSelectedLabel {
             [selectedLabel, nextImageView]
                 .forEach { self.addSubview($0) }
             
@@ -107,14 +107,14 @@ class UploadOptionView : UIView {
         }
     }
     
-    // MARK: - 암장 선택시 버튼 업데이트 YJ
-    func updateText(with gymName: String) {
-        selectedLabel.text = gymName
-        selectedLabel.textColor = .label
-        
-        nextImageView.isHidden = true
-        nextImageView.snp.makeConstraints {
-            $0.width.equalTo(0)
-        }
-    }
+//    // MARK: - 암장 선택시 버튼 업데이트 YJ
+//    func updateText(with gymName: String) {
+//        selectedLabel.text = gymName
+//        selectedLabel.textColor = .label
+//        
+//        nextImageView.isHidden = true
+//        nextImageView.snp.makeConstraints {
+//            $0.width.equalTo(0)
+//        }
+//    }
 }

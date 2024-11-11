@@ -1,8 +1,8 @@
 //
-//  GymSelectVC.swift
+//  SelectGymVC.swift
 //  WeClimb
 //
-//  Created by 강유정 on 11/5/24.
+//  Created by 강유정 on 11/12/24.
 //
 
 import UIKit
@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import RxSwift
 
-class GymSelectVC: UIViewController {
+class SelectGymVC: UIViewController {
     
     private let image: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "LogoImage"))
@@ -39,7 +39,7 @@ class GymSelectVC: UIViewController {
     private let okButton: UIButton = {
         let button = UIButton()
         button.setTitle(UploadNameSpace.okText, for: .normal)
-        button.setTitleColor(.label, for: .normal)
+        button.setTitleColor(.black, for: .normal)
         button.layer.cornerRadius = 23
         button.backgroundColor = .white
         button.isEnabled = false
@@ -48,13 +48,17 @@ class GymSelectVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private var gymInfo: Gym?
-    private let uploadVC = UploadVC(isClimbingVideo: true)
+//    private let uploadVC = UploadVC(isClimbingVideo: true)
+    private let uploadVM = UploadVM()
+    private var uploadVC: UploadVC?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
         selectGym()
         bindOKButton()
+        
+        uploadVC = UploadVC(uploadVM: uploadVM, isClimbingVideo: true)
     }
     
     private func setLayout() {
@@ -85,24 +89,29 @@ class GymSelectVC: UIViewController {
     
     private func selectGym() {
         gymButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                guard let self else { return }
                 let searchVC = SearchVC()
                 let navigationController = UINavigationController(rootViewController: searchVC)
                 navigationController.modalPresentationStyle = .pageSheet
                 searchVC.ShowSegment = false
                 searchVC.nextPush = false
                 searchVC.onSelectedGym = { gymInfo in
-                    self.gymInfo = gymInfo 
-                    self.uploadVC.setgradeButton(with: gymInfo)
-                    self.uploadVC.setSectorButton(with: gymInfo)
+                    self.gymInfo = gymInfo
+//                    self.uploadVM.optionSelectedGym(gymInfo)
+                    self.uploadVC?.setgradeButton(with: gymInfo)
+//                    self.uploadVC.setSectorButton(with: gymInfo)
+                    //                    self.uploadVC.gymInfo = gymInfo
+//                    self.uploadVM.gymRelay.accept(gymInfo)
+                    self.uploadVM.updateGymData(gymInfo)
                     
-                    self.uploadVC.gymInfo = gymInfo
+                    self.uploadVC?.gymView.isUserInteractionEnabled = true
+                    self.uploadVC?.gymLabel.text = gymInfo.gymName
                     
-                    self.uploadVC.gymView.isUserInteractionEnabled = true
-                    self.uploadVC.gymLabel.text = gymInfo.gymName
-                    
-                    self.gymButton.setTitle(gymInfo.gymName, for: .normal)
+                    var titleAttr = AttributedString(gymInfo.gymName)
+                    titleAttr.font = .systemFont(ofSize: 17.0, weight: .medium)
+                    self.gymButton.configuration?.attributedTitle = titleAttr
                     self.okButton.isEnabled = true
                     
                     self.dismiss(animated: true, completion: nil)
@@ -114,11 +123,15 @@ class GymSelectVC: UIViewController {
     
     private func bindOKButton() {
         okButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                guard let self = self, let gymInfo = self.gymInfo else { return }
-                self.uploadVC.gymInfo = gymInfo
-                
-                self.navigationController?.pushViewController(self.uploadVC, animated: true)
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                guard let self = self else { return }
+                if let uploadVC = self.uploadVC {
+//                    uploadVC = UploadVC(uploadVM: self.uploadVM, isClimbingVideo: true)
+                    uploadVC.gymInfo = self.gymInfo
+                    
+                    self.navigationController?.pushViewController(uploadVC, animated: true)
+                }
             })
             .disposed(by: disposeBag)
     }
