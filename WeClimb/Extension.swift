@@ -25,7 +25,7 @@ extension UIColor {
     }
     
     static let mainPurple = UIColor(hex: "#512BBB")
-
+    
 }
 
 
@@ -37,16 +37,16 @@ extension UIButton {
         static var isActivated = "isActivated"
     }
     
-//    var isActivated: Bool {
-//        get {
-//            return objc_getAssociatedObject(self, &AssociatedKeys.isActivated) as? Bool ?? false
-//        }
-//        set {
-//            objc_setAssociatedObject(self, &AssociatedKeys.isActivated, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-//            updateImage()
-//        }
-//    }
-//    
+    //    var isActivated: Bool {
+    //        get {
+    //            return objc_getAssociatedObject(self, &AssociatedKeys.isActivated) as? Bool ?? false
+    //        }
+    //        set {
+    //            objc_setAssociatedObject(self, &AssociatedKeys.isActivated, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    //            updateImage()
+    //        }
+    //    }
+    //    
     var isActivated: Bool {
         get {
             return objc_getAssociatedObject(self, &AssociatedKeys.isActivated) as? Bool ?? false
@@ -67,9 +67,9 @@ extension UIButton {
     //비활성화 상태
     private var normalImage: UIImage? {
         let isDarkMode = (traitCollection.userInterfaceStyle == .dark) || (backgroundColor == UIColor(hex: "#0C1014"))
-
+        
         let tintColor = isDarkMode ? UIColor(hex: "#FFFFFF") : UIColor(hex: "#CDCDCD")
-
+        
         return UIImage(systemName: "heart")?
             .withTintColor(tintColor)
             .withRenderingMode(.alwaysOriginal)
@@ -125,17 +125,17 @@ extension UIViewController {
         present(modalVC, animated: true, completion: nil)
     }
     private func modalTapGesture() {
-      let tapGesture = UITapGestureRecognizer(target: self, action: #selector(outsideTap(_:)))
-      view.superview?.addGestureRecognizer(tapGesture)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(outsideTap(_:)))
+        view.superview?.addGestureRecognizer(tapGesture)
     }
     
     @objc private func outsideTap(_ gesture: UITapGestureRecognizer) {
-      let touchLocation = gesture.location(in: self.view)
-      
-      //모달의 콘텐츠 영역을 제외한 빈 영역을 클릭했을 때만 모달을 닫음
-      if !self.view.point(inside: touchLocation, with: nil) {
-        self.dismiss(animated: true, completion: nil)
-      }
+        let touchLocation = gesture.location(in: self.view)
+        
+        //모달의 콘텐츠 영역을 제외한 빈 영역을 클릭했을 때만 모달을 닫음
+        if !self.view.point(inside: touchLocation, with: nil) {
+            self.dismiss(animated: true, completion: nil)
+        }
     }
     
     /// 커스텀 모달
@@ -209,6 +209,10 @@ extension String {
         }
     }
     
+    var getGradeArray: [String] {
+        return self.components(separatedBy: ", ")
+    }
+    
     func colorTextChange() -> String {
         let colorMap: [String: String] = [
             "빨": "빨강",
@@ -231,12 +235,11 @@ extension String {
             "파검": "파랑검정",
         ]
         return colorMap[self] ?? self
-    var getGradeArray: [String] {
-        return self.components(separatedBy: ", ")
     }
 }
 
 extension UIImage {
+    
     enum HoldColor: String {
         case black = "LogoBlack"
         case blue = "LogoBlue"
