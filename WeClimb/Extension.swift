@@ -186,17 +186,17 @@ extension String {
 
 extension UIImage {
     enum HoldColor: String {
-        case black = "blackHold"
-        case blue = "blueHold"
-        case etcetera = "etceteraHold"
-        case gray = "grayHold"
-        case green = "greenHold"
-        case mint = "mintHold"
-        case orange = "orangeHold"
-        case pink = "pinkHold"
-        case purple = "purpleHold"
-        case white = "whiteHold"
-        case yellow = "yellowHold"
+        case black = "LogoBlack"
+        case blue = "LogoBlue"
+        case other = "LogoOther"
+        case gray = "LogoGray"
+        case green = "LogoGreen"
+        case mint = "LogoMint"
+        case orange = "LogoOrange"
+        case pink = "LogoPink"
+        case purple = "LogoPurple"
+        case white = "LogoWhite"
+        case yellow = "LogoYellow"
     }
     
     /// 홀드 이미지를 반환하는 메소드
