@@ -291,7 +291,6 @@ final class FirebaseManager {
                       let grade = data["grade"] as? String,
                       let gymName = data["gymName"] as? String,
                       let sector = data["sector"] as? String,
-                      let hold = data["sector"] as? String,
                       let profileImage = data["profileImage"] as? String
                 else {
                     print("필수 정보 없음")
@@ -303,11 +302,10 @@ final class FirebaseManager {
                 additionalInfo.removeValue(forKey: "grade")
                 additionalInfo.removeValue(forKey: "gymName")
                 additionalInfo.removeValue(forKey: "sector")
-                additionalInfo.removeValue(forKey: "hold")
                 additionalInfo.removeValue(forKey: "profileImage")
                 
                 completion(Gym(address: address, grade: grade,
-                               gymName: gymName, sector: sector, Hold: hold,
+                               gymName: gymName, sector: sector,
                                profileImage: profileImage, additionalInfo: additionalInfo))
             }
     }

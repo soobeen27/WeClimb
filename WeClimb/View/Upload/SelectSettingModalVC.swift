@@ -19,7 +19,7 @@ class SelectSettingModalVC: UIViewController {
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: setCollectionLayout())
         collectionView.register(SelectSettingCell.self, forCellWithReuseIdentifier: SelectSettingCell.className)
-        collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.className)
+        collectionView.register(UploadHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: UploadHeaderView.className)
         
         collectionView.backgroundColor = UIColor {
             switch $0.userInterfaceStyle {
@@ -200,43 +200,14 @@ extension SelectSettingModalVC: UICollectionViewDelegate {
         
         guard let headerView = collectionView.dequeueReusableSupplementaryView(
             ofKind: kind,
-            withReuseIdentifier: HeaderView.className,
+            withReuseIdentifier: UploadHeaderView.className,
             for: indexPath
-        ) as? HeaderView else {
+        ) as? UploadHeaderView else {
             return UICollectionReusableView()
         }
         
         let sectionType = Section.allCases[indexPath.section]
         headerView.configure(with: sectionType.title)
         return headerView
-    }
-}
-
-// MARK: - 헤더뷰
-class HeaderView: UICollectionReusableView {
-    
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 15)
-        label.textColor = .label
-        label.textAlignment = .left
-        return label
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        addSubview(titleLabel)
-        titleLabel.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(10)
-        }
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func configure(with title: String) {
-        titleLabel.text = title
-        titleLabel.sizeToFit()
     }
 }

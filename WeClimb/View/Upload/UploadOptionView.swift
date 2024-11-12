@@ -106,15 +106,4 @@ class UploadOptionView : UIView {
             }
         }
     }
-    
-//    // MARK: - 암장 선택시 버튼 업데이트 YJ
-//    func updateText(with gymName: String) {
-//        selectedLabel.text = gymName
-//        selectedLabel.textColor = .label
-//        
-//        nextImageView.isHidden = true
-//        nextImageView.snp.makeConstraints {
-//            $0.width.equalTo(0)
-//        }
-//    }
 }

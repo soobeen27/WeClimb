@@ -92,14 +92,6 @@ class UploadVC: UIViewController {
         configuration.imagePadding = 5
         configuration.imagePlacement = .leading
         configuration.baseForegroundColor = .systemGray
-//        configuration.baseForegroundColor = UIColor {
-//            switch $0.userInterfaceStyle {
-//            case .dark:
-//                return UIColor.secondarySystemBackground
-//            default:
-//                return UIColor.white
-//            }
-//        }
         
         let button = UIButton(configuration: configuration)
         button.layer.borderWidth = 0.5
@@ -374,29 +366,28 @@ class UploadVC: UIViewController {
             let feedItem = self.viewModel.feedRelay.value[pageIndex]
             print("feeItem: \(feedItem)")
             
-            if feedItem.gym == nil || feedItem.gym?.isEmpty == true {
-                self.gradeButton.isHidden = true
-            } else {
-                self.gradeButton.isHidden = false
+//            if feedItem.gym == nil || feedItem.gym?.isEmpty == true {
+//                self.gradeButton.isHidden = true
+//            } else {
+//                self.gradeButton.isHidden = false
+            self.gradeButton.isHidden = false
+            
+            if let grade = feedItem.grade, !grade.isEmpty {
                 
-                if let grade = feedItem.grade, !grade.isEmpty {
-                    self.gradeButton.isHidden = false
-                    
-                    self.gradeButton.setTitle(grade.colorInfo.text, for: .normal)
-                    self.gradeButton.backgroundColor = .systemGray4.withAlphaComponent(0.6)
-                    
-                    let colorInfo = grade.colorInfo
-                    self.gradeButton.setImage(
-                        UIImage(systemName: "circle.fill")?
-                            .withTintColor(colorInfo.color, renderingMode: .alwaysOriginal),
-                        for: .normal
-                    )
-                } else {
-                    self.gradeButton.setTitle("선택", for: .normal)
-                    self.gradeButton.backgroundColor = .systemGray4.withAlphaComponent(0.6)
-                    self.gradeButton.setImage(nil, for: .normal)
-                }
-        
+                self.gradeButton.setTitle(grade.colorInfo.text, for: .normal)
+                self.gradeButton.backgroundColor = .systemGray4.withAlphaComponent(0.6)
+                
+                let colorInfo = grade.colorInfo
+                self.gradeButton.setImage(
+                    UIImage(systemName: "circle.fill")?
+                        .withTintColor(colorInfo.color, renderingMode: .alwaysOriginal),
+                    for: .normal
+                )
+            } else {
+                self.gradeButton.setTitle("선택", for: .normal)
+                self.gradeButton.backgroundColor = .systemGray4.withAlphaComponent(0.6)
+                self.gradeButton.setImage(nil, for: .normal)
+            }
                     
 //                    if feedItem.hold == nil || feedItem.hold?.isEmpty == true {
 //                        self.settingButton.setTitle("선택", for: .normal)
@@ -406,7 +397,7 @@ class UploadVC: UIViewController {
 //                        self.settingButton.setTitle(feedItem.hold, for: .normal)
 //                        self.settingButton.setImage(nil, for: .normal)
 //                    }
-                }
+//                }
                 
             })
             .disposed(by: disposeBag)
