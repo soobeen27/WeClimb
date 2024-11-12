@@ -23,7 +23,7 @@ class SelectSettingCell: UICollectionViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
         label.textAlignment = .center
-        label.textColor = .black
+        label.textColor = .label
         return label
     }()
     

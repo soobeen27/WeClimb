@@ -134,7 +134,7 @@ enum Section: Int, CaseIterable {
     var title: String {
         switch self {
         case .gradeSection : return "난이도를 선택해주세요"
-        case .holdSection : return "홀더를 선택해주세요"
+        case .holdSection : return "홀드를 선택해주세요"
         }
     }
 }
@@ -179,6 +179,20 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
 }
 
 extension SelectSettingModalVC: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        switch Section(rawValue: indexPath.section) {
+        case .gradeSection:
+            let grade = viewModel.gradeDataRelay.value[indexPath.row]
+            viewModel.optionSelected(optionText: grade, buttonType: "grade")
+        case .holdSection:
+            let hold = Hold.allCases[indexPath.row]
+            viewModel.optionSelected(optionText: hold.string, buttonType: "hold")
+        default:
+            break
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionHeader else {
             return UICollectionReusableView()

@@ -99,11 +99,6 @@ class SelectGymVC: UIViewController {
                 searchVC.nextPush = false
                 searchVC.onSelectedGym = { gymInfo in
                     self.gymInfo = gymInfo
-//                    self.uploadVM.optionSelectedGym(gymInfo)
-                    self.uploadVC?.setgradeButton(with: gymInfo)
-//                    self.uploadVC.setSectorButton(with: gymInfo)
-                    //                    self.uploadVC.gymInfo = gymInfo
-//                    self.uploadVM.gymRelay.accept(gymInfo)
                     self.uploadVM.updateGymData(gymInfo)
                     
                     self.uploadVC?.gymView.isUserInteractionEnabled = true
@@ -127,7 +122,6 @@ class SelectGymVC: UIViewController {
             .drive(onNext: { [weak self] in
                 guard let self = self else { return }
                 if let uploadVC = self.uploadVC {
-//                    uploadVC = UploadVC(uploadVM: self.uploadVM, isClimbingVideo: true)
                     uploadVC.gymInfo = self.gymInfo
                     
                     self.navigationController?.pushViewController(uploadVC, animated: true)
