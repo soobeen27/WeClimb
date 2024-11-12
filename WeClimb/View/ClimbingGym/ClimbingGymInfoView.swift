@@ -72,15 +72,15 @@ class ClimbingGymInfoView: UIView {
     }()
     
     // 난이도 레이블
-    private let difficultyLabel: UILabel = {
+    private let gradeLabel: UILabel = {
         let label = UILabel()
-        label.text = ClimbingGymNameSpace.difficulty
+        label.text = ClimbingGymNameSpace.grade
         label.font = UIFont.boldSystemFont(ofSize: 17)
         return label
     }()
     
     // 난이도 색상 바
-    private let difficultyBarView: UIStackView = {
+    private let gradeBarView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.distribution = .fillEqually
@@ -116,8 +116,8 @@ class ClimbingGymInfoView: UIView {
             facilityInfoStackView,
             parkingInfoLabel,
             parkingInfoDetailLabel,
-            difficultyLabel,
-            difficultyBarView,
+            gradeLabel,
+            gradeBarView,
             noInfoLabel
         ].forEach { addSubview($0) }
         
@@ -156,32 +156,29 @@ class ClimbingGymInfoView: UIView {
             $0.height.equalTo(40)
         }
         
-        difficultyLabel.snp.makeConstraints {
+        gradeLabel.snp.makeConstraints {
             $0.top.equalTo(parkingInfoDetailLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(40)
         }
         
-        difficultyBarView.snp.makeConstraints {
-            $0.top.equalTo(difficultyLabel.snp.bottom).offset(8)
+        gradeBarView.snp.makeConstraints {
+            $0.top.equalTo(gradeLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(20)
         }
         
         noInfoLabel.snp.makeConstraints {
-            $0.top.equalTo(difficultyBarView.snp.bottom).offset(32)
+            $0.top.equalTo(gradeBarView.snp.bottom).offset(32)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().offset(-16)
         }
     }
     
     private func bindViewModel() {
-        guard let viewModel else { return }
-        
-        viewModel.gymData
-            .compactMap { $0 }
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [ weak self] gym in
+        viewModel?.output.gymData
+            .drive(onNext: { [weak self] gym in
+                guard let gym else { return }
                 self?.updateView(with: gym)
             })
             .disposed(by: disposeBag)
@@ -210,7 +207,7 @@ class ClimbingGymInfoView: UIView {
         
         // 난이도 색상 바 설정
         let grades = gym.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
-        setupDifficultyBarView(from: grades)
+        setupgradeBarView(from: grades)
         
         // 정보 없음 메시지 설정
         let isAnyFacilityInfoAvailable = !(gym.additionalInfo["parking"] as? String ?? "").isEmpty
@@ -256,7 +253,7 @@ class ClimbingGymInfoView: UIView {
         facilityInfoStackView.addArrangedSubview(horizontalStackView)
     }
     
-    private func setupDifficultyBarView(from grades: [String]) {
+    private func setupgradeBarView(from grades: [String]) {
         clearExistingViews() // 기존에 추가된 뷰를 모두 제거
         
         let coloredViews = grades.map { createGradeView(for: $0) }
@@ -267,12 +264,12 @@ class ClimbingGymInfoView: UIView {
         if !grades.contains(where: { $0.hasPrefix("B") }) {
             addContainerView()
         } else {
-            addDifficultyBarViewWithoutContainer()
+            addgradeBarViewWithoutContainer()
         }
     }
     
     private func clearExistingViews() {
-        difficultyBarView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        gradeBarView.arrangedSubviews.forEach { $0.removeFromSuperview() }
     }
     
     private func createGradeView(for grade: String) -> UIView {
@@ -295,13 +292,13 @@ class ClimbingGymInfoView: UIView {
     
     private func addViewsToStackView(_ views: [UIView]) {
         for view in views {
-            difficultyBarView.addArrangedSubview(view)
+            gradeBarView.addArrangedSubview(view)
             view.snp.makeConstraints {
-                $0.width.equalTo(difficultyBarView.snp.width).multipliedBy(1.0 / CGFloat(views.count))
-                $0.height.equalTo(difficultyBarView.snp.height)
+                $0.width.equalTo(gradeBarView.snp.width).multipliedBy(1.0 / CGFloat(views.count))
+                $0.height.equalTo(gradeBarView.snp.height)
             }
         }
-        difficultyBarView.spacing = 0
+        gradeBarView.spacing = 0
     }
     
     private func addContainerView() {
@@ -314,24 +311,24 @@ class ClimbingGymInfoView: UIView {
         containerView.layer.cornerRadius = 4
         containerView.clipsToBounds = true
         
-        containerView.addSubview(difficultyBarView)
+        containerView.addSubview(gradeBarView)
         
         self.addSubview(containerView)
         
         containerView.snp.makeConstraints {
-            $0.top.equalTo(difficultyLabel.snp.bottom).offset(8)
+            $0.top.equalTo(gradeLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(20)
         }
         
-        difficultyBarView.snp.makeConstraints {
+        gradeBarView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
     
-    private func addDifficultyBarViewWithoutContainer() {
-        difficultyBarView.snp.makeConstraints {
-            $0.top.equalTo(difficultyLabel.snp.bottom).offset(8)
+    private func addgradeBarViewWithoutContainer() {
+        gradeBarView.snp.makeConstraints {
+            $0.top.equalTo(gradeLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(20)
         }

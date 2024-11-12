@@ -11,6 +11,6 @@ struct FeedCellModel {
     let imageURL: URL?
     let videoURL: URL?
     var grade: String?
-    var sector: String?
+    var hold: String?
     var gym: String?
 }

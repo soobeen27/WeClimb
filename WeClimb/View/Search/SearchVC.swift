@@ -221,7 +221,6 @@ class SearchVC: UIViewController {
                     climbingGymVC.configure(with: selectedItem)
                     
                     self.navigationController?.navigationBar.prefersLargeTitles = false
-                    climbingGymVC.navigation()
                     self.navigationController?.pushViewController(climbingGymVC, animated: true)
                 }
             })

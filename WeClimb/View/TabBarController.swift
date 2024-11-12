@@ -42,7 +42,7 @@ class TabBarController: UITabBarController {
             myPageVC = UINavigationController(rootViewController: MyPageVC())
             myPageVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "person"), selectedImage: nil)
             
-            uploadVC = UINavigationController(rootViewController: GymSelectVC())
+            uploadVC = UINavigationController(rootViewController: SelectGymVC())
             uploadVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
         } else {
             myPageVC = UINavigationController(rootViewController: GuestVC())

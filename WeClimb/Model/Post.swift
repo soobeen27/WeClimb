@@ -11,8 +11,10 @@ import FirebaseFirestore
 struct Media: Codable {
     let mediaUID: String
     let url: String
-    let sector: String?
+    let hold: String?
     let grade: String?
+    let gym: String?
+    let creationDate: Date?
     let postRef: DocumentReference
     //    let authorUID: String
     //    let postUID: String

@@ -153,7 +153,12 @@ class SFFeedCell: UICollectionViewCell {
     }
     
     func streamAndCacheVideo(with url: URL, cacheKey: String, completion: @escaping (URL?) -> Void) {
-        let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        guard let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+            print("캐시 디렉토리를 찾을 수 없음.")
+            completion(nil)
+            return
+        }
+        
         let cachedFileURL = cacheDirectory.appendingPathComponent(cacheKey)
         
         if FileManager.default.fileExists(atPath: cachedFileURL.path) {

@@ -25,6 +25,7 @@ extension UIColor {
     }
     
     static let mainPurple = UIColor(hex: "#512BBB")
+    
 }
 
 
@@ -36,16 +37,16 @@ extension UIButton {
         static var isActivated = "isActivated"
     }
     
-//    var isActivated: Bool {
-//        get {
-//            return objc_getAssociatedObject(self, &AssociatedKeys.isActivated) as? Bool ?? false
-//        }
-//        set {
-//            objc_setAssociatedObject(self, &AssociatedKeys.isActivated, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-//            updateImage()
-//        }
-//    }
-//    
+    //    var isActivated: Bool {
+    //        get {
+    //            return objc_getAssociatedObject(self, &AssociatedKeys.isActivated) as? Bool ?? false
+    //        }
+    //        set {
+    //            objc_setAssociatedObject(self, &AssociatedKeys.isActivated, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    //            updateImage()
+    //        }
+    //    }
+    //    
     var isActivated: Bool {
         get {
             return objc_getAssociatedObject(self, &AssociatedKeys.isActivated) as? Bool ?? false
@@ -66,9 +67,9 @@ extension UIButton {
     //비활성화 상태
     private var normalImage: UIImage? {
         let isDarkMode = (traitCollection.userInterfaceStyle == .dark) || (backgroundColor == UIColor(hex: "#0C1014"))
-
+        
         let tintColor = isDarkMode ? UIColor(hex: "#FFFFFF") : UIColor(hex: "#CDCDCD")
-
+        
         return UIImage(systemName: "heart")?
             .withTintColor(tintColor)
             .withRenderingMode(.alwaysOriginal)
@@ -124,17 +125,43 @@ extension UIViewController {
         present(modalVC, animated: true, completion: nil)
     }
     private func modalTapGesture() {
-      let tapGesture = UITapGestureRecognizer(target: self, action: #selector(outsideTap(_:)))
-      view.superview?.addGestureRecognizer(tapGesture)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(outsideTap(_:)))
+        view.superview?.addGestureRecognizer(tapGesture)
     }
     
     @objc private func outsideTap(_ gesture: UITapGestureRecognizer) {
-      let touchLocation = gesture.location(in: self.view)
-      
-      //모달의 콘텐츠 영역을 제외한 빈 영역을 클릭했을 때만 모달을 닫음
-      if !self.view.point(inside: touchLocation, with: nil) {
-        self.dismiss(animated: true, completion: nil)
-      }
+        let touchLocation = gesture.location(in: self.view)
+        
+        //모달의 콘텐츠 영역을 제외한 빈 영역을 클릭했을 때만 모달을 닫음
+        if !self.view.point(inside: touchLocation, with: nil) {
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    /// 커스텀 모달
+    /// iOS 16이상에서는 custom Detent를 사용하고, 15 이하는 large
+    /// - Parameters:
+    ///   - modalVC: 표시할 모달 뷰 컨트롤러
+    ///   - height: 모달의 원하는 높이
+    func presentCustomHeightModal(modalVC: UIViewController, height: CGFloat) {
+        modalVC.modalPresentationStyle = .pageSheet
+        modalVC.isModalInPresentation = false
+        
+        if let sheet = modalVC.sheetPresentationController {
+            if #available(iOS 16.0, *) {
+                let customDetent = UISheetPresentationController.Detent.custom { _ in
+                    return height
+                }
+                sheet.detents = [customDetent]
+            } else {
+                // iOS 15 이하는 .large()로 설정하고, 콘텐츠 높이를 제한하여 원하는 위치로 설정
+                sheet.detents = [.large()]
+                modalVC.view.frame.size.height = height
+            }
+            sheet.preferredCornerRadius = 20
+            sheet.prefersGrabberVisible = false
+        }
+        present(modalVC, animated: true, completion: nil)
     }
 }
 
@@ -147,26 +174,30 @@ extension String {
             return ("주황", UIColor(red: 253/255, green: 150/255, blue: 68/255, alpha: 1))
         case "노":
             return ("노랑", UIColor(red: 255/255, green: 235/255, blue: 26/255, alpha: 1))
+        case "연":
+            return ("연두", UIColor(red: 30/255, green: 212/255, blue: 90/255, alpha: 1))
         case "초":
-            return ("초록", UIColor(red: 30/255, green: 212/255, blue: 90/255, alpha: 1))
+            return ("초록", UIColor(red: 26/255, green: 120/255, blue: 14/255, alpha: 1))
+        case "하":
+            return ("하늘", UIColor(red: 19/255, green: 149/255, blue: 255/255, alpha: 1)) // "파"랑 같은 색
         case "파":
-            return ("파랑", UIColor(red: 0/255, green: 189/255, blue: 222/255, alpha: 1))
+            return ("파랑", UIColor(red: 35/255, green: 97/255, blue: 243/255, alpha: 1))
         case "남":
-            return ("남색", UIColor(red: 40/255, green: 100/255, blue: 240/255, alpha: 1))
+            return ("남색", UIColor(red: 15/255, green: 0/255, blue: 177/255, alpha: 1))
         case "보":
             return ("보라", UIColor(red: 160/255, green: 83/255, blue: 233/255, alpha: 1))
         case "검":
             return ("검정", UIColor(red: 11/255, green: 16/255, blue: 19/255, alpha: 1))
         case "흰":
-            return ("흰색", UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1))
+            return ("흰색", UIColor(red: 241/255, green: 239/255, blue: 239/255, alpha: 1))
+        case "민":
+            return ("민트", UIColor(red: 31/255, green: 223/255, blue: 213/255, alpha: 1))
         case "회":
             return ("회색", UIColor(red: 171/255, green: 171/255, blue: 171/255, alpha: 1))
         case "핑":
             return ("핑크", UIColor(red: 255/255, green: 88/255, blue: 188/255, alpha: 1))
         case "갈":
             return ("갈색", UIColor(red: 187/255, green: 120/255, blue: 58/255, alpha: 1))
-        case "하":
-            return ("하늘", UIColor(red: 0/255, green: 189/255, blue: 222/255, alpha: 1)) // "파"랑 같은 색
         case "노검":
             return ("노랑", UIColor(red: 133/255, green: 125/255, blue: 23/255, alpha: 1))
         case "초검":
@@ -174,7 +205,35 @@ extension String {
         case "파검":
             return ("파랑", UIColor(red: 6/255, green: 103/255, blue: 121/255, alpha: 1))
         default:
-            return ("그 외", UIColor.clear)
+            return ("기타", UIColor.clear)
         }
+    }
+    
+    var getGradeArray: [String] {
+        return self.components(separatedBy: ", ")
+    }
+    
+    func colorTextChange() -> String {
+        let colorMap: [String: String] = [
+            "빨": "빨강",
+            "주": "주황",
+            "노": "노랑",
+            "연": "연두",
+            "초": "초록",
+            "하": "하늘",
+            "파": "파랑",
+            "남": "남색",
+            "보": "보라",
+            "검": "검정",
+            "흰": "흰색",
+            "민": "민트",
+            "회": "회색",
+            "핑": "핑크",
+            "갈": "갈색",
+            "노검": "노랑검정",
+            "초검": "초록검정",
+            "파검": "파랑검정",
+        ]
+        return colorMap[self] ?? self
     }
 }

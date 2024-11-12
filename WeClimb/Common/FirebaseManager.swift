@@ -310,51 +310,39 @@ final class FirebaseManager {
             }
     }
     // MARK: 포스트 업로드
-    func uploadPost(media: [(url: URL, sector: String?, grade: String?)], caption: String?, gym: String?, thumbnail: String) async {
-        guard let user = Auth.auth().currentUser else {
-            print("로그인이 되지않음")
-            return
-        }
+    func uploadPost(myUID: String, media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnail: String) async {
+//        guard let user = Auth.auth().currentUser else {
+//            print("로그인이 되지않음")
+//            return
+//        }
         
         let storageRef = storage.reference()
         let db = Firestore.firestore()
         let postUID = UUID().uuidString
         let postRef = db.collection("posts").document(postUID)
-        
+        let creationDate = Date()
         do {
-            // Firestore 배치 생성
             let batch = db.batch()
             
-            // 비동기로 각각의 미디어 파일을 업로드하고 Firestore 배치에 추가
-            //            var urlForThumbnail: URL?
             var mediaReferences: [DocumentReference] = []
             for media in media.enumerated() {
-                //                if media.offset == 0 {
-                //                    urlForThumbnail = media.element.url
-                //                }
                 let fileName = media.element.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.element.url.lastPathComponent
-                let mediaRef = storageRef.child("users/\(user.uid)/\(fileName)")
+                let mediaRef = storageRef.child("users/\(myUID)/\(fileName)")
                 let mediaURL = try await uploadMedia(mediaRef: mediaRef, mediaURL: media.element.url)
                 
-                // Media 문서 생성
                 let mediaUID = UUID().uuidString
                 let mediaDocRef = db.collection("media").document(mediaUID)
-                let mediaData = Media(mediaUID: mediaUID, url: mediaURL.absoluteString, sector: media.element.sector, grade: media.element.grade, postRef: postRef)
+                let mediaData = Media(mediaUID: mediaUID, url: mediaURL.absoluteString, hold: media.element.hold, grade: media.element.grade, gym: gym, creationDate: creationDate, postRef: postRef)
                 
-                // Media 문서를 배치에 추가
                 batch.setData(try Firestore.Encoder().encode(mediaData), forDocument: mediaDocRef)
                 
                 mediaReferences.append(mediaDocRef)
             }
-            
-            // 포스트 데이터를 Firestore에 저장
-            let post = Post(postUID: postUID, authorUID: user.uid, creationDate: Date(), caption: caption, like: nil, gym: gym, medias: mediaReferences, thumbnail: thumbnail, commentCount: nil)
-            
-            let userRef = db.collection("users").document(user.uid)
+            let post = Post(postUID: postUID, authorUID: myUID, creationDate: creationDate, caption: caption, like: nil, gym: gym, medias: mediaReferences, thumbnail: thumbnail, commentCount: nil)
+            let userRef = db.collection("users").document(myUID)
             batch.setData(try Firestore.Encoder().encode(post), forDocument: postRef)
             batch.updateData(["posts": FieldValue.arrayUnion([postRef])], forDocument: userRef)
             
-            // 배치 커밋
             try await batch.commit()
             print("포스트 업로드 및 미디어 저장 완료")
             
@@ -514,7 +502,7 @@ final class FirebaseManager {
             switch result {
             case .success(let user):
                 let postRef: Query
-                if let blackList = user.blackList {
+                if let blackList = user.blackList, let _ = user.blackList?.first {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
                         .whereField("authorUID", notIn: blackList)
@@ -563,7 +551,7 @@ final class FirebaseManager {
             case .success(let user):
                 guard let lastFeed else { return }
                 let postRef: Query
-                if let blackList = user.blackList {
+                if let blackList = user.blackList, let _ = user.blackList?.first {
                     postRef = self.db.collection("posts")
                         .order(by: "creationDate", descending: true)
                         .whereField("authorUID", notIn: blackList)
@@ -860,27 +848,6 @@ final class FirebaseManager {
     }
     
     // MARK: Post 삭제
-//    func deletePost(uid: String) {
-//        guard let user = Auth.auth().currentUser else { return }
-//        let userRef = db.collection("users").document(user.uid)
-//        let postRef = db.collection("posts").document(uid)
-//        
-//        userRef.updateData(["posts" : FieldValue.arrayRemove([postRef])]) { error in
-//            if let error = error {
-//                print("Error - Deleting Post Reference: \(error)")
-//                return
-//            }
-//            print("Post Reference deleted Successfully!")
-//            postRef.delete { error in
-//                if let error = error {
-//                    print("Error - Deleting Post: \(error)")
-//                    return
-//                }
-//                print("Post Deleted Succssfully")
-//            }
-//        }
-//    }
-
     func deletePost(uid: String) -> Single<Void> {
         guard let user = Auth.auth().currentUser else { 
             return Single.create {
@@ -916,6 +883,48 @@ final class FirebaseManager {
     func fileNameFromUrl(urlString: String) -> String {
         guard let url = URL(string: urlString) else { return "" }
         return url.lastPathComponent
+    }
+    
+    /// 암장과 난이도 별로 쿼리해서 조건에 맞는 미디어만 반환하는 함수
+    /// - Parameters:
+    ///   - gymName: 암장이름
+    ///   - grade: 난이도
+    /// - Returns: 필터된 Single<[Media]> 미디어
+    func getQueriedMedias(gymName: String, grade: String) -> Single<[Media]>{
+        return Single.create { [weak self] single in
+            guard let self else {
+                single(.failure(CommonError.noSelf))
+                return Disposables.create()
+            }
+            let answerQuery = self.db.collection("media")
+                .whereField("gym", isEqualTo: gymName)
+                .whereField("grade", isEqualTo: grade)
+                .order(by: "creationDate", descending: true)
+            
+            answerQuery.getDocuments { snapshot, error in
+                if let error = error {
+//                    print("Error - \(#function) : \(error)")
+                    single(.failure(error))
+                    return
+                }
+                guard let snapshot else {
+//                    single(.failure(NSError(domain: "No Snapshot", code: 1)))
+                    single(.success([]))
+                    return
+                }
+                var medias: [Media] = []
+                for document in snapshot.documents {
+                    do {
+                        let media = try document.data(as: Media.self)
+                        medias.append(media)
+                    } catch {
+                        print(error)
+                    }
+                }
+                single(.success(medias))
+            }
+            return Disposables.create()
+        }
     }
 }
 /*

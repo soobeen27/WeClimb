@@ -16,24 +16,50 @@ class ClimbingGymVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = ClimbingGymVM()
     private let climbingGymInfoView = ClimbingGymInfoView()
+//    private let climbingDetailGymVC = ClimbingDetailGymVC()
     private var gymData: Gym?
     
     // MARK: - 공통 헤더 뷰 - DS
     private let headerView = GymHeaderView()
     
     // MARK: - 테이블 뷰 구성 - DS
-    lazy var tableView: UITableView = {
+    private let gradeTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .clear
+        tableView.showsVerticalScrollIndicator = true
         tableView.clipsToBounds = true
-        tableView.layer.cornerRadius = 10
-        tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
         tableView.separatorColor = UIColor.label.withAlphaComponent(0.2)
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
-        tableView.rowHeight = 120
-        
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 32, bottom: 0, right: 32)
+        tableView.rowHeight = 64
+        tableView.register(gradeTableViewCell.self, forCellReuseIdentifier: gradeTableViewCell.className)
         return tableView
+    }()
+    
+    // MARK: - 난이도 색상 구분 - DS
+    private let easyLabel: UILabel = {
+        let label = UILabel()
+        label.text = "EASY"
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textColor = .gray
+        return label
+    }()
+    
+    private let hardLabel: UILabel = {
+        let label = UILabel()
+        label.text = "HARD"
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textColor = .gray
+        return label
+    }()
+    
+    private let colorStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.alignment = .fill
+        stackView.distribution = .fillEqually
+        stackView.spacing = 2
+        return stackView
     }()
     
     // MARK: - 라이프사이클 - DS
@@ -42,126 +68,159 @@ class ClimbingGymVC: UIViewController {
         setLayout()
         bindSectionData()
         actions()
-//        navigation()
-        
-        tableView.register(SectionTableViewCell.self, forCellReuseIdentifier: Identifiers.sectionTableViewCell)
-        
     }
     
     func configure(with gym: Gym) {
+        self.gymData = gym
         viewModel.setGymInfo(gymName: gym.gymName)
-//        headerView.configure(with: gym)
         climbingGymInfoView.viewModel = viewModel
     }
     
-    // MARK: - 네비게이션 - DS
-    func navigation() {
-        viewModel.onItemSelected = { [weak self] (detailItems: [DetailItem]) in
-            guard let self else { return }
-            
-            let detailVM = ClimbingDetailGymVM(detailItems: detailItems)
-            let detailVC = ClimbingDetailGymVC(viewModel: detailVM)
-            self.navigationController?.pushViewController(detailVC, animated: true)
-        }
+    private func navigateToClimbingDetailGymVC(with grade: String) {
+        //        print("선택된 난이도: \(grade)")
+        guard let gymData = gymData else { return }
+        
+        let detailViewModel = ClimbingDetailGymVM(gym: gymData, grade: grade)
+        let climbingDetailGymVC = ClimbingDetailGymVC(viewModel: detailViewModel)
+        
+        climbingDetailGymVC.configure(with: gymData.gymName, grade: grade)
+        
+        navigationController?.pushViewController(climbingDetailGymVC, animated: true)
     }
     
     // MARK: - 데이터 바인딩 - DS
     private func bindSectionData() {
-        // gymData와 바인딩하여 UI 업데이트
-               viewModel.gymData
-                   .compactMap { $0 } // nil이 아닐 때만 처리
-                   .observe(on: MainScheduler.instance)
-                   .subscribe(onNext: { [weak self] gym in
-                       guard let self = self else { return }
-                       // Gym 데이터를 헤더와 정보 뷰에 설정
-                       self.headerView.configure(with: gym)
-//                       self.climbingGymInfoView.configure(with: gym)
-                   })
-                   .disposed(by: disposeBag)
-               
-               // isDataLoaded 상태에 따라 UI 초기화
-               viewModel.isDataLoaded
-                   .filter { $0 } // true일 때만 실행
-                   .observe(on: MainScheduler.instance)
-                   .subscribe(onNext: { [weak self] _ in
-                       guard let self = self else { return }
-                       // 데이터 로딩 후 초기 UI 설정
-                       self.setupInitialUI()
-                   })
-                   .disposed(by: disposeBag)
-           // ViewModel의 items와 테이블 뷰 바인딩
-           viewModel.items
-            .bind(to: tableView.rx.items(cellIdentifier: SectionTableViewCell.className, cellType: SectionTableViewCell.self)) { row, item, cell in
-                   cell.configure(with: item, completedCount: 0, totalCount: 0)
-               }
-               .disposed(by: disposeBag)
-           
-           // 테이블 뷰의 아이템 선택을 ViewModel의 itemSelected로 전달
-//           tableView.rx.itemSelected
-//               .bind(to: viewModel.itemSelected)
-//               .disposed(by: disposeBag)
+        viewModel.output.gymData
+            .drive(onNext: { [weak self] gym in
+                guard let self else { return }
+                if let gym {
+                    self.headerView.configure(with: gym)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.output.isDataLoaded
+            .filter { $0 }
+            .drive(onNext: { [weak self] _ in
+                self?.setupInitialUI()
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.output.items
+            .drive(gradeTableView.rx.items(cellIdentifier: gradeTableViewCell.className, cellType: gradeTableViewCell.self)) { row, item, cell in
+                cell.configure(with: item.color, grade: item.grade)
+            }
+            .disposed(by: disposeBag)
+        
+        viewModel.output.items
+            .drive(onNext: { [weak self] items in
+                guard let self else { return }
+                
+                self.colorStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+                items.forEach { item in
+                    let colorView = UIView()
+                    colorView.backgroundColor = item.color
+                    colorView.layer.cornerRadius = 2
+                    self.colorStackView.addArrangedSubview(colorView)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        gradeTableView.rx.modelSelected((UIColor, String).self) // 셀 모델 직접 구독
+            .subscribe(onNext: { [weak self] model in
+                guard let self = self else { return }
+                // 페이지 전환 로직 실행
+                self.navigateToClimbingDetailGymVC(with: model.1) // model.1: 선택된 난이도
+            })
+            .disposed(by: disposeBag)
+        
+        // Input 이벤트
+        gradeTableView.rx.itemSelected
+            .bind(to: viewModel.input.gradeSelected)
+            .disposed(by: disposeBag)
+        
+        headerView.segmentControl.rx.value
+            .bind(to: viewModel.input.segmentSelected)
+            .disposed(by: disposeBag)
     }
     
-    // 초기 UI 설정 메서드
-        private func setupInitialUI() {
-            let initialSegmentIndex = viewModel.selectedSegment.value
-            headerView.segmentControl.selectedSegmentIndex = initialSegmentIndex
-            updateSegmentControlUI(selectedIndex: initialSegmentIndex)
-        }
+    private func configureActions() {
+           headerView.followButton.addAction(UIAction { [weak self] _ in
+               guard let self else { return }
+               self.headerView.followButton.isHidden.toggle()
+               // follow 버튼 토글 로직 추가
+           }, for: .touchUpInside)
+       }
+       
+    private func setupInitialUI() {
+        // ViewModel의 selectedSegment를 UI에 반영
+        viewModel.output.selectedSegment
+            .drive(onNext: { [weak self] initialSegmentIndex in
+                guard let self else { return }
+                self.headerView.segmentControl.selectedSegmentIndex = initialSegmentIndex
+                self.updateSegmentControlUI(selectedIndex: initialSegmentIndex)
+            })
+            .disposed(by: disposeBag)
+    }
     
-    // Segment Control 선택 인덱스에 따른 UI 업데이트
-        private func updateSegmentControlUI(selectedIndex: Int) {
-            if selectedIndex == 1 {
-                tableView.isHidden = true
-                climbingGymInfoView.isHidden = false
+    private func updateSegmentControlUI(selectedIndex: Int) {
+        if selectedIndex == 1 {
+            gradeTableView.isHidden = true
+            climbingGymInfoView.isHidden = false
+            easyLabel.isHidden = true
+            hardLabel.isHidden = true
+        } else {
+            gradeTableView.isHidden = false
+            climbingGymInfoView.isHidden = true
+            easyLabel.isHidden = false
+            hardLabel.isHidden = false
+        }
+    }
+    
+    // MARK: - 세그먼트 컨트롤 및 버튼 액션 설정
+    private func actions() {
+        headerView.followButton.addAction(UIAction { [weak self] _ in
+            guard let self else { return }
+            self.headerView.followButton.isHidden = true
+            if self.headerView.followButton.title(for: .normal) == ClimbingGymNameSpace.follow {
+                self.headerView.followButton.setTitle(ClimbingGymNameSpace.unFollow, for: .normal)
+                self.headerView.followButton.backgroundColor = .lightGray
+                self.headerView.followButton.setTitleColor(.black, for: .normal)
+                ClimbingGymNameSpace.totalFollow += 1
             } else {
-                tableView.isHidden = false
-                climbingGymInfoView.isHidden = true
-            }
-        }
-    
-    // MARK: - 세그먼트 컨트롤 및 버튼 액션 설정 - DS
-        private func actions() {
-            headerView.followButton.addAction(UIAction { [weak self] _ in
-                guard let self = self else { return }
-                self.headerView.followButton.isHidden = true
-                if self.headerView.followButton.title(for: .normal) == ClimbingGymNameSpace.follow {
-                    self.headerView.followButton.setTitle(ClimbingGymNameSpace.unFollow, for: .normal)
-                    self.headerView.followButton.backgroundColor = .lightGray
-                    self.headerView.followButton.setTitleColor(.black, for: .normal)
-                    ClimbingGymNameSpace.totalFollow += 1
-                } else {
-                    self.headerView.followButton.setTitle(ClimbingGymNameSpace.follow, for: .normal)
-                    self.headerView.followButton.backgroundColor = .mainPurple
-                    self.headerView.followButton.setTitleColor(.white, for: .normal)
-                    if ClimbingGymNameSpace.totalFollow > 0 {
-                        ClimbingGymNameSpace.totalFollow -= 1
-                    }
+                self.headerView.followButton.setTitle(ClimbingGymNameSpace.follow, for: .normal)
+                self.headerView.followButton.backgroundColor = .mainPurple
+                self.headerView.followButton.setTitleColor(.white, for: .normal)
+                if ClimbingGymNameSpace.totalFollow > 0 {
+                    ClimbingGymNameSpace.totalFollow -= 1
                 }
-                self.headerView.updateFollowersCount(ClimbingGymNameSpace.follower)
-            }, for: .touchUpInside)
+            }
+            self.headerView.updateFollowersCount(ClimbingGymNameSpace.follower)
+        }, for: .touchUpInside)
+        
+        headerView.segmentControl.addAction(UIAction { [weak self] _ in
+            guard let self else { return }
             
-            // 세그먼트 컨트롤 값 변경 액션 설정
-            headerView.segmentControl.addAction(UIAction { [weak self] _ in
-                guard let self = self else { return }
-                
-                let selectedIndex = self.headerView.segmentControl.selectedSegmentIndex
-                self.viewModel.selectedSegment.accept(selectedIndex)
-                
-                // 세그먼트 선택에 따른 UI 업데이트
-                self.updateSegmentControlUI(selectedIndex: selectedIndex)
-            }, for: .valueChanged)
-        }
+            let selectedIndex = self.headerView.segmentControl.selectedSegmentIndex
+            self.viewModel.input.segmentSelected.accept(selectedIndex)
+            
+            self.updateSegmentControlUI(selectedIndex: selectedIndex)
+        }, for: .valueChanged)
+    }
     
-    // MARK: - 레이아웃 설정 - DS
+    // MARK: - 레이아웃 설정
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         climbingGymInfoView.isHidden = true
         
         [
             headerView,
-            tableView,
-            climbingGymInfoView
+            gradeTableView,
+            climbingGymInfoView,
+            easyLabel,
+            hardLabel,
+            colorStackView,
+//            countStackView
         ].forEach { view.addSubview($0) }
         
         headerView.snp.makeConstraints {
@@ -169,10 +228,26 @@ class ClimbingGymVC: UIViewController {
             $0.leading.trailing.equalToSuperview()
         }
         
-        tableView.snp.makeConstraints {
-            $0.top.equalTo(headerView.snp.bottom)
+        easyLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(16)
+            $0.top.equalTo(headerView.snp.bottom).offset(8)
+        }
+        
+        hardLabel.snp.makeConstraints {
+            $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalTo(headerView.snp.bottom).offset(8)
+        }
+        
+        colorStackView.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalTo(easyLabel.snp.bottom).offset(4)
+            $0.height.equalTo(16)
+        }
+        
+        gradeTableView.snp.makeConstraints {
+            $0.top.equalTo(colorStackView.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
         

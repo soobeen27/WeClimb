@@ -18,7 +18,8 @@ class SFCollectionViewCell: UICollectionViewCell {
     private var likeViewModel: LikeViewModel?
     var disposeBag = DisposeBag()
     
-    var medias: [Media] = []
+//    var medias: [Media] = []
+    var medias: [Media]?
     var post: Post?
     
     let pauseVide: ((SFFeedCell) -> Void)? = nil
@@ -66,10 +67,7 @@ class SFCollectionViewCell: UICollectionViewCell {
             }
             .asDriver(onErrorDriveWith: .empty())
     }
-    
-    
-    
-    
+
     private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
         //        pageControl.numberOfPages = images.count
@@ -223,6 +221,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         disposeBag = DisposeBag()
+        likeViewModel = nil
         feedUserNameLabel.text = nil
         feedProfileAddressLabel.text = nil
         feedCaptionLabel.text = nil
@@ -231,24 +230,10 @@ class SFCollectionViewCell: UICollectionViewCell {
         feedUserProfileImage.image = nil
         pageControl.currentPage = 0
         post = nil
-        medias = []
+        medias = nil
         setLikeButton()
     }
 
-//    private func showActionSheet(for post: Post) {
-//        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-//        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
-////            self?.reportModal()
-//        }
-//        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
-//        
-//        [reportAction, cancelAction].forEach {
-//            actionSheet.addAction($0)
-//        }
-        
-//        self.present(actionSheet, animated: true, completion: nil)
-        
-//    }
     // MARK: - UI 구성
     private func setupUI() {
         [
@@ -399,6 +384,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         self.post = post
         Task {
             medias = try await FirebaseManager.shared.fetchMedias(for: post)
+            guard let medias else { return }
             if medias.count > 0 {
                 self.addSubview(pageControl)
                 pageControl.snp.makeConstraints {
@@ -413,6 +399,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         
         feedCaptionLabel.text = post.caption
         commentButtonCounter.text = String(post.commentCount ?? 0)
+        likeButton.configureHeartButton()
         fetchLike()
         setLikeButton()
     }
@@ -432,30 +419,26 @@ class SFCollectionViewCell: UICollectionViewCell {
     //MARK: - 좋아요 버튼 세팅
     private func setLikeButton() {
         print("Setting LikeButton")
-        guard let user = Auth.auth().currentUser else { return }
+        guard let user = Auth.auth().currentUser,
+              let likeViewModel
+        else { return }
         likeButton.rx.tap
-            .asSignal().emit(onNext: { [weak self] in
-                guard let self = self else { return }
-                let postUID = self.medias[medias.startIndex].postRef.documentID
-//                likeViewModel?.likePost(myUID: user.uid, postUID: postUID)
-                likeViewModel?.likePost(myUID: user.uid)
+            .asSignal().emit(onNext: {
+                likeViewModel.likePost(myUID: user.uid)
             })
             .disposed(by: disposeBag)
         
-        likeViewModel?.postLikeList
+        likeViewModel.postLikeList
             .asDriver()
             .drive(onNext: { [weak self] likeList in
                 guard let self else { return }
-                likeButtonCounter.text =  "\(likeList.count)"
+                self.likeButtonCounter.text =  "\(likeList.count)"
+                print("LikeList: \(likeList)")
                 if likeList.contains([user.uid]) {
                     self.likeButton.isActivated = true
                 }  else {
                     self.likeButton.isActivated = false
                 }
-                self.likeButton.configureHeartButton()
-                print("isActivated: \(self.likeButton.isActivated)")
-                print("like list: \(likeList)")
-                
             })
             .disposed(by: disposeBag)
     }
@@ -473,6 +456,7 @@ class SFCollectionViewCell: UICollectionViewCell {
 // MARK: CollectionView Setting
 extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard let medias else { return 0}
         return medias.count
     }
     
@@ -480,6 +464,7 @@ extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDele
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SFFeedCell.className, for: indexPath) as? SFFeedCell else {
             return UICollectionViewCell()
         }
+        guard let medias else { return cell }
         let currentMedia = medias[indexPath.row]
         cell.configure(with: currentMedia)
         return cell
