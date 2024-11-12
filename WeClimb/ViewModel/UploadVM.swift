@@ -13,6 +13,7 @@ import FirebaseStorage
 import LightCompressor
 import RxRelay
 import RxSwift
+import RxCocoa
 
 class UploadVM {
     let mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
@@ -30,9 +31,17 @@ class UploadVM {
     
     var shouldUpdateUI: Bool = true
     
-    // 순환 참조 방지
-    weak var viewController: UploadVC?
     var completedMediaCount = 0
+    private let compressionProgressRelay = BehaviorRelay<Float>(value: 0.0)
+    var compressionProgress: Driver<Float> {
+        return compressionProgressRelay.asDriver()
+    }
+    
+    var gymRelay = BehaviorRelay<Gym?>(value: nil)
+    var gradeDataRelay: BehaviorRelay<[String]> = BehaviorRelay(value: [])
+    
+    var selectedGrade: BehaviorRelay<String?> = BehaviorRelay(value: nil)
+    var selectedHold: BehaviorRelay<Hold?> = BehaviorRelay(value: nil)
 }
 
 extension UploadVM {
@@ -42,15 +51,15 @@ extension UploadVM {
         
         var currentFeedItems = feedRelay.value
         var feedItem = currentFeedItems[currentPageIndex]
-        print("currentFeedItems: \(currentFeedItems)")
-
+        
         if buttonType == "grade" {
             feedItem.grade = optionText
-        } else if buttonType == "sector" {
+        } else if buttonType == "hold" {
             feedItem.hold = optionText
         }
-
+        
         currentFeedItems[currentPageIndex] = feedItem
+        print("currentFeedItems: \(currentFeedItems)")
         shouldUpdateUI = false  // UI업데이트 X
         feedRelay.accept(currentFeedItems)
     }
@@ -58,33 +67,30 @@ extension UploadVM {
     // MARK: - 페이지 변경 이벤트 방출 YJ
     func pageChanged(to pageIndex: Int) {
         pageChanged.accept(pageIndex)
-    
+        
         currentPageIndex = pageIndex
     }
     
-    // MARK: - 선택한 암장 정보 저장 YJ
-    func optionSelectedGym(_ gymInfo: Gym) {
-        let gymName = gymInfo.gymName
+    func updateGymData(_ gym: Gym) {
+        self.gymRelay.accept(gym)
         
-        var feedItem = feedRelay.value
-        
-        // feedRelay의 모든 항목의 gym 속성을 업데이트
-        for index in feedItem.indices {
-            feedItem[index].gym = gymName
-        }
-        shouldUpdateUI = false
-        feedRelay.accept(feedItem)
-        print("feedRelay/gym: \(feedRelay)")
+        let gradeParts = gym.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+        gradeDataRelay.accept(gradeParts)
     }
 }
 
 extension UploadVM {
-    // MARK: - 미디어 항목을 처리하는 메서드 YJ
     func setMedia() {
         isLoading.accept(true) // 로딩 시작
         
         let group = DispatchGroup() // 비동기 작업을 추적하기 위한 그룹
         var models = [FeedCellModel?](repeating: nil, count: mediaItems.value.count)
+        
+        // 암장 이름을 미리 가져옵니다.
+        guard let gymName = gymRelay.value?.gymName else {
+            print("암장 이름이 설정되지 않았습니다.")
+            return
+        }
         
         mediaItems.value.enumerated().forEach { (index, mediaItem) in
             group.enter()   // 비동기 작업 시작 알려줌
@@ -102,64 +108,72 @@ extension UploadVM {
                     do {
                         try FileManager.default.copyItem(at: url, to: tempVideoURL)
                         print("비디오 파일이 임시 디렉토리에 저장됨: \(tempVideoURL.path)")
+                    } catch {
+                        print("비디오 파일 복사 실패: \(error.localizedDescription)")
+                        group.leave()
+                        return
+                    }
+                    
+                    // AVAsset으로 비디오 상태 확인
+                    let asset = AVAsset(url: tempVideoURL)
+                    let isPlayable = asset.isPlayable
+                    let hasProtectedContent = asset.hasProtectedContent
+                    print("비디오 파일 상태: isPlayable=\(isPlayable), hasProtectedContent=\(hasProtectedContent)")
+                    
+                    // 파일이 재생 가능한 상태인지 확인
+                    guard isPlayable else {
+                        print("비디오 파일이 재생 불가능 상태입니다.")
+                        group.leave()
+                        return
+                    }
+                    
+                    // 비디오 항목에 암장 이름 추가
+                    Task {
+                        let durationInSeconds = await self.checkVideoDuration(url: tempVideoURL)
+                        if durationInSeconds > 60 {
+                            self.showAlert.accept(())
+                            print("비디오가 너무 깁니다. 알람을 보냅니다.")
+                        } else {
+                            models[index] = FeedCellModel(
+                                imageURL: nil,
+                                videoURL: tempVideoURL,
+                                grade: self.selectedGrade.value, hold: self.selectedHold.value?.koreanHold, gym: gymName
+                            )
+                        }
+                        group.leave()
+                    }
+                }
+            } else if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+                mediaItem.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
+                    guard let uiImage = image as? UIImage else {
+                        print("이미지 로드 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
+                        group.leave()
+                        return
+                    }
+                    
+                    // 임시 디렉토리에 이미지 저장
+                    let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
+                    
+                    if let data = uiImage.jpegData(compressionQuality: 1) {
+                        do {
+                            try data.write(to: tempImageURL)
+                            models[index] = FeedCellModel(
+                                imageURL: tempImageURL,
+                                videoURL: nil,
+                                grade: self.selectedGrade.value, hold: self.selectedHold.value?.koreanHold, gym: gymName
+                            )
                         } catch {
-                            print("비디오 파일 복사 실패: \(error.localizedDescription)")
-                            group.leave()
-                            return
-                        }
-                        
-                        // AVAsset으로 비디오 상태 확인
-                        let asset = AVAsset(url: tempVideoURL)
-                        let isPlayable = asset.isPlayable
-                        let hasProtectedContent = asset.hasProtectedContent
-                        print("비디오 파일 상태: isPlayable=\(isPlayable), hasProtectedContent=\(hasProtectedContent)")
-                        
-                        // 파일이 재생 가능한 상태인지 확인
-                        guard isPlayable else {
-                            print("비디오 파일이 재생 불가능 상태입니다.")
-                            group.leave()
-                            return
-                        }
-                        
-                        // 최종적으로 비디오 파일 로드
-                        Task {
-                            let durationInSeconds = await self.checkVideoDuration(url: tempVideoURL)
-                            if durationInSeconds > 60 {
-                                self.showAlert.accept(())
-                                print("비디오가 너무 깁니다. 알람을 보냅니다.")
-                                    } else {
-                                        models[index] = FeedCellModel(imageURL: nil, videoURL: tempVideoURL)
-                                    }
-                                    group.leave()
-                                }
-                            }
-                        } else if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
-                            mediaItem.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
-                                guard let uiImage = image as? UIImage else {
-                                    print("이미지 로드 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
-                                    group.leave()
-                                    return
-                                }
-                                
-                                // 임시 디렉토리에 이미지 저장
-                                let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
-                                
-                                if let data = uiImage.jpegData(compressionQuality: 1) {
-                                    do {
-                                        try data.write(to: tempImageURL)
-                                        models[index] = FeedCellModel(imageURL: tempImageURL, videoURL: nil)
-                                    } catch {
-                                        print("이미지 저장 실패: \(error.localizedDescription)")
-                                    }
-                                }
-                                group.leave()
-                            }
+                            print("이미지 저장 실패: \(error.localizedDescription)")
                         }
                     }
+                    group.leave()
+                }
+            }
+        }
         
         // 비동기 작업이 모두 완료되었을 때 호출되는 클로저
         group.notify(queue: .main) { [weak self] in
-            guard let self else { return }
+            guard let self = self else { return }
             self.isLoading.accept(false) // 로딩 종료
             
             if !models.isEmpty {
@@ -189,7 +203,7 @@ extension UploadVM {
 }
 
 extension UploadVM {
-    func upload(media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String) -> Observable<Void> {
+    func upload(media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String) -> Driver<Void> {
         return Observable.create { observer in
             let dispatchGroup = DispatchGroup()
             var uploadMedia: [(url: URL, hold: String?, grade: String?)] = []
@@ -227,6 +241,7 @@ extension UploadVM {
                 Task { [uploadMedia, caption, gym] in
                     let myUID = FirebaseManager.shared.currentUserUID()
                     await FirebaseManager.shared.uploadPost(myUID: myUID, media: uploadMedia, caption: caption, gym: gym, thumbnail: thumbnailURL)
+                    
                     observer.onNext(())
                     observer.onCompleted()
                 }
@@ -234,6 +249,7 @@ extension UploadVM {
             
             return Disposables.create()
         }
+        .asDriver(onErrorDriveWith: Driver.empty())
     }
     
     // MARK: - 비디오를 압축하는 메서드
@@ -241,7 +257,8 @@ extension UploadVM {
         
         let videoCompressor = LightCompressor()
         
-        let totalMediaCount = Float(feedRelay.value.count)        
+        let totalMediaCount = Float(feedRelay.value.count)
+        
         // 압축 작업 설정
         _ = videoCompressor.compressVideo(videos: [
             .init(
@@ -258,28 +275,18 @@ extension UploadVM {
         ],
         progressQueue: .main,
         progressHandler: { progress in
-            DispatchQueue.main.async { [unowned self] in
-                let currentProgress = Float(progress.fractionCompleted) / totalMediaCount
-                let overallProgress = (Float(completedMediaCount) + currentProgress) / totalMediaCount
-                
-                UIView.animate(withDuration: 5) {
-                    self.viewController?.progressBar.setProgress(overallProgress, animated: true)
-                }
-            }},
-            completion: {[weak self] result in
+            let currentProgress = Float(progress.fractionCompleted) / totalMediaCount
+            let overallProgress = (Float(self.completedMediaCount) + currentProgress) / totalMediaCount
+            
+            self.compressionProgressRelay.accept(overallProgress)
+        },
+                                          completion: { [weak self] result in
             guard let self = self else { return }
             
             switch result {
-                
             case .onSuccess(_, let path):
                 print("비디오 압축 완료: \(path)")
                 self.completedMediaCount += 1
-                DispatchQueue.main.async { [unowned self] in
-                    let allProgress = Float(self.completedMediaCount) / totalMediaCount
-                    UIView.animate(withDuration: 5) {
-                        self.viewController?.progressBar.setProgress(allProgress, animated: true)
-                    }
-                }
                 completion(path)
             case .onStart:
                 print("압축 시작")
@@ -294,7 +301,7 @@ extension UploadVM {
     }
     
     func getThumbnailImage(from videoURL: URL, completion: @escaping (String?) -> Void) {
-         print("썸네일 이미지 생성 중")
+        print("썸네일 이미지 생성 중")
         
         let asset = AVAsset(url: videoURL)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
@@ -355,4 +362,3 @@ extension UploadVM {
         }
     }
 }
-

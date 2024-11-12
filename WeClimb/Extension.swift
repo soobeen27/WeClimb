@@ -187,7 +187,7 @@ extension String {
         case "보":
             return ("보라", UIColor(red: 160/255, green: 83/255, blue: 233/255, alpha: 1))
         case "검":
-            return ("검정", UIColor(red: 47/255, green: 40/255, blue: 40/255, alpha: 1))
+            return ("검정", UIColor(red: 11/255, green: 16/255, blue: 19/255, alpha: 1))
         case "흰":
             return ("흰색", UIColor(red: 241/255, green: 239/255, blue: 239/255, alpha: 1))
         case "민":
@@ -205,7 +205,7 @@ extension String {
         case "파검":
             return ("파랑", UIColor(red: 6/255, green: 103/255, blue: 121/255, alpha: 1))
         default:
-            return ("그 외", UIColor.clear)
+            return ("기타", UIColor.clear)
         }
     }
     
