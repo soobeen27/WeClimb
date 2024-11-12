@@ -47,6 +47,9 @@ enum Hold {
         }
     }
     
+    /// 홀드 이미지 반환
+    /// - Parameter color: <#color description#>
+    /// - Returns: <#description#>
     func image(color: Self) -> UIImage? {
         return UIImage(named: color.string)
     }
