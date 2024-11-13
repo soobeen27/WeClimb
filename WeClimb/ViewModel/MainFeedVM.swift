@@ -16,12 +16,14 @@ class MainFeedVM {
     struct Input {
         let reportDeleteButtonTap: Driver<Post?>
         let commentButtonTap: Driver<Post?>
+        let profileTap: Driver<String?>
 //        let likeButtonTap: Driver<Post?>
     }
     
     struct Output {
         let presentReport: Driver<Post?>
         let presentComment: Driver<Post?>
+        let pushProfile: Driver<String?>
 //        let like: Driver<Post?>
     }
     
@@ -33,7 +35,8 @@ class MainFeedVM {
     
     func transform(input: Input) -> Output {
         return Output(presentReport: input.reportDeleteButtonTap, 
-                      presentComment: input.commentButtonTap )
+                      presentComment: input.commentButtonTap,
+                      pushProfile: input.profileTap  )
 //                      like: input.likeButtonTap )
     }
     

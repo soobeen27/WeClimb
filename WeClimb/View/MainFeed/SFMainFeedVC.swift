@@ -158,7 +158,8 @@ class SFMainFeedVC: UIViewController{
                 
                 let input = MainFeedVM.Input(
                     reportDeleteButtonTap: sfCell.reportDeleteButtonTap,
-                    commentButtonTap: sfCell.commentButtonTap
+                    commentButtonTap: sfCell.commentButtonTap,
+                    profileTap: sfCell.profileTap
                 )
                 
                 let output = self.viewModel.transform(input: input)
@@ -167,13 +168,25 @@ class SFMainFeedVC: UIViewController{
                     guard let self, let post else { return }
                     self.actionSheet(for: post)
                 })
-                .disposed(by: sfCell.disposeBag) // 각 셀에 disposeBag을 추가하여 관리
+                .disposed(by: sfCell.disposeBag)
 
                 output.presentComment.drive(onNext: { [weak self] post in
                     guard let self, let post else { return }
                     self.showCommentModal(for: post)
                 })
-                .disposed(by: sfCell.disposeBag) // 각 셀에 disposeBag을 추가하여 관리
+                .disposed(by: sfCell.disposeBag)
+                
+                output.pushProfile.drive(onNext: { name in
+                    guard let name else { return }
+                    let userPageVM = UserPageVM()
+                    userPageVM.fetchUserInfo(userName: name)
+                    
+                    let userPageVC = UserPageVC(viewModel: userPageVM)
+                    
+                    self.navigationController?.navigationBar.prefersLargeTitles = false
+                    self.navigationController?.pushViewController(userPageVC, animated: true)
+                })
+                .disposed(by: disposeBag)
             })
             .disposed(by: disposeBag)
     }
