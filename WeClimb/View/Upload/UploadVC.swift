@@ -534,6 +534,7 @@ extension UploadVC : PHPickerViewControllerDelegate {
             self.viewModel.setMedia()
         }
         
+        
         if !results.isEmpty {
             self.settingView.selectedLabel.isHidden = false
             self.settingView.nextImageView.isHidden = false
