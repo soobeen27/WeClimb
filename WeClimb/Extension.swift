@@ -142,10 +142,16 @@ extension UIViewController {
     /// iOS 16이상에서는 custom Detent를 사용하고, 15 이하는 large
     /// - Parameters:
     ///   - modalVC: 표시할 모달 뷰 컨트롤러
-    ///   - height: 모달의 원하는 높이
-    func presentCustomHeightModal(modalVC: UIViewController, height: CGFloat) {
+    ///   - heightRatio: 모달의 원하는 높이 비율 (예: 0.5 = 화면의 50%)
+    ///   사용법 : let testVC = ModalTestVC()
+    ///   self.presentCustomHeightModal(modalVC: testVC, heightRatio: 원하는비율)
+    
+    func presentCustomHeightModal(modalVC: UIViewController, heightRatio: CGFloat) {
         modalVC.modalPresentationStyle = .pageSheet
         modalVC.isModalInPresentation = false
+        
+        let screenHeight = UIScreen.main.bounds.height
+        let height = screenHeight * heightRatio // 화면 높이에 비율을 곱해 실제 높이 계산
         
         if let sheet = modalVC.sheetPresentationController {
             if #available(iOS 16.0, *) {

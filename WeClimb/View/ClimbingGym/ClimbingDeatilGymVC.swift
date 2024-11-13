@@ -161,11 +161,11 @@ class ClimbingDetailGymVC: UIViewController {
             $0.top.equalTo(gradeColorView.snp.bottom).offset(24)
             $0.trailing.equalToSuperview().offset(-16)
             $0.height.equalTo(24)
-            $0.width.equalTo(60)
+            $0.width.equalTo(64)
         }
         
         thumbnailCollectionView.snp.makeConstraints {
-            $0.top.equalTo(filterButton.snp.bottom).offset(10)
+            $0.top.equalTo(filterButton.snp.bottom).offset(16)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
@@ -177,7 +177,8 @@ class ClimbingDetailGymVC: UIViewController {
             .bind { [weak self] in
                 guard let self else { return }
                 let climbingFilterVC = ClimbingFilterVC()
-                self.presentCustomHeightModal(modalVC: climbingFilterVC, height: 576)
+//                self.presentCustomHeightModal(modalVC: climbingFilterVC, height: 576)
+                self.presentCustomHeightModal(modalVC: climbingFilterVC, heightRatio: 0.69)
             }
             .disposed(by: disposeBag)
     }
