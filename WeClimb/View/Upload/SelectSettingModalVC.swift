@@ -49,7 +49,7 @@ class SelectSettingModalVC: UIViewController {
         return collectionView
     }()
     
-    private let okButton: UIButton = {
+    let okButton: UIButton = {
         let button = UIButton()
         button.setTitle(UploadNameSpace.okText, for: .normal)
         button.setTitleColor(.label, for: .normal)
@@ -235,8 +235,6 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
 extension SelectSettingModalVC: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedCell = collectionView.cellForItem(at: indexPath)
-        selectedCell?.isSelected = false
         
         switch Section(rawValue: indexPath.section) {
         case .gradeSection:

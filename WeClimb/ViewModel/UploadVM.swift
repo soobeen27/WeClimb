@@ -17,7 +17,7 @@ import RxCocoa
 
 class UploadVM {
     let mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
-    let feedRelay = BehaviorRelay(value: [FeedCellModel]())
+    let feedRelay = BehaviorRelay<[FeedCellModel]>(value: [])
     let cellData = BehaviorRelay(value: [FeedCellModel]())
     
     let showAlert = PublishRelay<Void>()
@@ -26,7 +26,7 @@ class UploadVM {
     // 피커뷰에서 선택한 항목을 저장
     var selectedFeedItems = [FeedCellModel]()
     
-    let pageChanged = PublishRelay<Int>()
+    let pageChanged = BehaviorRelay<Int>(value: 0)
     private var currentPageIndex = 0
     
     var shouldUpdateUI: Bool = true
@@ -62,6 +62,7 @@ extension UploadVM {
         print("currentFeedItems: \(currentFeedItems)")
         shouldUpdateUI = false  // UI업데이트 X
         feedRelay.accept(currentFeedItems)
+        print("진짜 확인용: \(feedRelay.value)")
     }
     
     // MARK: - 페이지 변경 이벤트 방출 YJ

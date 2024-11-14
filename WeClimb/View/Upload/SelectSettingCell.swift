@@ -49,6 +49,7 @@ class SelectSettingCell: UICollectionViewCell {
         colorView.backgroundColor = .clear
         colorView.layer.contents = nil
         titleLabel.text = nil
+        layer.borderWidth = 0
     }
     
     private func setLayout() {
@@ -78,6 +79,21 @@ class SelectSettingCell: UICollectionViewCell {
             default:
                 return UIColor.white
             }
+        }
+    }
+    
+    override var isSelected: Bool {
+        didSet {
+            updateSelectionButton()
+        }
+    }
+    
+    private func updateSelectionButton() {
+        if isSelected {
+            layer.borderColor = UIColor.mainPurple.cgColor
+            layer.borderWidth = 1
+        } else {
+            layer.borderWidth = 0
         }
     }
 
