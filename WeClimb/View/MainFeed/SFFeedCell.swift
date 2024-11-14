@@ -43,7 +43,7 @@ class SFFeedCell: UICollectionViewCell {
     private lazy var gradeImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .center
         imageView.backgroundColor = .white
         imageView.layer.cornerRadius = 16
         return imageView
@@ -52,10 +52,12 @@ class SFFeedCell: UICollectionViewCell {
     private lazy var gymGradeStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [gymImageView, gradeImageView])
         stackView.axis = .horizontal
+        stackView.spacing = 8
         return stackView
     }()
     
     var gymTap = PublishRelay<String?>()
+    var gradeTap = PublishRelay<Media?>()
     
     var media: Media?
     
@@ -87,7 +89,9 @@ class SFFeedCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         resetPlayer()
-        imageView.image = nil
+        gradeImageView.image = nil
+        gradeImageView.backgroundColor = nil
+        gymImageView.image = nil
         media = nil
         setLayout()
 //        imageViewGestureBind()
@@ -105,7 +109,7 @@ class SFFeedCell: UICollectionViewCell {
         } else {
             loadImage(from: url)
         }
-        gymHoldImageBind(media: media)
+        gymGradeImageBind(media: media)
     }
     
     private func loadImage(from url: URL) {
@@ -245,9 +249,21 @@ class SFFeedCell: UICollectionViewCell {
             }
             .bind(to: gymTap)
             .disposed(by: disposeBag)
+        
+        let gradeImageTapGesture = UITapGestureRecognizer()
+        gradeImageView.isUserInteractionEnabled = true
+        gradeImageView.addGestureRecognizer(gradeImageTapGesture)
+        gradeImageTapGesture.rx.event
+            .throttle(.milliseconds(1000), scheduler: MainScheduler.instance)
+            .map { [weak self] _ in
+//                print(self?.media?.gym)
+                return self?.media
+            }
+            .bind(to: gradeTap)
+            .disposed(by: disposeBag)
     }
     
-    func gymHoldImageBind(media: Media) {
+    func gymGradeImageBind(media: Media) {
         guard let gymName = media.gym else {
             print("no Gym")
             return
@@ -259,18 +275,37 @@ class SFFeedCell: UICollectionViewCell {
             FirebaseManager.shared.loadImage(from: gymImageString, into: self.gymImageView)
             print(gymImageString)
         }
+        if let hold = media.hold, let holdColor = Hold(rawValue: hold),
+           let holdImage = holdColor.image(),
+           let gradeColor = media.grade?.colorInfo
+        {
+            let resizeImage = holdImage.scalePreservingAspectRatio(targetSize: CGSize(width: 35, height: 35))
+            gradeImageView.image = resizeImage
+//            gradeImageView.backgroundColor = media.grade
+//            gradeImageView.backgroundColor = UIColo
+            gradeImageView.backgroundColor = gradeColor.color
+        }
     }
     func setLayout() {
+//        [
+//            gymImageView
+//        ].forEach {
+//            self.contentView.addSubview($0)
+//        }
         [
-            gymImageView
+            gymGradeStackView
         ].forEach {
             self.contentView.addSubview($0)
         }
-        if let superview = gymImageView.superview {
-            superview.bringSubviewToFront(gymImageView)
-        }
         gymImageView.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 50, height: 50))
+//            $0.bottom.equalToSuperview().offset(-16)
+//            $0.trailing.equalToSuperview().offset(-16)
+        }
+        gradeImageView.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 50, height: 50))
+        }
+        gymGradeStackView.snp.makeConstraints {
             $0.bottom.equalToSuperview().offset(-16)
             $0.trailing.equalToSuperview().offset(-16)
         }

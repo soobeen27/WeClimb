@@ -15,6 +15,7 @@ import Firebase
 class MainFeedVM {
     
     let gymButtonTap = PublishRelay<String?>()
+    let gradeButtonTap = PublishRelay<Media?>()
     
     struct Input {
         let reportDeleteButtonTap: Driver<Post?>

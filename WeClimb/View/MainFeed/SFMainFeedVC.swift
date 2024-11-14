@@ -54,6 +54,7 @@ class SFMainFeedVC: UIViewController{
         buttonBind()
         feedLoading()
         gymImageTap()
+        gradeImageTap()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -124,6 +125,17 @@ class SFMainFeedVC: UIViewController{
                         self.navigationController?.pushViewController(climbingGymVC, animated: true)
                     }
                 }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func gradeImageTap() {
+        viewModel.gradeButtonTap
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { media in
+                guard let media else { return }
+                print(media.grade)
+                print(media.hold)
             })
             .disposed(by: disposeBag)
     }

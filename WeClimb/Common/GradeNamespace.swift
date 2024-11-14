@@ -28,3 +28,4 @@ struct GradeNamespace {
         "파검" : "blueBlack",
     ]
 }
+
