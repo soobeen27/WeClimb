@@ -31,7 +31,7 @@ class SelectGymVC: UIViewController {
         configuration.attributedTitle = titleAttr
         
         let button = UIButton(configuration: configuration)
-        button.tintColor = .systemBackground
+        button.tintColor = .white
 
         return button
     }()

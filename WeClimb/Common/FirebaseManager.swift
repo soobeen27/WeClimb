@@ -16,6 +16,7 @@ import FirebaseStorage
 import GoogleSignIn
 import RxSwift
 import Kingfisher
+import AVFoundation
 
 
 final class FirebaseManager {
@@ -310,11 +311,7 @@ final class FirebaseManager {
             }
     }
     // MARK: 포스트 업로드
-    func uploadPost(myUID: String, media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnail: String) async {
-//        guard let user = Auth.auth().currentUser else {
-//            print("로그인이 되지않음")
-//            return
-//        }
+    func uploadPost(myUID: String, media: [(url: URL, hold: String?, grade: String?, thumbnailURL: String?)], caption: String?, gym: String?, thumbnail: String) async {
         
         let storageRef = storage.reference()
         let db = Firestore.firestore()
@@ -325,20 +322,45 @@ final class FirebaseManager {
             let batch = db.batch()
             
             var mediaReferences: [DocumentReference] = []
+            var thumbnails: [String] = []
+            
             for media in media.enumerated() {
                 let fileName = media.element.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.element.url.lastPathComponent
                 let mediaRef = storageRef.child("users/\(myUID)/\(fileName)")
                 let mediaURL = try await uploadMedia(mediaRef: mediaRef, mediaURL: media.element.url)
                 
+                let thumbnailURL = media.element.thumbnailURL ?? ""
+                thumbnails.append(thumbnailURL)
+                
                 let mediaUID = UUID().uuidString
                 let mediaDocRef = db.collection("media").document(mediaUID)
-                let mediaData = Media(mediaUID: mediaUID, url: mediaURL.absoluteString, hold: media.element.hold, grade: media.element.grade, gym: gym, creationDate: creationDate, postRef: postRef)
+                
+                let mediaData = Media(
+                    mediaUID: mediaUID,
+                    url: mediaURL.absoluteString,
+                    hold: media.element.hold,
+                    grade: media.element.grade,
+                    gym: gym,
+                    creationDate: creationDate,
+                    postRef: postRef,
+                    thumbnailURL: thumbnailURL
+                )
                 
                 batch.setData(try Firestore.Encoder().encode(mediaData), forDocument: mediaDocRef)
                 
                 mediaReferences.append(mediaDocRef)
             }
-            let post = Post(postUID: postUID, authorUID: myUID, creationDate: creationDate, caption: caption, like: nil, gym: gym, medias: mediaReferences, thumbnail: thumbnail, commentCount: nil)
+            let post = Post(postUID: postUID,
+                            authorUID: myUID,
+                            creationDate: creationDate,
+                            caption: caption,
+                            like: nil,
+                            gym: gym,
+                            medias: mediaReferences,
+                            thumbnail: thumbnails.first ?? "",
+                            commentCount: nil
+            )
+            
             let userRef = db.collection("users").document(myUID)
             batch.setData(try Firestore.Encoder().encode(post), forDocument: postRef)
             batch.updateData(["posts": FieldValue.arrayUnion([postRef])], forDocument: userRef)
@@ -469,7 +491,7 @@ final class FirebaseManager {
     
     func fetchLike(from uid: String, type: Like) -> Observable<[String]> {
         return Observable<[String]>.create { [weak self] observer in
-            guard let self else { 
+            guard let self else {
                 observer.onError(CommonError.noSelf)
                 return Disposables.create()
             }
@@ -849,7 +871,7 @@ final class FirebaseManager {
     
     // MARK: Post 삭제
     func deletePost(uid: String) -> Single<Void> {
-        guard let user = Auth.auth().currentUser else { 
+        guard let user = Auth.auth().currentUser else {
             return Single.create {
                 $0(.failure(UserError.logout))
                 return Disposables.create()
@@ -879,18 +901,44 @@ final class FirebaseManager {
             return Disposables.create()
         }
     }
-
+    
     func fileNameFromUrl(urlString: String) -> String {
         guard let url = URL(string: urlString) else { return "" }
         return url.lastPathComponent
     }
+    
+//    // 특정 포스트의 미디어 URL들을 가져오기
+//    func fetchMediaForPost(postID: String, completion: @escaping (Result<[URL], Error>) -> Void) {
+//        let mediaCollection = db.collection("media")
+//        
+//        mediaCollection.whereField("postRef", isEqualTo: "/posts/\(postID)")
+//            .getDocuments { snapshot, error in
+//                if let error = error {
+//                    completion(.failure(error))
+//                    return
+//                }
+//                
+//                guard let snapshot = snapshot else {
+//                    completion(.success([]))
+//                    return
+//                }
+//                
+//                // 각 문서에서 "url" 필드를 가져와 URL 배열로 변환
+//                let urls = snapshot.documents.compactMap { document -> URL? in
+//                    guard let urlString = document.get("url") as? String else { return nil }
+//                    return URL(string: urlString)
+//                }
+//                
+//                completion(.success(urls))
+//            }
+//    }
     
     /// 암장과 난이도 별로 쿼리해서 조건에 맞는 미디어만 반환하는 함수
     /// - Parameters:
     ///   - gymName: 암장이름
     ///   - grade: 난이도
     /// - Returns: 필터된 Single<[Media]> 미디어
-    func getQueriedMedias(gymName: String, grade: String) -> Single<[Media]>{
+    func getQueriedMedias(gymName: String, grade: String) -> Single<[Media]> {
         return Single.create { [weak self] single in
             guard let self else {
                 single(.failure(CommonError.noSelf))
@@ -900,6 +948,8 @@ final class FirebaseManager {
                 .whereField("gym", isEqualTo: gymName)
                 .whereField("grade", isEqualTo: grade)
                 .order(by: "creationDate", descending: true)
+            
+            print("Querying medias with gymName: \(gymName), grade: \(grade)")
             
             answerQuery.getDocuments { snapshot, error in
                 if let error = error {
@@ -921,6 +971,7 @@ final class FirebaseManager {
                         print(error)
                     }
                 }
+                print("Fetched media documents:", medias)
                 single(.success(medias))
             }
             return Disposables.create()

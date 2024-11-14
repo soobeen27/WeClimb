@@ -16,6 +16,7 @@ struct Media: Codable {
     let gym: String?
     let creationDate: Date?
     let postRef: DocumentReference
+    let thumbnailURL: String?
     //    let authorUID: String
     //    let postUID: String
     //    let gym: String?

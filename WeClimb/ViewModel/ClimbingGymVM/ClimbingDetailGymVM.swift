@@ -9,8 +9,10 @@ import UIKit
 
 import RxCocoa
 import RxSwift
+import FirebaseFirestore
 
 class ClimbingDetailGymVM {
+    
     struct Output {
         let gymName: Driver<String>
         let logoImageURL: Driver<URL>
@@ -20,6 +22,7 @@ class ClimbingDetailGymVM {
     private let gymNameRelay = BehaviorRelay<String>(value: "")
     private let logoImageURLRelay = BehaviorRelay<URL?>(value: nil)
     private let problemThumbnailsRelay = BehaviorRelay<[URL]>(value: [])
+    private let disposeBag = DisposeBag()
     
     let output: Output
     
@@ -43,13 +46,29 @@ class ClimbingDetailGymVM {
             }
         }
         
-        // 문제 썸네일 가져오기
-//        fetchProblems(for: gym, grade: grade)
+        // 특정 Gym과 grade에 맞는 미디어 URL 로드
+                loadMediaURLs(for: gym.gymName, grade: grade)
+            }
+            
+    private func loadMediaURLs(for gymName: String, grade: String) {
+        FirebaseManager.shared.getQueriedMedias(gymName: gymName, grade: grade)
+            .subscribe(onSuccess: { [weak self] medias in
+                guard let self = self else { return }
+                
+                // 각 Media 객체의 썸네일 URL을 HTTPS 형식으로 변환하여 저장
+                let thumbnailURLs: [URL] = medias.compactMap { media in
+                    if let thumbnailURLString = media.thumbnailURL {
+                        return URL(string: thumbnailURLString)
+                    }
+                    return nil
+                }
+                
+                print("Fetched Thumbnail URLs:", thumbnailURLs)
+                self.problemThumbnailsRelay.accept(thumbnailURLs)
+                
+            }, onFailure: { error in
+                print("미디어 URL 가져오기 오류: \(error)")
+            })
+            .disposed(by: disposeBag)
     }
-    
-//    private func fetchProblems(for gym: Gym, grade: String) {
-//        FirebaseManager.shared.fetchProblems(for: gym.gymName, grade: grade) { [weak self] urls in
-//            self?.problemThumbnailsRelay.accept(urls)
-//        }
-//    }
 }
