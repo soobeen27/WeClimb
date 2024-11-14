@@ -16,6 +16,21 @@ class SelectSettingModalVC: UIViewController {
     private var viewModel: UploadVM
     private let disposeBag = DisposeBag()
     
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.addSubview(contentView)
+        return scrollView
+    }()
+    
+    private lazy var contentView: UIView = {
+        let contentView = UIView()
+        [collectionView, okButton]
+            .forEach {
+                contentView.addSubview($0)
+            }
+        return contentView
+    }()
+    
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: setCollectionLayout())
         collectionView.register(SelectSettingCell.self, forCellWithReuseIdentifier: SelectSettingCell.className)
@@ -29,7 +44,26 @@ class SelectSettingModalVC: UIViewController {
                 return UIColor.systemGroupedBackground
             }
         }
+        
+        collectionView.isScrollEnabled = false
         return collectionView
+    }()
+    
+    let okButton: UIButton = {
+        let button = UIButton()
+        button.setTitle(UploadNameSpace.okText, for: .normal)
+        button.setTitleColor(.label, for: .normal)
+        button.layer.cornerRadius = 20
+        
+        button.backgroundColor = UIColor {
+            switch $0.userInterfaceStyle {
+            case .dark:
+                return UIColor.secondarySystemBackground
+            default:
+                return UIColor.white
+            }
+        }
+        return button
     }()
     
     init(viewModel: UploadVM) {
@@ -54,13 +88,34 @@ class SelectSettingModalVC: UIViewController {
     }
     
     private func setLayout() {
-        view.addSubview(collectionView)
+        view.addSubview(scrollView)
         
-        collectionView.snp.makeConstraints {
+        scrollView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(16)
             $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).inset(8)
             $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).inset(8)
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(8)
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalTo(scrollView)
+            $0.width.equalTo(scrollView)
+            $0.bottom.equalTo(okButton.snp.bottom).offset(16)
+        }
+        
+        collectionView.snp.makeConstraints {
+            $0.top.equalTo(contentView.snp.top)
+            $0.leading.equalTo(contentView.snp.leading)
+            $0.trailing.equalTo(contentView.snp.trailing)
+            $0.height.equalTo(400)
+        }
+        
+        okButton.snp.makeConstraints {
+            $0.top.equalTo(collectionView.snp.bottom).offset(16)
+            $0.leading.equalTo(contentView.snp.leading).inset(16)
+            $0.trailing.equalTo(contentView.snp.trailing).inset(16)
+            $0.bottom.equalTo(contentView.snp.bottom).offset(-16)
+            $0.height.equalTo(40)
         }
     }
     
@@ -112,7 +167,6 @@ class SelectSettingModalVC: UIViewController {
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .estimated(40)
-            //                heightDimension: .absolute(50)
         )
         
         let header = NSCollectionLayoutBoundarySupplementaryItem(
@@ -181,6 +235,7 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
 extension SelectSettingModalVC: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
         switch Section(rawValue: indexPath.section) {
         case .gradeSection:
             let grade = viewModel.gradeDataRelay.value[indexPath.row]

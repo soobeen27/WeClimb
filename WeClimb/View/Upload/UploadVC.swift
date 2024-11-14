@@ -36,7 +36,7 @@ class UploadVC: UIViewController {
     private lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [selectedMediaView, callPHPickerButton, gradeButton, textView, gymView, settingView, loadingIndicator, gymView, gymLabel, /*settingButton*/]
+        [selectedMediaView, callPHPickerButton, gradeButton, textView, gymView, settingView, loadingIndicator, gymView, gymLabel, holdButton]
             .forEach {
                 view.addSubview($0)
             }
@@ -96,9 +96,42 @@ class UploadVC: UIViewController {
         let button = UIButton(configuration: configuration)
         button.layer.borderWidth = 0.5
         button.layer.borderColor = UIColor.gray.cgColor
-        button.layer.cornerRadius = 20        
+        button.layer.cornerRadius = 18
         button.layer.zPosition = 1
         button.isHidden = true
+        button.setTitleColor(.label, for: .normal)
+        button.backgroundColor = UIColor {
+            switch $0.userInterfaceStyle {
+            case .dark:
+                return UIColor.secondarySystemBackground
+            default:
+                return UIColor.white
+            }
+        }
+        
+        return button
+    }()
+    
+    private let holdButton: UIButton = {
+        var configuration = UIButton.Configuration.plain()
+        
+        var titleAttr = AttributedString(UploadNameSpace.select)
+        titleAttr.font = .systemFont(ofSize: 15.0)
+        configuration.attributedTitle = titleAttr
+        
+        let defaultImage = UIImage(named: "holdOther")
+        configuration.image = defaultImage
+        configuration.imagePadding = 5
+        configuration.imagePlacement = .leading
+//        configuration.baseForegroundColor = .systemGray
+        
+        let button = UIButton(configuration: configuration)
+        button.layer.borderWidth = 0.5
+        button.layer.borderColor = UIColor.gray.cgColor
+        button.layer.cornerRadius = 18
+        button.layer.zPosition = 1
+        button.isHidden = true
+        button.imageView?.contentMode = .scaleAspectFit
         button.setTitleColor(.label, for: .normal)
         button.backgroundColor = UIColor {
             switch $0.userInterfaceStyle {
@@ -193,9 +226,9 @@ class UploadVC: UIViewController {
         setAlert()
         setLoading()
         setNotifications()
-        setButton()
+//        setSettingButton()
         bindPostButton()
-        //        bindSettingButton()
+        bindSettingButton()
         self.viewModel.feedRelay.accept([])
         self.viewModel.cellData.accept([])
     }
@@ -305,18 +338,27 @@ class UploadVC: UIViewController {
         let gymTapGesture = UITapGestureRecognizer()
         settingView.addGestureRecognizer(gymTapGesture)
         
+        let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
+        
         gymTapGesture.rx.event
             .asDriver()
             .drive(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 
-                let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
+//                let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
                 if let sheet = settingModalVC.sheetPresentationController {
                     sheet.detents = [.medium()]
                 }
                 self.present(settingModalVC, animated: true, completion: nil)
-                self.settingView.selectedLabel.isHidden = true
-                self.settingView.nextImageView.isHidden = true
+            })
+            .disposed(by: disposeBag)
+        
+        settingModalVC.okButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                guard let self = self else { return }
+                self.dismiss(animated: true, completion: nil)
+                setSettingButton()
             })
             .disposed(by: disposeBag)
     }
@@ -354,51 +396,60 @@ class UploadVC: UIViewController {
     }
     
     // MARK: - 페이지 변경 이벤트 구독 및 버튼 초기화 YJ
-    private func setButton() {
+    private func setSettingButton() {
         Driver.combineLatest(
-            viewModel.pageChanged.asDriver(onErrorJustReturn: 0),
-            viewModel.feedRelay.asDriver()
-        )
+              viewModel.pageChanged.asDriver(onErrorJustReturn: 0).startWith(0),
+              viewModel.feedRelay.asDriver().startWith([])
+          )
         .drive(onNext: { [weak self] pageIndex, feedItems in
             guard let self = self else { return }
-            print("페이지 인덱스: \(pageIndex)")
-            
-            let feedItem = self.viewModel.feedRelay.value[pageIndex]
-            print("feeItem: \(feedItem)")
-            
-            //            if feedItem.gym == nil || feedItem.gym?.isEmpty == true {
-            //                self.gradeButton.isHidden = true
-            //            } else {
-            //                self.gradeButton.isHidden = false
-            self.gradeButton.isHidden = false
-            
-            if let grade = feedItem.grade, !grade.isEmpty {
+                let pageIndex = self.viewModel.pageChanged.value
                 
-                self.gradeButton.setTitle(grade.colorInfo.text, for: .normal)
-                self.gradeButton.backgroundColor = .systemGray4.withAlphaComponent(0.6)
+                guard pageIndex >= 0 && pageIndex < feedItems.count else {
+                    print("잘못된 페이지 인덱스")
+                    return
+                }
                 
-                let colorInfo = grade.colorInfo
-                self.gradeButton.setImage(
-                    UIImage(systemName: "circle.fill")?
-                        .withTintColor(colorInfo.color, renderingMode: .alwaysOriginal),
-                    for: .normal
-                )
-            } else {
-                self.gradeButton.setTitle("선택", for: .normal)
-                self.gradeButton.backgroundColor = .systemGray4.withAlphaComponent(0.6)
-                self.gradeButton.setImage(nil, for: .normal)
+                let feedItem = feedItems[pageIndex]
+                
+                print("feeItem: \(feedItem)")
+            print("feeItem즈: \(feedItems)")
+            
+            if feedItem.grade == nil, feedItem.hold == nil {
+                self.gradeButton.isHidden = true
+                self.settingView.selectedLabel.isHidden = false
+                self.settingView.nextImageView.isHidden = false
+                self.holdButton.isHidden = true
             }
             
-            //                    if feedItem.hold == nil || feedItem.hold?.isEmpty == true {
-            //                        self.settingButton.setTitle("선택", for: .normal)
-            //                        self.settingButton.setImage(UIImage(systemName: "chevron.right"), for: .normal)
-            //                        self.settingButton.imageView?.tintColor = .secondaryLabel
-            //                    } else {
-            //                        self.settingButton.setTitle(feedItem.hold, for: .normal)
-            //                        self.settingButton.setImage(nil, for: .normal)
-            //                    }
-            //                }
-            
+            if feedItem.grade != nil {
+                self.settingView.selectedLabel.isHidden = true
+                self.settingView.nextImageView.isHidden = true
+                self.gradeButton.isHidden = false
+                self.gradeButton.setTitle(feedItem.grade?.colorInfo.text, for: .normal)
+                self.gradeButton.backgroundColor = .clear
+                
+                let colorInfo = feedItem.grade?.colorInfo
+                self.gradeButton.setImage(
+                    UIImage(systemName: "circle.fill")?
+                        .withTintColor(colorInfo?.color ?? UIColor.clear, renderingMode: .alwaysOriginal), for: .normal)
+            }
+ 
+            if let hold = feedItem.hold, feedItem.hold != nil {
+                self.settingView.selectedLabel.isHidden = true
+                self.settingView.nextImageView.isHidden = true
+                self.holdButton.isHidden = false
+                
+                if let holdEnum = Hold.allCases.first(where: { $0.string == hold }) {
+                    self.holdButton.setTitle(holdEnum.koreanHold, for: .normal)
+                    self.holdButton.backgroundColor = .clear
+                }
+                
+                if let holdImage = UIImage(named: hold) {
+                       self.holdButton.imageView?.contentMode = .scaleAspectFit
+                       self.holdButton.setImage(holdImage, for: .normal)
+                   }
+            }
         })
         .disposed(by: disposeBag)
     }
@@ -480,7 +531,17 @@ class UploadVC: UIViewController {
         gradeButton.snp.makeConstraints {
             $0.top.equalTo(settingView.snp.top).inset(8)
             $0.bottom.equalTo(settingView.snp.bottom).inset(8)
-            //            $0.height.equalTo(settingView.snp.height).multipliedBy(0.8)
+            $0.centerY.equalTo(settingView.snp.centerY)
+//            $0.height.equalTo(settingView.snp.height).multipliedBy(0.8)
+//            $0.trailing.equalTo(settingView.snp.trailing).offset(-8)
+        }
+        
+        holdButton.snp.makeConstraints {
+            $0.top.equalTo(settingView.snp.top).inset(8)
+            $0.bottom.equalTo(settingView.snp.bottom).inset(8)
+            $0.centerY.equalTo(settingView.snp.centerY)
+//            $0.height.equalTo(settingView.snp.height).multipliedBy(0.8)
+            $0.leading.equalTo(gradeButton.snp.trailing).offset(8)
             $0.trailing.equalTo(settingView.snp.trailing).offset(-8)
         }
         
@@ -534,12 +595,9 @@ extension UploadVC : PHPickerViewControllerDelegate {
             self.viewModel.setMedia()
         }
         
-        
         if !results.isEmpty {
-            self.settingView.selectedLabel.isHidden = false
-            self.settingView.nextImageView.isHidden = false
-            
-            bindSettingButton()
+            self.settingView.selectedLabel.isHidden = true
+            self.settingView.nextImageView.isHidden = true
             
             let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelButtonTapped))
             navigationItem.rightBarButtonItem = cancelButton
