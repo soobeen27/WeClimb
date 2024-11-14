@@ -341,16 +341,18 @@ class UploadVC: UIViewController {
         
         let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
         
+        let navigationModal = UINavigationController(rootViewController: settingModalVC)
+        
         gymTapGesture.rx.event
             .asDriver()
             .drive(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 
 //                let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
-                if let sheet = settingModalVC.sheetPresentationController {
+                if let sheet = navigationModal.sheetPresentationController {
                     sheet.detents = [.medium()]
                 }
-                self.present(settingModalVC, animated: true, completion: nil)
+                self.present(navigationModal, animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
         

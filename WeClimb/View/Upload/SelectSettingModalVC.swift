@@ -79,12 +79,17 @@ class SelectSettingModalVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         setColor()
+        setNavigation()
         
         collectionView.delegate = self
         collectionView.dataSource = self
         
         view.layer.cornerRadius = 20
         view.layer.masksToBounds = true
+    }
+    
+    private func setNavigation() {
+        self.title = UploadNameSpace.select
     }
     
     private func setLayout() {
@@ -162,7 +167,7 @@ class SelectSettingModalVC: UIViewController {
         let section = NSCollectionLayoutSection(group: verticalGroup)
         section.orthogonalScrollingBehavior = .continuous
         section.interGroupSpacing = 16
-        section.contentInsets = .init(top: 16, leading: 16, bottom: 16, trailing: 16)
+        section.contentInsets = .init(top: 8, leading: 16, bottom: 8, trailing: 16)
         
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
