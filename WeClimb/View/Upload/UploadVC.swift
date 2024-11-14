@@ -118,9 +118,11 @@ class UploadVC: UIViewController {
         var titleAttr = AttributedString(UploadNameSpace.select)
         titleAttr.font = .systemFont(ofSize: 15.0)
         configuration.attributedTitle = titleAttr
-        
-        let defaultImage = UIImage(named: "holdOther")
-        configuration.image = defaultImage
+
+         if let defaultImage = UIImage(named: "holdOther") {
+             let resizedImage = defaultImage.resize(targetSize: CGSize(width: 25, height: 25))
+             configuration.image = resizedImage
+         }
         configuration.imagePadding = 5
         configuration.imagePlacement = .leading
 //        configuration.baseForegroundColor = .systemGray
@@ -138,7 +140,7 @@ class UploadVC: UIViewController {
             case .dark:
                 return UIColor.secondarySystemBackground
             default:
-                return UIColor.white
+                return UIColor.systemGroupedBackground
             }
         }
         
@@ -226,9 +228,8 @@ class UploadVC: UIViewController {
         setAlert()
         setLoading()
         setNotifications()
-//        setSettingButton()
         bindPostButton()
-        bindSettingButton()
+//        bindSettingButton()
         self.viewModel.feedRelay.accept([])
         self.viewModel.cellData.accept([])
     }
@@ -448,40 +449,9 @@ class UploadVC: UIViewController {
                 }
                 
                 if let holdImage = UIImage(named: hold) {
-//                    configuration.imageView?.contentMode = .scaleAspectFit
-//                    configuration.setImage(holdImage, for: .normal)
-                    configuration.image = holdImage
-                    configuration.imagePadding = 5
-                    configuration.imagePlacement = .leading
-                }
-                
-                
-                
-//                var titleAttr = AttributedString(UploadNameSpace.select)
-//                titleAttr.font = .systemFont(ofSize: 15.0)
-//                configuration.attributedTitle = titleAttr
-                
-//                let defaultImage = UIImage(named: "holdOther")
-//                configuration.image = defaultImage
-//                configuration.imagePadding = 5
-//                configuration.imagePlacement = .leading
-        //        configuration.baseForegroundColor = .systemGray
-                
-                let button = UIButton(configuration: configuration)
-                button.layer.borderWidth = 0.5
-                button.layer.borderColor = UIColor.gray.cgColor
-                button.layer.cornerRadius = 18
-                button.layer.zPosition = 1
-                button.isHidden = true
-                button.imageView?.contentMode = .scaleAspectFit
-                button.setTitleColor(.label, for: .normal)
-                button.backgroundColor = UIColor {
-                    switch $0.userInterfaceStyle {
-                    case .dark:
-                        return UIColor.secondarySystemBackground
-                    default:
-                        return UIColor.white
-                    }
+                    let resizedImage = holdImage.resize(targetSize: CGSize(width: 20, height: 20))
+                    self.holdButton.imageView?.contentMode = .scaleAspectFit
+                    self.holdButton.setImage(resizedImage, for: .normal)
                 }
             }
         })
@@ -630,8 +600,7 @@ extension UploadVC : PHPickerViewControllerDelegate {
         }
         
         if !results.isEmpty {
-            self.settingView.selectedLabel.isHidden = true
-            self.settingView.nextImageView.isHidden = true
+            bindSettingButton()
             
             let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelButtonTapped))
             navigationItem.rightBarButtonItem = cancelButton
