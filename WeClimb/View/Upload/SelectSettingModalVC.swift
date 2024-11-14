@@ -16,21 +16,6 @@ class SelectSettingModalVC: UIViewController {
     private var viewModel: UploadVM
     private let disposeBag = DisposeBag()
     
-    private lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.addSubview(contentView)
-        return scrollView
-    }()
-    
-    private lazy var contentView: UIView = {
-        let contentView = UIView()
-        [collectionView, okButton]
-            .forEach {
-                contentView.addSubview($0)
-            }
-        return contentView
-    }()
-    
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: setCollectionLayout())
         collectionView.register(SelectSettingCell.self, forCellWithReuseIdentifier: SelectSettingCell.className)
@@ -44,8 +29,8 @@ class SelectSettingModalVC: UIViewController {
                 return UIColor.systemGroupedBackground
             }
         }
+        collectionView.isScrollEnabled = true
         
-        collectionView.isScrollEnabled = false
         return collectionView
     }()
     
@@ -93,33 +78,20 @@ class SelectSettingModalVC: UIViewController {
     }
     
     private func setLayout() {
-        view.addSubview(scrollView)
+        [collectionView, okButton]
+            .forEach {  view.addSubview($0) }
         
-        scrollView.snp.makeConstraints {
+        collectionView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(16)
             $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).inset(8)
             $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).inset(8)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(8)
-        }
-        
-        contentView.snp.makeConstraints {
-            $0.edges.equalTo(scrollView)
-            $0.width.equalTo(scrollView)
-            $0.bottom.equalTo(okButton.snp.bottom).offset(16)
-        }
-        
-        collectionView.snp.makeConstraints {
-            $0.top.equalTo(contentView.snp.top)
-            $0.leading.equalTo(contentView.snp.leading)
-            $0.trailing.equalTo(contentView.snp.trailing)
-            $0.height.equalTo(400)
+            $0.bottom.equalTo(okButton.snp.top).offset(-16)
         }
         
         okButton.snp.makeConstraints {
-            $0.top.equalTo(collectionView.snp.bottom).offset(16)
-            $0.leading.equalTo(contentView.snp.leading).inset(16)
-            $0.trailing.equalTo(contentView.snp.trailing).inset(16)
-            $0.bottom.equalTo(contentView.snp.bottom).offset(-16)
+            $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).inset(16)
+            $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).inset(16)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(16)
             $0.height.equalTo(40)
         }
     }
@@ -136,7 +108,6 @@ class SelectSettingModalVC: UIViewController {
     }
     
     private func setCollectionLayout() -> UICollectionViewLayout {
-        
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(0.6)

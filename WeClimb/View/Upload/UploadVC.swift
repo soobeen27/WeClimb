@@ -348,11 +348,7 @@ class UploadVC: UIViewController {
             .drive(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 
-//                let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
-                if let sheet = navigationModal.sheetPresentationController {
-                    sheet.detents = [.medium()]
-                }
-                self.present(navigationModal, animated: true, completion: nil)
+                self.presentCustomHeightModal(modalVC: navigationModal, heightRatio: 0.6)
             })
             .disposed(by: disposeBag)
         
@@ -437,8 +433,6 @@ class UploadVC: UIViewController {
                     UIImage(systemName: "circle.fill")?
                         .withTintColor(colorInfo?.color ?? UIColor.clear, renderingMode: .alwaysOriginal), for: .normal)
             }
-            
-            var configuration = UIButton.Configuration.plain()
             
             if let hold = feedItem.hold, feedItem.hold != nil {
                 self.settingView.selectedLabel.isHidden = true
