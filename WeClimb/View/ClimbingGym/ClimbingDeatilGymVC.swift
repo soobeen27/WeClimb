@@ -88,8 +88,40 @@ class ClimbingDetailGymVC: UIViewController {
         layout.itemSize = CGSize(width: width, height: width * 1.5)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
         collectionView.register(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailCell.className)
         return collectionView
+    }()
+    
+    private let emptyPost: UIView = {
+        let view = UIView()
+        view.isHidden = false
+        
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "no_Post") // 비어 있을 때 보여줄 이미지
+        
+        let label = UILabel()
+        label.text = "게시물이 없습니다."
+        label.textColor = .gray
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 13)
+        
+        [imageView, label]
+            .forEach { view.addSubview($0) }
+        
+        imageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview().offset(-20)
+            $0.width.height.equalTo(120)
+        }
+        
+        label.snp.makeConstraints {
+            $0.top.equalTo(imageView.snp.bottom).offset(8)
+            $0.centerX.equalToSuperview()
+        }
+        
+        return view
     }()
     
     override func viewDidLoad() {
@@ -114,11 +146,26 @@ class ClimbingDetailGymVC: UIViewController {
         
         // 썸네일 컬렉션 뷰 바인딩
         viewModel.output.problemThumbnails
+            .drive(onNext: { [weak self] urls in
+                guard let self = self else { return }
+                
+                if urls.isEmpty {
+                    // 썸네일이 없을 때 emptyPost 뷰를 보이고 컬렉션 뷰 숨기기
+                    self.emptyPost.isHidden = false
+                    self.thumbnailCollectionView.isHidden = true
+                } else {
+                    // 썸네일이 있을 때 emptyPost 뷰 숨기고 컬렉션 뷰 보이기
+                    self.emptyPost.isHidden = true
+                    self.thumbnailCollectionView.isHidden = false
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.output.problemThumbnails
             .drive(thumbnailCollectionView.rx.items(cellIdentifier: ThumbnailCell.className, cellType: ThumbnailCell.self)) { index, url, cell in
                 cell.configure(with: url.absoluteString)
             }
             .disposed(by: disposeBag)
-        
     }
     
     private func setLayout() {
@@ -130,6 +177,7 @@ class ClimbingDetailGymVC: UIViewController {
             gradeColorView,
             filterButton,
             thumbnailCollectionView,
+            emptyPost,
         ].forEach { view.addSubview($0) }
         
         logoImageView.snp.makeConstraints {
@@ -172,6 +220,10 @@ class ClimbingDetailGymVC: UIViewController {
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        emptyPost.snp.makeConstraints {
+            $0.edges.equalTo(thumbnailCollectionView)
         }
     }
     
