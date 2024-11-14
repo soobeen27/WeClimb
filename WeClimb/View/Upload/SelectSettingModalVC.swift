@@ -39,6 +39,7 @@ class SelectSettingModalVC: UIViewController {
         button.setTitle(UploadNameSpace.okText, for: .normal)
         button.setTitleColor(.label, for: .normal)
         button.layer.cornerRadius = 20
+        button.isEnabled = false
         
         button.backgroundColor = UIColor {
             switch $0.userInterfaceStyle {
@@ -71,6 +72,8 @@ class SelectSettingModalVC: UIViewController {
         
         view.layer.cornerRadius = 20
         view.layer.masksToBounds = true
+
+        bindOkButton()
     }
     
     private func setNavigation() {
@@ -107,6 +110,21 @@ class SelectSettingModalVC: UIViewController {
         }
     }
     
+    private func bindOkButton() {
+        Driver.combineLatest(
+            viewModel.selectedGrade.asDriver(onErrorJustReturn: ""),
+            viewModel.selectedHold.asDriver(onErrorJustReturn: .none)
+        )
+        .drive(onNext: { [weak self] selectedGrade, selectedHold in
+            guard let self else { return }
+            
+            if selectedGrade != nil, selectedHold != nil {
+                self.okButton.isEnabled = true
+            }
+        })
+        .disposed(by: disposeBag)
+    }
+
     private func setCollectionLayout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),

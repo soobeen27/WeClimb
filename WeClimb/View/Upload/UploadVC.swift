@@ -335,38 +335,11 @@ class UploadVC: UIViewController {
         }
     }
     
-    private func bindSettingButton() {
-        let gymTapGesture = UITapGestureRecognizer()
-        settingView.addGestureRecognizer(gymTapGesture)
-        
-        let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
-        
-        let navigationModal = UINavigationController(rootViewController: settingModalVC)
-        
-        gymTapGesture.rx.event
-            .asDriver()
-            .drive(onNext: { [weak self] _ in
-                guard let self = self else { return }
-                
-                self.presentCustomHeightModal(modalVC: navigationModal, heightRatio: 0.6)
-            })
-            .disposed(by: disposeBag)
-        
-        settingModalVC.okButton.rx.tap
-            .asDriver()
-            .drive(onNext: { [weak self] in
-                guard let self = self else { return }
-                self.dismiss(animated: true, completion: nil)
-                setSettingButton()
-            })
-            .disposed(by: disposeBag)
-    }
-    
     private func setAlert() {
         viewModel.showAlert
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 print("알림 이벤트 발생")
                 
                 CommonManager.shared.showAlert(from: self,
@@ -382,7 +355,7 @@ class UploadVC: UIViewController {
         viewModel.isLoading
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isLoading in
-                guard let self = self else { return }
+                guard let self else { return }
                 if isLoading {
                     self.callPHPickerButton.isHidden = true
                     self.loadingIndicator.startAnimating()
@@ -394,6 +367,33 @@ class UploadVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    private func bindSettingButton() {
+        let gymTapGesture = UITapGestureRecognizer()
+        settingView.addGestureRecognizer(gymTapGesture)
+        
+        let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
+        
+        let navigationModal = UINavigationController(rootViewController: settingModalVC)
+        
+        gymTapGesture.rx.event
+            .asDriver()
+            .drive(onNext: { [weak self] _ in
+                guard let self else { return }
+                
+                self.presentCustomHeightModal(modalVC: navigationModal, heightRatio: 0.6)
+            })
+            .disposed(by: disposeBag)
+        
+        settingModalVC.okButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                guard let self else { return }
+                self.dismiss(animated: true, completion: nil)
+                setSettingButton()
+            })
+            .disposed(by: disposeBag)
+    }
+    
     // MARK: - 페이지 변경 이벤트 구독 및 버튼 초기화 YJ
     private func setSettingButton() {
         Driver.combineLatest(
@@ -401,7 +401,7 @@ class UploadVC: UIViewController {
             viewModel.feedRelay.asDriver().startWith([])
         )
         .drive(onNext: { [weak self] pageIndex, feedItems in
-            guard let self = self else { return }
+            guard let self else { return }
             let pageIndex = self.viewModel.pageChanged.value
             
             guard pageIndex >= 0 && pageIndex < feedItems.count else {
