@@ -949,6 +949,8 @@ final class FirebaseManager {
                 .whereField("grade", isEqualTo: grade)
                 .order(by: "creationDate", descending: true)
             
+            print("Querying medias with gymName: \(gymName), grade: \(grade)")
+            
             answerQuery.getDocuments { snapshot, error in
                 if let error = error {
 //                    print("Error - \(#function) : \(error)")
