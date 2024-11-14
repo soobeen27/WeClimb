@@ -80,10 +80,13 @@ class ClimbingDetailGymVC: UIViewController {
     
     private let thumbnailCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 10
-        layout.minimumInteritemSpacing = 10
-        layout.itemSize = CGSize(width: 100, height: 150) // 셀 크기 설정
+        
+        layout.minimumInteritemSpacing = 1.0
+        layout.minimumLineSpacing = 1.0
+        
+        let width = (UIScreen.main.bounds.width - 2 * 16 - 2 * 1.0) / 3
+        layout.itemSize = CGSize(width: width, height: width * 1.5)
+        
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailCell.className)
         return collectionView

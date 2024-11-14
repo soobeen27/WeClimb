@@ -219,7 +219,8 @@ extension UploadVM {
                             let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
                             do {
                                 try compressedData.write(to: tempImageURL)
-                                uploadMedia.append((url: tempImageURL, hold: item.hold, grade: item.grade, thumbnailURL: ""))
+                                // 이미지 URL을 그대로 썸네일 URL로 지정
+                                uploadMedia.append((url: tempImageURL, hold: item.hold, grade: item.grade, thumbnailURL: item.url.absoluteString))
                             } catch {
                                 print("이미지 저장 실패: \(error.localizedDescription)")
                             }
