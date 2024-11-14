@@ -69,6 +69,21 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
         return view
     }()
     
+    private let holdCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 10
+        layout.minimumInteritemSpacing = 10
+        layout.itemSize = CGSize(width: 100, height: 100)
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.register(SelectSettingCell.self, forCellWithReuseIdentifier: SelectSettingCell.className)
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        return collectionView
+    }()
+
     // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -80,6 +95,8 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
         bindViewModel()
         
         scrollView.delegate = self
+        holdCollectionView.delegate = self
+        holdCollectionView.dataSource = self
     }
     
     // MARK: - Layout
@@ -92,6 +109,7 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
             viewOptionStackView,
             indicatorBar,
             scrollView,
+            holdCollectionView,
         ].forEach { view.addSubview($0) }
         
         [
@@ -120,6 +138,12 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
             $0.top.equalTo(viewOptionStackView.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(1)
+        }
+        
+        holdCollectionView.snp.makeConstraints {
+            $0.top.equalTo(indicatorBar.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.height.equalTo(60) // 높이 고정
         }
         
         scrollView.snp.makeConstraints {
@@ -211,5 +235,30 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
             holdLabel.textColor = .gray
             armReachLabel.textColor = .label
         }
+    }
+}
+
+extension ClimbingFilterVC: UICollectionViewDelegate {
+    // 셀 선택시 동작로직
+}
+
+extension ClimbingFilterVC: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return Hold.allCases.count
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 2
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SelectSettingCell.className, for: indexPath) as? SelectSettingCell else {
+            return UICollectionViewCell()
+        }
+        
+        let hold = Hold.allCases[indexPath.item]
+        cell.configure(item: hold)
+        
+        return cell
     }
 }

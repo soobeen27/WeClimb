@@ -39,9 +39,7 @@ class SettingVM {
     func checkLoginType() -> LoginType {
         guard let user = Auth.auth().currentUser else { return .none }
         
-        let snsType = user.providerData.map {
-            $0.providerID
-        }[0]
+        let snsType = user.providerData.first.map { $0.providerID } ?? "unknown"
         
         print(snsType)
         
