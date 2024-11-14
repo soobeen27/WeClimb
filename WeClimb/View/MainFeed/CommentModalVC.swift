@@ -130,6 +130,7 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
     private func setTextField() {
         commentTextField.rx.text
             .asDriver()
+            .throttle(.milliseconds(1000))
             .drive(onNext: { [weak self] text in
                 guard let self else { return }
                 if let text, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

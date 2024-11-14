@@ -248,7 +248,7 @@ class MyPageVC: UIViewController {
                 switch result {
                 case .success(let user):
                     self?.nameLabel.text = user.userName
-                    self?.userInfoLabel.text = "\(user.height ?? "")cm  |  \(user.armReach ?? "")cm"
+                    self?.userInfoLabel.text = "\(user.height ?? 0)cm  |  \(user.armReach ?? 0)cm"
                     
                     // Firebase Storage에서 이미지 로드
                     if let profileImageUrl = user.profileImage, let url = URL(string: profileImageUrl) {

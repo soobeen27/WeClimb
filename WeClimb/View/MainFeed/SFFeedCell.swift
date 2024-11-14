@@ -10,12 +10,17 @@ import AVFoundation
 import UIKit
 
 import SnapKit
+import RxSwift
+import RxCocoa
+import Kingfisher
 
 class SFFeedCell: UICollectionViewCell {
     var imageView: UIImageView!
     var player: AVPlayer?
     var playerLayer: AVPlayerLayer?
     var isVideo: Bool = false
+    
+    var disposeBag = DisposeBag()
     
     let playButton: UIButton = {
         let button = UIButton()
@@ -25,6 +30,32 @@ class SFFeedCell: UICollectionViewCell {
         button.tintColor = .gray
         return button
     }()
+    
+    private lazy var gymImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFit
+        imageView.backgroundColor = .white
+        imageView.layer.cornerRadius = 16
+        return imageView
+    }()
+    
+    private lazy var gradeImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFit
+        imageView.backgroundColor = .white
+        imageView.layer.cornerRadius = 16
+        return imageView
+    }()
+    
+    private lazy var gymGradeStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [gymImageView, gradeImageView])
+        stackView.axis = .horizontal
+        return stackView
+    }()
+    
+    var gymTap = PublishRelay<String?>()
     
     var media: Media?
     
@@ -44,6 +75,9 @@ class SFFeedCell: UICollectionViewCell {
             $0.center.equalTo(contentView)
             $0.size.equalTo(75)
         }
+        setLayout()
+//        gymHoldImageBind()
+        imageViewGestureBind()
     }
     
     required init?(coder: NSCoder) {
@@ -55,9 +89,11 @@ class SFFeedCell: UICollectionViewCell {
         resetPlayer()
         imageView.image = nil
         media = nil
+        setLayout()
+//        imageViewGestureBind()
     }
     
-    func configure(with media: Media) {
+    func configure(with media: Media, viewModel: MainFeedVM) {
         guard let url = URL(string: media.url) else { return }
         imageView.image = nil
         resetPlayer()
@@ -69,6 +105,7 @@ class SFFeedCell: UICollectionViewCell {
         } else {
             loadImage(from: url)
         }
+        gymHoldImageBind(media: media)
     }
     
     private func loadImage(from url: URL) {
@@ -194,5 +231,48 @@ class SFFeedCell: UICollectionViewCell {
         
         print("다운로드 시작: \(url.absoluteString)")
         task.resume()
+    }
+    
+    func imageViewGestureBind() {
+        let gymImageTapGesture = UITapGestureRecognizer()
+        gymImageView.isUserInteractionEnabled = true
+        gymImageView.addGestureRecognizer(gymImageTapGesture)
+        gymImageTapGesture.rx.event
+            .throttle(.milliseconds(1000), scheduler: MainScheduler.instance)
+            .map { [weak self] _ in
+//                print(self?.media?.gym)
+                return self?.media?.gym
+            }
+            .bind(to: gymTap)
+            .disposed(by: disposeBag)
+    }
+    
+    func gymHoldImageBind(media: Media) {
+        guard let gymName = media.gym else {
+            print("no Gym")
+            return
+        }
+        FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
+            guard let self,
+                  let gymImageString = gym?.profileImage
+            else { return }
+            FirebaseManager.shared.loadImage(from: gymImageString, into: self.gymImageView)
+            print(gymImageString)
+        }
+    }
+    func setLayout() {
+        [
+            gymImageView
+        ].forEach {
+            self.contentView.addSubview($0)
+        }
+        if let superview = gymImageView.superview {
+            superview.bringSubviewToFront(gymImageView)
+        }
+        gymImageView.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 50, height: 50))
+            $0.bottom.equalToSuperview().offset(-16)
+            $0.trailing.equalToSuperview().offset(-16)
+        }
     }
 }

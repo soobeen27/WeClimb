@@ -13,18 +13,19 @@ import Firebase
 
 
 class MainFeedVM {
+    
+    let gymButtonTap = PublishRelay<String?>()
+    
     struct Input {
         let reportDeleteButtonTap: Driver<Post?>
         let commentButtonTap: Driver<Post?>
         let profileTap: Driver<String?>
-//        let likeButtonTap: Driver<Post?>
     }
     
     struct Output {
         let presentReport: Driver<Post?>
         let presentComment: Driver<Post?>
         let pushProfile: Driver<String?>
-//        let like: Driver<Post?>
     }
     
     private let disposeBag = DisposeBag()
@@ -36,8 +37,8 @@ class MainFeedVM {
     func transform(input: Input) -> Output {
         return Output(presentReport: input.reportDeleteButtonTap, 
                       presentComment: input.commentButtonTap,
-                      pushProfile: input.profileTap  )
-//                      like: input.likeButtonTap )
+                      pushProfile: input.profileTap
+                      )
     }
     
     func mainFeed() {
@@ -96,34 +97,4 @@ class MainFeedVM {
     func deletePost(uid: String) -> Single<Void> {
         return FirebaseManager.shared.deletePost(uid: uid)
     }
-//    
-//    func likePost(myUID: String, postUID: String)  {
-//            let postRef = db.collection("posts").document(postUID)
-//            self.db.runTransaction { transaction, errorPointer in
-//                let postSnapshot: DocumentSnapshot
-//                do {
-//                    postSnapshot = try transaction.getDocument(postRef)
-//                } catch let fetchError as NSError {
-//                    errorPointer?.pointee = fetchError
-//                    return nil
-//                }
-//                var currentLikeList = postSnapshot.data()?["like"] as? [String] ?? []
-//                
-//                if currentLikeList.contains([myUID]) {
-//                    transaction.updateData(["like" : FieldValue.arrayRemove([myUID])], forDocument: postRef)
-//                    currentLikeList.removeAll { $0 == myUID }
-//                } else {
-//                    transaction.updateData(["like" : FieldValue.arrayUnion([myUID])], forDocument: postRef)
-//                    currentLikeList.append(myUID)
-//                }
-//                return currentLikeList
-//            } completion: { object, error in
-//                if let error = error {
-//                    print("Error : \(error) ", #file, #function, #line)
-//                    return
-//                } else if let likeList = object as? [String] {
-//                    self.postLikeList.accept(likeList)
-//                }
-//            }
-//    }
 }

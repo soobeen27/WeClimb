@@ -33,11 +33,11 @@ class PersonalDetailsVM {
     let disposeBag = DisposeBag()
         
         // BehaviorRelay로 변경하고 초기값을 설정합니다.
-        let heightInput = BehaviorRelay<String>(value: "")
-        let armReachInput = BehaviorRelay<String>(value: "")
+        let heightInput = BehaviorRelay<Int>(value: 0)
+        let armReachInput = BehaviorRelay<Int>(value: 0)
         
-        private var currentHeight: String?
-        private var currentArmReach: String?
+        private var currentHeight: Int?
+        private var currentArmReach: Int?
 
         init() {
             heightInput.subscribe(onNext: { [weak self] height in
