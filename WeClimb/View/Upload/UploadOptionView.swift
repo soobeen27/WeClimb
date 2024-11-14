@@ -32,7 +32,7 @@ class UploadOptionView : UIView {
         label.text = UploadNameSpace.select
         label.textColor = .secondaryLabel
         label.textAlignment = .right
-        label.isHidden = true
+//        label.isHidden = true
         return label
     }()
     
@@ -40,7 +40,7 @@ class UploadOptionView : UIView {
         let imageView = UIImageView(image: UIImage(systemName: "chevron.right"))
         imageView.tintColor = .systemGray
         imageView.contentMode = .scaleAspectFit
-        imageView.isHidden = true
+//        imageView.isHidden = true
         return imageView
     }()
     

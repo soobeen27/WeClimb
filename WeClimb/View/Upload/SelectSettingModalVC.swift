@@ -16,21 +16,6 @@ class SelectSettingModalVC: UIViewController {
     private var viewModel: UploadVM
     private let disposeBag = DisposeBag()
     
-    private lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.addSubview(contentView)
-        return scrollView
-    }()
-    
-    private lazy var contentView: UIView = {
-        let contentView = UIView()
-        [collectionView, okButton]
-            .forEach {
-                contentView.addSubview($0)
-            }
-        return contentView
-    }()
-    
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: setCollectionLayout())
         collectionView.register(SelectSettingCell.self, forCellWithReuseIdentifier: SelectSettingCell.className)
@@ -44,8 +29,8 @@ class SelectSettingModalVC: UIViewController {
                 return UIColor.systemGroupedBackground
             }
         }
+        collectionView.isScrollEnabled = true
         
-        collectionView.isScrollEnabled = false
         return collectionView
     }()
     
@@ -54,6 +39,7 @@ class SelectSettingModalVC: UIViewController {
         button.setTitle(UploadNameSpace.okText, for: .normal)
         button.setTitleColor(.label, for: .normal)
         button.layer.cornerRadius = 20
+        button.isEnabled = false
         
         button.backgroundColor = UIColor {
             switch $0.userInterfaceStyle {
@@ -79,42 +65,36 @@ class SelectSettingModalVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         setColor()
+        setNavigation()
         
         collectionView.delegate = self
         collectionView.dataSource = self
         
         view.layer.cornerRadius = 20
         view.layer.masksToBounds = true
+
+        bindOkButton()
+    }
+    
+    private func setNavigation() {
+        self.title = UploadNameSpace.select
     }
     
     private func setLayout() {
-        view.addSubview(scrollView)
+        [collectionView, okButton]
+            .forEach {  view.addSubview($0) }
         
-        scrollView.snp.makeConstraints {
+        collectionView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(16)
             $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).inset(8)
             $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).inset(8)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(8)
-        }
-        
-        contentView.snp.makeConstraints {
-            $0.edges.equalTo(scrollView)
-            $0.width.equalTo(scrollView)
-            $0.bottom.equalTo(okButton.snp.bottom).offset(16)
-        }
-        
-        collectionView.snp.makeConstraints {
-            $0.top.equalTo(contentView.snp.top)
-            $0.leading.equalTo(contentView.snp.leading)
-            $0.trailing.equalTo(contentView.snp.trailing)
-            $0.height.equalTo(400)
+            $0.bottom.equalTo(okButton.snp.top).offset(-16)
         }
         
         okButton.snp.makeConstraints {
-            $0.top.equalTo(collectionView.snp.bottom).offset(16)
-            $0.leading.equalTo(contentView.snp.leading).inset(16)
-            $0.trailing.equalTo(contentView.snp.trailing).inset(16)
-            $0.bottom.equalTo(contentView.snp.bottom).offset(-16)
+            $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).inset(16)
+            $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).inset(16)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(16)
             $0.height.equalTo(40)
         }
     }
@@ -130,8 +110,22 @@ class SelectSettingModalVC: UIViewController {
         }
     }
     
+    private func bindOkButton() {
+        Driver.combineLatest(
+            viewModel.selectedGrade.asDriver(onErrorJustReturn: ""),
+            viewModel.selectedHold.asDriver(onErrorJustReturn: .none)
+        )
+        .drive(onNext: { [weak self] selectedGrade, selectedHold in
+            guard let self else { return }
+            
+            if selectedGrade != nil, selectedHold != nil {
+                self.okButton.isEnabled = true
+            }
+        })
+        .disposed(by: disposeBag)
+    }
+
     private func setCollectionLayout() -> UICollectionViewLayout {
-        
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(0.6)
@@ -162,7 +156,7 @@ class SelectSettingModalVC: UIViewController {
         let section = NSCollectionLayoutSection(group: verticalGroup)
         section.orthogonalScrollingBehavior = .continuous
         section.interGroupSpacing = 16
-        section.contentInsets = .init(top: 16, leading: 16, bottom: 16, trailing: 16)
+        section.contentInsets = .init(top: 8, leading: 16, bottom: 8, trailing: 16)
         
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
@@ -197,7 +191,7 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch Section(rawValue: section) {
         case .gradeSection:
-            return viewModel.gradeDataRelay.value.count
+            return viewModel.gradeRelayArray.value.count
         case .holdSection:
             return Hold.allCases.count
         default:
@@ -216,14 +210,33 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
         
         switch Section(rawValue: indexPath.section) {
         case .gradeSection:
-            let grade = viewModel.gradeDataRelay.value[indexPath.row]
+            let grade = viewModel.gradeRelayArray.value[indexPath.row]
             print("Grade: \(grade)")
             cell.configure(item: grade)
+            
+            viewModel.selectedGrade
+                .asDriver(onErrorJustReturn: "")
+                .map { $0 == grade }
+                .drive(onNext: { isSelected in
+                    cell.layer.borderColor = isSelected ? UIColor.mainPurple.cgColor : UIColor.clear.cgColor
+                    cell.layer.borderWidth = isSelected ? 1 : 0
+                })
+                .disposed(by: disposeBag)
             
         case .holdSection:
             let hold = Hold.allCases[indexPath.row]
             print("Hold: \(hold)")
             cell.configure(item: hold)
+            
+            viewModel.selectedHold
+                .asDriver(onErrorJustReturn: .none)
+                .map { $0 == hold }
+                .drive(onNext: { isSelected in
+                    cell.layer.borderColor = isSelected ? UIColor.mainPurple.cgColor : UIColor.clear.cgColor
+                    cell.layer.borderWidth = isSelected ? 1 : 0
+                })
+                .disposed(by: disposeBag)
+            
         default:
             return UICollectionViewCell()
         }
@@ -233,15 +246,16 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
 }
 
 extension SelectSettingModalVC: UICollectionViewDelegate {
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         switch Section(rawValue: indexPath.section) {
         case .gradeSection:
-            let grade = viewModel.gradeDataRelay.value[indexPath.row]
+            let grade = viewModel.gradeRelayArray.value[indexPath.row]
+            viewModel.selectedGrade.accept(grade)
             viewModel.optionSelected(optionText: grade, buttonType: "grade")
         case .holdSection:
             let hold = Hold.allCases[indexPath.row]
+            viewModel.selectedHold.accept(hold)
             viewModel.optionSelected(optionText: hold.string, buttonType: "hold")
         default:
             break

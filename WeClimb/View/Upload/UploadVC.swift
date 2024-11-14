@@ -118,9 +118,11 @@ class UploadVC: UIViewController {
         var titleAttr = AttributedString(UploadNameSpace.select)
         titleAttr.font = .systemFont(ofSize: 15.0)
         configuration.attributedTitle = titleAttr
-        
-        let defaultImage = UIImage(named: "holdOther")
-        configuration.image = defaultImage
+
+         if let defaultImage = UIImage(named: "holdOther") {
+             let resizedImage = defaultImage.resize(targetSize: CGSize(width: 25, height: 25))
+             configuration.image = resizedImage
+         }
         configuration.imagePadding = 5
         configuration.imagePlacement = .leading
 //        configuration.baseForegroundColor = .systemGray
@@ -138,7 +140,7 @@ class UploadVC: UIViewController {
             case .dark:
                 return UIColor.secondarySystemBackground
             default:
-                return UIColor.white
+                return UIColor.systemGroupedBackground
             }
         }
         
@@ -226,9 +228,8 @@ class UploadVC: UIViewController {
         setAlert()
         setLoading()
         setNotifications()
-//        setSettingButton()
         bindPostButton()
-        bindSettingButton()
+//        bindSettingButton()
         self.viewModel.feedRelay.accept([])
         self.viewModel.cellData.accept([])
     }
@@ -334,40 +335,11 @@ class UploadVC: UIViewController {
         }
     }
     
-    private func bindSettingButton() {
-        let gymTapGesture = UITapGestureRecognizer()
-        settingView.addGestureRecognizer(gymTapGesture)
-        
-        let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
-        
-        gymTapGesture.rx.event
-            .asDriver()
-            .drive(onNext: { [weak self] _ in
-                guard let self = self else { return }
-                
-//                let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
-                if let sheet = settingModalVC.sheetPresentationController {
-                    sheet.detents = [.medium()]
-                }
-                self.present(settingModalVC, animated: true, completion: nil)
-            })
-            .disposed(by: disposeBag)
-        
-        settingModalVC.okButton.rx.tap
-            .asDriver()
-            .drive(onNext: { [weak self] in
-                guard let self = self else { return }
-                self.dismiss(animated: true, completion: nil)
-                setSettingButton()
-            })
-            .disposed(by: disposeBag)
-    }
-    
     private func setAlert() {
         viewModel.showAlert
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 print("알림 이벤트 발생")
                 
                 CommonManager.shared.showAlert(from: self,
@@ -383,7 +355,7 @@ class UploadVC: UIViewController {
         viewModel.isLoading
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isLoading in
-                guard let self = self else { return }
+                guard let self else { return }
                 if isLoading {
                     self.callPHPickerButton.isHidden = true
                     self.loadingIndicator.startAnimating()
@@ -395,24 +367,51 @@ class UploadVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    private func bindSettingButton() {
+        let gymTapGesture = UITapGestureRecognizer()
+        settingView.addGestureRecognizer(gymTapGesture)
+        
+        let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
+        
+        let navigationModal = UINavigationController(rootViewController: settingModalVC)
+        
+        gymTapGesture.rx.event
+            .asDriver()
+            .drive(onNext: { [weak self] _ in
+                guard let self else { return }
+                
+                self.presentCustomHeightModal(modalVC: navigationModal, heightRatio: 0.6)
+            })
+            .disposed(by: disposeBag)
+        
+        settingModalVC.okButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                guard let self else { return }
+                self.dismiss(animated: true, completion: nil)
+                setSettingButton()
+            })
+            .disposed(by: disposeBag)
+    }
+    
     // MARK: - 페이지 변경 이벤트 구독 및 버튼 초기화 YJ
     private func setSettingButton() {
         Driver.combineLatest(
-              viewModel.pageChanged.asDriver(onErrorJustReturn: 0).startWith(0),
-              viewModel.feedRelay.asDriver().startWith([])
-          )
+            viewModel.pageChanged.asDriver(onErrorJustReturn: 0).startWith(0),
+            viewModel.feedRelay.asDriver().startWith([])
+        )
         .drive(onNext: { [weak self] pageIndex, feedItems in
-            guard let self = self else { return }
-                let pageIndex = self.viewModel.pageChanged.value
-                
-                guard pageIndex >= 0 && pageIndex < feedItems.count else {
-                    print("잘못된 페이지 인덱스")
-                    return
-                }
-                
-                let feedItem = feedItems[pageIndex]
-                
-                print("feeItem: \(feedItem)")
+            guard let self else { return }
+            let pageIndex = self.viewModel.pageChanged.value
+            
+            guard pageIndex >= 0 && pageIndex < feedItems.count else {
+                print("잘못된 페이지 인덱스")
+                return
+            }
+            
+            let feedItem = feedItems[pageIndex]
+            
+            print("feeItem: \(feedItem)")
             print("feeItem즈: \(feedItems)")
             
             if feedItem.grade == nil, feedItem.hold == nil {
@@ -434,7 +433,7 @@ class UploadVC: UIViewController {
                     UIImage(systemName: "circle.fill")?
                         .withTintColor(colorInfo?.color ?? UIColor.clear, renderingMode: .alwaysOriginal), for: .normal)
             }
- 
+            
             if let hold = feedItem.hold, feedItem.hold != nil {
                 self.settingView.selectedLabel.isHidden = true
                 self.settingView.nextImageView.isHidden = true
@@ -446,9 +445,10 @@ class UploadVC: UIViewController {
                 }
                 
                 if let holdImage = UIImage(named: hold) {
-                       self.holdButton.imageView?.contentMode = .scaleAspectFit
-                       self.holdButton.setImage(holdImage, for: .normal)
-                   }
+                    let resizedImage = holdImage.resize(targetSize: CGSize(width: 20, height: 20))
+                    self.holdButton.imageView?.contentMode = .scaleAspectFit
+                    self.holdButton.setImage(resizedImage, for: .normal)
+                }
             }
         })
         .disposed(by: disposeBag)
@@ -596,8 +596,7 @@ extension UploadVC : PHPickerViewControllerDelegate {
         }
         
         if !results.isEmpty {
-            self.settingView.selectedLabel.isHidden = true
-            self.settingView.nextImageView.isHidden = true
+            bindSettingButton()
             
             let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelButtonTapped))
             navigationItem.rightBarButtonItem = cancelButton
@@ -661,7 +660,7 @@ extension UploadVC {
                         uploadStatus = .fail
                     }
                     
-                    let gym = self.gymView.selectedLabel.text ?? ""
+                    let gym = self.gymLabel.text ?? ""
                     
                     DispatchQueue.main.async {
                         UIView.animate(withDuration: 15) {
