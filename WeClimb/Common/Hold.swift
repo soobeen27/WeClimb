@@ -24,7 +24,7 @@ enum Hold : CaseIterable {
     
     var string: String {
         switch self {
-        case . red:
+        case .red:
             return "holdRed"
         case .black:
             return "holdBlack"
@@ -53,7 +53,7 @@ enum Hold : CaseIterable {
     
     var koreanHold: String {
         switch self {
-        case . red:
+        case .red:
             return "빨강"
         case .black:
             return "검정"

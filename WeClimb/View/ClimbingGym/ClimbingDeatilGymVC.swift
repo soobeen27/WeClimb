@@ -85,7 +85,7 @@ class ClimbingDetailGymVC: UIViewController {
         layout.minimumInteritemSpacing = 10
         layout.itemSize = CGSize(width: 100, height: 150) // 셀 크기 설정
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        //        collectionView.register("셀 이름머하지".self, forCellWithReuseIdentifier: "셀 이름머하지".identifier)
+        collectionView.register(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailCell.className)
         return collectionView
     }()
     
@@ -109,13 +109,13 @@ class ClimbingDetailGymVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        //        viewModel.output.problemThumbnails
-        //            .drive(thumbnailCollectionView.rx.items) { collectionView, row, url in
-        //                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: IndexPath(row: row, section: 0)) as! ThumbnailCell
-        //                FirebaseManager.shared.loadImage(from: url.absoluteString, into: cell.imageView)
-        //                return cell
-        //            }
-        //            .disposed(by: disposeBag)
+        // 썸네일 컬렉션 뷰 바인딩
+        viewModel.output.problemThumbnails
+            .drive(thumbnailCollectionView.rx.items(cellIdentifier: ThumbnailCell.className, cellType: ThumbnailCell.self)) { index, url, cell in
+                cell.configure(with: url.absoluteString)
+            }
+            .disposed(by: disposeBag)
+        
     }
     
     private func setLayout() {
@@ -177,7 +177,6 @@ class ClimbingDetailGymVC: UIViewController {
             .bind { [weak self] in
                 guard let self else { return }
                 let climbingFilterVC = ClimbingFilterVC()
-//                self.presentCustomHeightModal(modalVC: climbingFilterVC, height: 576)
                 self.presentCustomHeightModal(modalVC: climbingFilterVC, heightRatio: 0.69)
             }
             .disposed(by: disposeBag)
