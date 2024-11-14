@@ -88,7 +88,7 @@ class PersonalDetailsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
-        setupBindings()
+//        setupBindings()
     }
     
     private func setLayout() {
@@ -155,31 +155,31 @@ class PersonalDetailsVC: UIViewController {
             $0.height.equalTo(50)
         }
     }
-    
-    private func setupBindings() {
-        heightButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
-                let rangePickerVC = RangePickerVC()
-                
-                rangePickerVC.modalPresentationStyle = .pageSheet
-                if let sheet = rangePickerVC.sheetPresentationController {
-                    sheet.detents = [.custom { _ in
-                        return 296
-                    }]
-                    sheet.preferredCornerRadius = 24
-                }
-                
-                rangePickerVC.selectedRange
-                    .subscribe(onNext: { [weak self] selectedRange in
-                        self?.heightButton.setTitle("\(selectedRange) cm", for: .normal)
-                        self?.viewModel.heightInput.accept(selectedRange)  // onNext 대신 accept 사용
-                    })
-                    .disposed(by: self.disposeBag)
-                
-                self.present(rangePickerVC, animated: true, completion: nil)
-            })
-            .disposed(by: disposeBag)
+//    
+//    private func setupBindings() {
+//        heightButton.rx.tap
+//            .subscribe(onNext: { [weak self] in
+//                guard let self = self else { return }
+//                let rangePickerVC = RangePickerVC()
+//                
+//                rangePickerVC.modalPresentationStyle = .pageSheet
+//                if let sheet = rangePickerVC.sheetPresentationController {
+//                    sheet.detents = [.custom { _ in
+//                        return 296
+//                    }]
+//                    sheet.preferredCornerRadius = 24
+//                }
+//                
+//                rangePickerVC.selectedRange
+//                    .subscribe(onNext: { [weak self] selectedRange in
+//                        self?.heightButton.setTitle("\(selectedRange) cm", for: .normal)
+////                        self?.viewModel.heightInput.accept(selectedRange)  // onNext 대신 accept 사용
+//                    })
+//                    .disposed(by: self.disposeBag)
+//                
+//                self.present(rangePickerVC, animated: true, completion: nil)
+//            })
+//            .disposed(by: disposeBag)
         
         //        heightButton.rx.tap
         //            .subscribe(onNext: { [weak self] in
@@ -204,29 +204,29 @@ class PersonalDetailsVC: UIViewController {
         //            })
         //            .disposed(by: disposeBag)
         
-        armReachButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
-                let rangePickerVC = RangePickerVC()
-                
-                rangePickerVC.modalPresentationStyle = .pageSheet
-                if let sheet = rangePickerVC.sheetPresentationController {
-                    sheet.detents = [.custom { _ in
-                        return 296
-                    }]
-                    sheet.preferredCornerRadius = 24
-                }
-                
-                rangePickerVC.selectedRange
-                    .subscribe(onNext: { [weak self] selectedRange in
-                        self?.armReachButton.setTitle("\(selectedRange) cm", for: .normal)
-                        self?.viewModel.armReachInput.accept(selectedRange)
-                    })
-                    .disposed(by: self.disposeBag)
-                
-                self.present(rangePickerVC, animated: true, completion: nil)
-            })
-            .disposed(by: disposeBag)
+//        armReachButton.rx.tap
+//            .subscribe(onNext: { [weak self] in
+//                guard let self = self else { return }
+//                let rangePickerVC = RangePickerVC()
+//                
+//                rangePickerVC.modalPresentationStyle = .pageSheet
+//                if let sheet = rangePickerVC.sheetPresentationController {
+//                    sheet.detents = [.custom { _ in
+//                        return 296
+//                    }]
+//                    sheet.preferredCornerRadius = 24
+//                }
+//                
+//                rangePickerVC.selectedRange
+//                    .subscribe(onNext: { [weak self] selectedRange in
+//                        self?.armReachButton.setTitle("\(selectedRange) cm", for: .normal)
+////                        self?.viewModel.armReachInput.accept(selectedRange)
+//                    })
+//                    .disposed(by: self.disposeBag)
+//                
+//                self.present(rangePickerVC, animated: true, completion: nil)
+//            })
+//            .disposed(by: disposeBag)
         
         //        armReachButton.rx.tap
         //            .subscribe(onNext: { [weak self] in
@@ -251,21 +251,21 @@ class PersonalDetailsVC: UIViewController {
         //            })
         //            .disposed(by: disposeBag)
         
-        confirmButton.rx.tap
-            .withLatestFrom(Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput))
-            .subscribe(onNext: { [weak self] newHeight, newArmReach in
-                guard let self = self else { return }
-                
-                FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
-                    FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach) {
-                        let tabBarController = TabBarController()
-                        self.navigationController?.pushViewController(tabBarController, animated: true)
-                        self.navigationController?.setNavigationBarHidden(true, animated: true)
-                    }
-                }
-            })
-            .disposed(by: disposeBag)
-    }
+//        confirmButton.rx.tap
+//            .withLatestFrom(Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput))
+//            .subscribe(onNext: { [weak self] newHeight, newArmReach in
+//                guard let self = self else { return }
+//                
+////                FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
+////                    FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach) {
+////                        let tabBarController = TabBarController()
+////                        self.navigationController?.pushViewController(tabBarController, animated: true)
+////                        self.navigationController?.setNavigationBarHidden(true, animated: true)
+////                    }
+//                }
+//            })
+//            .disposed(by: disposeBag)
+//    }
         
 //        // heightInput과 armReachInput 결합
 //        Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput)
