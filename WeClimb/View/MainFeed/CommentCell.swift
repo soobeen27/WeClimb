@@ -144,9 +144,7 @@ class CommentCell: UITableViewCell {
         let myUID = FirebaseManager.shared.currentUserUID()
 
         likeButton.rx.tap
-            .asSignal().emit(onNext: { [weak self] in
-                guard let self = self else { return }
-
+            .asSignal().emit(onNext: {
                 commentCellVM.likeComment(myUID: myUID)
             })
             .disposed(by: disposeBag)

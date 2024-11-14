@@ -17,8 +17,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     private var likeViewModel: LikeViewModel?
     var disposeBag = DisposeBag()
-    
-//    var medias: [Media] = []
+    private var viewModel: MainFeedVM?
     var medias: [Media]?
     var post: Post?
     
@@ -397,7 +396,8 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     
     // MARK: - configure 메서드
-    func configure(with post: Post) {
+    func configure(with post: Post, viewModel: MainFeedVM) {
+        self.viewModel = viewModel
         likeViewModel = LikeViewModel(post: post)
         FirebaseManager.shared.getUserInfoFrom(uid: post.authorUID) { [weak self] result in
             guard let self else { return }
@@ -500,9 +500,12 @@ extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDele
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SFFeedCell.className, for: indexPath) as? SFFeedCell else {
             return UICollectionViewCell()
         }
-        guard let medias else { return cell }
+        guard let medias, let viewModel else { return cell }
         let currentMedia = medias[indexPath.row]
-        cell.configure(with: currentMedia)
+        cell.configure(with: currentMedia, viewModel: viewModel)
+        cell.gymTap
+            .bind(to: viewModel.gymButtonTap)
+            .disposed(by: cell.disposeBag)
         return cell
     }
     
