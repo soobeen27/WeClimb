@@ -96,13 +96,13 @@ class EditPersonalDetailsVC: UIViewController {
                         self.viewModel.heightInput.accept(userHeight)  // input에 저장
                         self.heightButton.setTitle("\(String(describing: self.viewModel.heightInput.value)) cm", for: .normal)
                     } else {
-                        self.viewModel.heightInput.accept("cm")
+                        self.viewModel.heightInput.accept(0)
                     }
                     if let userArmReach = user.armReach {
                         self.viewModel.armReachInput.accept(userArmReach)
                         self.armReachButton.setTitle("\(String(describing: self.viewModel.armReachInput.value)) cm", for: .normal)
                     } else {
-                        self.viewModel.armReachInput.accept("cm")
+                        self.viewModel.armReachInput.accept(0)
                     }
                     
                 case .failure(let error):

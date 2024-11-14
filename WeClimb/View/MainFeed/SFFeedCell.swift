@@ -40,6 +40,21 @@ class SFFeedCell: UICollectionViewCell {
         return imageView
     }()
     
+    private lazy var gradeImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFit
+        imageView.backgroundColor = .white
+        imageView.layer.cornerRadius = 16
+        return imageView
+    }()
+    
+    private lazy var gymGradeStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [gymImageView, gradeImageView])
+        stackView.axis = .horizontal
+        return stackView
+    }()
+    
     var gymTap = PublishRelay<String?>()
     
     var media: Media?
@@ -223,6 +238,7 @@ class SFFeedCell: UICollectionViewCell {
         gymImageView.isUserInteractionEnabled = true
         gymImageView.addGestureRecognizer(gymImageTapGesture)
         gymImageTapGesture.rx.event
+            .throttle(.milliseconds(1000), scheduler: MainScheduler.instance)
             .map { [weak self] _ in
 //                print(self?.media?.gym)
                 return self?.media?.gym
