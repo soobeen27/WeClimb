@@ -398,21 +398,21 @@ class UploadVC: UIViewController {
     // MARK: - 페이지 변경 이벤트 구독 및 버튼 초기화 YJ
     private func setSettingButton() {
         Driver.combineLatest(
-              viewModel.pageChanged.asDriver(onErrorJustReturn: 0).startWith(0),
-              viewModel.feedRelay.asDriver().startWith([])
-          )
+            viewModel.pageChanged.asDriver(onErrorJustReturn: 0).startWith(0),
+            viewModel.feedRelay.asDriver().startWith([])
+        )
         .drive(onNext: { [weak self] pageIndex, feedItems in
             guard let self = self else { return }
-                let pageIndex = self.viewModel.pageChanged.value
-                
-                guard pageIndex >= 0 && pageIndex < feedItems.count else {
-                    print("잘못된 페이지 인덱스")
-                    return
-                }
-                
-                let feedItem = feedItems[pageIndex]
-                
-                print("feeItem: \(feedItem)")
+            let pageIndex = self.viewModel.pageChanged.value
+            
+            guard pageIndex >= 0 && pageIndex < feedItems.count else {
+                print("잘못된 페이지 인덱스")
+                return
+            }
+            
+            let feedItem = feedItems[pageIndex]
+            
+            print("feeItem: \(feedItem)")
             print("feeItem즈: \(feedItems)")
             
             if feedItem.grade == nil, feedItem.hold == nil {
@@ -434,7 +434,9 @@ class UploadVC: UIViewController {
                     UIImage(systemName: "circle.fill")?
                         .withTintColor(colorInfo?.color ?? UIColor.clear, renderingMode: .alwaysOriginal), for: .normal)
             }
- 
+            
+            var configuration = UIButton.Configuration.plain()
+            
             if let hold = feedItem.hold, feedItem.hold != nil {
                 self.settingView.selectedLabel.isHidden = true
                 self.settingView.nextImageView.isHidden = true
@@ -446,9 +448,41 @@ class UploadVC: UIViewController {
                 }
                 
                 if let holdImage = UIImage(named: hold) {
-                       self.holdButton.imageView?.contentMode = .scaleAspectFit
-                       self.holdButton.setImage(holdImage, for: .normal)
-                   }
+//                    configuration.imageView?.contentMode = .scaleAspectFit
+//                    configuration.setImage(holdImage, for: .normal)
+                    configuration.image = holdImage
+                    configuration.imagePadding = 5
+                    configuration.imagePlacement = .leading
+                }
+                
+                
+                
+//                var titleAttr = AttributedString(UploadNameSpace.select)
+//                titleAttr.font = .systemFont(ofSize: 15.0)
+//                configuration.attributedTitle = titleAttr
+                
+//                let defaultImage = UIImage(named: "holdOther")
+//                configuration.image = defaultImage
+//                configuration.imagePadding = 5
+//                configuration.imagePlacement = .leading
+        //        configuration.baseForegroundColor = .systemGray
+                
+                let button = UIButton(configuration: configuration)
+                button.layer.borderWidth = 0.5
+                button.layer.borderColor = UIColor.gray.cgColor
+                button.layer.cornerRadius = 18
+                button.layer.zPosition = 1
+                button.isHidden = true
+                button.imageView?.contentMode = .scaleAspectFit
+                button.setTitleColor(.label, for: .normal)
+                button.backgroundColor = UIColor {
+                    switch $0.userInterfaceStyle {
+                    case .dark:
+                        return UIColor.secondarySystemBackground
+                    default:
+                        return UIColor.white
+                    }
+                }
             }
         })
         .disposed(by: disposeBag)
@@ -661,7 +695,7 @@ extension UploadVC {
                         uploadStatus = .fail
                     }
                     
-                    let gym = self.gymView.selectedLabel.text ?? ""
+                    let gym = self.gymLabel.text ?? ""
                     
                     DispatchQueue.main.async {
                         UIView.animate(withDuration: 15) {
