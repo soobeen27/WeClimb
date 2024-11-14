@@ -202,7 +202,7 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch Section(rawValue: section) {
         case .gradeSection:
-            return viewModel.gradeDataRelay.value.count
+            return viewModel.gradeRelayArray.value.count
         case .holdSection:
             return Hold.allCases.count
         default:
@@ -221,14 +221,33 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
         
         switch Section(rawValue: indexPath.section) {
         case .gradeSection:
-            let grade = viewModel.gradeDataRelay.value[indexPath.row]
+            let grade = viewModel.gradeRelayArray.value[indexPath.row]
             print("Grade: \(grade)")
             cell.configure(item: grade)
+            
+            viewModel.selectedGrade
+                .asDriver(onErrorJustReturn: "")
+                .map { $0 == grade }
+                .drive(onNext: { isSelected in
+                    cell.layer.borderColor = isSelected ? UIColor.mainPurple.cgColor : UIColor.clear.cgColor
+                    cell.layer.borderWidth = isSelected ? 1 : 0
+                })
+                .disposed(by: disposeBag)
             
         case .holdSection:
             let hold = Hold.allCases[indexPath.row]
             print("Hold: \(hold)")
             cell.configure(item: hold)
+            
+            viewModel.selectedHold
+                .asDriver(onErrorJustReturn: .none)
+                .map { $0 == hold }
+                .drive(onNext: { isSelected in
+                    cell.layer.borderColor = isSelected ? UIColor.mainPurple.cgColor : UIColor.clear.cgColor
+                    cell.layer.borderWidth = isSelected ? 1 : 0
+                })
+                .disposed(by: disposeBag)
+            
         default:
             return UICollectionViewCell()
         }
@@ -238,15 +257,16 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
 }
 
 extension SelectSettingModalVC: UICollectionViewDelegate {
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         switch Section(rawValue: indexPath.section) {
         case .gradeSection:
-            let grade = viewModel.gradeDataRelay.value[indexPath.row]
+            let grade = viewModel.gradeRelayArray.value[indexPath.row]
+            viewModel.selectedGrade.accept(grade)
             viewModel.optionSelected(optionText: grade, buttonType: "grade")
         case .holdSection:
             let hold = Hold.allCases[indexPath.row]
+            viewModel.selectedHold.accept(hold)
             viewModel.optionSelected(optionText: hold.string, buttonType: "hold")
         default:
             break

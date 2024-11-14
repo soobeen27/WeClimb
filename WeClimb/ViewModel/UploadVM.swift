@@ -38,10 +38,10 @@ class UploadVM {
     }
     
     var gymRelay = BehaviorRelay<Gym?>(value: nil)
-    var gradeDataRelay: BehaviorRelay<[String]> = BehaviorRelay(value: [])
+    var gradeRelayArray: BehaviorRelay<[String]> = BehaviorRelay(value: [])
     
-    var selectedGrade: BehaviorRelay<String?> = BehaviorRelay(value: nil)
-    var selectedHold: BehaviorRelay<Hold?> = BehaviorRelay(value: nil)
+    var selectedGrade = BehaviorRelay<String?>(value: nil)
+    var selectedHold = BehaviorRelay<Hold?>(value: nil)
 }
 
 extension UploadVM {
@@ -76,7 +76,7 @@ extension UploadVM {
         self.gymRelay.accept(gym)
         
         let gradeParts = gym.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
-        gradeDataRelay.accept(gradeParts)
+        gradeRelayArray.accept(gradeParts)
     }
 }
 
