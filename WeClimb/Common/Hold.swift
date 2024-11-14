@@ -9,6 +9,7 @@ import UIKit
 
 /// CaseIterable -> 열거형의 각각 모든 case들을 한데 묶어서 컬렉션인 배열로 만들어주는 프로토콜 채택.
 enum Hold : CaseIterable {
+    case red
     case black
     case blue
     case gray
@@ -23,6 +24,8 @@ enum Hold : CaseIterable {
     
     var string: String {
         switch self {
+        case .red:
+            return "holdRed"
         case .black:
             return "holdBlack"
         case .blue:
@@ -50,6 +53,8 @@ enum Hold : CaseIterable {
     
     var koreanHold: String {
         switch self {
+        case .red:
+            return "빨강"
         case .black:
             return "검정"
         case .blue:

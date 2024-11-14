@@ -80,13 +80,48 @@ class ClimbingDetailGymVC: UIViewController {
     
     private let thumbnailCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 10
-        layout.minimumInteritemSpacing = 10
-        layout.itemSize = CGSize(width: 100, height: 150) // 셀 크기 설정
+        
+        layout.minimumInteritemSpacing = 1.0
+        layout.minimumLineSpacing = 1.0
+        
+        let width = (UIScreen.main.bounds.width - 2 * 16 - 2 * 1.0) / 3
+        layout.itemSize = CGSize(width: width, height: width * 1.5)
+        
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        //        collectionView.register("셀 이름머하지".self, forCellWithReuseIdentifier: "셀 이름머하지".identifier)
+        collectionView.backgroundColor = .clear
+        collectionView.register(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailCell.className)
         return collectionView
+    }()
+    
+    private let emptyPost: UIView = {
+        let view = UIView()
+        view.isHidden = false
+        
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "no_Post") // 비어 있을 때 보여줄 이미지
+        
+        let label = UILabel()
+        label.text = "게시물이 없습니다."
+        label.textColor = .gray
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 13)
+        
+        [imageView, label]
+            .forEach { view.addSubview($0) }
+        
+        imageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview().offset(-20)
+            $0.width.height.equalTo(120)
+        }
+        
+        label.snp.makeConstraints {
+            $0.top.equalTo(imageView.snp.bottom).offset(8)
+            $0.centerX.equalToSuperview()
+        }
+        
+        return view
     }()
     
     override func viewDidLoad() {
@@ -109,13 +144,28 @@ class ClimbingDetailGymVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        //        viewModel.output.problemThumbnails
-        //            .drive(thumbnailCollectionView.rx.items) { collectionView, row, url in
-        //                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: IndexPath(row: row, section: 0)) as! ThumbnailCell
-        //                FirebaseManager.shared.loadImage(from: url.absoluteString, into: cell.imageView)
-        //                return cell
-        //            }
-        //            .disposed(by: disposeBag)
+        // 썸네일 컬렉션 뷰 바인딩
+        viewModel.output.problemThumbnails
+            .drive(onNext: { [weak self] urls in
+                guard let self = self else { return }
+                
+                if urls.isEmpty {
+                    // 썸네일이 없을 때 emptyPost 뷰를 보이고 컬렉션 뷰 숨기기
+                    self.emptyPost.isHidden = false
+                    self.thumbnailCollectionView.isHidden = true
+                } else {
+                    // 썸네일이 있을 때 emptyPost 뷰 숨기고 컬렉션 뷰 보이기
+                    self.emptyPost.isHidden = true
+                    self.thumbnailCollectionView.isHidden = false
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.output.problemThumbnails
+            .drive(thumbnailCollectionView.rx.items(cellIdentifier: ThumbnailCell.className, cellType: ThumbnailCell.self)) { index, url, cell in
+                cell.configure(with: url.absoluteString)
+            }
+            .disposed(by: disposeBag)
     }
     
     private func setLayout() {
@@ -127,6 +177,7 @@ class ClimbingDetailGymVC: UIViewController {
             gradeColorView,
             filterButton,
             thumbnailCollectionView,
+            emptyPost,
         ].forEach { view.addSubview($0) }
         
         logoImageView.snp.makeConstraints {
@@ -161,14 +212,18 @@ class ClimbingDetailGymVC: UIViewController {
             $0.top.equalTo(gradeColorView.snp.bottom).offset(24)
             $0.trailing.equalToSuperview().offset(-16)
             $0.height.equalTo(24)
-            $0.width.equalTo(60)
+            $0.width.equalTo(64)
         }
         
         thumbnailCollectionView.snp.makeConstraints {
-            $0.top.equalTo(filterButton.snp.bottom).offset(10)
+            $0.top.equalTo(filterButton.snp.bottom).offset(16)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        emptyPost.snp.makeConstraints {
+            $0.edges.equalTo(thumbnailCollectionView)
         }
     }
     
@@ -177,7 +232,7 @@ class ClimbingDetailGymVC: UIViewController {
             .bind { [weak self] in
                 guard let self else { return }
                 let climbingFilterVC = ClimbingFilterVC()
-                self.presentCustomHeightModal(modalVC: climbingFilterVC, height: 576)
+                self.presentCustomHeightModal(modalVC: climbingFilterVC, heightRatio: 0.69)
             }
             .disposed(by: disposeBag)
     }

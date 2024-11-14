@@ -50,6 +50,8 @@
 		6B9033402C89DB1B0012D955 /* PersonalDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B90333F2C89DB1B0012D955 /* PersonalDetailsVC.swift */; };
 		6B9033422C8AAA5E0012D955 /* RangePickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9033412C8AAA5E0012D955 /* RangePickerVC.swift */; };
 		6B9CEA5A2CE1095C004166DE /* ClimbingFilterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9CEA592CE1095B004166DE /* ClimbingFilterVC.swift */; };
+		6B9CEA5C2CE20188004166DE /* ClimbingFilterVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9CEA5B2CE20188004166DE /* ClimbingFilterVM.swift */; };
+		6B9CEA5E2CE49DA1004166DE /* GymThumbnailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9CEA5D2CE49DA1004166DE /* GymThumbnailCell.swift */; };
 		6BA24C922C80D9150089CECE /* SectionDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */; };
 		6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */; };
 		6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */; };
@@ -180,6 +182,8 @@
 		6B90333F2C89DB1B0012D955 /* PersonalDetailsVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = PersonalDetailsVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		6B9033412C8AAA5E0012D955 /* RangePickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangePickerVC.swift; sourceTree = "<group>"; };
 		6B9CEA592CE1095B004166DE /* ClimbingFilterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingFilterVC.swift; sourceTree = "<group>"; };
+		6B9CEA5B2CE20188004166DE /* ClimbingFilterVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingFilterVM.swift; sourceTree = "<group>"; };
+		6B9CEA5D2CE49DA1004166DE /* GymThumbnailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymThumbnailCell.swift; sourceTree = "<group>"; };
 		6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionDetailTableViewCell.swift; sourceTree = "<group>"; };
 		6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDeatilGymVC.swift; sourceTree = "<group>"; };
 		6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDetailGymVM.swift; sourceTree = "<group>"; };
@@ -319,6 +323,7 @@
 			children = (
 				6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */,
 				6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */,
+				6B9CEA5B2CE20188004166DE /* ClimbingFilterVM.swift */,
 			);
 			path = ClimbingGymVM;
 			sourceTree = "<group>";
@@ -343,6 +348,7 @@
 				6BC91F922C7CC81400B34083 /* DifficultyTableViewCell.swift */,
 				6BA24C912C80D9150089CECE /* SectionDetailTableViewCell.swift */,
 				6B9CEA592CE1095B004166DE /* ClimbingFilterVC.swift */,
+				6B9CEA5D2CE49DA1004166DE /* GymThumbnailCell.swift */,
 			);
 			path = ClimbingGym;
 			sourceTree = "<group>";
@@ -690,6 +696,7 @@
 				6B8F38B92C888F6B0018C40D /* PrivacyPolicyVC.swift in Sources */,
 				435B7E422C8024AB00EB9816 /* EditPageVC.swift in Sources */,
 				6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */,
+				6B9CEA5C2CE20188004166DE /* ClimbingFilterVM.swift in Sources */,
 				F4892C2F2C7D9EA700C5FF16 /* UploadNameSpace.swift in Sources */,
 				C4E29C1D2C898AFB0076BCA6 /* SFMainFeedVC.swift in Sources */,
 				F4892C2B2C7CCDF200C5FF16 /* Identifiers.swift in Sources */,
@@ -705,6 +712,7 @@
 				6B7F76972CA4A1C300B05B3F /* BlackListCell.swift in Sources */,
 				43A79AE22C85BD3B00B960A2 /* SettingModel.swift in Sources */,
 				F4892C102C7C27D800C5FF16 /* ExampleModel.swift in Sources */,
+				6B9CEA5E2CE49DA1004166DE /* GymThumbnailCell.swift in Sources */,
 				C49FC70B2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift in Sources */,
 				43A79ADA2C85930A00B960A2 /* ProfileImagePickerVC.swift in Sources */,
 				6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */,

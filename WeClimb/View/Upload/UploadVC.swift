@@ -36,7 +36,7 @@ class UploadVC: UIViewController {
     private lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [selectedMediaView, callPHPickerButton, gradeButton, textView, gymView, settingView, loadingIndicator, gymView, gymLabel, /*settingButton*/]
+        [selectedMediaView, callPHPickerButton, gradeButton, textView, gymView, settingView, loadingIndicator, gymView, gymLabel, holdButton]
             .forEach {
                 view.addSubview($0)
             }
@@ -78,7 +78,7 @@ class UploadVC: UIViewController {
         label.font = .systemFont(ofSize: 15)
         return label
     }()
-
+    
     private let gradeButton: UIButton = {
         var configuration = UIButton.Configuration.plain()
         
@@ -87,7 +87,7 @@ class UploadVC: UIViewController {
         configuration.attributedTitle = titleAttr
         
         let image = UIImage(systemName: "circle.fill")?
-                .withConfiguration(UIImage.SymbolConfiguration(pointSize: 23, weight: .regular, scale: .large))
+            .withConfiguration(UIImage.SymbolConfiguration(pointSize: 23, weight: .regular, scale: .large))
         configuration.image = image
         configuration.imagePadding = 5
         configuration.imagePlacement = .leading
@@ -96,7 +96,7 @@ class UploadVC: UIViewController {
         let button = UIButton(configuration: configuration)
         button.layer.borderWidth = 0.5
         button.layer.borderColor = UIColor.gray.cgColor
-        button.layer.cornerRadius = 20        
+        button.layer.cornerRadius = 18
         button.layer.zPosition = 1
         button.isHidden = true
         button.setTitleColor(.label, for: .normal)
@@ -111,7 +111,40 @@ class UploadVC: UIViewController {
         
         return button
     }()
-
+    
+    private let holdButton: UIButton = {
+        var configuration = UIButton.Configuration.plain()
+        
+        var titleAttr = AttributedString(UploadNameSpace.select)
+        titleAttr.font = .systemFont(ofSize: 15.0)
+        configuration.attributedTitle = titleAttr
+        
+        let defaultImage = UIImage(named: "holdOther")
+        configuration.image = defaultImage
+        configuration.imagePadding = 5
+        configuration.imagePlacement = .leading
+//        configuration.baseForegroundColor = .systemGray
+        
+        let button = UIButton(configuration: configuration)
+        button.layer.borderWidth = 0.5
+        button.layer.borderColor = UIColor.gray.cgColor
+        button.layer.cornerRadius = 18
+        button.layer.zPosition = 1
+        button.isHidden = true
+        button.imageView?.contentMode = .scaleAspectFit
+        button.setTitleColor(.label, for: .normal)
+        button.backgroundColor = UIColor {
+            switch $0.userInterfaceStyle {
+            case .dark:
+                return UIColor.secondarySystemBackground
+            default:
+                return UIColor.white
+            }
+        }
+        
+        return button
+    }()
+    
     private let textView: UITextView = {
         let textView = UITextView()
         textView.font = .systemFont(ofSize: 15)
@@ -193,9 +226,9 @@ class UploadVC: UIViewController {
         setAlert()
         setLoading()
         setNotifications()
-        setButton()
+//        setSettingButton()
         bindPostButton()
-        //        bindSettingButton()
+        bindSettingButton()
         self.viewModel.feedRelay.accept([])
         self.viewModel.cellData.accept([])
     }
@@ -305,18 +338,27 @@ class UploadVC: UIViewController {
         let gymTapGesture = UITapGestureRecognizer()
         settingView.addGestureRecognizer(gymTapGesture)
         
+        let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
+        
         gymTapGesture.rx.event
             .asDriver()
             .drive(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 
-                let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
+//                let settingModalVC = SelectSettingModalVC(viewModel: self.viewModel)
                 if let sheet = settingModalVC.sheetPresentationController {
                     sheet.detents = [.medium()]
                 }
                 self.present(settingModalVC, animated: true, completion: nil)
-                self.settingView.selectedLabel.isHidden = true
-                self.settingView.nextImageView.isHidden = true
+            })
+            .disposed(by: disposeBag)
+        
+        settingModalVC.okButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                guard let self = self else { return }
+                self.dismiss(animated: true, completion: nil)
+                setSettingButton()
             })
             .disposed(by: disposeBag)
     }
@@ -354,53 +396,62 @@ class UploadVC: UIViewController {
     }
     
     // MARK: - 페이지 변경 이벤트 구독 및 버튼 초기화 YJ
-    private func setButton() {
+    private func setSettingButton() {
         Driver.combineLatest(
-            viewModel.pageChanged.asDriver(onErrorJustReturn: 0),
-            viewModel.feedRelay.asDriver()
-        )
+              viewModel.pageChanged.asDriver(onErrorJustReturn: 0).startWith(0),
+              viewModel.feedRelay.asDriver().startWith([])
+          )
         .drive(onNext: { [weak self] pageIndex, feedItems in
             guard let self = self else { return }
-            print("페이지 인덱스: \(pageIndex)")
-            
-            let feedItem = self.viewModel.feedRelay.value[pageIndex]
-            print("feeItem: \(feedItem)")
-            
-//            if feedItem.gym == nil || feedItem.gym?.isEmpty == true {
-//                self.gradeButton.isHidden = true
-//            } else {
-//                self.gradeButton.isHidden = false
-            self.gradeButton.isHidden = false
-            
-            if let grade = feedItem.grade, !grade.isEmpty {
+                let pageIndex = self.viewModel.pageChanged.value
                 
-                self.gradeButton.setTitle(grade.colorInfo.text, for: .normal)
-                self.gradeButton.backgroundColor = .systemGray4.withAlphaComponent(0.6)
+                guard pageIndex >= 0 && pageIndex < feedItems.count else {
+                    print("잘못된 페이지 인덱스")
+                    return
+                }
                 
-                let colorInfo = grade.colorInfo
+                let feedItem = feedItems[pageIndex]
+                
+                print("feeItem: \(feedItem)")
+            print("feeItem즈: \(feedItems)")
+            
+            if feedItem.grade == nil, feedItem.hold == nil {
+                self.gradeButton.isHidden = true
+                self.settingView.selectedLabel.isHidden = false
+                self.settingView.nextImageView.isHidden = false
+                self.holdButton.isHidden = true
+            }
+            
+            if feedItem.grade != nil {
+                self.settingView.selectedLabel.isHidden = true
+                self.settingView.nextImageView.isHidden = true
+                self.gradeButton.isHidden = false
+                self.gradeButton.setTitle(feedItem.grade?.colorInfo.text, for: .normal)
+                self.gradeButton.backgroundColor = .clear
+                
+                let colorInfo = feedItem.grade?.colorInfo
                 self.gradeButton.setImage(
                     UIImage(systemName: "circle.fill")?
-                        .withTintColor(colorInfo.color, renderingMode: .alwaysOriginal),
-                    for: .normal
-                )
-            } else {
-                self.gradeButton.setTitle("선택", for: .normal)
-                self.gradeButton.backgroundColor = .systemGray4.withAlphaComponent(0.6)
-                self.gradeButton.setImage(nil, for: .normal)
+                        .withTintColor(colorInfo?.color ?? UIColor.clear, renderingMode: .alwaysOriginal), for: .normal)
             }
-                    
-//                    if feedItem.hold == nil || feedItem.hold?.isEmpty == true {
-//                        self.settingButton.setTitle("선택", for: .normal)
-//                        self.settingButton.setImage(UIImage(systemName: "chevron.right"), for: .normal)
-//                        self.settingButton.imageView?.tintColor = .secondaryLabel
-//                    } else {
-//                        self.settingButton.setTitle(feedItem.hold, for: .normal)
-//                        self.settingButton.setImage(nil, for: .normal)
-//                    }
-//                }
+ 
+            if let hold = feedItem.hold, feedItem.hold != nil {
+                self.settingView.selectedLabel.isHidden = true
+                self.settingView.nextImageView.isHidden = true
+                self.holdButton.isHidden = false
                 
-            })
-            .disposed(by: disposeBag)
+                if let holdEnum = Hold.allCases.first(where: { $0.string == hold }) {
+                    self.holdButton.setTitle(holdEnum.koreanHold, for: .normal)
+                    self.holdButton.backgroundColor = .clear
+                }
+                
+                if let holdImage = UIImage(named: hold) {
+                       self.holdButton.imageView?.contentMode = .scaleAspectFit
+                       self.holdButton.setImage(holdImage, for: .normal)
+                   }
+            }
+        })
+        .disposed(by: disposeBag)
     }
     
     private func setLayout() {
@@ -480,7 +531,17 @@ class UploadVC: UIViewController {
         gradeButton.snp.makeConstraints {
             $0.top.equalTo(settingView.snp.top).inset(8)
             $0.bottom.equalTo(settingView.snp.bottom).inset(8)
+            $0.centerY.equalTo(settingView.snp.centerY)
 //            $0.height.equalTo(settingView.snp.height).multipliedBy(0.8)
+//            $0.trailing.equalTo(settingView.snp.trailing).offset(-8)
+        }
+        
+        holdButton.snp.makeConstraints {
+            $0.top.equalTo(settingView.snp.top).inset(8)
+            $0.bottom.equalTo(settingView.snp.bottom).inset(8)
+            $0.centerY.equalTo(settingView.snp.centerY)
+//            $0.height.equalTo(settingView.snp.height).multipliedBy(0.8)
+            $0.leading.equalTo(gradeButton.snp.trailing).offset(8)
             $0.trailing.equalTo(settingView.snp.trailing).offset(-8)
         }
         
@@ -535,10 +596,8 @@ extension UploadVC : PHPickerViewControllerDelegate {
         }
         
         if !results.isEmpty {
-            self.settingView.selectedLabel.isHidden = false
-            self.settingView.nextImageView.isHidden = false
-            
-            bindSettingButton()
+            self.settingView.selectedLabel.isHidden = true
+            self.settingView.nextImageView.isHidden = true
             
             let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelButtonTapped))
             navigationItem.rightBarButtonItem = cancelButton
@@ -551,92 +610,81 @@ extension UploadVC {
     private func bindPostButton() {
         postButton.rx.tap
             .do(onNext: { [weak self] in
-                guard let self = self else { return }
-                
-                self.postButton.backgroundColor = UIColor.systemGray6
-                self.postButton.setTitle("", for: .normal)
-                
-                self.basicpProgressBar.isHidden = false
-                self.basicpProgressBar.alpha = 1.0
-                self.progressBar.isHidden = false
-                self.progressBar.alpha = 1.0
-                self.progressLoading.isHidden = false
-                self.progressLoading.startAnimating()
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    
+                    self.postButton.backgroundColor = UIColor.systemGray6
+                    self.postButton.setTitle("", for: .normal)
+                    
+                    self.basicpProgressBar.isHidden = false
+                    self.basicpProgressBar.alpha = 1.0
+                    self.progressBar.isHidden = false
+                    self.progressBar.alpha = 1.0
+                    self.progressLoading.isHidden = false
+                    self.progressLoading.startAnimating()
+                }
             })
             .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
-                
-                if self.isUploading {
-                    print("업로드 중, 업로드 버튼 클릭 무시.")
-                    return
-                }
-                
-                print("업로드 버튼 클릭.")
-                
-                // 첫 번째 미디어 가져오기
-                guard let firstFeedItem = self.viewModel.feedRelay.value.first else {
-                    print("첫 번째 미디어가 없습니다.")
-                    CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
-                    return
-                }
-                
-                let media = self.viewModel.feedRelay.value.compactMap { feedItem -> (url: URL, hold: String?, grade: String?)? in
-                    // 비디오가 있는 경우
-                    if let videoURL = feedItem.videoURL {
-                        print("비디오 URL: \(videoURL)")
-                        return (url: videoURL, hold: feedItem.hold, grade: feedItem.grade)
+                DispatchQueue.main.async { // 메인 스레드에서 실행
+                    guard let self = self else { return }
+                    
+                    if self.isUploading {
+                        print("업로드 중, 업로드 버튼 클릭 무시.")
+                        return
                     }
-                    // 이미지가 있는 경우
-                    if let imageURL = feedItem.imageURL {
-                        print("이미지 URL: \(imageURL)")
-                        return (url: imageURL, hold: feedItem.hold, grade: feedItem.grade)
+                    
+                    print("업로드 버튼 클릭.")
+                    
+                    // 첫 번째 미디어 가져오기
+                    guard let firstFeedItem = self.viewModel.feedRelay.value.first else {
+                        print("첫 번째 미디어가 없습니다.")
+                        CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
+                        return
                     }
-                    return nil
-                }.compactMap { $0 } // nil 제거
-                
-                var uploadStatus: UploadStatus = .success
-                var caption: String
-                if self.textView.textColor == .secondaryLabel {
-                    caption = ""
-                } else {
-                    caption = self.textView.text ?? ""
-                }
-                
-                if media.isEmpty {
-                    uploadStatus = .fail
-                }
-                
-                if self.gymView.selectedLabel.text == UploadNameSpace.selectGym {
-                    uploadStatus = .fail
-                }
-                
-                let gym = self.gymView.selectedLabel.text ?? ""
-                
-                DispatchQueue.main.async {
-                    UIView.animate(withDuration: 15) {
-                        self.basicpProgressBar.setProgress(1.0, animated: true)
+                    
+                    let media = self.viewModel.feedRelay.value.compactMap { feedItem -> (url: URL, hold: String?, grade: String?)? in
+                        if let videoURL = feedItem.videoURL {
+                            print("비디오 URL: \(videoURL)")
+                            return (url: videoURL, hold: feedItem.hold, grade: feedItem.grade)
+                        }
+                        if let imageURL = feedItem.imageURL {
+                            print("이미지 URL: \(imageURL)")
+                            return (url: imageURL, hold: feedItem.hold, grade: feedItem.grade)
+                        }
+                        return nil
                     }
-                }
-                
-                if let videoURL = firstFeedItem.videoURL {
-                    // 비디오 URL로 썸네일 생성
-                    self.viewModel.getThumbnailImage(from: videoURL) { thumbnailURL in
-                        let thumbnail = thumbnailURL ?? ""
-                        self.uploadMedia(media: media, caption: caption, gym: gym, thumbnailURL: thumbnail, uploadStatus: uploadStatus)
+                    
+                    var uploadStatus: UploadStatus = .success
+                    let caption = self.textView.textColor == .secondaryLabel ? "" : (self.textView.text ?? "")
+                    
+                    if media.isEmpty || self.gymView.selectedLabel.text == UploadNameSpace.selectGym {
+                        uploadStatus = .fail
                     }
-                } else {
-                    // 사진 이미지인 경우
-                    self.uploadMedia(media: media, caption: caption, gym: gym, thumbnailURL: "", uploadStatus: .success)
+                    
+                    let gym = self.gymView.selectedLabel.text ?? ""
+                    
+                    DispatchQueue.main.async {
+                        UIView.animate(withDuration: 15) {
+                            self.basicpProgressBar.setProgress(1.0, animated: true)
+                        }
+                    }
+                    
+                    self.uploadMedia(media: media, caption: caption, gym: gym, thumbnailURL: "", uploadStatus: uploadStatus)
+                    
                 }
             })
             .disposed(by: disposeBag)
         
         viewModel.compressionProgress
             .drive(onNext: { [weak self] progress in
-                self?.progressBar.setProgress(progress, animated: true)
+                DispatchQueue.main.async { // 메인 스레드에서 실행
+                    self?.progressBar.setProgress(progress, animated: true)
+                }
             })
             .disposed(by: disposeBag)
     }
+    
+    
     
     private func uploadMedia(media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String, uploadStatus: UploadStatus) {
         switch uploadStatus {
@@ -647,45 +695,47 @@ extension UploadVC {
             
             self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailURL)
                 .drive(onNext: {
-                    print("업로드 성공")
-                    CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
-                    self.initUploadVC()
-                    self.isUploading = false
-                    self.progressLoading.stopAnimating()
+                    DispatchQueue.main.async { // UI 업데이트 코드 메인 스레드에서 실행
+                        print("업로드 성공")
+                        CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
+                        self.initUploadVC()
+                        self.isUploading = false
+                        self.progressLoading.stopAnimating()
+                    }
                 })
                 .disposed(by: self.disposeBag)
             
         }
     }
-
-// MARK: - 업로드뷰 초기화 YJ
-private func initUploadVC() {
-    //
-    //        let newUploadVC = UploadVC()
-    //        feedView?.pauseAllVideo()
-    //
-    //        if let tabBarController = tabBarController,
-    //           var viewControllers = tabBarController.viewControllers {
-    //
-    //            let newUploadNavVC = UINavigationController(rootViewController: newUploadVC)
-    //            newUploadNavVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
-    //
-    //            viewControllers[2] = newUploadNavVC   // 기존 탭바2에 세로운 인스턴스 삽입
-    //
-    //            tabBarController.setViewControllers(viewControllers, animated: false) // 변경된 뷰를 탭 바에 설정
-    //            tabBarController.selectedIndex = 2    // 새로 생성한 곳으로 전환
-    //        }
-    //
-    //        setNavigation()
-    //        textView.delegate = self
-    //        setLayout()
-    //        mediaItemsBind()
-    //        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
-    //        setGymView()
-    //        setAlert()
-    //        setLoading()
-    //        setNotifications()
-//        setUIMenu()
-//        bindPostButton()
+    
+    // MARK: - 업로드뷰 초기화 YJ
+    private func initUploadVC() {
+        //
+        //        let newUploadVC = UploadVC()
+        //        feedView?.pauseAllVideo()
+        //
+        //        if let tabBarController = tabBarController,
+        //           var viewControllers = tabBarController.viewControllers {
+        //
+        //            let newUploadNavVC = UINavigationController(rootViewController: newUploadVC)
+        //            newUploadNavVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
+        //
+        //            viewControllers[2] = newUploadNavVC   // 기존 탭바2에 세로운 인스턴스 삽입
+        //
+        //            tabBarController.setViewControllers(viewControllers, animated: false) // 변경된 뷰를 탭 바에 설정
+        //            tabBarController.selectedIndex = 2    // 새로 생성한 곳으로 전환
+        //        }
+        //
+        //        setNavigation()
+        //        textView.delegate = self
+        //        setLayout()
+        //        mediaItemsBind()
+        //        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
+        //        setGymView()
+        //        setAlert()
+        //        setLoading()
+        //        setNotifications()
+        //        setUIMenu()
+        //        bindPostButton()
     }
 }

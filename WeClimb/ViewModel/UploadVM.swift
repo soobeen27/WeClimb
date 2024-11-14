@@ -17,7 +17,7 @@ import RxCocoa
 
 class UploadVM {
     let mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
-    let feedRelay = BehaviorRelay(value: [FeedCellModel]())
+    let feedRelay = BehaviorRelay<[FeedCellModel]>(value: [])
     let cellData = BehaviorRelay(value: [FeedCellModel]())
     
     let showAlert = PublishRelay<Void>()
@@ -26,7 +26,7 @@ class UploadVM {
     // 피커뷰에서 선택한 항목을 저장
     var selectedFeedItems = [FeedCellModel]()
     
-    let pageChanged = PublishRelay<Int>()
+    let pageChanged = BehaviorRelay<Int>(value: 0)
     private var currentPageIndex = 0
     
     var shouldUpdateUI: Bool = true
@@ -62,6 +62,7 @@ extension UploadVM {
         print("currentFeedItems: \(currentFeedItems)")
         shouldUpdateUI = false  // UI업데이트 X
         feedRelay.accept(currentFeedItems)
+        print("진짜 확인용: \(feedRelay.value)")
     }
     
     // MARK: - 페이지 변경 이벤트 방출 YJ
@@ -206,20 +207,20 @@ extension UploadVM {
     func upload(media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String) -> Driver<Void> {
         return Observable.create { observer in
             let dispatchGroup = DispatchGroup()
-            var uploadMedia: [(url: URL, hold: String?, grade: String?)] = []
+            var uploadMedia: [(url: URL, hold: String?, grade: String?, thumbnailURL: String?)] = []
             
             for item in media {
                 dispatchGroup.enter()
                 
-                // 이미지인 경우
                 if item.url.pathExtension == "jpg" || item.url.pathExtension == "png" {
+                    // 이미지인 경우
                     if let image = UIImage(contentsOfFile: item.url.path) {
-                        // 이미지 압축
                         if let compressedData = image.jpegData(compressionQuality: 0.6) {
                             let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
                             do {
                                 try compressedData.write(to: tempImageURL)
-                                uploadMedia.append((url: tempImageURL, hold: item.hold, grade: item.grade))
+                                // 이미지 URL을 그대로 썸네일 URL로 지정
+                                uploadMedia.append((url: tempImageURL, hold: item.hold, grade: item.grade, thumbnailURL: item.url.absoluteString))
                             } catch {
                                 print("이미지 저장 실패: \(error.localizedDescription)")
                             }
@@ -228,11 +229,17 @@ extension UploadVM {
                     dispatchGroup.leave()
                 } else {
                     // 비디오인 경우
-                    self.compressVideo(inputURL: item.url) { compressedURL in
-                        if let compressedURL = compressedURL {
-                            uploadMedia.append((url: compressedURL, hold: item.hold, grade: item.grade))
+                    self.compressVideo(inputURL: item.url) { [weak self] compressedURL in
+                        guard let self = self, let compressedURL = compressedURL else {
+                            dispatchGroup.leave()
+                            return
                         }
-                        dispatchGroup.leave()
+                        
+                        // 비디오 썸네일 생성
+                        self.getThumbnailImage(from: compressedURL) { thumbnailURL in
+                            uploadMedia.append((url: compressedURL, hold: item.hold, grade: item.grade, thumbnailURL: thumbnailURL))
+                            dispatchGroup.leave()
+                        }
                     }
                 }
             }
