@@ -559,12 +559,10 @@ extension UploadVC {
     private func bindPostButton() {
         postButton.rx.tap
             .do(onNext: { [weak self] in
-                DispatchQueue.main.async {
-                    guard let self = self else { return }
-                    
-                    self.postButton.backgroundColor = UIColor.systemGray6
-                    self.addLoadingOverlay()
-                }
+                guard let self else { return }
+                
+                self.postButton.backgroundColor = UIColor.systemGray6
+                self.addLoadingOverlay()
             })
             .subscribe(onNext: { [weak self] in
                 DispatchQueue.main.async {
@@ -587,11 +585,11 @@ extension UploadVC {
                     let media = self.viewModel.feedRelay.value.compactMap { feedItem -> (url: URL, hold: String?, grade: String?)? in
                         if let videoURL = feedItem.videoURL {
                             print("비디오 URL: \(videoURL)")
-                            return (url: videoURL, hold: feedItem.hold, grade: feedItem.grade)
+                            return (url: videoURL, hold: feedItem.hold, grade: feedItem.grade?.colorInfo.englishText)
                         }
                         if let imageURL = feedItem.imageURL {
                             print("이미지 URL: \(imageURL)")
-                            return (url: imageURL, hold: feedItem.hold, grade: feedItem.grade)
+                            return (url: imageURL, hold: feedItem.hold, grade: feedItem.grade?.colorInfo.englishText)
                         }
                         return nil
                     }
