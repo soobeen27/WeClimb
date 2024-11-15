@@ -292,10 +292,6 @@ extension UploadVM {
         ],
         progressQueue: .main,
         progressHandler: { progress in
-            let currentProgress = Float(progress.fractionCompleted) / totalMediaCount
-            let overallProgress = (Float(self.completedMediaCount) + currentProgress) / totalMediaCount
-            
-            self.compressionProgressRelay.accept(overallProgress)
         },
                                           completion: { [weak self] result in
             guard let self = self else { return }
