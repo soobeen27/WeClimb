@@ -515,7 +515,7 @@ class UploadVC: UIViewController {
         textView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.top.equalTo(selectedMediaView.snp.bottom).offset(8)
-            $0.height.equalTo(80)
+            $0.height.equalTo(100)
         }
         
         gymView.snp.makeConstraints {

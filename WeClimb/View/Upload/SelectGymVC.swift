@@ -124,6 +124,8 @@ class SelectGymVC: UIViewController {
                 if let uploadVC = self.uploadVC {
                     uploadVC.gymInfo = self.gymInfo
                     
+                    uploadVC.hidesBottomBarWhenPushed = true
+                    
                     self.navigationController?.pushViewController(uploadVC, animated: true)
                 }
             })
