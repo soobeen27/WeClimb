@@ -308,7 +308,7 @@ class SFFeedCell: UICollectionViewCell {
            let holdImage = holdColor.image(),
            let gradeColor = media.grade?.colorInfo
         {
-            let resizeImage = holdImage.scalePreservingAspectRatio(targetSize: CGSize(width: 35, height: 35))
+            let resizeImage = holdImage.resize(targetSize: CGSize(width: 35, height: 35))
             gradeImageView.image = resizeImage
 //            gradeImageView.backgroundColor = media.grade
 //            gradeImageView.backgroundColor = UIColo
