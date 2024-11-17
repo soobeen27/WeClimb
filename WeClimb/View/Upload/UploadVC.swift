@@ -164,39 +164,8 @@ class UploadVC: UIViewController {
         button.backgroundColor = .mainPurple // 앱 틴트 컬러
         button.layer.cornerRadius = 10
         button.clipsToBounds = true
-        
-        button.addSubview(basicpProgressBar)
-        button.addSubview(progressLoading)
-        button.addSubview(progressBar)
+
         return button
-    }()
-    
-    let basicpProgressBar: UIProgressView = {
-        let progressBar = UIProgressView(progressViewStyle: .default)
-        progressBar.tintColor = .mainPurple
-        progressBar.trackTintColor = .clear
-        progressBar.isHidden = true
-        progressBar.layer.zPosition = 2
-        progressBar.alpha = 1.0
-        return progressBar
-    }()
-    
-    let progressBar: UIProgressView = {
-        let progressBar = UIProgressView(progressViewStyle: .default)
-        progressBar.tintColor = UIColor.mainPurple
-        progressBar.trackTintColor = .clear
-        progressBar.isHidden = true
-        progressBar.layer.zPosition = 1
-        progressBar.alpha = 1.0
-        return progressBar
-    }()
-    
-    private lazy var progressLoading: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .medium)
-        indicator.hidesWhenStopped = true
-        indicator.layer.zPosition = 3
-        indicator.color = .white
-        return indicator
     }()
     
     private lazy var loadingIndicator: UIActivityIndicatorView = {
@@ -207,6 +176,8 @@ class UploadVC: UIViewController {
     
     private var isCurrentScreenActive: Bool = false
     private var isUploading = false
+    
+    private var loadingOverlay: UIView?
     
     init(uploadVM: UploadVM, isClimbingVideo: Bool) {
         self.viewModel = uploadVM
@@ -254,7 +225,7 @@ class UploadVC: UIViewController {
     }
     
     @objc private func cancelButtonTapped() {
-        initUploadVC()
+        initFeedView()
     }
     
     private func setNotifications() {
@@ -337,16 +308,15 @@ class UploadVC: UIViewController {
     
     private func setAlert() {
         viewModel.showAlert
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] in
+            .asDriver(onErrorJustReturn: ())
+            .drive(onNext: { [weak self] in
                 guard let self else { return }
                 print("알림 이벤트 발생")
                 
                 CommonManager.shared.showAlert(from: self,
                                                title: "알림",
                                                message: "1분 미만 비디오를 업로드해주세요.",
-                                               includeCancel: true)
-                initUploadVC()
+                                               includeCancel: false)
             })
             .disposed(by: disposeBag)
     }
@@ -462,26 +432,6 @@ class UploadVC: UIViewController {
                 view.addSubview($0)
             }
         
-        basicpProgressBar.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(-12)
-            $0.width.equalToSuperview().multipliedBy(0.6)
-            $0.top.equalToSuperview()
-            $0.height.equalToSuperview()
-        }
-        
-        progressBar.snp.makeConstraints {
-            $0.leading.equalToSuperview()
-            $0.trailing.equalToSuperview().offset(12)
-            $0.top.equalToSuperview()
-            $0.height.equalToSuperview()
-        }
-        
-        progressLoading.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.centerY.equalToSuperview()
-            $0.height.equalToSuperview().inset(3)
-        }
-        
         scrollView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.left.right.equalToSuperview()
@@ -515,7 +465,7 @@ class UploadVC: UIViewController {
         textView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.top.equalTo(selectedMediaView.snp.bottom).offset(8)
-            $0.height.equalTo(80)
+            $0.height.equalTo(100)
         }
         
         gymView.snp.makeConstraints {
@@ -609,23 +559,14 @@ extension UploadVC {
     private func bindPostButton() {
         postButton.rx.tap
             .do(onNext: { [weak self] in
-                DispatchQueue.main.async {
-                    guard let self = self else { return }
-                    
-                    self.postButton.backgroundColor = UIColor.systemGray6
-                    self.postButton.setTitle("", for: .normal)
-                    
-                    self.basicpProgressBar.isHidden = false
-                    self.basicpProgressBar.alpha = 1.0
-                    self.progressBar.isHidden = false
-                    self.progressBar.alpha = 1.0
-                    self.progressLoading.isHidden = false
-                    self.progressLoading.startAnimating()
-                }
+                guard let self else { return }
+                
+                self.postButton.backgroundColor = UIColor.systemGray6
+                self.addLoadingOverlay()
             })
             .subscribe(onNext: { [weak self] in
-                DispatchQueue.main.async { // 메인 스레드에서 실행
-                    guard let self = self else { return }
+                DispatchQueue.main.async {
+                    guard let self else { return }
                     
                     if self.isUploading {
                         print("업로드 중, 업로드 버튼 클릭 무시.")
@@ -644,11 +585,11 @@ extension UploadVC {
                     let media = self.viewModel.feedRelay.value.compactMap { feedItem -> (url: URL, hold: String?, grade: String?)? in
                         if let videoURL = feedItem.videoURL {
                             print("비디오 URL: \(videoURL)")
-                            return (url: videoURL, hold: feedItem.hold, grade: feedItem.grade)
+                            return (url: videoURL, hold: feedItem.hold, grade: feedItem.grade?.colorInfo.englishText)
                         }
                         if let imageURL = feedItem.imageURL {
                             print("이미지 URL: \(imageURL)")
-                            return (url: imageURL, hold: feedItem.hold, grade: feedItem.grade)
+                            return (url: imageURL, hold: feedItem.hold, grade: feedItem.grade?.colorInfo.englishText)
                         }
                         return nil
                     }
@@ -662,28 +603,35 @@ extension UploadVC {
                     
                     let gym = self.gymLabel.text ?? ""
                     
-                    DispatchQueue.main.async {
-                        UIView.animate(withDuration: 15) {
-                            self.basicpProgressBar.setProgress(1.0, animated: true)
-                        }
-                    }
-                    
                     self.uploadMedia(media: media, caption: caption, gym: gym, thumbnailURL: "", uploadStatus: uploadStatus)
                     
                 }
             })
             .disposed(by: disposeBag)
+    }
+
+    private func addLoadingOverlay() {
+        guard loadingOverlay == nil else { return }
         
-        viewModel.compressionProgress
-            .drive(onNext: { [weak self] progress in
-                DispatchQueue.main.async { // 메인 스레드에서 실행
-                    self?.progressBar.setProgress(progress, animated: true)
-                }
-            })
-            .disposed(by: disposeBag)
+        let overlay = UIView()
+        overlay.frame = self.view.bounds
+        overlay.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        
+        let loadingIndicator = UIActivityIndicatorView(style: .large)
+        let centerY = overlay.center.y - 50
+        loadingIndicator.center = CGPoint(x: overlay.center.x, y: centerY)
+        loadingIndicator.color = .white
+        loadingIndicator.startAnimating()
+        overlay.addSubview(loadingIndicator)
+        
+        loadingOverlay = overlay
+        self.view.addSubview(overlay)
     }
     
-    
+    private func removeLoadingOverlay() {
+        loadingOverlay?.removeFromSuperview()
+        loadingOverlay = nil
+    }
     
     private func uploadMedia(media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String, uploadStatus: UploadStatus) {
         switch uploadStatus {
@@ -694,12 +642,15 @@ extension UploadVC {
             
             self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailURL)
                 .drive(onNext: {
-                    DispatchQueue.main.async { // UI 업데이트 코드 메인 스레드에서 실행
-                        print("업로드 성공")
-                        CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
-                        self.initUploadVC()
-                        self.isUploading = false
-                        self.progressLoading.stopAnimating()
+                    print("업로드 성공")
+                    CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
+                    self.initFeedView()
+                    
+                    self.removeLoadingOverlay()
+                    self.isUploading = false
+                    
+                    if let tabBarController = self.tabBarController {
+                        tabBarController.selectedIndex = 0
                     }
                 })
                 .disposed(by: self.disposeBag)
@@ -708,33 +659,25 @@ extension UploadVC {
     }
     
     // MARK: - 업로드뷰 초기화 YJ
-    private func initUploadVC() {
-        //
-        //        let newUploadVC = UploadVC()
-        //        feedView?.pauseAllVideo()
-        //
-        //        if let tabBarController = tabBarController,
-        //           var viewControllers = tabBarController.viewControllers {
-        //
-        //            let newUploadNavVC = UINavigationController(rootViewController: newUploadVC)
-        //            newUploadNavVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
-        //
-        //            viewControllers[2] = newUploadNavVC   // 기존 탭바2에 세로운 인스턴스 삽입
-        //
-        //            tabBarController.setViewControllers(viewControllers, animated: false) // 변경된 뷰를 탭 바에 설정
-        //            tabBarController.selectedIndex = 2    // 새로 생성한 곳으로 전환
-        //        }
-        //
-        //        setNavigation()
-        //        textView.delegate = self
-        //        setLayout()
-        //        mediaItemsBind()
-        //        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
-        //        setGymView()
-        //        setAlert()
-        //        setLoading()
-        //        setNotifications()
-        //        setUIMenu()
-        //        bindPostButton()
+    private func initFeedView() {
+        feedView?.pauseAllVideo()
+        feedView = nil
+        
+        let newUploadVC = UploadVC(uploadVM: self.viewModel, isClimbingVideo: true)
+        newUploadVC.hidesBottomBarWhenPushed = true
+        
+        self.viewModel.feedRelay.accept([])
+        self.viewModel.cellData.accept([])
+        
+        setNavigation()
+        textView.delegate = self
+        setLayout()
+        mediaItemsBind()
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
+        setAlert()
+        setLoading()
+        setNotifications()
+        bindPostButton()
     }
+    
 }

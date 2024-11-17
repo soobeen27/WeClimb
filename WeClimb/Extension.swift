@@ -172,46 +172,46 @@ extension UIViewController {
 }
 
 extension String {
-    var colorInfo: (text: String, color: UIColor) {
+    var colorInfo: (text: String, englishText: String, color: UIColor) {
         switch self {
         case "빨":
-            return ("빨강", UIColor(red: 224/255, green: 53/255, blue: 53/255, alpha: 1))
+            return ("빨강", "Red", UIColor(red: 224/255, green: 53/255, blue: 53/255, alpha: 1))
         case "주":
-            return ("주황", UIColor(red: 253/255, green: 150/255, blue: 68/255, alpha: 1))
+            return ("주황", "Orange", UIColor(red: 253/255, green: 150/255, blue: 68/255, alpha: 1))
         case "노":
-            return ("노랑", UIColor(red: 255/255, green: 235/255, blue: 26/255, alpha: 1))
+            return ("노랑", "Yellow", UIColor(red: 255/255, green: 235/255, blue: 26/255, alpha: 1))
         case "연":
-            return ("연두", UIColor(red: 30/255, green: 212/255, blue: 90/255, alpha: 1))
+            return ("연두", "Light Green", UIColor(red: 30/255, green: 212/255, blue: 90/255, alpha: 1))
         case "초":
-            return ("초록", UIColor(red: 26/255, green: 120/255, blue: 14/255, alpha: 1))
+            return ("초록", "Green", UIColor(red: 26/255, green: 120/255, blue: 14/255, alpha: 1))
         case "하":
-            return ("하늘", UIColor(red: 19/255, green: 149/255, blue: 255/255, alpha: 1)) // "파"랑 같은 색
+            return ("하늘", "Sky Blue", UIColor(red: 19/255, green: 149/255, blue: 255/255, alpha: 1)) // "파"랑 같은 색
         case "파":
-            return ("파랑", UIColor(red: 35/255, green: 97/255, blue: 243/255, alpha: 1))
+            return ("파랑", "Blue", UIColor(red: 35/255, green: 97/255, blue: 243/255, alpha: 1))
         case "남":
-            return ("남색", UIColor(red: 15/255, green: 0/255, blue: 177/255, alpha: 1))
+            return ("남색", "Indigo", UIColor(red: 15/255, green: 0/255, blue: 177/255, alpha: 1))
         case "보":
-            return ("보라", UIColor(red: 160/255, green: 83/255, blue: 233/255, alpha: 1))
+            return ("보라", "Purple", UIColor(red: 160/255, green: 83/255, blue: 233/255, alpha: 1))
         case "검":
-            return ("검정", UIColor(red: 11/255, green: 16/255, blue: 19/255, alpha: 1))
+            return ("검정", "Black", UIColor(red: 11/255, green: 16/255, blue: 19/255, alpha: 1))
         case "흰":
-            return ("흰색", UIColor(red: 241/255, green: 239/255, blue: 239/255, alpha: 1))
+            return ("흰색", "White", UIColor(red: 241/255, green: 239/255, blue: 239/255, alpha: 1))
         case "민":
-            return ("민트", UIColor(red: 31/255, green: 223/255, blue: 213/255, alpha: 1))
+            return ("민트", "Mint", UIColor(red: 31/255, green: 223/255, blue: 213/255, alpha: 1))
         case "회":
-            return ("회색", UIColor(red: 171/255, green: 171/255, blue: 171/255, alpha: 1))
+            return ("회색", "Gray", UIColor(red: 171/255, green: 171/255, blue: 171/255, alpha: 1))
         case "핑":
-            return ("핑크", UIColor(red: 255/255, green: 88/255, blue: 188/255, alpha: 1))
+            return ("핑크", "Pink", UIColor(red: 255/255, green: 88/255, blue: 188/255, alpha: 1))
         case "갈":
-            return ("갈색", UIColor(red: 187/255, green: 120/255, blue: 58/255, alpha: 1))
+            return ("갈색", "Brown", UIColor(red: 187/255, green: 120/255, blue: 58/255, alpha: 1))
         case "노검":
-            return ("노랑", UIColor(red: 133/255, green: 125/255, blue: 23/255, alpha: 1))
+            return ("노랑", "Dark Yellow", UIColor(red: 133/255, green: 125/255, blue: 23/255, alpha: 1))
         case "초검":
-            return ("초록", UIColor(red: 21/255, green: 114/255, blue: 55/255, alpha: 1))
+            return ("초록", "Dark Green", UIColor(red: 21/255, green: 114/255, blue: 55/255, alpha: 1))
         case "파검":
-            return ("파랑", UIColor(red: 6/255, green: 103/255, blue: 121/255, alpha: 1))
+            return ("파랑", "Dark Blue", UIColor(red: 6/255, green: 103/255, blue: 121/255, alpha: 1))
         default:
-            return ("기타", UIColor.clear)
+            return ("기타", "Other", UIColor.clear)
         }
     }
     
