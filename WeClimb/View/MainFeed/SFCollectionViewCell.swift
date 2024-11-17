@@ -27,7 +27,8 @@ class SFCollectionViewCell: UICollectionViewCell {
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal //가로 스크롤
-        layout.itemSize = CGSize(width: contentView.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
+//        layout.itemSize = CGSize(width: contentView.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
+        layout.itemSize = CGSize(width: contentView.bounds.width, height: contentView.bounds.height)
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
         

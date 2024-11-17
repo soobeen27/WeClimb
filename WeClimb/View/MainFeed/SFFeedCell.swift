@@ -97,6 +97,11 @@ class SFFeedCell: UICollectionViewCell {
 //        imageViewGestureBind()
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        playerLayer?.frame = self.contentView.bounds
+    }
+    
     func configure(with media: Media, viewModel: MainFeedVM) {
         guard let url = URL(string: media.url) else { return }
         imageView.image = nil
@@ -136,16 +141,40 @@ class SFFeedCell: UICollectionViewCell {
     }
     
     private func setupPlayer(with url: URL) {
+        let asset = AVAsset(url: url)
         player = AVPlayer(url: url)
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.frame = self.contentView.bounds
-        playerLayer?.videoGravity = .resizeAspect
+        guard let track = asset.tracks(withMediaType: .video).first else {
+            print("비디오 트랙을 찾을 수 없습니다.")
+            return
+        }
+
+        let size = track.naturalSize.applying(track.preferredTransform)
+        let width = abs(size.width)
+        let height = abs(size.height)
+        let ratio = height / width
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            if width >= height {
+                self.playerLayer?.videoGravity = .resizeAspect
+            } else {
+                self.playerLayer?.videoGravity = .resizeAspectFill
+            }
+        }
+//        playerLayer?.videoGravity = .resizeAspect
         if let playerLayer = self.playerLayer {
             self.contentView.layer.addSublayer(playerLayer)
         }
         setupPlayButton()
         playButton.isHidden = false
         self.contentView.bringSubviewToFront(playButton)
+        if let playerLayer = playerLayer {
+            contentView.layer.insertSublayer(playerLayer, at: 0)
+        }
+        gymGradeImageBringToFront()
     }
     
     func setupPlayButton() {
@@ -286,6 +315,12 @@ class SFFeedCell: UICollectionViewCell {
             gradeImageView.backgroundColor = gradeColor.color
         }
     }
+    
+    func gymGradeImageBringToFront() {
+        contentView.bringSubviewToFront(gradeImageView)
+        contentView.bringSubviewToFront(gymImageView)
+    }
+    
     func setLayout() {
 //        [
 //            gymImageView
