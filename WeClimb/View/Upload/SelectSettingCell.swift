@@ -81,21 +81,6 @@ class SelectSettingCell: UICollectionViewCell {
             }
         }
     }
-    
-    override var isSelected: Bool {
-        didSet {
-            updateSelectionButton()
-        }
-    }
-    
-    private func updateSelectionButton() {
-        if isSelected {
-            layer.borderColor = UIColor.mainPurple.cgColor
-            layer.borderWidth = 1
-        } else {
-            layer.borderWidth = 0
-        }
-    }
 
     func configure(item: Any) {
         
