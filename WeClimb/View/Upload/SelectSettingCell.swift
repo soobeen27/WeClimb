@@ -108,7 +108,7 @@ class SelectSettingCell: UICollectionViewCell {
         } else if let hold = item as? Hold {
             
             titleLabel.text = hold.koreanHold
-            if let image = hold.image(color: hold) {
+            if let image = hold.image() {
                 colorView.layer.contents = image.cgImage
             }
         }

@@ -506,6 +506,9 @@ extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDele
         cell.gymTap
             .bind(to: viewModel.gymButtonTap)
             .disposed(by: cell.disposeBag)
+        cell.gradeTap
+            .bind(to: viewModel.gradeButtonTap)
+            .disposed(by: cell.disposeBag)
         return cell
     }
     

@@ -25,7 +25,6 @@ final class FirebaseManager {
     private let storage = Storage.storage()
     private let disposeBag = DisposeBag()
     private var lastFeed: QueryDocumentSnapshot?
-    
     // 중복 요청 방지 및 캐싱 관리
     private var ongoingRequests = [String: Bool]()
     private var urlCache = NSCache<NSString, NSURL>()
@@ -318,6 +317,15 @@ final class FirebaseManager {
         let postUID = UUID().uuidString
         let postRef = db.collection("posts").document(postUID)
         let creationDate = Date()
+        var user: User?
+        getUserInfoFrom(uid: myUID) { result in
+            switch result {
+            case .success(let userdata):
+                user = userdata
+            case .failure(let error):
+                print("Error - while getUserInfoFrom \(error)")
+            }
+        }
         do {
             let batch = db.batch()
             
@@ -343,7 +351,9 @@ final class FirebaseManager {
                     gym: gym,
                     creationDate: creationDate,
                     postRef: postRef,
-                    thumbnailURL: thumbnailURL
+                    thumbnailURL: thumbnailURL,
+                    height: user?.height,
+                    armReach: user?.armReach
                 )
                 
                 batch.setData(try Firestore.Encoder().encode(mediaData), forDocument: mediaDocRef)
@@ -933,36 +943,79 @@ final class FirebaseManager {
 //            }
 //    }
     
-    /// 암장과 난이도 별로 쿼리해서 조건에 맞는 미디어만 반환하는 함수
+    
+    /// 필터가 적용된 포스트를 반환하는 메소드
     /// - Parameters:
+    ///   - lastSnapshot: 무한 스크롤을 위한 마지막 스냅샷
     ///   - gymName: 암장이름
     ///   - grade: 난이도
-    /// - Returns: 필터된 Single<[Media]> 미디어
-    func getQueriedMedias(gymName: String, grade: String) -> Single<[Media]> {
-        return Single.create { [weak self] single in
-            guard let self else {
-                single(.failure(CommonError.noSelf))
-                return Disposables.create()
+    ///   - hold: 홀드색
+    ///   - height: 키 범위 [작은수, 큰수]
+    ///   - armReach: 암리치 범위 [작은수, 큰수]
+    ///   - completion: 무한스크롤을 위한 마지막 스냅샷을 넘김. 이걸 따로 저장해뒀다가 더 로딩해야할때 lastSnapshot에 넣으면됨
+    /// - Returns: 필터가 적용된 하나의 미디어만 가진 포스트
+    func getFilteredPost(lastSnapshot: QueryDocumentSnapshot? = nil, gymName: String, grade: String,
+                          hold: String? = nil, height: [Int]? = nil,
+                         armReach: [Int]? = nil,
+                         completion: @escaping (QueryDocumentSnapshot?) -> Void) -> Single<[Post]> {
+        let answerQuery = filteredPostQuery(gymName: gymName, grade: grade,
+                                            hold: hold, height: height,
+                                            armReach: armReach, lastSnapshot: lastSnapshot)
+        
+        return getFilteredMedia(query: answerQuery, completionHandler: { snapshot in
+            completion(snapshot)
+        })
+            .flatMap { [weak self] medias in
+                guard let self = self else { return .just([]) }
+                return self.getSingleMediaPosts(medias: medias)
             }
-            let answerQuery = self.db.collection("media")
-                .whereField("gym", isEqualTo: gymName)
-                .whereField("grade", isEqualTo: grade)
-                .order(by: "creationDate", descending: true)
-            
-            print("Querying medias with gymName: \(gymName), grade: \(grade)")
-            
-            answerQuery.getDocuments { snapshot, error in
+    }
+    
+    private func filteredPostQuery(gymName: String,
+                                   grade: String,
+                                   hold: String? = nil, 
+                                   height: [Int]? = nil,
+                                   armReach: [Int]? = nil,
+                                   lastSnapshot: QueryDocumentSnapshot? = nil
+    ) -> Query {
+        var answerQuery = self.db.collection("media")
+            .whereField("gym", isEqualTo: gymName)
+            .whereField("grade", isEqualTo: grade)
+            .order(by: "creationDate", descending: true)
+            .limit(to: 20)
+        
+        if let hold {
+            answerQuery = answerQuery.whereField("hold", isEqualTo: hold)
+        }
+        if let height {
+            answerQuery = answerQuery.whereField("height", isGreaterThanOrEqualTo: height[0])
+                .whereField("height", isLessThanOrEqualTo: height[1])
+        }
+        if let armReach {
+            answerQuery = answerQuery.whereField("armReach", isGreaterThanOrEqualTo: armReach[0])
+                .whereField("armReach", isLessThanOrEqualTo: armReach[1])
+        }
+        if let lastPost = lastSnapshot {
+            answerQuery = answerQuery.start(afterDocument: lastPost)
+        }
+        return answerQuery
+    }
+    
+    private func getFilteredMedia(query: Query,
+                                  completionHandler: @escaping (QueryDocumentSnapshot?) -> Void) -> Single<[Media]> {
+        return Single.create { [weak self] single in
+            guard let self else { return Disposables.create() }
+            query.getDocuments { snapshot, error in
                 if let error = error {
-//                    print("Error - \(#function) : \(error)")
                     single(.failure(error))
                     return
                 }
                 guard let snapshot else {
-//                    single(.failure(NSError(domain: "No Snapshot", code: 1)))
                     single(.success([]))
                     return
                 }
                 var medias: [Media] = []
+                completionHandler(snapshot.documents.last)
                 for document in snapshot.documents {
                     do {
                         let media = try document.data(as: Media.self)
@@ -977,6 +1030,53 @@ final class FirebaseManager {
             return Disposables.create()
         }
     }
+
+    private func getSingleMediaPosts(medias: [Media]) -> Single<[Post]> {
+        let postObservables = medias.map { [weak self] media -> Single<Post?> in
+            guard let self = self else { return .just(nil) }
+            return Single<Post?>.create { single in
+                media.postRef.getDocument { snapshot, error in
+                    if let error = error {
+                        print("Error - get post \(error)")
+                        single(.success(nil)) // 오류 발생 시 nil 반환하여 계속 진행
+                        return
+                    }
+                    
+                    guard let data = snapshot?.data(),
+                          let postUID = data["postUID"] as? String,
+                          let authorUID = data["authorUID"] as? String,
+//                          let creationDate = data["creationDate"] as? Date,
+                          let creationDate = data["creationDate"] as? Timestamp,
+//                          let mediaUID = data["mediaUID"] as? String,
+                          let thumbnail = media.thumbnailURL else {
+                                print("여기서 실패해용")
+                              single(.success(nil))
+                              return
+                    }
+
+                    let filteredPostMediaRef = self.db.collection("media").document(media.mediaUID)
+                    
+                    let post = Post(postUID: postUID,
+                                    authorUID: authorUID,
+//                                    creationDate: creationDate,
+                                    creationDate: creationDate.dateValue(),
+                                    caption: data["caption"] as? String,
+                                    like: data["like"] as? [String],
+                                    gym: data["gym"] as? String,
+                                    medias: [filteredPostMediaRef],
+                                    thumbnail: thumbnail,
+                                    commentCount: data["commentCount"] as? Int)
+                    
+                    single(.success(post))
+                }
+                return Disposables.create()
+            }
+            .catchAndReturn(nil)
+        }
+        return Single.zip(postObservables)
+            .map { $0.compactMap { $0 } }
+    }
+
 }
 /*
  HTTP 변환 사용 예시
