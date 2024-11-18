@@ -528,103 +528,194 @@ final class FirebaseManager {
     
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
+//    func feedFirst(completion: @escaping ([Post]?) -> Void) {
+//        currentUserInfo { [weak self] result in
+//            guard let self else { return }
+//            switch result {
+//            case .success(let user):
+//                let postRef: Query
+//                if let blackList = user.blackList, let _ = user.blackList?.first {
+//                    postRef = self.db.collection("posts")
+//                        .order(by: "creationDate", descending: true)
+//                        .whereField("authorUID", notIn: blackList)
+//                        .limit(to: 5)
+//                } else {
+//                    postRef = self.db.collection("posts")
+//                        .order(by: "creationDate", descending: true)
+//                        .limit(to: 5)
+//                }
+//                postRef.getDocuments { snapshot, error in
+//                    if let error = error {
+//                        print("피드 가져오는중 에러: \(error)")
+//                        completion(nil)
+//                        return
+//                    }
+//                    
+//                    guard let documents = snapshot?.documents else {
+//                        print("현재 피드가 없음")
+//                        completion(nil)
+//                        return
+//                    }
+//                    
+//                    if let lastDocument = documents.last {
+//                        self.lastFeed = lastDocument
+//                    }
+//                    
+//                    let posts = documents.compactMap {
+//                        do {
+//                            return try $0.data(as: Post.self)
+//                        } catch {
+//                            return nil
+//                        }
+//                    }
+//                    completion(posts)
+//                }
+//                
+//            case .failure(let error):
+//                print("유저 정보 가져오는 중 에러: \(error)")
+//            }
+//        }
+//    }  
     func feedFirst(completion: @escaping ([Post]?) -> Void) {
-        currentUserInfo { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let user):
-                let postRef: Query
-                if let blackList = user.blackList, let _ = user.blackList?.first {
-                    postRef = self.db.collection("posts")
-                        .order(by: "creationDate", descending: true)
-                        .whereField("authorUID", notIn: blackList)
-                        .limit(to: 5)
-                } else {
-                    postRef = self.db.collection("posts")
-                        .order(by: "creationDate", descending: true)
-                        .limit(to: 5)
-                }
-                postRef.getDocuments { snapshot, error in
-                    if let error = error {
-                        print("피드 가져오는중 에러: \(error)")
-                        completion(nil)
-                        return
-                    }
-                    
-                    guard let documents = snapshot?.documents else {
-                        print("현재 피드가 없음")
-                        completion(nil)
-                        return
-                    }
-                    
-                    if let lastDocument = documents.last {
-                        self.lastFeed = lastDocument
-                    }
-                    
-                    let posts = documents.compactMap {
-                        do {
-                            return try $0.data(as: Post.self)
-                        } catch {
-                            return nil
-                        }
-                    }
-                    completion(posts)
-                }
-                
-            case .failure(let error):
-                print("유저 정보 가져오는 중 에러: \(error)")
-            }
-        }
-    }
-    func feedLoading(completion: @escaping ([Post]?) -> Void) {
+        var postRef = db.collection("posts")
+            .order(by: "creationDate", descending: true)
+            .limit(to: 5)
+        
         currentUserInfo { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let user):
                 guard let lastFeed else { return }
-                let postRef: Query
                 if let blackList = user.blackList, let _ = user.blackList?.first {
-                    postRef = self.db.collection("posts")
-                        .order(by: "creationDate", descending: true)
+                    postRef = postRef
                         .whereField("authorUID", notIn: blackList)
-                        .limit(to: 5)
-                        .start(afterDocument: lastFeed)
-                } else {
-                    postRef = self.db.collection("posts")
-                        .order(by: "creationDate", descending: true)
-                        .limit(to: 5)
-                        .start(afterDocument: lastFeed)
                 }
-                postRef.getDocuments { snapshot, error in
-                    if let error = error {
-                        print("피드 가져오는중 에러: \(error)")
-                        completion(nil)
-                        return
-                    }
-                    
-                    guard let documents = snapshot?.documents else {
-                        print("현재 피드가 없음")
-                        completion(nil)
-                        return
-                    }
-                    
-                    if let lastDocument = documents.last {
-                        self.lastFeed = lastDocument
-                    }
-                    
-                    let posts = documents.compactMap {
-                        do {
-                            return try $0.data(as: Post.self)
-                        } catch {
-                            return nil
-                        }
-                    }
-                    completion(posts)
-                }
-                
             case .failure(let error):
                 print("유저 정보 가져오는 중 에러: \(error)")
             }
+        }
+        postRef.getDocuments { snapshot, error in
+            if let error = error {
+                print("피드 가져오는중 에러: \(error)")
+                completion(nil)
+                return
+            }
+            
+            guard let documents = snapshot?.documents else {
+                print("현재 피드가 없음")
+                completion(nil)
+                return
+            }
+            
+            if let lastDocument = documents.last {
+                self.lastFeed = lastDocument
+            }
+            
+            let posts = documents.compactMap {
+                do {
+                    return try $0.data(as: Post.self)
+                } catch {
+                    return nil
+                }
+            }
+            completion(posts)
+        }
+    }
+//    func feedLoading(completion: @escaping ([Post]?) -> Void) {
+//        currentUserInfo { [weak self] result in
+//            guard let self else { return }
+//            switch result {
+//            case .success(let user):
+//                guard let lastFeed else { return }
+//                let postRef: Query
+//                if let blackList = user.blackList, let _ = user.blackList?.first {
+//                    postRef = self.db.collection("posts")
+//                        .order(by: "creationDate", descending: true)
+//                        .whereField("authorUID", notIn: blackList)
+//                        .limit(to: 5)
+//                        .start(afterDocument: lastFeed)
+//                } else {
+//                    postRef = self.db.collection("posts")
+//                        .order(by: "creationDate", descending: true)
+//                        .limit(to: 5)
+//                        .start(afterDocument: lastFeed)
+//                }
+//                postRef.getDocuments { snapshot, error in
+//                    if let error = error {
+//                        print("피드 가져오는중 에러: \(error)")
+//                        completion(nil)
+//                        return
+//                    }
+//                    
+//                    guard let documents = snapshot?.documents else {
+//                        print("현재 피드가 없음")
+//                        completion(nil)
+//                        return
+//                    }
+//                    
+//                    if let lastDocument = documents.last {
+//                        self.lastFeed = lastDocument
+//                    }
+//                    
+//                    let posts = documents.compactMap {
+//                        do {
+//                            return try $0.data(as: Post.self)
+//                        } catch {
+//                            return nil
+//                        }
+//                    }
+//                    completion(posts)
+//                }
+//                
+//            case .failure(let error):
+//                print("유저 정보 가져오는 중 에러: \(error)")
+//            }
+//        }
+//    }
+    func feedLoading(completion: @escaping ([Post]?) -> Void) {
+        guard let lastFeed else { return }
+        var postRef = db.collection("posts")
+            .order(by: "creationDate", descending: true)
+            .limit(to: 5)
+            .start(afterDocument: lastFeed)
+
+        
+        currentUserInfo { result in
+            switch result {
+            case .success(let user):
+                if let blackList = user.blackList, let _ = user.blackList?.first {
+                    postRef = postRef
+                        .whereField("authorUID", notIn: blackList)
+                }
+            case .failure(let error):
+                print("유저 정보 가져오는 중 에러: \(error)")
+            }
+        }
+        postRef.getDocuments { snapshot, error in
+            if let error = error {
+                print("피드 가져오는중 에러: \(error)")
+                completion(nil)
+                return
+            }
+            
+            guard let documents = snapshot?.documents else {
+                print("현재 피드가 없음")
+                completion(nil)
+                return
+            }
+            
+            if let lastDocument = documents.last {
+                self.lastFeed = lastDocument
+            }
+            
+            let posts = documents.compactMap {
+                do {
+                    return try $0.data(as: Post.self)
+                } catch {
+                    return nil
+                }
+            }
+            completion(posts)
         }
     }
     
