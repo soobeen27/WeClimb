@@ -36,7 +36,6 @@ class SettingVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         setNavigation()
         setLayout()

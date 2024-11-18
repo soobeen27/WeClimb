@@ -17,8 +17,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     private var likeViewModel: LikeViewModel?
     var disposeBag = DisposeBag()
-    
-//    var medias: [Media] = []
+    private var viewModel: MainFeedVM?
     var medias: [Media]?
     var post: Post?
     
@@ -28,7 +27,8 @@ class SFCollectionViewCell: UICollectionViewCell {
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal //가로 스크롤
-        layout.itemSize = CGSize(width: contentView.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
+//        layout.itemSize = CGSize(width: contentView.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
+        layout.itemSize = CGSize(width: contentView.bounds.width, height: contentView.bounds.height)
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
         
@@ -73,6 +73,14 @@ class SFCollectionViewCell: UICollectionViewCell {
     var commentButtonTap: Driver<Post?> {
         print("comment button tapped")
         return commentButton.rx.tap
+            .map { [weak self] in
+                self?.post
+            }
+            .asDriver(onErrorDriveWith: .empty())
+    }
+    
+    var likeButtonTap: Driver<Post?> {
+        return likeButton.rx.tap
             .map { [weak self] in
                 self?.post
             }
@@ -161,7 +169,7 @@ class SFCollectionViewCell: UICollectionViewCell {
 //        return label
 //    }()
     
-    private let likeButton = UIButton()
+    let likeButton = UIButton()
     
     private let likeButtonCounter: UILabel = {
         let label = UILabel()
@@ -397,7 +405,8 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     
     // MARK: - configure 메서드
-    func configure(with post: Post) {
+    func configure(with post: Post, viewModel: MainFeedVM) {
+        self.viewModel = viewModel
         likeViewModel = LikeViewModel(post: post)
         FirebaseManager.shared.getUserInfoFrom(uid: post.authorUID) { [weak self] result in
             guard let self else { return }
@@ -435,9 +444,10 @@ class SFCollectionViewCell: UICollectionViewCell {
         
         feedCaptionLabel.text = post.caption
         commentButtonCounter.text = String(post.commentCount ?? 0)
-        likeButton.configureHeartButton()
         fetchLike()
-        setLikeButton()
+        likeButton.configureHeartButton()
+
+//        setLikeButton()
     }
     
     func fetchLike() {
@@ -453,11 +463,14 @@ class SFCollectionViewCell: UICollectionViewCell {
     }
     
     //MARK: - 좋아요 버튼 세팅
-    private func setLikeButton() {
+    func setLikeButton() {
         print("Setting LikeButton")
+        let loginNeeded = LoginNeeded()
+//        loginNeeded.loginAlert(vc: self)
         guard let user = Auth.auth().currentUser,
               let likeViewModel
         else { return }
+        
         likeButton.rx.tap
             .asSignal().emit(onNext: {
                 likeViewModel.likePost(myUID: user.uid)
@@ -469,7 +482,6 @@ class SFCollectionViewCell: UICollectionViewCell {
             .drive(onNext: { [weak self] likeList in
                 guard let self else { return }
                 self.likeButtonCounter.text =  "\(likeList.count)"
-                print("LikeList: \(likeList)")
                 if likeList.contains([user.uid]) {
                     self.likeButton.isActivated = true
                 }  else {
@@ -500,9 +512,15 @@ extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDele
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SFFeedCell.className, for: indexPath) as? SFFeedCell else {
             return UICollectionViewCell()
         }
-        guard let medias else { return cell }
+        guard let medias, let viewModel else { return cell }
         let currentMedia = medias[indexPath.row]
-        cell.configure(with: currentMedia)
+        cell.configure(with: currentMedia, viewModel: viewModel)
+        cell.gymTap
+            .bind(to: viewModel.gymButtonTap)
+            .disposed(by: cell.disposeBag)
+        cell.gradeTap
+            .bind(to: viewModel.gradeButtonTap)
+            .disposed(by: cell.disposeBag)
         return cell
     }
     
