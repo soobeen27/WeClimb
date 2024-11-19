@@ -153,6 +153,7 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
                 let userUID = FirebaseManager.shared.currentUserUID()
                 let post = self.viewModel.post
                 self.viewModel.addComment(userUID: userUID, fromPostUid: post.postUID, content: self.commentTextField.text ?? "")
+                self.commentTextField.text = ""
             }
             .disposed(by: disposeBag)
     }
