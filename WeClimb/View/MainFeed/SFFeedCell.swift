@@ -18,7 +18,7 @@ class SFFeedCell: UICollectionViewCell {
     var imageView: UIImageView!
     var player: AVPlayer?
     var playerLayer: AVPlayerLayer?
-    var isVideo: Bool = false
+//    var isVideo: Bool = false
     
     var disposeBag = DisposeBag()
     
@@ -118,7 +118,7 @@ class SFFeedCell: UICollectionViewCell {
     }
     
     private func loadImage(from url: URL) {
-        self.isVideo = false
+//        self.isVideo = false
         self.playButton.isHidden = true
         imageView.kf.setImage(with: url)
     }
@@ -171,9 +171,11 @@ class SFFeedCell: UICollectionViewCell {
         setupPlayButton()
         playButton.isHidden = false
         self.contentView.bringSubviewToFront(playButton)
+        
         if let playerLayer = playerLayer {
             contentView.layer.insertSublayer(playerLayer, at: 0)
         }
+        
         gymGradeImageBringToFront()
     }
     
@@ -198,11 +200,12 @@ class SFFeedCell: UICollectionViewCell {
     }
     
     func stopVideo() {
-        if isVideo {
+        print("Stop")
+//        if isVideo {
             playButton.isHidden = false
             self.contentView.bringSubviewToFront(self.playButton)
             player?.pause()
-        }
+//        }
     }
     
     func playVideo() {
@@ -218,7 +221,7 @@ class SFFeedCell: UICollectionViewCell {
         playerLayer?.removeFromSuperlayer()
         player = nil
         playerLayer = nil
-        isVideo = false
+//        isVideo = false
         playButton.isHidden = true
     }
     

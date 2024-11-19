@@ -45,15 +45,15 @@ class SFMainFeedVC: UIViewController{
         return indicator
     }()
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-
-        print("현재 페이지 인덱스: \(currentPageIndex)")
-        if currentPageIndex == 0 {
-//            innerCollectionViewPlayers(playOrPause: true)
-            playFirstVisibleVideo()
-        }
-    }
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//
+//        print("현재 페이지 인덱스: \(currentPageIndex)")
+//        if currentPageIndex == 0 {
+////            innerCollectionViewPlayers(playOrPause: true)
+//            playFirstVisibleVideo()
+//        }
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -94,14 +94,14 @@ class SFMainFeedVC: UIViewController{
     }
     
     private func playFirstVisibleVideo() {
-        // 첫 번째 셀을 찾고 해당 셀의 비디오를 재생하는 로직
+        
         let indexPath = IndexPath(item: 0, section: 0)
         if let cell = collectionView.cellForItem(at: indexPath) as? SFCollectionViewCell {
             let innerCollectionView = cell.collectionView
-            // 내부 컬렉션 뷰에서 첫 번째 비디오 셀 찾기
+            
             if let firstInnerCell = innerCollectionView.visibleCells.first as? SFFeedCell,
                let media = firstInnerCell.media {
-                // 비디오 URL이 mp4인 경우에만 재생
+                
                 if let url = URL(string: media.url), url.pathExtension.lowercased() == "mp4" {
                     print("비디오 재생: \(media.url)")
                     firstInnerCell.playVideo()
