@@ -78,6 +78,7 @@
 		917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */; };
 		917DA89E2CD4B0A0006FF6B9 /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 917DA89D2CD4B0A0006FF6B9 /* RxBlocking */; };
 		91995F202CA4A24100BCC004 /* SFFeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */; };
+		91A717002CEA0D25007F825C /* LoginNeeded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A716FF2CEA0D25007F825C /* LoginNeeded.swift */; };
 		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
 		91BFA9332C91962F0044D5AD /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BFA9322C91962F0044D5AD /* Post.swift */; };
@@ -202,6 +203,7 @@
 		917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeClimbTests.swift; sourceTree = "<group>"; };
 		917DA89F2CD4B340006FF6B9 /* WeClimb.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = WeClimb.xctestplan; sourceTree = "<group>"; };
 		91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFFeedCell.swift; sourceTree = "<group>"; };
+		91A716FF2CEA0D25007F825C /* LoginNeeded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginNeeded.swift; sourceTree = "<group>"; };
 		91AF25602C8C15FC002283BD /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
 		91AF25622C8D771A002283BD /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
 		91BFA9322C91962F0044D5AD /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
@@ -523,6 +525,7 @@
 				C431978F2CAAC3FD00029E3C /* ProfileManager.swift */,
 				91DC7D232CE0C721004CB66D /* GradeNamespace.swift */,
 				91E21D102CE20017003269DD /* Hold.swift */,
+				91A716FF2CEA0D25007F825C /* LoginNeeded.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -772,6 +775,7 @@
 				C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */,
 				43A0E72A2CE3888800F15682 /* UploadHeaderView.swift in Sources */,
 				91FF42CC2CC5F37C003D9279 /* SNSAuthVM.swift in Sources */,
+				91A717002CEA0D25007F825C /* LoginNeeded.swift in Sources */,
 				6B7F76992CA4A8E900B05B3F /* BlackListVM.swift in Sources */,
 				C47A0B012C9115760068173A /* CommentCell.swift in Sources */,
 				91995F202CA4A24100BCC004 /* SFFeedCell.swift in Sources */,
