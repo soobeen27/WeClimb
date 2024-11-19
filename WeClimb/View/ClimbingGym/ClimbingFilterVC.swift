@@ -606,21 +606,25 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate, UICollectionView
         }
     }
     
-    //    // MARK: - Confirm Button Action
-    //    private func setupConfirmButtonAction() {
-    //        confirmButton.rx.tap
-    //            .bind { [weak self] in
-    //                guard let self = self else { return }
-    //                let filterConditions = FilterConditions(
-    //                    holdColor: try? self.viewModel.holdSelectedSubject.value(),
-    //                    heightRange: try? self.viewModel.heightRangeSubject.value(),
-    //                    armReachRange: try? self.viewModel.armReachRangeSubject.value()
-    //                )
-    //                self.filterApplied?(filterConditions)
-    //                self.dismiss(animated: true, completion: nil)
-    //            }
-    //            .disposed(by: disposeBag)
-    //    }
+    // MARK: - Confirm Button Action
+//    private func setupConfirmButtonAction() {
+//        confirmButton.rx.tap
+//            .bind { [weak self] in
+//                guard let self else { return }
+//                
+//                let filterConditions = FilterConditions(
+//                    holdColor: try? self.viewModel.holdSelectedSubject.value(),
+//                    heightRange: try? self.viewModel.heightRangeSubject.value(),
+//                    armReachRange: try? self.viewModel.armReachRangeSubject.value()
+//                )
+//                
+//                // 조건 전달
+//                NotificationCenter.default.post(name: .filterConditionsUpdated, object: filterConditions)
+//                
+//                self.dismiss(animated: true, completion: nil)
+//            }
+//            .disposed(by: disposeBag)
+//    }
 }
 
 extension ClimbingFilterVC: UICollectionViewDataSource {

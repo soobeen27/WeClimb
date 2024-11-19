@@ -179,7 +179,8 @@ class PersonalDetailsVC: UIViewController {
         
         // Firebase 업데이트 성공 여부 구독
         viewModel.updateSuccess
-            .subscribe(onNext: { [weak self] success in
+            .asDriver(onErrorJustReturn: false)
+            .drive(onNext: { [weak self] success in
                 guard let self = self else { return }
                 
                 if success {
