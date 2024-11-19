@@ -21,6 +21,8 @@ class SFMainFeedVC: UIViewController{
     var startingIndex: Int
     private let feedType: FeedType
     
+    var currentPageIndex: Int = 0
+    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -40,6 +42,16 @@ class SFMainFeedVC: UIViewController{
         indicator.center = CGPoint(x: collectionView.frame.width / 2, y: 50)
         return indicator
     }()
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        print("현재 페이지 인덱스: \(currentPageIndex)")
+        if currentPageIndex == 0 {
+//            innerCollectionViewPlayers(playOrPause: true)
+            playFirstVisibleVideo()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -76,6 +88,23 @@ class SFMainFeedVC: UIViewController{
     private func feedLoading() {
         if feedType == .mainFeed {
             viewModel.mainFeed()
+        }
+    }
+    
+    private func playFirstVisibleVideo() {
+        // 첫 번째 셀을 찾고 해당 셀의 비디오를 재생하는 로직
+        let indexPath = IndexPath(item: 0, section: 0)
+        if let cell = collectionView.cellForItem(at: indexPath) as? SFCollectionViewCell {
+            let innerCollectionView = cell.collectionView
+            // 내부 컬렉션 뷰에서 첫 번째 비디오 셀 찾기
+            if let firstInnerCell = innerCollectionView.visibleCells.first as? SFFeedCell,
+               let media = firstInnerCell.media {
+                // 비디오 URL이 mp4인 경우에만 재생
+                if let url = URL(string: media.url), url.pathExtension.lowercased() == "mp4" {
+                    print("비디오 재생: \(media.url)")
+                    firstInnerCell.playVideo()
+                }
+            }
         }
     }
     
@@ -302,26 +331,48 @@ class SFMainFeedVC: UIViewController{
     }
     
     func innerCollectionViewPlayers(playOrPause: Bool) {
-        // 현재 보이는 셀을 가져옴
-        guard let visibleCells = collectionView.visibleCells as? [SFCollectionViewCell] else { return }
+        guard currentPageIndex < collectionView.numberOfItems(inSection: 0) else {
+            print("현재 페이지 인덱스가 잘못됨.")
+            return
+        }
+
+        let indexPath = IndexPath(item: currentPageIndex, section: 0)
         
-        // 각 셀 안의 AVPlayer 일시정지
-        visibleCells.forEach { cell in
-            let innerCollectionView = cell.collectionView
-            guard let innerVisibleCells = innerCollectionView.visibleCells as? [SFFeedCell] else { return }
-            
-            if playOrPause {
-                if let cell = innerVisibleCells.last {
-                    cell.playVideo()
+        guard let cell = collectionView.cellForItem(at: indexPath) as? SFCollectionViewCell else {
+            print("현재 페이지의 셀을 찾을 수 없음.")
+            return
+        }
+
+        let innerCollectionView = cell.collectionView
+        
+        guard let firstInnerCell = innerCollectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? SFFeedCell else {
+            print("내부 컬렉션 뷰에서 첫 번째 셀이 없음.")
+            return
+        }
+
+        guard let media = firstInnerCell.media else {
+            print("내부 셀에 미디어가 없음.")
+            return
+        }
+
+        print("현재 페이지의 내부 셀 미디어 URL: \(media.url)")
+
+        if let url = URL(string: media.url) {
+            let fileExtension = url.pathExtension.lowercased()
+            if fileExtension == "mp4" {
+                if playOrPause {
+                    print("비디오 재생: \(media.url)")
+                    firstInnerCell.playVideo()
+                } else {
+                    print("비디오 정지: \(media.url)")
+                    firstInnerCell.stopVideo()
                 }
             } else {
-                innerVisibleCells.forEach { innerCell in
-                    innerCell.stopVideo()
-                }
+                print("비디오 파일이 아님: \(media.url)")
+                firstInnerCell.stopVideo()
             }
         }
     }
-    
     
     //MARK: - 차단하기 관련 메서드
     private func blockUser(authorUID: String) {
@@ -339,9 +390,7 @@ class SFMainFeedVC: UIViewController{
     }
 }
 
-
 //MARK: - 컬렉션뷰 델리게이트 설정
-
 extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
@@ -358,6 +407,7 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
                 isRefresh = true
             }
         }
+        innerCollectionViewPlayers(playOrPause: false)
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -365,8 +415,17 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
         if feedType == .mainFeed {
             isRefresh = false
         }
+        
+        let pageIndex = Int(round(scrollView.contentOffset.y / scrollView.frame.height))
+        print("인덱스 확인 \(pageIndex)")
+        guard currentPageIndex != pageIndex else { return }
+        innerCollectionViewPlayers(playOrPause: false)
+        currentPageIndex = pageIndex
+        print("인덱스 넘어감 \(currentPageIndex)")
+        
+        innerCollectionViewPlayers(playOrPause: true)
+        
     }
-    
 }
 
 extension SFMainFeedVC {
