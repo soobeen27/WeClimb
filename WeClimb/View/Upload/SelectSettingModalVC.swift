@@ -73,11 +73,11 @@ class SelectSettingModalVC: UIViewController {
         view.layer.cornerRadius = 20
         view.layer.masksToBounds = true
 
-        bindOkButton()
+        bindSettingCell()
     }
     
     private func setNavigation() {
-        self.title = UploadNameSpace.select
+        self.title = UploadNameSpace.setting
     }
     
     private func setLayout() {
@@ -110,16 +110,42 @@ class SelectSettingModalVC: UIViewController {
         }
     }
     
-    private func bindOkButton() {
+    private func bindSettingCell() {
         Driver.combineLatest(
-            viewModel.selectedGrade.asDriver(onErrorJustReturn: ""),
-            viewModel.selectedHold.asDriver(onErrorJustReturn: .none)
+            viewModel.pageChanged.asDriver(onErrorJustReturn: 0),
+            viewModel.feedRelay.asDriver()
         )
-        .drive(onNext: { [weak self] selectedGrade, selectedHold in
+        .drive(onNext: { [weak self] pageIndex, feedItems in
             guard let self else { return }
+
+            self.viewModel.selectedGrade.accept("")
+            self.viewModel.selectedHold.accept(.none)
+
+            guard pageIndex >= 0 && pageIndex < feedItems.count else {
+                self.okButton.isEnabled = false
+                return
+            }
+
+            let feedItem = feedItems[pageIndex]
             
-            if selectedGrade != nil, selectedHold != nil {
+            let currentGrade = feedItem.grade
+            let currentHoldString = feedItem.hold
+
+            let isGradeSelected = currentGrade != nil
+            let isHoldSelected = currentHoldString != nil
+
+            if isGradeSelected, isHoldSelected {
                 self.okButton.isEnabled = true
+            } else {
+                self.okButton.isEnabled = false
+            }
+
+            self.viewModel.selectedGrade.accept(currentGrade ?? "")
+            
+            if let currentHold = Hold.allCases.first(where: { $0.string == currentHoldString }) {
+                self.viewModel.selectedHold.accept(currentHold)
+            } else {
+                self.viewModel.selectedHold.accept(.none)
             }
         })
         .disposed(by: disposeBag)

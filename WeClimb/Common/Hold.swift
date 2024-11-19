@@ -8,19 +8,19 @@
 import UIKit
 
 /// CaseIterable -> 열거형의 각각 모든 case들을 한데 묶어서 컬렉션인 배열로 만들어주는 프로토콜 채택.
-enum Hold : CaseIterable {
-    case red
-    case black
-    case blue
-    case gray
-    case green
-    case mint
-    case orange
-    case pink
-    case purple
-    case white
-    case yellow
-    case other
+enum Hold : String, CaseIterable {
+    case red = "red"
+    case black = "black"
+    case blue = "blue"
+    case gray = "gray"
+    case green = "green"
+    case mint = "mint"
+    case orange = "orange"
+    case pink = "pink"
+    case purple = "purple"
+    case white = "white"
+    case yellow = "yellow"
+    case other = "other"
     
     var string: String {
         switch self {
@@ -80,7 +80,10 @@ enum Hold : CaseIterable {
         }
     }
     
-    func image(color: Self) -> UIImage? {
-        return UIImage(named: color.string)
+//    func image(color: Self) -> UIImage? {
+//        return UIImage(named: color.string)
+//    }
+    func image() -> UIImage? {
+        return UIImage(named: self.string)
     }
 }

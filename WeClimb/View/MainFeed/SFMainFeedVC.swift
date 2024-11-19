@@ -17,9 +17,11 @@ class SFMainFeedVC: UIViewController{
     private let disposeBag = DisposeBag()
     
     var viewModel: MainFeedVM
+    var likeVM: LikeViewModel?
     var isRefresh = false
     var startingIndex: Int
     private let feedType: FeedType
+    private let loginNeeded = LoginNeeded()
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -53,6 +55,8 @@ class SFMainFeedVC: UIViewController{
         setupCollectionView()
         buttonBind()
         feedLoading()
+        gymImageTap()
+        gradeImageTap()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -106,21 +110,59 @@ class SFMainFeedVC: UIViewController{
         collectionView.backgroundColor = UIColor(hex: "#0B1013")
         collectionView.addSubview(activityIndicator)
     }
+    
+    private func gymImageTap() {
+        viewModel.gymButtonTap
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { gymName in
+                guard let gymName else { return }
+                FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
+                    guard let self, let gym else { return }
+                    DispatchQueue.main.async {
+                        let climbingGymVC = ClimbingGymVC()
+                        climbingGymVC.configure(with: gym)
+                        
+                        self.navigationController?.navigationBar.prefersLargeTitles = false
+                        self.navigationController?.navigationBar.tintColor = .systemBlue
+                        self.navigationController?.pushViewController(climbingGymVC, animated: true)
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func gradeImageTap() {
+        viewModel.gradeButtonTap
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { media in
+                guard let media else { return }
+                print(media.grade)
+                print(media.hold)
+            })
+            .disposed(by: disposeBag)
+    }
 
     private func bindCollectionView() {
         viewModel.posts
             .asDriver()
             .drive(collectionView.rx
                 .items(cellIdentifier: SFCollectionViewCell.className,
-                       cellType: SFCollectionViewCell.self)) { index, post, cell in
-                
-                cell.configure(with: post)
-//                cell.commentButton.rx.tap
-//                    .asSignal().emit(onNext: { [weak self] in
-//                        guard let self else { return }
-//                        self.showCommentModal(for: post)
-//                    })
-//                    .disposed(by: cell.disposeBag)
+                       cellType: SFCollectionViewCell.self)) { [weak self] index, post, cell in
+                guard let self else { return }
+                cell.configure(with: post, viewModel: self.viewModel)
+                if let _ = Auth.auth().currentUser {
+                    cell.setLikeButton()
+                } else {
+                    cell.likeButton.rx.tap
+                        .asDriver()
+                        .drive(onNext: {
+                            if self.loginNeeded.loginAlert(vc: self) {
+                                cell.likeButton.isEnabled = false
+                                cell.likeButton.isActivated = false
+                            }
+                        })
+                        .disposed(by: cell.disposeBag)
+                }
             }
             .disposed(by: disposeBag)
 
@@ -154,29 +196,35 @@ class SFMainFeedVC: UIViewController{
         collectionView.rx
             .willDisplayCell
             .subscribe(onNext: { [weak self] (cell, indexPath) in
-                guard let self, let sfCell = cell as? SFCollectionViewCell else { return }
-                
-                let input = MainFeedVM.Input(
+                guard let self,
+                      let sfCell = cell as? SFCollectionViewCell
+                else { return }
+                var input: MainFeedVM.Input
+                input = MainFeedVM.Input(
                     reportDeleteButtonTap: sfCell.reportDeleteButtonTap,
                     commentButtonTap: sfCell.commentButtonTap,
                     profileTap: sfCell.profileTap
                 )
-                
                 let output = self.viewModel.transform(input: input)
                 
                 output.presentReport.drive(onNext: { [weak self] post in
                     guard let self, let post else { return }
-                    self.actionSheet(for: post)
+                    if !self.loginNeeded.loginAlert(vc: self) {
+                        self.actionSheet(for: post)
+                    }
                 })
                 .disposed(by: sfCell.disposeBag)
 
                 output.presentComment.drive(onNext: { [weak self] post in
                     guard let self, let post else { return }
-                    self.showCommentModal(for: post)
+                    if !self.loginNeeded.loginAlert(vc: self) {
+                        self.showCommentModal(for: post)
+                    }
                 })
                 .disposed(by: sfCell.disposeBag)
                 
-                output.pushProfile.drive(onNext: { name in
+                output.pushProfile
+                    .drive(onNext: { name in
                     guard let name else { return }
                     let userPageVM = UserPageVM()
                     userPageVM.fetchUserInfo(userName: name)
@@ -265,13 +313,6 @@ class SFMainFeedVC: UIViewController{
             }
         return actionSheet
     }
-
-    
-    //MARK: - 신고하기 모달 시트
-//    private func reportModal() {
-//        let modalVC = FeedReportModalVC()
-//        presentModal(modalVC: modalVC)
-//    }
     
     // MARK: - 신고하기 및 댓글 모달 표시
     private func showCommentModal(for post: Post) {

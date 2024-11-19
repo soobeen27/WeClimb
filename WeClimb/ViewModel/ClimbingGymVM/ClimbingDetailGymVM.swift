@@ -51,24 +51,24 @@ class ClimbingDetailGymVM {
             }
             
     private func loadMediaURLs(for gymName: String, grade: String) {
-        FirebaseManager.shared.getQueriedMedias(gymName: gymName, grade: grade)
-            .subscribe(onSuccess: { [weak self] medias in
-                guard let self = self else { return }
-                
-                // 각 Media 객체의 썸네일 URL을 HTTPS 형식으로 변환하여 저장
-                let thumbnailURLs: [URL] = medias.compactMap { media in
-                    if let thumbnailURLString = media.thumbnailURL {
-                        return URL(string: thumbnailURLString)
-                    }
-                    return nil
-                }
-                
-                print("Fetched Thumbnail URLs:", thumbnailURLs)
-                self.problemThumbnailsRelay.accept(thumbnailURLs)
-                
-            }, onFailure: { error in
-                print("미디어 URL 가져오기 오류: \(error)")
-            })
-            .disposed(by: disposeBag)
+//        FirebaseManager.shared.getFilteredPost(gymName: gymName, grade: grade)
+//            .subscribe(onSuccess: { [weak self] medias in
+//                guard let self = self else { return }
+//                
+//                // 각 Media 객체의 썸네일 URL을 HTTPS 형식으로 변환하여 저장
+////                let thumbnailURLs: [URL] = medias.compactMap { media in
+////                    if let thumbnailURLString = media.thumbnailURL {
+////                        return URL(string: thumbnailURLString)
+////                    }
+////                    return nil
+////                }
+////                
+////                print("Fetched Thumbnail URLs:", thumbnailURLs)
+////                self.problemThumbnailsRelay.accept(thumbnailURLs)
+//                
+//            }, onFailure: { error in
+//                print("미디어 URL 가져오기 오류: \(error)")
+//            })
+//            .disposed(by: disposeBag)
     }
 }
