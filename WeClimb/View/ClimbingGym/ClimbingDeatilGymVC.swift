@@ -1,10 +1,10 @@
-////
-////  ClimbingDeatilGymVC.swift
-////  WeClimb
-////
-////  Created by 머성이 on 8/30/24.
-////
 //
+//  ClimbingDeatilGymVC.swift
+//  WeClimb
+//
+//  Created by 머성이 on 8/30/24.
+//
+
 import UIKit
 
 import SnapKit
@@ -15,6 +15,8 @@ class ClimbingDetailGymVC: UIViewController {
     
     private let viewModel: ClimbingDetailGymVM
     private let disposeBag = DisposeBag()
+    
+//    let filterConditionsRelay = BehaviorRelay<FilterConditions?>(value: nil)
     
     init(viewModel: ClimbingDetailGymVM) {
         self.viewModel = viewModel
@@ -231,7 +233,11 @@ class ClimbingDetailGymVC: UIViewController {
         filterButton.rx.tap
             .bind { [weak self] in
                 guard let self else { return }
-                let climbingFilterVC = ClimbingFilterVC()
+                
+                // 기본값으로 ClimbingFilterVC 초기화
+                let climbingFilterVC = ClimbingFilterVC(gymName: "TestGym", grade: "빨")
+                
+                // 모달 표시
                 self.presentCustomHeightModal(modalVC: climbingFilterVC, heightRatio: 0.69)
             }
             .disposed(by: disposeBag)
