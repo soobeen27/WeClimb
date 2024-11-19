@@ -17,9 +17,11 @@ class SFMainFeedVC: UIViewController{
     private let disposeBag = DisposeBag()
     
     var viewModel: MainFeedVM
+    var likeVM: LikeViewModel?
     var isRefresh = false
     var startingIndex: Int
     private let feedType: FeedType
+    private let loginNeeded = LoginNeeded()
     
     var currentPageIndex: Int = 0
     
@@ -177,6 +179,19 @@ class SFMainFeedVC: UIViewController{
                        cellType: SFCollectionViewCell.self)) { [weak self] index, post, cell in
                 guard let self else { return }
                 cell.configure(with: post, viewModel: self.viewModel)
+                if let _ = Auth.auth().currentUser {
+                    cell.setLikeButton()
+                } else {
+                    cell.likeButton.rx.tap
+                        .asDriver()
+                        .drive(onNext: {
+                            if self.loginNeeded.loginAlert(vc: self) {
+                                cell.likeButton.isEnabled = false
+                                cell.likeButton.isActivated = false
+                            }
+                        })
+                        .disposed(by: cell.disposeBag)
+                }
             }
             .disposed(by: disposeBag)
 
@@ -223,13 +238,17 @@ class SFMainFeedVC: UIViewController{
                 
                 output.presentReport.drive(onNext: { [weak self] post in
                     guard let self, let post else { return }
-                    self.actionSheet(for: post)
+                    if !self.loginNeeded.loginAlert(vc: self) {
+                        self.actionSheet(for: post)
+                    }
                 })
                 .disposed(by: sfCell.disposeBag)
 
                 output.presentComment.drive(onNext: { [weak self] post in
                     guard let self, let post else { return }
-                    self.showCommentModal(for: post)
+                    if !self.loginNeeded.loginAlert(vc: self) {
+                        self.showCommentModal(for: post)
+                    }
                 })
                 .disposed(by: sfCell.disposeBag)
                 

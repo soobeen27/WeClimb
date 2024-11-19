@@ -36,18 +36,6 @@ class SettingVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        FirebaseManager.shared.getFilteredPost(gymName: "9클라이밍", grade: "빨",hold: "빨", height: [100,200], armReach: [100,200], completion: { snapshot in
-            print("snapshot@@@@@@@@@@@@@@@@@@@:::::::::::\(snapshot)")
-        })
-            .subscribe(onSuccess: { posts in
-                print(posts)
-                posts.forEach { post in
-                    print("@@@@@@@@@@@@@@@@@@@@\(post)")
-                }
-            }, onFailure: { error in
-                print("@@@@@@@@@@@@@이거 왜 실패? \(error)")
-            })
-            .disposed(by: disposeBag)
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         setNavigation()
         setLayout()

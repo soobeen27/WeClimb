@@ -38,10 +38,12 @@ class UploadVM {
     }
     
     var gymRelay = BehaviorRelay<Gym?>(value: nil)
-    var gradeDataRelay: BehaviorRelay<[String]> = BehaviorRelay(value: [])
+    var gradeRelayArray: BehaviorRelay<[String]> = BehaviorRelay(value: [])
     
-    var selectedGrade: BehaviorRelay<String?> = BehaviorRelay(value: nil)
-    var selectedHold: BehaviorRelay<Hold?> = BehaviorRelay(value: nil)
+    var selectedGrade = BehaviorRelay<String?>(value: nil)
+    var selectedHold = BehaviorRelay<Hold?>(value: nil)
+    
+    var shouldStopProcessing = false
 }
 
 extension UploadVM {
@@ -76,7 +78,7 @@ extension UploadVM {
         self.gymRelay.accept(gym)
         
         let gradeParts = gym.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
-        gradeDataRelay.accept(gradeParts)
+        gradeRelayArray.accept(gradeParts)
     }
 }
 
@@ -134,6 +136,9 @@ extension UploadVM {
                         if durationInSeconds > 60 {
                             self.showAlert.accept(())
                             print("비디오가 너무 깁니다. 알람을 보냅니다.")
+                            self.shouldStopProcessing = true
+                            group.leave()
+                            return
                         } else {
                             models[index] = FeedCellModel(
                                 imageURL: nil,
@@ -176,6 +181,11 @@ extension UploadVM {
         group.notify(queue: .main) { [weak self] in
             guard let self = self else { return }
             self.isLoading.accept(false) // 로딩 종료
+            
+            if shouldStopProcessing {
+                print("비디오 길이 초과로 모든 미디어 항목 처리 중단")
+                return
+            }
             
             if !models.isEmpty {
                 self.feedRelay.accept(models.compactMap { $0 })
@@ -282,10 +292,6 @@ extension UploadVM {
         ],
         progressQueue: .main,
         progressHandler: { progress in
-            let currentProgress = Float(progress.fractionCompleted) / totalMediaCount
-            let overallProgress = (Float(self.completedMediaCount) + currentProgress) / totalMediaCount
-            
-            self.compressionProgressRelay.accept(overallProgress)
         },
                                           completion: { [weak self] result in
             guard let self = self else { return }
