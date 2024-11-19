@@ -15,3 +15,9 @@ struct Gym {
     let profileImage: String?
     let additionalInfo: [String: Any]
 }
+
+struct FilterConditions {
+    let holdColor: String?
+    let heightRange: (Int, Int)?
+    let armReachRange: (Int, Int)?
+}
