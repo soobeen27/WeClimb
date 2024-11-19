@@ -9,6 +9,7 @@ import UIKit
 
 import RxSwift
 import RxCocoa
+//import RxGesture
 import SnapKit
 
 class MyPageVC: UIViewController {
@@ -23,6 +24,7 @@ class MyPageVC: UIViewController {
         imageView.layer.cornerRadius = 40
         imageView.clipsToBounds = true
         imageView.image = UIImage(named: "testStone") // 기본 프로필 이미지
+        imageView.isUserInteractionEnabled = true // 사용자 입력 허용
         return imageView
     }()
     
@@ -134,7 +136,7 @@ class MyPageVC: UIViewController {
         stackView.alignment = .center
         stackView.distribution = .fillEqually
         stackView.layer.cornerRadius = 10
-//        stackView.backgroundColor = .mainPurple.withAlphaComponent(0.1)
+        //        stackView.backgroundColor = .mainPurple.withAlphaComponent(0.1)
         stackView.layer.borderColor = UIColor.systemGray4.cgColor
         stackView.layer.borderWidth = 0.5
         return stackView
@@ -230,6 +232,7 @@ class MyPageVC: UIViewController {
         bindEmpty()
         bindCollectionView()
         bindEditProfile()
+        bindGesture()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -304,7 +307,7 @@ class MyPageVC: UIViewController {
         collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
         
-        [profileImage, profileStackView, totalStackView, collectionView, segmentControl, emptyPost]
+        [profileImage, profileStackView, /*totalStackView, */collectionView, segmentControl, emptyPost]
             .forEach{ view.addSubview($0) }
         
         [nameStackView, userInfoLabel, editButton]
@@ -322,8 +325,8 @@ class MyPageVC: UIViewController {
         [postCountLabel, postLabel]
             .forEach{ postStackView.addArrangedSubview($0) }
         
-        [postStackView, followStackView, followingStackView]
-            .forEach{ totalStackView.addArrangedSubview($0) }
+//        [postStackView, followStackView, followingStackView]
+//            .forEach{ totalStackView.addArrangedSubview($0) }
         
         profileImage.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).inset(8)
@@ -344,15 +347,15 @@ class MyPageVC: UIViewController {
             $0.width.equalTo(120)
         }
         
-        totalStackView.snp.makeConstraints {
-            $0.top.equalTo(profileImage.snp.bottom).offset(30)
-            $0.leading.equalToSuperview().inset(16)
-            $0.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(60)
-        }
+//        totalStackView.snp.makeConstraints {
+//            $0.top.equalTo(profileImage.snp.bottom).offset(30)
+//            $0.leading.equalToSuperview().inset(16)
+//            $0.trailing.equalToSuperview().inset(16)
+//            $0.height.equalTo(60)
+//        }
         
         segmentControl.snp.makeConstraints {
-            $0.top.equalTo(totalStackView.snp.bottom).offset(32)
+            $0.top.equalTo(profileImage.snp.bottom).offset(32)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         
@@ -497,6 +500,36 @@ class MyPageVC: UIViewController {
           })
           .disposed(by: disposeBag)
       }
+    
+//    private func bindGesture() {
+//        profileImage.rx.tapGesture()
+//            .when(.recognized)
+//            .subscribe(onNext: { [weak self] _ in
+//                guard let self = self,
+//                      let image = self.profileImage.image else { return }
+//                self.presentFullscreenImage(image)
+//            })
+//            .disposed(by: disposeBag)
+//    }
+    
+    private func bindGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageTapped))
+        profileImage.addGestureRecognizer(tapGesture)
+        profileImage.isUserInteractionEnabled = true // 제스처를 사용하기 위해 필요
+    }
+
+    @objc 
+    private func profileImageTapped() {
+        guard let image = profileImage.image else { return }
+        presentFullscreenImage(image)
+    }
+    
+    private func presentFullscreenImage(_ image: UIImage) {
+        let profileImageFullScreen = ProfileImageFullScreen(image: image)
+        profileImageFullScreen.modalPresentationStyle = .overFullScreen
+        profileImageFullScreen.modalTransitionStyle = .crossDissolve
+        present(profileImageFullScreen, animated: true, completion: nil)
+    }
 }
 
 //extension MyPageVC: UICollectionViewDelegate {
