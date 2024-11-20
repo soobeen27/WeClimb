@@ -98,6 +98,29 @@ class CommentVM {
         }
     }
     
+    func deleteComments(commentUID: String) {
+        let postUID = post.postUID
+        let commentRef = db.collection("posts")
+            .document(postUID)
+            .collection("comments")
+            .document(commentUID)
+        
+        commentRef.delete { [weak self] error in
+            guard let self else { return }
+            if let error = error {
+                print("Error - deleting comment \(error)")
+                return
+            }
+            var currentComments = self.comments.value
+            
+            currentComments.removeAll { comment in
+                comment.commentUID == commentUID
+            }
+            
+            self.comments.accept(currentComments)
+        }
+    }
+    
 //    func fetchCommentLikeList(commentUID: String) {
 //        let commentRef = self.db.collection("post").document(post.postUID)
 //            .collection("comments").document(commentUID)

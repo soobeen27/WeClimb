@@ -16,6 +16,10 @@ class CommentCell: UITableViewCell {
     
     var disposeBag = DisposeBag()
     
+    let longPress = PublishRelay<Comment?>()
+    
+    var commentCellVM: CommentCellVM?
+    
     private let commentProfileImage: UIImageView = {
         let image = UIImageView()
         image.layer.cornerRadius = 19
@@ -70,6 +74,7 @@ class CommentCell: UITableViewCell {
         
 //        likeButton.configureHeartButton()
         setLayout()
+        bindLongPress()
     }
     
     required init?(coder: NSCoder) {
@@ -81,7 +86,21 @@ class CommentCell: UITableViewCell {
         commentProfileImage.image = nil
         commentUser.text = nil
         commentLabel.text = nil
+        disposeBag = DisposeBag()
 //        likeButtonCounter.text = nil
+    }
+    
+    func bindLongPress() {
+        let longPressGesture = UILongPressGestureRecognizer(target: self,
+                                                            action: #selector(longPressAccept))
+        self.addGestureRecognizer(longPressGesture)
+    }
+    
+    @objc
+    private func longPressAccept(_ gesture: UILongPressGestureRecognizer) {
+        if gesture.state == .began {
+            longPress.accept(commentCellVM?.comment)
+        }
     }
     
     
@@ -127,6 +146,7 @@ class CommentCell: UITableViewCell {
     
     //MARK: - configure
     func configure(commentCellVM: CommentCellVM) {
+        self.commentCellVM = commentCellVM
         if let profileString = commentCellVM.user.profileImage {
             let imageURL = URL(string: profileString)
             commentProfileImage.kf.setImage(with: imageURL)
