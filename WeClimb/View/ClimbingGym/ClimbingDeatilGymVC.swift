@@ -234,11 +234,11 @@ class ClimbingDetailGymVC: UIViewController {
             .bind { [weak self] in
                 guard let self else { return }
                 
-                // 기본값으로 ClimbingFilterVC 초기화
-                let climbingFilterVC = ClimbingFilterVC(gymName: "TestGym", grade: "빨")
+//                // 기본값으로 ClimbingFilterVC 초기화
+//                let climbingFilterVC = ClimbingFilterVC(gymName: "TestGym", grade: "빨")
                 
                 // 모달 표시
-                self.presentCustomHeightModal(modalVC: climbingFilterVC, heightRatio: 0.69)
+//                self.presentCustomHeightModal(modalVC: climbingFilterVC, heightRatio: 0.69)
             }
             .disposed(by: disposeBag)
     }

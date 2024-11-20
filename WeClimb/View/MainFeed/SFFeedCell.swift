@@ -293,27 +293,41 @@ class SFFeedCell: UICollectionViewCell {
     }
     
     func gymGradeImageBind(media: Media) {
-        guard let gymName = media.gym else {
-            print("no Gym")
-            return
-        }
-        FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
-            guard let self,
-                  let gymImageString = gym?.profileImage
-            else { return }
-            FirebaseManager.shared.loadImage(from: gymImageString, into: self.gymImageView)
-            print(gymImageString)
-        }
-        if let hold = media.hold, let holdColor = Hold(rawValue: hold),
-           let holdImage = holdColor.image(),
-           let gradeColor = media.grade?.colorInfo
-        {
-            let resizeImage = holdImage.resize(targetSize: CGSize(width: 35, height: 35))
+        print("Media grade: \(media.grade ?? "없음")")
+        
+        // 임시 테스트 이미지
+        if let gradeTestImage = UIImage(named: "gradeTEST") {
+            // 이미지를 리사이즈
+            let resizeImage = gradeTestImage.resize(targetSize: CGSize(width: 50, height: 50))
             gradeImageView.image = resizeImage
-//            gradeImageView.backgroundColor = media.grade
-//            gradeImageView.backgroundColor = UIColo
-            gradeImageView.backgroundColor = gradeColor.color
+            gradeImageView.backgroundColor = UIColor.clear
+            print("gradeTEST 리사이즈 완료 및 설정")
+        } else {
+            print("gradeTEST 이미지 로드 실패")
         }
+        
+        
+//        guard let gymName = media.gym else {
+//            print("no Gym")
+//            return
+//        }
+//        FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
+//            guard let self,
+//                  let gymImageString = gym?.profileImage
+//            else { return }
+//            FirebaseManager.shared.loadImage(from: gymImageString, into: self.gymImageView)
+//            print(gymImageString)
+//        }
+//        if let hold = media.hold, let holdColor = Hold(rawValue: hold),
+//           let holdImage = holdColor.image(),
+//           let gradeColor = media.grade?.colorInfo
+//        {
+//            let resizeImage = holdImage.resize(targetSize: CGSize(width: 35, height: 35))
+//            gradeImageView.image = resizeImage
+////            gradeImageView.backgroundColor = media.grade
+////            gradeImageView.backgroundColor = UIColo
+//            gradeImageView.backgroundColor = gradeColor.color
+//        }
     }
     
     func gymGradeImageBringToFront() {
