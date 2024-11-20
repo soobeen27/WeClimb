@@ -306,28 +306,27 @@ class SFFeedCell: UICollectionViewCell {
             print("gradeTEST 이미지 로드 실패")
         }
         
-        
-//        guard let gymName = media.gym else {
-//            print("no Gym")
-//            return
-//        }
-//        FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
-//            guard let self,
-//                  let gymImageString = gym?.profileImage
-//            else { return }
-//            FirebaseManager.shared.loadImage(from: gymImageString, into: self.gymImageView)
-//            print(gymImageString)
-//        }
-//        if let hold = media.hold, let holdColor = Hold(rawValue: hold),
-//           let holdImage = holdColor.image(),
-//           let gradeColor = media.grade?.colorInfo
-//        {
-//            let resizeImage = holdImage.resize(targetSize: CGSize(width: 35, height: 35))
-//            gradeImageView.image = resizeImage
-////            gradeImageView.backgroundColor = media.grade
-////            gradeImageView.backgroundColor = UIColo
-//            gradeImageView.backgroundColor = gradeColor.color
-//        }
+        guard let gymName = media.gym else {
+            print("no Gym")
+            return
+        }
+        FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
+            guard let self,
+                  let gymImageString = gym?.profileImage
+            else { return }
+            FirebaseManager.shared.loadImage(from: gymImageString, into: self.gymImageView)
+            print(gymImageString)
+        }
+        if let hold = media.hold, let holdColor = Hold(rawValue: hold),
+           let holdImage = holdColor.image(),
+           let gradeColor = media.grade?.colorInfo
+        {
+            let resizeImage = holdImage.resize(targetSize: CGSize(width: 35, height: 35))
+            gradeImageView.image = resizeImage
+//            gradeImageView.backgroundColor = media.grade
+//            gradeImageView.backgroundColor = UIColo
+            gradeImageView.backgroundColor = gradeColor.color
+        }
     }
     
     func gymGradeImageBringToFront() {
