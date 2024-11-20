@@ -106,9 +106,15 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
                         print("Error - :\(error)")
                     }
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
+        
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
+    }
+    
+    private func tableViewRowTap() {
+//        tableView.rx.
     }
     
     private func setProfileImageView() {
@@ -130,15 +136,11 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
     private func setTextField() {
         commentTextField.rx.text
             .asDriver()
-            .throttle(.milliseconds(1000))
             .drive(onNext: { [weak self] text in
                 guard let self else { return }
                 if let text, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     self.submitButton.isEnabled = true
                     self.submitButton.backgroundColor = .systemBlue
-                } else {
-                    self.submitButton.isEnabled = false
-                    self.submitButton.backgroundColor = nil
                 }
             })
             .disposed(by: disposeBag)
@@ -147,13 +149,15 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
     private func submitButtonBind() {
         submitButton.rx.tap
             .asSignal()
+            .throttle(.milliseconds(2000))
             .emit { [weak self] _ in
                 guard let self else { return }
-                print("it's called")
                 let userUID = FirebaseManager.shared.currentUserUID()
                 let post = self.viewModel.post
                 self.viewModel.addComment(userUID: userUID, fromPostUid: post.postUID, content: self.commentTextField.text ?? "")
-                self.commentTextField.text = ""
+                self.commentTextField.text = nil
+                self.submitButton.isEnabled = false
+                self.submitButton.backgroundColor = nil
             }
             .disposed(by: disposeBag)
     }
@@ -202,6 +206,7 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
     }
 
     private func setLayout() {
+        view.overrideUserInterfaceStyle = .dark
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
         [titleLabel, commentTextField, submitButton, tableView, profileImageView].forEach {

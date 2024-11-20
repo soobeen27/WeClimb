@@ -58,9 +58,9 @@ class SFCollectionViewCell: UICollectionViewCell {
                 print("profile tapped")
                 return self?.feedUserNameLabel.text
             }
-            .distinctUntilChanged()
+//            .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
-            .throttle(.milliseconds(1000))
+            .throttle(.milliseconds(2000))
     }
     
     var reportDeleteButtonTap: Driver<Post?> {

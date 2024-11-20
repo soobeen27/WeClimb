@@ -86,6 +86,7 @@ class CommentCell: UITableViewCell {
     
     
     private func setLayout() {
+        contentView.overrideUserInterfaceStyle = .dark
         [commentProfileImage, commentStackView, likeStackView]
             .forEach {
                 contentView.addSubview($0)
