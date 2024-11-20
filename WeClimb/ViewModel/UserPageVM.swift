@@ -25,10 +25,10 @@ class UserPageVM {
     func blockUser(byUID uid: String, completion: @escaping (Bool) -> Void) {
         FirebaseManager.shared.addBlackList(blockedUser: uid) { success in
             if success {
-                print("차단 성공")
+//                print("차단 성공")
                 completion(true)
             } else {
-                print("차단 실패")
+//                print("차단 실패")
                 completion(false)
             }
         }
@@ -40,7 +40,7 @@ class UserPageVM {
             case .success(let user):
                 self?.userSubject.onNext(user)
                 guard let postRefs = user.posts else {
-                    print("사용자의 포스트가 없음.")
+//                    print("사용자의 포스트가 없음.")
                     return
                 }
                 self?.fetchUserPosts(from: postRefs)

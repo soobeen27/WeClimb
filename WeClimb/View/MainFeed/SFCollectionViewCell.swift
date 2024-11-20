@@ -20,6 +20,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     private var viewModel: MainFeedVM?
     var medias: [Media]?
     var post: Post?
+    var isBind = false
     
     let pauseVide: ((SFFeedCell) -> Void)? = nil
     
@@ -255,6 +256,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         post = nil
         medias = nil
         setLikeButton()
+        isBind = false
     }
     
     private func addGesture() {

@@ -79,7 +79,6 @@ class SFFeedCell: UICollectionViewCell {
         }
         setLayout()
 //        gymHoldImageBind()
-        imageViewGestureBind()
     }
     
     required init?(coder: NSCoder) {
@@ -94,6 +93,7 @@ class SFFeedCell: UICollectionViewCell {
         gymImageView.image = nil
         media = nil
         setLayout()
+        disposeBag = DisposeBag()
 //        imageViewGestureBind()
     }
     
@@ -115,6 +115,7 @@ class SFFeedCell: UICollectionViewCell {
             loadImage(from: url)
         }
         gymGradeImageBind(media: media)
+        imageViewGestureBind()
     }
     
     private func loadImage(from url: URL) {
