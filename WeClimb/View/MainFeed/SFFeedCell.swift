@@ -157,12 +157,14 @@ class SFFeedCell: UICollectionViewCell {
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
             if width >= height {
                 self.playerLayer?.videoGravity = .resizeAspect
             } else {
                 self.playerLayer?.videoGravity = .resizeAspectFill
             }
+            CATransaction.commit()
         }
 //        playerLayer?.videoGravity = .resizeAspect
         if let playerLayer = self.playerLayer {

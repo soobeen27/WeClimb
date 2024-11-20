@@ -224,8 +224,8 @@ class SFMainFeedVC: UIViewController{
                 .disposed(by: sfCell.disposeBag)
                 
                 output.pushProfile
-                    .drive(onNext: { name in
-                    guard let name else { return }
+                    .drive(onNext: { [weak self] name in
+                    guard let name, let self else { return }
                     let userPageVM = UserPageVM()
                     userPageVM.fetchUserInfo(userName: name)
                     
@@ -234,7 +234,7 @@ class SFMainFeedVC: UIViewController{
                     self.navigationController?.navigationBar.prefersLargeTitles = false
                     self.navigationController?.pushViewController(userPageVC, animated: true)
                 })
-                .disposed(by: disposeBag)
+                    .disposed(by: sfCell.disposeBag)
             })
             .disposed(by: disposeBag)
     }

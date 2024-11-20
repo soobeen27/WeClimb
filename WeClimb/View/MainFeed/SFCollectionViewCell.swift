@@ -55,10 +55,12 @@ class SFCollectionViewCell: UICollectionViewCell {
     var profileTap: Driver<String?> {
         return profileTapGesture.rx.event
             .map { [weak self] _ in
-//                self?.post?.authorUID
-                self?.feedUserNameLabel.text
+                print("profile tapped")
+                return self?.feedUserNameLabel.text
             }
+            .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
+            .throttle(.milliseconds(1000))
     }
     
     var reportDeleteButtonTap: Driver<Post?> {
@@ -249,6 +251,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         likeButtonCounter.text = "0"
         feedUserProfileImage.image = nil
         pageControl.currentPage = 0
+        pageControl.numberOfPages = 0
         post = nil
         medias = nil
         setLikeButton()
@@ -430,24 +433,20 @@ class SFCollectionViewCell: UICollectionViewCell {
         Task {
             medias = try await FirebaseManager.shared.fetchMedias(for: post)
             guard let medias else { return }
-            if medias.count > 0 {
-                self.addSubview(pageControl)
-                pageControl.snp.makeConstraints {
-                    $0.centerX.equalToSuperview()
-                    $0.bottom.equalTo(collectionView.snp.bottom).offset(-40)
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                if medias.count > 1 {
+                    self.addSubview(pageControl)
+                    pageControl.snp.makeConstraints {
+                        $0.centerX.equalToSuperview()
+                        $0.bottom.equalTo(self.feedProfileStackView.snp.top).offset(-20)
+                    }
+                    pageControl.numberOfPages = medias.count
+                    pageControl.currentPage = 0
                 }
-                pageControl.numberOfPages = medias.count
-                pageControl.currentPage = 0
+                collectionView.reloadData()
             }
-            collectionView.reloadData()
         }
-        
-        feedCaptionLabel.text = post.caption
-        commentButtonCounter.text = String(post.commentCount ?? 0)
-        fetchLike()
-        likeButton.configureHeartButton()
-
-//        setLikeButton()
     }
     
     func fetchLike() {
