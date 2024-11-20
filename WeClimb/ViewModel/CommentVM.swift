@@ -17,7 +17,7 @@ class CommentVM {
     private let db = Firestore.firestore()
     let post: Post
     var comments = BehaviorRelay<[Comment]>(value: [])
-    var commentLikeList = BehaviorRelay<[String]>(value: [])
+//    var commentLikeList = BehaviorRelay<[String]>(value: [])
     
     let disposeBag = DisposeBag()
     
@@ -98,50 +98,50 @@ class CommentVM {
         }
     }
     
-    func fetchCommentLikeList(commentUID: String) {
-        let commentRef = self.db.collection("post").document(post.postUID)
-            .collection("comments").document(commentUID)
-        
-        commentRef.getDocument { [weak self] snapshot, error in
-            if let error = error {
-                print("Error - fetchCommentLikeList \(error)")
-                return
-            }
-            guard let self else { return }
-            let data = snapshot?.data()?["like"] as? [String] ?? []
-            self.commentLikeList.accept(data)
-        } 
-    }
-    
-    func likeComment(myUID: String, postUID: String, commentUID: String) {
-        let commentRef = self.db.collection("posts").document(postUID)
-            .collection("comments").document(commentUID)
-        
-        self.db.runTransaction { transaction, errorPointer in
-            let commentSnapshot: DocumentSnapshot
-            do {
-                commentSnapshot = try transaction.getDocument(commentRef)
-            } catch let fetchError as NSError {
-                errorPointer?.pointee = fetchError
-                return nil
-            }
-            var currentLikeList = commentSnapshot.data()?["like"] as? [String] ?? []
-            
-            if currentLikeList.contains([myUID]) {
-                transaction.updateData(["like" : FieldValue.arrayRemove([myUID])], forDocument: commentRef)
-                currentLikeList.removeAll { $0 == myUID }
-            } else {
-                transaction.updateData(["like" : FieldValue.arrayUnion([myUID])], forDocument: commentRef)
-                currentLikeList.append(myUID)
-            }
-            return currentLikeList
-        } completion: { [weak self] object, error in
-            if let error = error {
-                print("Error : \(error) ", #file, #function, #line)
-                return
-            } else if let likeList = object as? [String], let self {
-                self.commentLikeList.accept(likeList)
-            }
-        }
-    }
+//    func fetchCommentLikeList(commentUID: String) {
+//        let commentRef = self.db.collection("post").document(post.postUID)
+//            .collection("comments").document(commentUID)
+//        
+//        commentRef.getDocument { [weak self] snapshot, error in
+//            if let error = error {
+//                print("Error - fetchCommentLikeList \(error)")
+//                return
+//            }
+//            guard let self else { return }
+//            let data = snapshot?.data()?["like"] as? [String] ?? []
+//            self.commentLikeList.accept(data)
+//        } 
+//    }
+//    
+//    func likeComment(myUID: String, postUID: String, commentUID: String) {
+//        let commentRef = self.db.collection("posts").document(postUID)
+//            .collection("comments").document(commentUID)
+//        
+//        self.db.runTransaction { transaction, errorPointer in
+//            let commentSnapshot: DocumentSnapshot
+//            do {
+//                commentSnapshot = try transaction.getDocument(commentRef)
+//            } catch let fetchError as NSError {
+//                errorPointer?.pointee = fetchError
+//                return nil
+//            }
+//            var currentLikeList = commentSnapshot.data()?["like"] as? [String] ?? []
+//            
+//            if currentLikeList.contains([myUID]) {
+//                transaction.updateData(["like" : FieldValue.arrayRemove([myUID])], forDocument: commentRef)
+//                currentLikeList.removeAll { $0 == myUID }
+//            } else {
+//                transaction.updateData(["like" : FieldValue.arrayUnion([myUID])], forDocument: commentRef)
+//                currentLikeList.append(myUID)
+//            }
+//            return currentLikeList
+//        } completion: { [weak self] object, error in
+//            if let error = error {
+//                print("Error : \(error) ", #file, #function, #line)
+//                return
+//            } else if let likeList = object as? [String], let self {
+//                self.commentLikeList.accept(likeList)
+//            }
+//        }
+//    }
 }
