@@ -269,23 +269,12 @@ class EditPersonalDetailsVC: UIViewController {
                 if let armReach = armReach { data["armReach"] = armReach }
                 
                 self.viewModel.updateUserDetails(data: data)
-            })
-            .disposed(by: disposeBag)
-        
-        // Firebase 업데이트 성공 여부 구독
-        viewModel.updateSuccess
-            .asDriver(onErrorJustReturn: false)
-            .drive(onNext: { [weak self] success in
-                guard let self = self else { return }
-                
-                if success {
-                    print("사용자 정보 업데이트 성공!")
-                    
-                    let tabBarController = TabBarController()
-                    self.navigationController?.pushViewController(tabBarController, animated: true)
-                    self.navigationController?.setNavigationBarHidden(true, animated: true)
-                } else {
-                    print("사용자 정보 업데이트 실패.")
+                DispatchQueue.main.async {
+                    let alert = UIAlertController(title: "정보 수정이 완료되었습니다", message: nil, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
+                        self.navigationController?.popViewController(animated: true)
+                    }))
+                    self.present(alert, animated: true, completion: nil)
                 }
             })
             .disposed(by: disposeBag)
