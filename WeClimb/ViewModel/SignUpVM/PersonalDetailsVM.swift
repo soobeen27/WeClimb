@@ -12,40 +12,11 @@ import RxSwift
 
 class PersonalDetailsVM {
     
-//    let disposeBag = DisposeBag()
-//    
-//    let heightInput = PublishSubject<String>()
-//    let armReachInput = PublishSubject<String>()
-//    
-//    private var currentHeight: String?
-//    private var currentArmReach: String?
-//
-//    init() {
-//        heightInput.subscribe(onNext: { [weak self] height in
-//            self?.currentHeight = height
-//        }).disposed(by: disposeBag)
-//
-//        armReachInput.subscribe(onNext: { [weak self] armReach in
-//            self?.currentArmReach = armReach
-//        }).disposed(by: disposeBag)
-//    }
+    let updateSuccess = PublishRelay<Bool>() // 업데이트 결과 전달용 Relay
     
-    let disposeBag = DisposeBag()
-        
-        // BehaviorRelay로 변경하고 초기값을 설정합니다.
-        let heightInput = BehaviorRelay<Int>(value: 0)
-        let armReachInput = BehaviorRelay<Int>(value: 0)
-        
-        private var currentHeight: Int?
-        private var currentArmReach: Int?
-
-        init() {
-            heightInput.subscribe(onNext: { [weak self] height in
-                self?.currentHeight = height
-            }).disposed(by: disposeBag)
-
-            armReachInput.subscribe(onNext: { [weak self] armReach in
-                self?.currentArmReach = armReach
-            }).disposed(by: disposeBag)
+    func updateUserDetails(data: [String: Any]) {
+        FirebaseManager.shared.updateUserDetails(data: data) { success in
+            self.updateSuccess.accept(success) // 결과 전달
         }
+    }
 }

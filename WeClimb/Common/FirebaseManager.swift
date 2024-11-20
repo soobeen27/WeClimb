@@ -922,6 +922,27 @@ final class FirebaseManager {
         }
     }
     
+    // 인자로 받아라
+    func updateUserDetails(data: [String: Any], completion: @escaping (Bool) -> Void) {
+        let uid = currentUserUID()
+        guard !uid.isEmpty else {
+            print("UID를 가져오지 못했습니다.")
+            completion(false)
+            return
+        }
+        
+        let userRef = db.collection("users").document(uid)
+        userRef.updateData(data) { error in
+            if let error = error {
+                print("업데이트 에러 발생: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                print("데이터 업데이트 성공!")
+                completion(true)
+            }
+        }
+    }
+    
     // MARK: 로그인된 계정 삭제
     func userDelete(completion: @escaping (Error?) -> Void) {
         guard let user = Auth.auth().currentUser else { return }

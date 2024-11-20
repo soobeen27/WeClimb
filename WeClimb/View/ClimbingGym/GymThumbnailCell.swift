@@ -37,6 +37,20 @@ class ThumbnailCell: UICollectionViewCell {
         }
     }
     
+    override var isSelected: Bool {
+        didSet {
+            layer.borderWidth = 0
+            layer.borderColor = UIColor.clear.cgColor
+        }
+    }
+    
+    override var isHighlighted: Bool {
+        didSet {
+            layer.borderWidth = 0
+            layer.borderColor = UIColor.clear.cgColor
+        }
+    }
+    
     func configure(with url: String) {
         // URL을 Kingfisher로 로드하여 이미지 설정
         guard let imageURL = URL(string: url) else {
