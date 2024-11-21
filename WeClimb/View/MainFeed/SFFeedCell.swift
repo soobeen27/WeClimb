@@ -15,12 +15,19 @@ import RxCocoa
 import Kingfisher
 
 class SFFeedCell: UICollectionViewCell {
-    var imageView: UIImageView!
     var player: AVPlayer?
     var playerLayer: AVPlayerLayer?
     var isVideo: Bool = false
     
     var disposeBag = DisposeBag()
+    
+    lazy var imageView: UIImageView = {
+        let imageView = UIImageView(frame: contentView.bounds)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.backgroundColor = .clear
+        return imageView
+    }()
     
     let playButton: UIButton = {
         let button = UIButton()
@@ -67,10 +74,11 @@ class SFFeedCell: UICollectionViewCell {
         contentView.backgroundColor = UIColor(hex: "#0B1013")
         
         // 이미지 뷰 초기화
-        imageView = UIImageView(frame: contentView.bounds)
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        contentView.addSubview(imageView)
+//        imageView = UIImageView(frame: contentView.bounds)
+//        imageView.contentMode = .scaleAspectFill
+//        imageView.clipsToBounds = true
+//        imageView.backgroundColor = .clear
+//        contentView.addSubview(imageView)
         
         contentView.addSubview(playButton)
         playButton.snp.makeConstraints {
@@ -91,9 +99,12 @@ class SFFeedCell: UICollectionViewCell {
         gradeImageView.image = nil
         gradeImageView.backgroundColor = nil
         gymImageView.image = nil
+        imageView.image = nil
+        imageView.backgroundColor = .clear
         media = nil
         setLayout()
         disposeBag = DisposeBag()
+        imageView.removeFromSuperview()
 //        imageViewGestureBind()
     }
     
@@ -121,6 +132,7 @@ class SFFeedCell: UICollectionViewCell {
     private func loadImage(from url: URL) {
         self.isVideo = false
         self.playButton.isHidden = true
+        contentView.addSubview(imageView)
         imageView.kf.setImage(with: url)
     }
     
@@ -146,6 +158,7 @@ class SFFeedCell: UICollectionViewCell {
         player = AVPlayer(url: url)
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.frame = self.contentView.bounds
+        playerLayer?.backgroundColor = UIColor.clear.cgColor
         guard let track = asset.tracks(withMediaType: .video).first else {
             print("비디오 트랙을 찾을 수 없습니다.")
             return
@@ -165,17 +178,15 @@ class SFFeedCell: UICollectionViewCell {
             } else {
                 self.playerLayer?.videoGravity = .resizeAspectFill
             }
+            playerLayer?.opacity = 1.0
             CATransaction.commit()
-        }
-//        playerLayer?.videoGravity = .resizeAspect
-        if let playerLayer = self.playerLayer {
-            self.contentView.layer.addSublayer(playerLayer)
         }
         setupPlayButton()
         playButton.isHidden = false
         self.contentView.bringSubviewToFront(playButton)
         if let playerLayer = playerLayer {
-            contentView.layer.insertSublayer(playerLayer, at: 0)
+            contentView.layer.insertSublayer(playerLayer, below: gymGradeStackView.layer)
+//            contentView.layer.insertSublayer(playerLayer, at: 0)
         }
         gymGradeImageBringToFront()
     }

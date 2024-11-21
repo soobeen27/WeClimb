@@ -505,7 +505,7 @@ class SFCollectionViewCell: UICollectionViewCell {
 // MARK: CollectionView Setting
 extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let medias else { return 0}
+        guard let medias else { return 0 }
         return medias.count
     }
     
