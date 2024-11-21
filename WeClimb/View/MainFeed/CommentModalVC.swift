@@ -10,6 +10,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 import Kingfisher
+import FirebaseAuth
 
 class CommentModalVC: UIViewController, UIScrollViewDelegate {
     
@@ -106,11 +107,23 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
                         print("Error - :\(error)")
                     }
                 }
-            }.disposed(by: disposeBag)
+                cell.longPress
+                    .asDriver(onErrorJustReturn: nil)
+                    .throttle(.milliseconds(3000))
+                    .drive(onNext: { [weak self] comment in
+                        guard let self, let comment else { return }
+                        self.actionSheet(for: comment)
+                        print("Long Pressed")
+                    
+                    })
+                    .disposed(by: cell.disposeBag)
+            }
+            .disposed(by: disposeBag)
+        
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
     }
-    
+        
     private func setProfileImageView() {
         FirebaseManager.shared.currentUserInfo { [weak self] result in
             switch result {
@@ -130,15 +143,11 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
     private func setTextField() {
         commentTextField.rx.text
             .asDriver()
-            .throttle(.milliseconds(1000))
             .drive(onNext: { [weak self] text in
                 guard let self else { return }
                 if let text, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     self.submitButton.isEnabled = true
                     self.submitButton.backgroundColor = .systemBlue
-                } else {
-                    self.submitButton.isEnabled = false
-                    self.submitButton.backgroundColor = nil
                 }
             })
             .disposed(by: disposeBag)
@@ -147,12 +156,15 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
     private func submitButtonBind() {
         submitButton.rx.tap
             .asSignal()
+            .throttle(.milliseconds(2000))
             .emit { [weak self] _ in
                 guard let self else { return }
-                print("it's called")
                 let userUID = FirebaseManager.shared.currentUserUID()
                 let post = self.viewModel.post
                 self.viewModel.addComment(userUID: userUID, fromPostUid: post.postUID, content: self.commentTextField.text ?? "")
+                self.commentTextField.text = nil
+                self.submitButton.isEnabled = false
+                self.submitButton.backgroundColor = nil
             }
             .disposed(by: disposeBag)
     }
@@ -199,8 +211,73 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
             })
             .disposed(by: disposeBag)
     }
+    
+    private func actionSheet(for comment: Comment) {
+        var actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        guard let user = Auth.auth().currentUser else { return }
+        
+        if comment.authorUID == user.uid {
+            actionSheet = deleteActionSheet(comment: comment)
+        } else {
+            actionSheet = reportBlockActionSheet(comment: comment)
+        }
+        
+        self.present(actionSheet, animated: true, completion: nil)
+    }
+    
+    private func deleteActionSheet(comment: Comment) -> UIAlertController {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let deleteAction = UIAlertAction(title: "삭제하기", style: .destructive) { [weak self] _ in
+            guard let self else { return }
+            self.viewModel.deleteComments(commentUID: comment.commentUID)
+        }
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+        
+        [deleteAction, cancelAction]
+            .forEach {
+                actionSheet.addAction($0)
+            }
+        return actionSheet
+    }
+    
+    private func reportBlockActionSheet(comment: Comment) -> UIAlertController {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
+//            self?.reportModal()
+            let modalVC = FeedReportModalVC()
+            self?.presentModal(modalVC: modalVC)
+        }
+        let blockAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
+            guard let self else { return }
+            self.blockUser(authorUID: comment.authorUID)
+        }
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+        
+        [reportAction, blockAction, cancelAction]
+            .forEach {
+                actionSheet.addAction($0)
+            }
+        return actionSheet
+    }
+    
+    //MARK: - 차단하기 관련 메서드
+    private func blockUser(authorUID: String) {
+        FirebaseManager.shared.addBlackList(blockedUser: authorUID) { [weak self] success in
+            guard let self else { return }
+            
+            if success {
+                print("차단 성공: \(authorUID)")
+                CommonManager.shared.showAlert(from: self, title: "차단 완료", message: "")
+            } else {
+                print("차단 실패: \(authorUID)")
+                CommonManager.shared.showAlert(from: self, title: "차단 실패", message: "차단을 실패했습니다. 다시 시도해주세요.")
+            }
+        }
+    }
 
     private func setLayout() {
+        view.overrideUserInterfaceStyle = .dark
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
         [titleLabel, commentTextField, submitButton, tableView, profileImageView].forEach {
