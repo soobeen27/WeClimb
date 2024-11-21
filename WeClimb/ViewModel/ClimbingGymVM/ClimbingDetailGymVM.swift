@@ -33,9 +33,10 @@ class ClimbingDetailGymVM {
         return gymNameRelay.value
     }
     
-    init(gym: Gym, grade: String) {
+    init(gym: Gym, grade: String, initialFilterConditions: FilterConditions) {
         self.gymNameRelay.accept(gym.gymName)
         self.grade = grade.colorInfo.englishText
+        self.currentFilterConditions = initialFilterConditions
         
         self.output = Output(
             gymName: gymNameRelay.asDriver(),
@@ -106,5 +107,21 @@ class ClimbingDetailGymVM {
             print("초기 미디어 데이터 로드 실패: \(error)")
         })
         .disposed(by: disposeBag)
+    }
+}
+
+extension ClimbingDetailGymVM {
+    static func create(gym: Gym, grade: String, hold: String?) -> ClimbingDetailGymVM {
+        let initialFilterConditions = FilterConditions(
+            holdColor: hold,
+            heightRange: nil,
+            armReachRange: nil
+        )
+        
+        return ClimbingDetailGymVM(
+            gym: gym,
+            grade: grade,
+            initialFilterConditions: initialFilterConditions
+        )
     }
 }
