@@ -235,14 +235,18 @@ class ClimbingDetailGymVC: UIViewController {
             .bind { [weak self] in
                 guard let self = self else { return }
                 
-                let gymName = self.viewModel.gymNameRelay.value
-                let grade = self.viewModel.grade
-                let climbingFilterVC = ClimbingFilterVC(gymName: gymName, grade: grade)
+                let currentFilter = self.viewModel.getCurrentFilterConditions()
+                let climbingFilterVC = ClimbingFilterVC(
+                    gymName: self.viewModel.gymName,
+                    grade: self.viewModel.grade,
+                    initialFilterConditions: currentFilter
+                )
                 
                 climbingFilterVC.filterConditionsRelay
-                    .subscribe(onNext: { [weak self] filterConditions in
-                        self?.viewModel.applyFilters(filterConditions: filterConditions)
-                        print("Filter Applied: \(filterConditions)")
+                    .subscribe(onNext: { [weak self] newConditions in
+                        guard let self = self else { return }
+                        self.viewModel.updateFilterConditions(newConditions)
+                        self.viewModel.applyFilters(filterConditions: newConditions)
                     })
                     .disposed(by: self.disposeBag)
                 

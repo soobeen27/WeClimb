@@ -66,13 +66,16 @@ class ClimbingDetailGymVM {
         let mappedHoldColor = filterConditions.holdColor.map { holdColor in
             "hold\(holdColor.capitalized)"
         }
-        
+
+        let heightCondition = filterConditions.heightRange.flatMap { $0 == (0, 200) ? nil : $0 }
+        let armReachCondition = filterConditions.armReachRange.flatMap { $0 == (0, 200) ? nil : $0 }
+
         FirebaseManager.shared.getFilteredPost(
             gymName: gymNameRelay.value,
             grade: grade,
             hold: mappedHoldColor,
-            height: filterConditions.heightRange.map { [$0.0, $0.1] },
-            armReach: filterConditions.armReachRange.map { [$0.0, $0.1] },
+            height: heightCondition.map { [$0.0, $0.1] },
+            armReach: armReachCondition.map { [$0.0, $0.1] },
             completion: { _ in }
         )
         .subscribe(onSuccess: { [weak self] filteredPosts in

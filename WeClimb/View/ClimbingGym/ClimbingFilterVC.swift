@@ -29,9 +29,13 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     
-    init(gymName: String, grade: String) {
+    init(gymName: String, grade: String, initialFilterConditions: FilterConditions) {
         self.viewModel = ClimbingFilterVM(gymName: gymName, grade: grade)
         super.init(nibName: nil, bundle: nil)
+        
+        // 초기 필터 조건 설정
+        self.selectedHoldColor = initialFilterConditions.holdColor
+        self.filterConditionsRelay.accept(initialFilterConditions)
     }
     
     required init?(coder: NSCoder) {
@@ -127,17 +131,17 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
     
     private let heightSlider: CustomSlider = {
         let slider = CustomSlider()
-        slider.minimumValue = 120
+        slider.minimumValue = 0
         slider.maximumValue = 200
         slider.lowerValue = 0
-        slider.upperValue = 180
+        slider.upperValue = 200
         slider.backgroundColor = .clear
         return slider
     }()
     
     private lazy var heightMinTextField: UITextField = {
         let textField = createTextFieldWithCM()
-        textField.text = "120"
+        textField.text = "0"
         return textField
     }()
     
@@ -149,17 +153,17 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
     
     private let armReachSlider: CustomSlider = {
         let slider = CustomSlider()
-        slider.minimumValue = 120
+        slider.minimumValue = 0
         slider.maximumValue = 200
         slider.lowerValue = 0
-        slider.upperValue = 180
+        slider.upperValue = 200
         slider.backgroundColor = .clear
         return slider
     }()
     
     private lazy var armReachMinTextField: UITextField = {
         let textField = createTextFieldWithCM()
-        textField.text = "120"
+        textField.text = "0"
         return textField
     }()
     
@@ -643,16 +647,17 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
         confirmButton.rx.tap
             .bind { [weak self] in
                 guard let self = self else { return }
-                
-                // 현재 필터 조건 확인
+
                 let filterConditions = FilterConditions(
                     holdColor: self.selectedHoldColor,
                     heightRange: (Int(self.heightSlider.lowerValue), Int(self.heightSlider.upperValue)),
                     armReachRange: (Int(self.armReachSlider.lowerValue), Int(self.armReachSlider.upperValue))
                 )
-                print("Filter Conditions Created - Hold: \(filterConditions.holdColor ?? "None"), Height: \(filterConditions.heightRange ?? (0, 0)), ArmReach: \(filterConditions.armReachRange ?? (0, 0))")
+                print("Filter Conditions Created - Hold Color: \(filterConditions.holdColor ?? "None"), " +
+                      "Height Range: \(filterConditions.heightRange ?? (0, 0)), " +
+                      "Arm Reach Range: \(filterConditions.armReachRange ?? (0, 0))")
 
-                // 필터 전달
+                // Relay를 통해 상위 컨트롤러에 전달
                 self.filterConditionsRelay.accept(filterConditions)
 
                 // 모달 닫기
@@ -668,33 +673,40 @@ extension ClimbingFilterVC: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SelectSettingCell.className, for: indexPath) as? SelectSettingCell else {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: SelectSettingCell.className,
+            for: indexPath
+        ) as? SelectSettingCell else {
             return UICollectionViewCell()
         }
-        
-        let hold = Hold.allCases[indexPath.item]
+
+        let hold = Hold.allCases[indexPath.row]
         cell.configure(item: hold)
-        
+
+        // 선택된 상태를 반영
+        if hold.rawValue == selectedHoldColor {
+            cell.layer.borderColor = UIColor.label.cgColor
+            cell.layer.borderWidth = 2.0
+        } else {
+            cell.layer.borderColor = UIColor.clear.cgColor
+            cell.layer.borderWidth = 0.0
+        }
         return cell
     }
 }
 
 extension ClimbingFilterVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // 선택된 색상 가져오기
-        selectedHoldColor = Hold.allCases[indexPath.row].rawValue
+        let selectedHold = Hold.allCases[indexPath.row].rawValue
+        selectedHoldColor = selectedHold
+        collectionView.reloadData()
 
-        // 기존 필터 조건 가져오기
         let currentConditions = filterConditionsRelay.value
-
-        // 새로운 필터 조건 생성 (색상만 업데이트)
         let updatedConditions = FilterConditions(
             holdColor: selectedHoldColor,
             heightRange: currentConditions.heightRange,
             armReachRange: currentConditions.armReachRange
         )
-
-        // Relay에 업데이트
         filterConditionsRelay.accept(updatedConditions)
     }
 }
