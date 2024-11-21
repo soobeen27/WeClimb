@@ -52,7 +52,15 @@ class ClimbingDetailGymVM {
             }
         }
         
-        loadMediaURLs(for: gym.gymName, grade: self.grade)
+//        if initialFilterConditions.holdColor == nil &&
+//            initialFilterConditions.heightRange == nil &&
+//            initialFilterConditions.armReachRange == nil {
+//            // 필터 조건이 없으면 기본 로드
+            loadMediaURLs(for: gymName, grade: grade)
+//        } else {
+//            // 필터 조건이 있으면 필터 적용
+//            applyFilters(filterConditions: initialFilterConditions)
+//        }
     }
     
     func updateFilterConditions(_ newConditions: FilterConditions) {
@@ -65,12 +73,16 @@ class ClimbingDetailGymVM {
     
     func applyFilters(filterConditions: FilterConditions) {
         let mappedHoldColor = filterConditions.holdColor.map { holdColor in
-            "hold\(holdColor.capitalized)"
+            "\(holdColor.capitalized)"
         }
 
         let heightCondition = filterConditions.heightRange.flatMap { $0 == (0, 200) ? nil : $0 }
         let armReachCondition = filterConditions.armReachRange.flatMap { $0 == (0, 200) ? nil : $0 }
 
+        print("[DEBUG] Applying Filters - GymName: \(gymNameRelay.value), Grade: \(grade), Hold: \(mappedHoldColor ?? "None")")
+        print("[DEBUG] HeightRange: \(String(describing: heightCondition)), ArmReachRange: \(String(describing: armReachCondition))")
+
+        
         FirebaseManager.shared.getFilteredPost(
             gymName: gymNameRelay.value,
             grade: grade,
@@ -83,6 +95,8 @@ class ClimbingDetailGymVM {
             guard let self = self else { return }
             print("Filtered Posts Count: \(filteredPosts.count)")
             let thumbnailURLs = filteredPosts.compactMap { URL(string: $0.thumbnail ?? "") }
+            print("[DEBUG] Filtered Thumbnail URLs: \(thumbnailURLs)")
+
             self.problemThumbnailsRelay.accept(thumbnailURLs)
         }, onFailure: { error in
             print("필터링된 데이터 로드 실패: \(error)")
