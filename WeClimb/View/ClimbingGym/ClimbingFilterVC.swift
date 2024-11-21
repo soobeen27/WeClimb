@@ -241,6 +241,7 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
         setLayout()
         bindViewModel()
         setupBindings()
+        setupInitialSliderValues()
         setupTabActions()
         bindTabSelection()
         setupCloseButtonAction()
@@ -425,8 +426,27 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
         }
     }
     
+    private func setupInitialSliderValues() {
+        let currentConditions = filterConditionsRelay.value
+        
+        if let heightRange = currentConditions.heightRange {
+            heightSlider.lowerValue = Double(heightRange.0)
+            heightSlider.upperValue = Double(heightRange.1)
+            
+            heightMinTextField.text = "\(heightRange.0)"
+            heightMaxTextField.text = "\(heightRange.1)"
+        }
+        
+        if let armReachRange = currentConditions.armReachRange {
+            armReachSlider.lowerValue = Double(armReachRange.0)
+            armReachSlider.upperValue = Double(armReachRange.1)
+            
+            armReachMinTextField.text = "\(armReachRange.0)"
+            armReachMaxTextField.text = "\(armReachRange.1)"
+        }
+    }
     
-    //    // MARK: - Actions Setup
+        // MARK: - Actions Setup
     private func setupTabActions() {
         let holdTapGesture = UITapGestureRecognizer()
         let armReachTapGesture = UITapGestureRecognizer()
@@ -583,7 +603,6 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
     }
     
     private func bindViewModel() {
-        
         heightSlider.lowerValueChanged = { [weak self] lowerValue in
             guard let self = self else { return }
             let lower = Int(lowerValue)
@@ -613,34 +632,34 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
         }
     }
     
-    func heightSliderDidChange(minValue: Int, maxValue: Int) {
-        let currentConditions = filterConditionsRelay.value
-        
-        // 새로운 필터 조건 생성 (키 업데이트)
-        let updatedConditions = FilterConditions(
-            holdColor: currentConditions.holdColor,
-            heightRange: (minValue, maxValue),
-            armReachRange: currentConditions.armReachRange
-        )
-        
-        // Relay에 업데이트
-        filterConditionsRelay.accept(updatedConditions)
-        print("updatedConditions")
-    }
+//    func heightSliderDidChange(minValue: Int, maxValue: Int) {
+//        let currentConditions = filterConditionsRelay.value
+//        
+//        // 새로운 필터 조건 생성 (키 업데이트)
+//        let updatedConditions = FilterConditions(
+//            holdColor: currentConditions.holdColor,
+//            heightRange: (minValue, maxValue),
+//            armReachRange: currentConditions.armReachRange
+//        )
+//        
+//        // Relay에 업데이트
+//        filterConditionsRelay.accept(updatedConditions)
+//        print("updatedConditions")
+//    }
     
-    func armReachSliderDidChange(minValue: Int, maxValue: Int) {
-        let currentConditions = filterConditionsRelay.value
-        
-        // 새로운 필터 조건 생성 (암리치만 업데이트)
-        let updatedConditions = FilterConditions(
-            holdColor: currentConditions.holdColor,
-            heightRange: currentConditions.heightRange,
-            armReachRange: (minValue, maxValue)
-        )
-        
-        // Relay에 업데이트
-        filterConditionsRelay.accept(updatedConditions)
-    }
+//    func armReachSliderDidChange(minValue: Int, maxValue: Int) {
+//        let currentConditions = filterConditionsRelay.value
+//        
+//        // 새로운 필터 조건 생성 (암리치만 업데이트)
+//        let updatedConditions = FilterConditions(
+//            holdColor: currentConditions.holdColor,
+//            heightRange: currentConditions.heightRange,
+//            armReachRange: (minValue, maxValue)
+//        )
+//        
+//        // Relay에 업데이트
+//        filterConditionsRelay.accept(updatedConditions)
+//    }
     
     // MARK: - Confirm Button Action
     private func setupConfirmButtonAction() {
@@ -653,10 +672,7 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
                     heightRange: (Int(self.heightSlider.lowerValue), Int(self.heightSlider.upperValue)),
                     armReachRange: (Int(self.armReachSlider.lowerValue), Int(self.armReachSlider.upperValue))
                 )
-                print("Filter Conditions Created - Hold Color: \(filterConditions.holdColor ?? "None"), " +
-                      "Height Range: \(filterConditions.heightRange ?? (0, 0)), " +
-                      "Arm Reach Range: \(filterConditions.armReachRange ?? (0, 0))")
-
+                
                 // Relay를 통해 상위 컨트롤러에 전달
                 self.filterConditionsRelay.accept(filterConditions)
 

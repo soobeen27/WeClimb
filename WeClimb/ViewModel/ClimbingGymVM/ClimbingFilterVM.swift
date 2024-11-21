@@ -53,24 +53,4 @@ class ClimbingFilterVM {
         // Relay에 새로운 조건 전달
         filterConditionsRelay.accept(currentConditions)
     }
-
-//    func fetchFilteredPosts() {
-//        let filterConditions = filterConditionsRelay.value
-//
-//        FirebaseManager.shared.getFilteredPost(
-//            gymName: gymName,
-//            grade: grade,
-//            hold: filterConditions.holdColor,
-//            height: filterConditions.heightRange.map { [$0.0, $0.1] },
-//            armReach: filterConditions.armReachRange.map { [$0.0, $0.1] }
-//        ) { snapshot in
-//            print("Snapshot fetched.")
-//        }
-//        .subscribe(onSuccess: { [weak self] posts in
-//            self?.filteredPostsSubject.onNext(posts)
-//        }, onFailure: { error in
-//            print("Error fetching filtered posts: \(error)")
-//        })
-//        .disposed(by: disposeBag)
-//    }
 }
