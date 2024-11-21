@@ -133,7 +133,9 @@ class SFFeedCell: UICollectionViewCell {
         self.isVideo = false
         self.playButton.isHidden = true
         contentView.addSubview(imageView)
+        contentView.sendSubviewToBack(imageView)
         imageView.kf.setImage(with: url)
+        
     }
     
     private func loadVideo(from media: Media) {
@@ -186,7 +188,6 @@ class SFFeedCell: UICollectionViewCell {
         self.contentView.bringSubviewToFront(playButton)
         if let playerLayer = playerLayer {
             contentView.layer.insertSublayer(playerLayer, below: gymGradeStackView.layer)
-//            contentView.layer.insertSublayer(playerLayer, at: 0)
         }
         gymGradeImageBringToFront()
     }
