@@ -18,7 +18,8 @@ class SFCollectionViewCell: UICollectionViewCell {
     private var likeViewModel: LikeViewModel?
     var disposeBag = DisposeBag()
     private var viewModel: MainFeedVM?
-    var medias: [Media]?
+//    var medias: [Media]?
+    let medias = PublishRelay<[Media]>()
     var post: Post?
     var isBind = false
     
@@ -28,7 +29,6 @@ class SFCollectionViewCell: UICollectionViewCell {
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal //가로 스크롤
-//        layout.itemSize = CGSize(width: contentView.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
         layout.itemSize = CGSize(width: contentView.bounds.width, height: contentView.bounds.height)
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
@@ -37,8 +37,8 @@ class SFCollectionViewCell: UICollectionViewCell {
         collectionView.backgroundColor = UIColor(hex: "#0B1013")
         collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
         collectionView.isPagingEnabled = true
-        collectionView.delegate = self
-        collectionView.dataSource = self
+//        collectionView.delegate = self
+//        collectionView.dataSource = self
         collectionView.register(SFFeedCell.self, forCellWithReuseIdentifier: SFFeedCell.className)
         return collectionView
     }()
@@ -59,7 +59,6 @@ class SFCollectionViewCell: UICollectionViewCell {
                 print("profile tapped")
                 return self?.feedUserNameLabel.text
             }
-//            .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
             .throttle(.milliseconds(2000))
     }
@@ -92,7 +91,6 @@ class SFCollectionViewCell: UICollectionViewCell {
 
     private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
-        //        pageControl.numberOfPages = images.count
         pageControl.pageIndicatorTintColor = .lightGray
         pageControl.currentPageIndicatorTintColor = .white
         return pageControl
@@ -151,28 +149,15 @@ class SFCollectionViewCell: UICollectionViewCell {
 //        button.isHidden = true
 //        return button
 //    }()
-    
-//    private let levelLabel: UILabel = {
-//        let label = UILabel()
-//        label.textColor = .white
-//        label.backgroundColor = .mainPurple.withAlphaComponent(0.5)
-//        label.clipsToBounds = true
-//        return label
-//    }()
-    
-//    private let sectorLabel: UILabel = {
-//        let label = UILabel()
-//        label.backgroundColor = UIColor.white.withAlphaComponent(0.2)
-//        return label
-//    }()
-//    
-//    private let dDayLabel: UILabel = {
-//        let label = UILabel()
-//        label.backgroundColor = UIColor.white.withAlphaComponent(0.2)
-//        return label
-//    }()
-    
-    let likeButton = UIButton()
+
+    let likeButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "heart"), for: .normal)
+        button.tintColor = .white
+        button.backgroundColor = .clear
+        
+        return button
+    }()
     
     private let likeButtonCounter: UILabel = {
         let label = UILabel()
@@ -203,20 +188,15 @@ class SFCollectionViewCell: UICollectionViewCell {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 10
+        stackView.backgroundColor = .clear
         return stackView
     }()
-    
-//    private let gymInfoStackView: UIStackView = {
-//        let stackView = UIStackView()
-//        stackView.axis = .horizontal
-//        stackView.spacing = 15
-//        return stackView
-//    }()
-    
+
     private let likeStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 1
+        stackView.backgroundColor = .clear
         return stackView
     }()
     
@@ -224,6 +204,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 1
+        stackView.backgroundColor = .clear
         return stackView
     }()
     
@@ -254,7 +235,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         pageControl.currentPage = 0
         pageControl.numberOfPages = 0
         post = nil
-        medias = nil
+//        medias = nil
         setLikeButton()
         isBind = false
     }
@@ -337,6 +318,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     // MARK: - 레이아웃 설정
     private func setLayout() {
+        contentView.overrideUserInterfaceStyle = .dark
         collectionView.snp.makeConstraints {
             $0.width.equalToSuperview()
 //            $0.height.equalTo(collectionView.snp.width).multipliedBy(16.0/9.0)
@@ -364,19 +346,6 @@ class SFCollectionViewCell: UICollectionViewCell {
             $0.height.equalTo(20)
             $0.bottom.equalToSuperview().offset(-16)
         }
-//        gymInfoStackView.snp.makeConstraints {
-//            $0.top.equalTo(feedCaptionLabel.snp.bottom).offset(12)
-//            $0.leading.equalToSuperview().inset(16)
-//        }
-//        levelLabel.snp.makeConstraints {
-//            $0.size.equalTo(CGSize(width: 45, height: 20))
-//        }
-//        sectorLabel.snp.makeConstraints {
-//            $0.size.equalTo(CGSize(width: 45, height: 20))
-//        }
-//        dDayLabel.snp.makeConstraints {
-//            $0.size.equalTo(CGSize(width: 45, height: 20))
-//        }
         likeStackView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.57)
             $0.trailing.equalToSuperview().inset(10)
@@ -408,6 +377,26 @@ class SFCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    func bindCollectionView() {
+        medias
+            .asDriver(onErrorJustReturn: [])
+            .drive(collectionView.rx.items(cellIdentifier: SFFeedCell.className,
+                                           cellType: SFFeedCell.self))
+        { [weak self] index, media, cell in
+            guard let self, let viewModel = self.viewModel else { return }
+            cell.configure(with: media, viewModel: viewModel)
+            cell.gymTap
+                .bind(to: viewModel.gymButtonTap)
+                .disposed(by: cell.disposeBag)
+            cell.gradeTap
+                .bind(to: viewModel.gradeButtonTap)
+                .disposed(by: cell.disposeBag)
+        }
+        .disposed(by: disposeBag)
+        
+        collectionView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
+    }
     
     // MARK: - configure 메서드
     func configure(with post: Post, viewModel: MainFeedVM) {
@@ -432,23 +421,28 @@ class SFCollectionViewCell: UICollectionViewCell {
             }
         }
         self.post = post
-        Task {
-            medias = try await FirebaseManager.shared.fetchMedias(for: post)
-            guard let medias else { return }
-            DispatchQueue.main.async { [weak self] in
+        FirebaseManager.shared.fetchMedias(for: post)
+            .subscribe(onSuccess: { [weak self] medias in
                 guard let self else { return }
-                if medias.count > 1 {
-                    self.addSubview(pageControl)
-                    pageControl.snp.makeConstraints {
-                        $0.centerX.equalToSuperview()
-                        $0.bottom.equalTo(self.feedProfileStackView.snp.top).offset(-20)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    if medias.count > 1 {
+                        self.addSubview(self.pageControl)
+                        self.pageControl.snp.makeConstraints {
+                            $0.centerX.equalToSuperview()
+                            $0.bottom.equalTo(self.feedProfileStackView.snp.top).offset(-20)
+                        }
+                        self.pageControl.numberOfPages = medias.count
+                        self.pageControl.currentPage = 0
                     }
-                    pageControl.numberOfPages = medias.count
-                    pageControl.currentPage = 0
                 }
-                collectionView.reloadData()
-            }
-        }
+                self.medias.accept(medias)
+            }, onFailure: { error in
+                print("Error - getting Media \(error)")
+            })
+            .disposed(by: disposeBag)
+        
+        bindCollectionView()
     }
     
     func fetchLike() {
@@ -465,9 +459,6 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     //MARK: - 좋아요 버튼 세팅
     func setLikeButton() {
-        print("Setting LikeButton")
-        let loginNeeded = LoginNeeded()
-//        loginNeeded.loginAlert(vc: self)
         guard let user = Auth.auth().currentUser,
               let likeViewModel
         else { return }
@@ -495,17 +486,18 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     // MARK: - 버튼 그림자 모드
     private func addShadow(to view: UIView) {
-        view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOffset = CGSize(width: 1, height: 1)
-        view.layer.shadowOpacity = 0.5
-        view.layer.shadowRadius = 2
-        view.layer.masksToBounds = false
+//        view.layer.shadowColor = UIColor.black.cgColor
+//        view.layer.shadowOffset = CGSize(width: 1, height: 1)
+//        view.layer.shadowOpacity = 0.5
+//        view.layer.shadowRadius = 2
+//        view.layer.masksToBounds = false
     }
 }
 // MARK: CollectionView Setting
 //extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension SFCollectionViewCell: UICollectionViewDelegateFlowLayout {
 //    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        guard let medias else { return 0}
+//        guard let medias else { return 0 }
 //        return medias.count
 //    }
 //    
