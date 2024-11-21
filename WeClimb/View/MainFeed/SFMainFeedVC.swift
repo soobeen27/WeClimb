@@ -150,7 +150,7 @@ class SFMainFeedVC: UIViewController{
                     DispatchQueue.main.async {
                         let climbingGymVC = ClimbingGymVC()
                         climbingGymVC.configure(with: gym)
-                        
+                        print("GymImageTap")
                         self.navigationController?.navigationBar.prefersLargeTitles = false
                         self.navigationController?.navigationBar.tintColor = .systemBlue
                         self.navigationController?.pushViewController(climbingGymVC, animated: true)
@@ -226,8 +226,10 @@ class SFMainFeedVC: UIViewController{
             .willDisplayCell
             .subscribe(onNext: { [weak self] (cell, indexPath) in
                 guard let self,
-                      let sfCell = cell as? SFCollectionViewCell
+                      let sfCell = cell as? SFCollectionViewCell,
+                      !sfCell.isBind
                 else { return }
+                sfCell.isBind = true
                 var input: MainFeedVM.Input
                 input = MainFeedVM.Input(
                     reportDeleteButtonTap: sfCell.reportDeleteButtonTap,
@@ -236,7 +238,7 @@ class SFMainFeedVC: UIViewController{
                 )
                 let output = self.viewModel.transform(input: input)
                 
-                output.presentReport.drive(onNext: { [weak self] post in
+                output.presentReport.asSignal(onErrorSignalWith: .empty()).emit(onNext: { [weak self] post in
                     guard let self, let post else { return }
                     if !self.loginNeeded.loginAlert(vc: self) {
                         self.actionSheet(for: post)
@@ -244,7 +246,7 @@ class SFMainFeedVC: UIViewController{
                 })
                 .disposed(by: sfCell.disposeBag)
 
-                output.presentComment.drive(onNext: { [weak self] post in
+                output.presentComment.asSignal(onErrorSignalWith: .empty()).emit(onNext: { [weak self] post in
                     guard let self, let post else { return }
                     if !self.loginNeeded.loginAlert(vc: self) {
                         self.showCommentModal(for: post)
@@ -253,8 +255,8 @@ class SFMainFeedVC: UIViewController{
                 .disposed(by: sfCell.disposeBag)
                 
                 output.pushProfile
-                    .drive(onNext: { name in
-                    guard let name else { return }
+                    .asSignal(onErrorSignalWith: .empty()).emit(onNext: { [weak self] name in
+                    guard let name, let self else { return }
                     let userPageVM = UserPageVM()
                     userPageVM.fetchUserInfo(userName: name)
                     
@@ -263,7 +265,7 @@ class SFMainFeedVC: UIViewController{
                     self.navigationController?.navigationBar.prefersLargeTitles = false
                     self.navigationController?.pushViewController(userPageVC, animated: true)
                 })
-                .disposed(by: disposeBag)
+                    .disposed(by: sfCell.disposeBag)
             })
             .disposed(by: disposeBag)
     }
@@ -305,8 +307,9 @@ class SFMainFeedVC: UIViewController{
         let deleteAction = UIAlertAction(title: "삭제하기", style: .destructive) { [weak self] _ in
             guard let self else { return }
             self.viewModel.deletePost(uid: post.postUID)
-                .asDriver(onErrorDriveWith: .empty())
-                .drive(onNext: { _ in
+//                .asDriver(onErrorDriveWith: .empty())
+                .asSignal(onErrorSignalWith: .empty())
+                .emit(onNext: { _ in
                     CommonManager.shared.showAlert(from: self, title: "알림", message: "게시물이 삭제되었습니다.") {
                         self.navigationController?.popViewController(animated: true)
                     }
