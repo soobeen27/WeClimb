@@ -289,16 +289,16 @@ class UserPageVC: UIViewController {
             return
         }
         
-        print("차단할 유저 UID: \(userUID)")
+//        print("차단할 유저 UID: \(userUID)")
         
         // 차단 기능 수행
         viewModel.blockUser(byUID: userUID) { [weak self] success in
             guard let self = self else { return }
             if success {
-                print("차단 완료!")
+//                print("차단 완료!")
                 CommonManager.shared.showAlert(from: self, title: "차단완료", message: "")
             } else {
-                print("차단 실패")
+//                print("차단 실패")
                 CommonManager.shared.showAlert(from: self, title: "차단실패", message: "")
             }
         }
@@ -389,7 +389,7 @@ class UserPageVC: UIViewController {
         
         followFollowingButton.rx.tap
             .bind { [weak self] in
-                print("followFollowingButton tapped")
+//                print("followFollowingButton tapped")
                 self?.buttonTapped()
             }
             .disposed(by: disposeBag)
@@ -402,7 +402,7 @@ class UserPageVC: UIViewController {
             .drive(collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { index, post, cell in
 
                 if let thumbnailURL = post.thumbnail, !thumbnailURL.isEmpty {
-                    print("유저페이지 썸네일 URL: \(thumbnailURL)")
+//                    print("유저페이지 썸네일 URL: \(thumbnailURL)")
                     cell.configure(with: thumbnailURL)
                 }
             }
