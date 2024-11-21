@@ -719,30 +719,72 @@ final class FirebaseManager {
         }
     }
     
-    func fetchMedias(for post: Post) async throws -> [Media] {
-        // medias의 DocumentReference들을 한 번에 가져오기 위한 batch 작업
-        let mediaRefs: [DocumentReference] = post.medias
-        var medias: [Media] = []
-        
-        guard !mediaRefs.isEmpty else {
-            return medias // 미디어가 없으면 빈 배열 반환
-        }
-        
-        // Firestore에서 여러 DocumentReference를 한 번에 가져오기
-        let batchQuery = try await db.getAllDocuments(from: mediaRefs)
-        
-        // 가져온 문서들을 Media 객체로 변환
-        medias = batchQuery.compactMap { document in
-            do {
-                return try document.data(as: Media.self)
-            } catch {
-                print("Media 데이터를 파싱하는데 실패: \(error)")
-                return nil
+//    func fetchMedias(for post: Post) async throws -> [Media] {
+//        // medias의 DocumentReference들을 한 번에 가져오기 위한 batch 작업
+//        let mediaRefs: [DocumentReference] = post.medias
+//        var medias: [Media] = []
+//        
+//        guard !mediaRefs.isEmpty else {
+//            return medias // 미디어가 없으면 빈 배열 반환
+//        }
+//        
+//        // Firestore에서 여러 DocumentReference를 한 번에 가져오기
+//        let batchQuery = try await db.getAllDocuments(from: mediaRefs)
+//        
+//        // 가져온 문서들을 Media 객체로 변환
+//        medias = batchQuery.compactMap { document in
+//            do {
+//                return try document.data(as: Media.self)
+//            } catch {
+//                print("Media 데이터를 파싱하는데 실패: \(error)")
+//                return nil
+//            }
+//        }
+//        
+//        return medias
+//    }
+
+    func fetchMedias(for post: Post) -> Single<[Media]> {
+        return Single.create { [weak self] single in
+            guard let self else { return Disposables.create() }
+            Task { [weak self] in
+                guard let self else { return }
+                do {
+                    let mediaRefs: [DocumentReference] = post.medias
+                    var medias: [Media] = []
+                    
+                    guard !mediaRefs.isEmpty else {
+                        single(.success(medias))
+                        return
+                    }
+                    
+                    let batchQuery = try await self.db.getAllDocuments(from: mediaRefs)
+                    
+                    let mediaDict: [String: Media] = batchQuery.compactMap { document in
+                        if let media = try? document.data(as: Media.self) {
+                            return (document.documentID, media)
+                        } else {
+                            return nil
+                        }
+                    }.reduce(into: [:]) { dict, item in
+                        dict[item.0] = item.1
+                    }
+                    
+                    medias = mediaRefs.compactMap { ref in
+                        mediaDict[ref.documentID]
+                    }
+                    
+                    single(.success(medias))
+                } catch {
+                    single(.failure(error))
+                }
             }
+            
+            return Disposables.create()
         }
-        
-        return medias
     }
+
+
     
     //MARK: 팔로우, 언팔
     /// 팔로우, 언팔로우
