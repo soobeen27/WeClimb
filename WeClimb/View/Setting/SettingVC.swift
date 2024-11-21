@@ -135,17 +135,9 @@ class SettingVC: UIViewController {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let deleteAction = UIAlertAction(title: SettingNameSpace.accountRemove, style: .destructive) { [weak self] _ in
-//            self?.viewModel.deleteUser()
-//                .observe(on: MainScheduler.instance)
-//                .subscribe(onNext: {
-//                    print("회원탈퇴 성공")
-//                    self?.navigateToLoginVC() // 로그인 화면으로 전환
-//                }, onError: { error in
-//                    print("회원탈퇴 실패: \(error.localizedDescription)")
-//                })
-//                .disposed(by: self?.disposeBag ?? DisposeBag())
             guard let self else { return }
-            self.reAuth { result in
+            self.reAuth { [weak self] result in
+                guard let self else { return }
                 if result {
                     FirebaseManager.shared.userDelete { error in
                         if let error = error {
@@ -284,6 +276,14 @@ extension SettingVC: ASAuthorizationControllerDelegate {
                         return
                     }
                     print("Apple ReAuth Succeed!")
+                    FirebaseManager.shared.userDelete { [weak self] error in
+                        guard let self else { return }
+                        if let error = error {
+                            print("Error - deleting apple account \(error)")
+                        }
+                        print("account from apple deleted")
+                        self.navigateToLoginVC()
+                    }
                 })
             }
         }
