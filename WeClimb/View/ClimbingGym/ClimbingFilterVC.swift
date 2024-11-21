@@ -13,8 +13,7 @@ import RxSwift
 
 class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
     
-    //    // 필터 결과
-    //    var filterApplied: ((FilterConditions) -> Void)?
+    private var selectedHoldColor: String?
     
     private let viewModel: ClimbingFilterVM
     private let disposeBag = DisposeBag()
@@ -643,8 +642,21 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
     private func setupConfirmButtonAction() {
         confirmButton.rx.tap
             .bind { [weak self] in
-                self?.viewModel.fetchFilteredPosts()
-                self?.dismiss(animated: true, completion: nil)
+                guard let self = self else { return }
+                
+                // 현재 필터 조건 확인
+                let filterConditions = FilterConditions(
+                    holdColor: self.selectedHoldColor,
+                    heightRange: (Int(self.heightSlider.lowerValue), Int(self.heightSlider.upperValue)),
+                    armReachRange: (Int(self.armReachSlider.lowerValue), Int(self.armReachSlider.upperValue))
+                )
+                print("Filter Conditions Created - Hold: \(filterConditions.holdColor ?? "None"), Height: \(filterConditions.heightRange ?? (0, 0)), ArmReach: \(filterConditions.armReachRange ?? (0, 0))")
+
+                // 필터 전달
+                self.filterConditionsRelay.accept(filterConditions)
+
+                // 모달 닫기
+                self.dismiss(animated: true, completion: nil)
             }
             .disposed(by: disposeBag)
     }
@@ -670,14 +682,14 @@ extension ClimbingFilterVC: UICollectionViewDataSource {
 extension ClimbingFilterVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // 선택된 색상 가져오기
-        let selectedHold = Hold.allCases[indexPath.row].rawValue
+        selectedHoldColor = Hold.allCases[indexPath.row].rawValue
 
         // 기존 필터 조건 가져오기
         let currentConditions = filterConditionsRelay.value
 
         // 새로운 필터 조건 생성 (색상만 업데이트)
         let updatedConditions = FilterConditions(
-            holdColor: selectedHold,
+            holdColor: selectedHoldColor,
             heightRange: currentConditions.heightRange,
             armReachRange: currentConditions.armReachRange
         )

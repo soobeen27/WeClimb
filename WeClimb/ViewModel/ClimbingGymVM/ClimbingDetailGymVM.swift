@@ -22,6 +22,7 @@ class ClimbingDetailGymVM {
     let gymNameRelay = BehaviorRelay<String>(value: "")
     private let logoImageURLRelay = BehaviorRelay<URL?>(value: nil)
     private let problemThumbnailsRelay = BehaviorRelay<[URL]>(value: [])
+    private var currentFilterConditions = FilterConditions()
     private let disposeBag = DisposeBag()
     
     // Output
@@ -53,21 +54,31 @@ class ClimbingDetailGymVM {
         loadMediaURLs(for: gym.gymName, grade: self.grade)
     }
     
-    // 필터 적용 메서드
+    func updateFilterConditions(_ newConditions: FilterConditions) {
+        currentFilterConditions = newConditions
+    }
+    
+    func getCurrentFilterConditions() -> FilterConditions {
+        return currentFilterConditions
+    }
+    
     func applyFilters(filterConditions: FilterConditions) {
+        let mappedHoldColor = filterConditions.holdColor.map { holdColor in
+            "hold\(holdColor.capitalized)"
+        }
+        
         FirebaseManager.shared.getFilteredPost(
             gymName: gymNameRelay.value,
             grade: grade,
-            hold: filterConditions.holdColor,
+            hold: mappedHoldColor,
             height: filterConditions.heightRange.map { [$0.0, $0.1] },
             armReach: filterConditions.armReachRange.map { [$0.0, $0.1] },
             completion: { _ in }
         )
         .subscribe(onSuccess: { [weak self] filteredPosts in
             guard let self = self else { return }
-            let thumbnailURLs = filteredPosts.compactMap { post in
-                URL(string: post.thumbnail ?? "")
-            }
+            print("Filtered Posts Count: \(filteredPosts.count)")
+            let thumbnailURLs = filteredPosts.compactMap { URL(string: $0.thumbnail ?? "") }
             self.problemThumbnailsRelay.accept(thumbnailURLs)
         }, onFailure: { error in
             print("필터링된 데이터 로드 실패: \(error)")

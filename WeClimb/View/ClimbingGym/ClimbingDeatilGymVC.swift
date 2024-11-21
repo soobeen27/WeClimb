@@ -242,6 +242,7 @@ class ClimbingDetailGymVC: UIViewController {
                 climbingFilterVC.filterConditionsRelay
                     .subscribe(onNext: { [weak self] filterConditions in
                         self?.viewModel.applyFilters(filterConditions: filterConditions)
+                        print("Filter Applied: \(filterConditions)")
                     })
                     .disposed(by: self.disposeBag)
                 
