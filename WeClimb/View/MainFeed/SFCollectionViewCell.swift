@@ -18,7 +18,8 @@ class SFCollectionViewCell: UICollectionViewCell {
     private var likeViewModel: LikeViewModel?
     var disposeBag = DisposeBag()
     private var viewModel: MainFeedVM?
-    var medias: [Media]?
+//    var medias: [Media]?
+    let medias = PublishRelay<[Media]>()
     var post: Post?
     var isBind = false
     
@@ -36,8 +37,8 @@ class SFCollectionViewCell: UICollectionViewCell {
         collectionView.backgroundColor = UIColor(hex: "#0B1013")
         collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
         collectionView.isPagingEnabled = true
-        collectionView.delegate = self
-        collectionView.dataSource = self
+//        collectionView.delegate = self
+//        collectionView.dataSource = self
         collectionView.register(SFFeedCell.self, forCellWithReuseIdentifier: SFFeedCell.className)
         return collectionView
     }()
@@ -234,7 +235,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         pageControl.currentPage = 0
         pageControl.numberOfPages = 0
         post = nil
-        medias = nil
+//        medias = nil
         setLikeButton()
         isBind = false
     }
@@ -376,6 +377,26 @@ class SFCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    func bindCollectionView() {
+        medias
+            .asDriver(onErrorJustReturn: [])
+            .drive(collectionView.rx.items(cellIdentifier: SFFeedCell.className,
+                                           cellType: SFFeedCell.self))
+        { [weak self] index, media, cell in
+            guard let self, let viewModel = self.viewModel else { return }
+            cell.configure(with: media, viewModel: viewModel)
+            cell.gymTap
+                .bind(to: viewModel.gymButtonTap)
+                .disposed(by: cell.disposeBag)
+            cell.gradeTap
+                .bind(to: viewModel.gradeButtonTap)
+                .disposed(by: cell.disposeBag)
+        }
+        .disposed(by: disposeBag)
+        
+        collectionView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
+    }
     
     // MARK: - configure 메서드
     func configure(with post: Post, viewModel: MainFeedVM) {
@@ -400,23 +421,28 @@ class SFCollectionViewCell: UICollectionViewCell {
             }
         }
         self.post = post
-        Task {
-            medias = try await FirebaseManager.shared.fetchMedias(for: post)
-            guard let medias else { return }
-            DispatchQueue.main.async { [weak self] in
+        FirebaseManager.shared.fetchMedias(for: post)
+            .subscribe(onSuccess: { [weak self] medias in
                 guard let self else { return }
-                if medias.count > 1 {
-                    self.addSubview(pageControl)
-                    pageControl.snp.makeConstraints {
-                        $0.centerX.equalToSuperview()
-                        $0.bottom.equalTo(self.feedProfileStackView.snp.top).offset(-20)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    if medias.count > 1 {
+                        self.addSubview(self.pageControl)
+                        self.pageControl.snp.makeConstraints {
+                            $0.centerX.equalToSuperview()
+                            $0.bottom.equalTo(self.feedProfileStackView.snp.top).offset(-20)
+                        }
+                        self.pageControl.numberOfPages = medias.count
+                        self.pageControl.currentPage = 0
                     }
-                    pageControl.numberOfPages = medias.count
-                    pageControl.currentPage = 0
                 }
-                collectionView.reloadData()
-            }
-        }
+                self.medias.accept(medias)
+            }, onFailure: { error in
+                print("Error - getting Media \(error)")
+            })
+            .disposed(by: disposeBag)
+        
+        bindCollectionView()
     }
     
     func fetchLike() {
@@ -468,27 +494,28 @@ class SFCollectionViewCell: UICollectionViewCell {
     }
 }
 // MARK: CollectionView Setting
-extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let medias else { return 0 }
-        return medias.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SFFeedCell.className, for: indexPath) as? SFFeedCell else {
-            return UICollectionViewCell()
-        }
-        guard let medias, let viewModel else { return cell }
-        let currentMedia = medias[indexPath.row]
-        cell.configure(with: currentMedia, viewModel: viewModel)
-        cell.gymTap
-            .bind(to: viewModel.gymButtonTap)
-            .disposed(by: cell.disposeBag)
-        cell.gradeTap
-            .bind(to: viewModel.gradeButtonTap)
-            .disposed(by: cell.disposeBag)
-        return cell
-    }
+//extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension SFCollectionViewCell: UICollectionViewDelegateFlowLayout {
+//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        guard let medias else { return 0 }
+//        return medias.count
+//    }
+//    
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SFFeedCell.className, for: indexPath) as? SFFeedCell else {
+//            return UICollectionViewCell()
+//        }
+//        guard let medias, let viewModel else { return cell }
+//        let currentMedia = medias[indexPath.row]
+//        cell.configure(with: currentMedia, viewModel: viewModel)
+//        cell.gymTap
+//            .bind(to: viewModel.gymButtonTap)
+//            .disposed(by: cell.disposeBag)
+//        cell.gradeTap
+//            .bind(to: viewModel.gradeButtonTap)
+//            .disposed(by: cell.disposeBag)
+//        return cell
+//    }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         stopVideos()
