@@ -56,8 +56,15 @@ class SelectGymVC: UIViewController {
         setLayout()
         selectGym()
         bindOKButton()
+        setGymButton()
         
         self.uploadVC = UploadVC(uploadVM: self.viewModel, isClimbingVideo: true)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
     private func setLayout() {
@@ -126,8 +133,34 @@ class SelectGymVC: UIViewController {
                     uploadVC.hidesBottomBarWhenPushed = true
                     
                     self.navigationController?.pushViewController(uploadVC, animated: true)
+                    self.navigationController?.setNavigationBarHidden(false, animated: true)
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func setGymButton() {
+        self.viewModel.gymRelay
+                .asDriver(onErrorJustReturn: nil)
+                .filter { $0 == nil }
+                .drive(onNext: { [weak self] _ in
+                    guard let self else { return }
+                    self.initGymButton()
+                })
+                .disposed(by: disposeBag)
+    }
+    
+    private func initGymButton() {
+        var configuration = UIButton.Configuration.plain()
+        configuration.imagePadding = 8
+        configuration.imagePlacement = .trailing
+        configuration.image = UIImage(systemName: "chevron.down")
+        
+        var titleAttr = AttributedString.init(UploadNameSpace.selectGym)
+        titleAttr.font = .systemFont(ofSize: 17.0, weight: .medium)
+        configuration.attributedTitle = titleAttr
+        
+        gymButton.configuration = configuration
+        gymButton.tintColor = .white
     }
 }

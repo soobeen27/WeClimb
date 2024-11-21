@@ -228,7 +228,7 @@ class UploadVC: UIViewController {
     }
     
     @objc private func cancelButtonTapped() {
-        initUploadVC()
+        initUploadVC(                        )
     }
     
     private func setNotifications() {
@@ -371,7 +371,7 @@ class UploadVC: UIViewController {
     private func setSettingButton() {
         Driver.combineLatest(
             viewModel.pageChanged.asDriver(onErrorJustReturn: 0).startWith(0),
-            viewModel.feedRelay.asDriver(onErrorJustReturn: [])
+            viewModel.feedRelay.asDriver()
         )
         .drive(onNext: { [weak self] pageIndex, feedItems in
             guard let self else { return }
@@ -655,18 +655,33 @@ extension UploadVC {
                 .drive(onNext: {
                     print("업로드 성공")
                     CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
+                    
+                    self.tabBarController?.selectedIndex = 0
+                    
                     self.initUploadVC()
+                    self.removeFromParent()
+                    self.setNewUplodVC()
+                    
+                    self.navigationController?.popToRootViewController(animated: true)
                     
                     self.removeLoadingOverlay()
                     self.isUploading = false
-                    
-                    if let tabBarController = self.tabBarController {
-                        tabBarController.selectedIndex = 0
-                    }
                 })
                 .disposed(by: self.disposeBag)
-            
         }
+    }
+    
+    private func setNewUplodVC() {
+        self.textView.text = ""
+        self.postButton.backgroundColor = .mainPurple
+        
+        if textView.text == "" {
+            textView.textColor = .secondaryLabel
+            textView.text = UploadNameSpace.placeholder
+        }
+        
+        self.viewModel.gymRelay.accept(nil)
+
     }
     
     // MARK: - 업로드뷰 초기화 YJ
@@ -715,5 +730,10 @@ extension UploadVC {
             .disposed(by: disposeBag)
         
         self.viewModel.setMedia()
-    } 
+        
+        self.gradeButton.isHidden = true
+        self.settingView.selectedLabel.isHidden = false
+        self.settingView.nextImageView.isHidden = false
+        self.holdButton.isHidden = true
+    }
 }
