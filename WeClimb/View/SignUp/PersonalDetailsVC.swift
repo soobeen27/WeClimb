@@ -67,7 +67,7 @@ class PersonalDetailsVC: UIViewController {
     
     private let armReachTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "팔 길이를 입력하세요"
+        textField.placeholder = "팔길이를 입력하세요"
         textField.font = UIFont.systemFont(ofSize: 18)
         textField.textColor = .black
         textField.borderStyle = .roundedRect
@@ -85,10 +85,22 @@ class PersonalDetailsVC: UIViewController {
         return button
     }()
     
+    func cmLabel() -> UILabel {
+        let label = UILabel()
+        label.text = "cm"
+        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        label.textColor = .black
+        return label
+    }
+    
+    lazy var cmLabel1 = cmLabel()
+    lazy var cmLabel2 = cmLabel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
         setupBindings()
+        addKeyboardObservers()
     }
     
     private func setLayout() {
@@ -101,8 +113,10 @@ class PersonalDetailsVC: UIViewController {
             titleDetailLabel,
             heightLabel,
             heightTextField,
+            cmLabel1,
             armReachLabel,
             armReachTextField,
+            cmLabel2,
             confirmButton
         ].forEach { view.addSubview($0) }
         
@@ -131,7 +145,7 @@ class PersonalDetailsVC: UIViewController {
         
         heightTextField.snp.makeConstraints {
             $0.centerY.equalTo(heightLabel)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.trailing.equalToSuperview().offset(-50)
             $0.width.equalTo(160)
             $0.height.equalTo(40)
         }
@@ -143,8 +157,22 @@ class PersonalDetailsVC: UIViewController {
         
         armReachTextField.snp.makeConstraints {
             $0.centerY.equalTo(armReachLabel)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.trailing.equalToSuperview().offset(-50)
             $0.width.equalTo(160)
+            $0.height.equalTo(40)
+        }
+        
+        cmLabel1.snp.makeConstraints {
+            $0.centerY.equalTo(heightTextField.snp.centerY)
+            $0.trailing.equalToSuperview().inset(16)
+            $0.width.equalTo(30)
+            $0.height.equalTo(40)
+        }
+        
+        cmLabel2.snp.makeConstraints {
+            $0.centerY.equalTo(armReachTextField.snp.centerY)
+            $0.trailing.equalToSuperview().inset(16)
+            $0.width.equalTo(30)
             $0.height.equalTo(40)
         }
         
@@ -194,5 +222,45 @@ class PersonalDetailsVC: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    
+    //MARK: - 키보드 on&off에 따른 버튼 애니메이션
+    private func addKeyboardObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    private func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc
+    private func keyboardWillShow(notification: NSNotification) {
+        if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRectangle = keyboardFrame.cgRectValue
+            let keyboardHeight = keyboardRectangle.height
+            UIView.animate(withDuration: 0.3) {
+                self.confirmButton.transform = CGAffineTransform(translationX: 0, y: -keyboardHeight + self.view.safeAreaInsets.bottom)
+            }
+        }
+    }
+    
+    @objc
+    private func keyboardWillHide(notification: NSNotification) {
+        UIView.animate(withDuration: 0.3) {
+            self.confirmButton.transform = .identity
+        }
+    }
+    
+    deinit {
+        removeKeyboardObservers()
+    }
+    
+    
+    //MARK: - 빈공간 터치 시 키보드 내리기
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+        super.touchesBegan(touches, with: event)
     }
 }
