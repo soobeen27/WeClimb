@@ -68,15 +68,15 @@ extension UIButton {
     private var normalImage: UIImage? {
         let isDarkMode = (traitCollection.userInterfaceStyle == .dark) || (backgroundColor == UIColor(hex: "#0C1014"))
         
-        let tintColor = isDarkMode ? UIColor(hex: "#FFFFFF") : UIColor(hex: "#CDCDCD")
+//        let tintColor = isDarkMode ? UIColor(hex: "#FFFFFF") : UIColor(hex: "#CDCDCD")
         
         return UIImage(systemName: "heart")?
-            .withTintColor(tintColor)
+            .withTintColor(.white)
             .withRenderingMode(.alwaysOriginal)
     }
     
     //버튼의 이미지를 현재 상태에 따라 업데이트
-    private func updateImage() {
+    func updateImage() {
         let image = isActivated ? activatedImage : normalImage
         self.setImage(image, for: .normal)
     }

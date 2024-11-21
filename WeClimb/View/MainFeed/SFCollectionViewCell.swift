@@ -28,7 +28,6 @@ class SFCollectionViewCell: UICollectionViewCell {
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal //가로 스크롤
-//        layout.itemSize = CGSize(width: contentView.bounds.width, height: UIScreen.main.bounds.width * (16.0/9.0))
         layout.itemSize = CGSize(width: contentView.bounds.width, height: contentView.bounds.height)
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
@@ -59,7 +58,6 @@ class SFCollectionViewCell: UICollectionViewCell {
                 print("profile tapped")
                 return self?.feedUserNameLabel.text
             }
-//            .distinctUntilChanged()
             .asDriver(onErrorDriveWith: .empty())
             .throttle(.milliseconds(2000))
     }
@@ -92,7 +90,6 @@ class SFCollectionViewCell: UICollectionViewCell {
 
     private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
-        //        pageControl.numberOfPages = images.count
         pageControl.pageIndicatorTintColor = .lightGray
         pageControl.currentPageIndicatorTintColor = .white
         return pageControl
@@ -151,28 +148,15 @@ class SFCollectionViewCell: UICollectionViewCell {
 //        button.isHidden = true
 //        return button
 //    }()
-    
-//    private let levelLabel: UILabel = {
-//        let label = UILabel()
-//        label.textColor = .white
-//        label.backgroundColor = .mainPurple.withAlphaComponent(0.5)
-//        label.clipsToBounds = true
-//        return label
-//    }()
-    
-//    private let sectorLabel: UILabel = {
-//        let label = UILabel()
-//        label.backgroundColor = UIColor.white.withAlphaComponent(0.2)
-//        return label
-//    }()
-//    
-//    private let dDayLabel: UILabel = {
-//        let label = UILabel()
-//        label.backgroundColor = UIColor.white.withAlphaComponent(0.2)
-//        return label
-//    }()
-    
-    let likeButton = UIButton()
+
+    let likeButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "heart"), for: .normal)
+        button.tintColor = .white
+        button.backgroundColor = .clear
+        
+        return button
+    }()
     
     private let likeButtonCounter: UILabel = {
         let label = UILabel()
@@ -203,20 +187,15 @@ class SFCollectionViewCell: UICollectionViewCell {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 10
+        stackView.backgroundColor = .clear
         return stackView
     }()
-    
-//    private let gymInfoStackView: UIStackView = {
-//        let stackView = UIStackView()
-//        stackView.axis = .horizontal
-//        stackView.spacing = 15
-//        return stackView
-//    }()
-    
+
     private let likeStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 1
+        stackView.backgroundColor = .clear
         return stackView
     }()
     
@@ -224,6 +203,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 1
+        stackView.backgroundColor = .clear
         return stackView
     }()
     
@@ -337,6 +317,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     // MARK: - 레이아웃 설정
     private func setLayout() {
+        contentView.overrideUserInterfaceStyle = .dark
         collectionView.snp.makeConstraints {
             $0.width.equalToSuperview()
 //            $0.height.equalTo(collectionView.snp.width).multipliedBy(16.0/9.0)
@@ -364,19 +345,6 @@ class SFCollectionViewCell: UICollectionViewCell {
             $0.height.equalTo(20)
             $0.bottom.equalToSuperview().offset(-16)
         }
-//        gymInfoStackView.snp.makeConstraints {
-//            $0.top.equalTo(feedCaptionLabel.snp.bottom).offset(12)
-//            $0.leading.equalToSuperview().inset(16)
-//        }
-//        levelLabel.snp.makeConstraints {
-//            $0.size.equalTo(CGSize(width: 45, height: 20))
-//        }
-//        sectorLabel.snp.makeConstraints {
-//            $0.size.equalTo(CGSize(width: 45, height: 20))
-//        }
-//        dDayLabel.snp.makeConstraints {
-//            $0.size.equalTo(CGSize(width: 45, height: 20))
-//        }
         likeStackView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.57)
             $0.trailing.equalToSuperview().inset(10)
@@ -465,9 +433,6 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     //MARK: - 좋아요 버튼 세팅
     func setLikeButton() {
-        print("Setting LikeButton")
-        let loginNeeded = LoginNeeded()
-//        loginNeeded.loginAlert(vc: self)
         guard let user = Auth.auth().currentUser,
               let likeViewModel
         else { return }
@@ -495,11 +460,11 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     // MARK: - 버튼 그림자 모드
     private func addShadow(to view: UIView) {
-        view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOffset = CGSize(width: 1, height: 1)
-        view.layer.shadowOpacity = 0.5
-        view.layer.shadowRadius = 2
-        view.layer.masksToBounds = false
+//        view.layer.shadowColor = UIColor.black.cgColor
+//        view.layer.shadowOffset = CGSize(width: 1, height: 1)
+//        view.layer.shadowOpacity = 0.5
+//        view.layer.shadowRadius = 2
+//        view.layer.masksToBounds = false
     }
 }
 // MARK: CollectionView Setting

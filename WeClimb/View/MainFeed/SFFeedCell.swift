@@ -70,16 +70,9 @@ class SFFeedCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        contentView.overrideUserInterfaceStyle = .dark
         contentView.backgroundColor = UIColor(hex: "#0B1013")
-        
-        // 이미지 뷰 초기화
-//        imageView = UIImageView(frame: contentView.bounds)
-//        imageView.contentMode = .scaleAspectFill
-//        imageView.clipsToBounds = true
-//        imageView.backgroundColor = .clear
-//        contentView.addSubview(imageView)
-        
+//        contentView.backgroundColor = .clear
         contentView.addSubview(playButton)
         playButton.snp.makeConstraints {
             $0.center.equalTo(contentView)
@@ -95,6 +88,10 @@ class SFFeedCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        if let playerLayer = playerLayer {
+            playerLayer.removeFromSuperlayer()
+        }
+        imageView.removeFromSuperview()
         resetPlayer()
         gradeImageView.image = nil
         gradeImageView.backgroundColor = nil
@@ -104,7 +101,6 @@ class SFFeedCell: UICollectionViewCell {
         media = nil
         setLayout()
         disposeBag = DisposeBag()
-        imageView.removeFromSuperview()
 //        imageViewGestureBind()
     }
     
@@ -160,7 +156,8 @@ class SFFeedCell: UICollectionViewCell {
         player = AVPlayer(url: url)
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.frame = self.contentView.bounds
-        playerLayer?.backgroundColor = UIColor.clear.cgColor
+        playerLayer?.opacity = 1.0
+        playerLayer?.backgroundColor = UIColor(hex: "#0B1013").cgColor
         guard let track = asset.tracks(withMediaType: .video).first else {
             print("비디오 트랙을 찾을 수 없습니다.")
             return
@@ -180,14 +177,14 @@ class SFFeedCell: UICollectionViewCell {
             } else {
                 self.playerLayer?.videoGravity = .resizeAspectFill
             }
-            playerLayer?.opacity = 1.0
             CATransaction.commit()
         }
         setupPlayButton()
         playButton.isHidden = false
         self.contentView.bringSubviewToFront(playButton)
         if let playerLayer = playerLayer {
-            contentView.layer.insertSublayer(playerLayer, below: gymGradeStackView.layer)
+//            contentView.layer.insertSublayer(playerLayer, below: gymGradeStackView.layer)
+            contentView.layer.insertSublayer(playerLayer, at: 0)
         }
         gymGradeImageBringToFront()
     }
