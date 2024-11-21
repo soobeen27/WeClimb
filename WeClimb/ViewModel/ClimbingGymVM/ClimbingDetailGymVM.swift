@@ -19,56 +19,78 @@ class ClimbingDetailGymVM {
         let problemThumbnails: Driver<[URL]>
     }
     
-    private let gymNameRelay = BehaviorRelay<String>(value: "")
+    let gymNameRelay = BehaviorRelay<String>(value: "")
     private let logoImageURLRelay = BehaviorRelay<URL?>(value: nil)
     private let problemThumbnailsRelay = BehaviorRelay<[URL]>(value: [])
     private let disposeBag = DisposeBag()
     
+    // Output
     let output: Output
+    let grade: String
+    
+    var gymName: String {
+        return gymNameRelay.value
+    }
     
     init(gym: Gym, grade: String) {
-        // Output 정의
-        output = Output(
+        self.gymNameRelay.accept(gym.gymName)
+        self.grade = grade.colorInfo.englishText
+        
+        self.output = Output(
             gymName: gymNameRelay.asDriver(),
             logoImageURL: logoImageURLRelay.asDriver().compactMap { $0 },
             problemThumbnails: problemThumbnailsRelay.asDriver()
         )
         
-        // Gym 정보 설정
         gymNameRelay.accept(gym.gymName)
         
-        // profileImage (gs:// URL) 변환하여 사용
         if let profileImage = gym.profileImage {
             FirebaseManager.shared.fetchImageURL(from: profileImage) { [weak self] url in
-                if let url = url {
-                    self?.logoImageURLRelay.accept(url)
-                }
+                self?.logoImageURLRelay.accept(url)
             }
         }
         
-        // 특정 Gym과 grade에 맞는 미디어 URL 로드
-                loadMediaURLs(for: gym.gymName, grade: grade)
+        loadMediaURLs(for: gym.gymName, grade: self.grade)
+    }
+    
+    // 필터 적용 메서드
+    func applyFilters(filterConditions: FilterConditions) {
+        FirebaseManager.shared.getFilteredPost(
+            gymName: gymNameRelay.value,
+            grade: grade,
+            hold: filterConditions.holdColor,
+            height: filterConditions.heightRange.map { [$0.0, $0.1] },
+            armReach: filterConditions.armReachRange.map { [$0.0, $0.1] },
+            completion: { _ in }
+        )
+        .subscribe(onSuccess: { [weak self] filteredPosts in
+            guard let self = self else { return }
+            let thumbnailURLs = filteredPosts.compactMap { post in
+                URL(string: post.thumbnail ?? "")
             }
-            
+            self.problemThumbnailsRelay.accept(thumbnailURLs)
+        }, onFailure: { error in
+            print("필터링된 데이터 로드 실패: \(error)")
+        })
+        .disposed(by: disposeBag)
+    }
+    
+    // 초기 미디어 데이터 로드
     private func loadMediaURLs(for gymName: String, grade: String) {
-//        FirebaseManager.shared.getFilteredPost(gymName: gymName, grade: grade)
-//            .subscribe(onSuccess: { [weak self] medias in
-//                guard let self = self else { return }
-//                
-//                // 각 Media 객체의 썸네일 URL을 HTTPS 형식으로 변환하여 저장
-////                let thumbnailURLs: [URL] = medias.compactMap { media in
-////                    if let thumbnailURLString = media.thumbnailURL {
-////                        return URL(string: thumbnailURLString)
-////                    }
-////                    return nil
-////                }
-////                
-////                print("Fetched Thumbnail URLs:", thumbnailURLs)
-////                self.problemThumbnailsRelay.accept(thumbnailURLs)
-//                
-//            }, onFailure: { error in
-//                print("미디어 URL 가져오기 오류: \(error)")
-//            })
-//            .disposed(by: disposeBag)
+        FirebaseManager.shared.getFilteredPost(
+            gymName: gymName,
+            grade: grade,
+            completion: { _ in}
+        )
+        .subscribe(onSuccess: { [weak self] medias in
+            guard let self = self else { return }
+            let thumbnailURLs = medias.compactMap { media in
+                URL(string: media.thumbnail ?? "")
+            }
+            self.problemThumbnailsRelay.accept(thumbnailURLs)
+        }, onFailure: { error in
+            print("초기 미디어 데이터 로드 실패: \(error)")
+        })
+        .disposed(by: disposeBag)
     }
 }

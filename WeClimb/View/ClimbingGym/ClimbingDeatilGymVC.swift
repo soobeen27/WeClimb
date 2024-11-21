@@ -16,8 +16,6 @@ class ClimbingDetailGymVC: UIViewController {
     private let viewModel: ClimbingDetailGymVM
     private let disposeBag = DisposeBag()
     
-//    let filterConditionsRelay = BehaviorRelay<FilterConditions?>(value: nil)
-    
     init(viewModel: ClimbingDetailGymVM) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -164,7 +162,10 @@ class ClimbingDetailGymVC: UIViewController {
             .disposed(by: disposeBag)
         
         viewModel.output.problemThumbnails
-            .drive(thumbnailCollectionView.rx.items(cellIdentifier: ThumbnailCell.className, cellType: ThumbnailCell.self)) { index, url, cell in
+            .drive(thumbnailCollectionView.rx.items(
+                cellIdentifier: ThumbnailCell.className,
+            cellType: ThumbnailCell.self
+            )) { index, url, cell in
                 cell.configure(with: url.absoluteString)
             }
             .disposed(by: disposeBag)
@@ -232,13 +233,19 @@ class ClimbingDetailGymVC: UIViewController {
     private func setupActions() {
         filterButton.rx.tap
             .bind { [weak self] in
-                guard let self else { return }
+                guard let self = self else { return }
                 
-//                // 기본값으로 ClimbingFilterVC 초기화
-//                let climbingFilterVC = ClimbingFilterVC(gymName: "TestGym", grade: "빨")
+                let gymName = self.viewModel.gymNameRelay.value
+                let grade = self.viewModel.grade
+                let climbingFilterVC = ClimbingFilterVC(gymName: gymName, grade: grade)
                 
-                // 모달 표시
-//                self.presentCustomHeightModal(modalVC: climbingFilterVC, heightRatio: 0.69)
+                climbingFilterVC.filterConditionsRelay
+                    .subscribe(onNext: { [weak self] filterConditions in
+                        self?.viewModel.applyFilters(filterConditions: filterConditions)
+                    })
+                    .disposed(by: self.disposeBag)
+                
+                self.presentCustomHeightModal(modalVC: climbingFilterVC, heightRatio: 0.69)
             }
             .disposed(by: disposeBag)
     }

@@ -10,69 +10,70 @@ import UIKit
 import RxCocoa
 import RxSwift
 
+import RxCocoa
+import RxSwift
+
 class ClimbingFilterVM {
-    // MARK: - Input
-    struct Input {
-        let holdSelected: AnyObserver<String?>
-        let heightRangeSelected: AnyObserver<(Int, Int)>
-        let armReachRangeSelected: AnyObserver<(Int, Int)>
-        let fetchFilteredPosts: AnyObserver<Void>
-    }
-    
     // MARK: - Output
     struct Output {
         let filteredPosts: Driver<[Post]>
     }
-    
-    let input: Input
+
     let output: Output
     
-    private let holdSelectedSubject = PublishSubject<String?>()
-    private let heightRangeSubject = PublishSubject<(Int, Int)>()
-    private let armReachRangeSubject = PublishSubject<(Int, Int)>()
-    private let fetchFilteredPostsSubject = PublishSubject<Void>()
-    private let filteredPostsSubject = PublishSubject<[Post]>()
-    
+    private let filterConditionsRelay = BehaviorRelay<FilterConditions>(
+        value: FilterConditions(holdColor: nil, heightRange: (0, 200), armReachRange: (0, 200))
+    )
+    private let filteredPostsSubject = BehaviorSubject<[Post]>(value: [])
     private let gymName: String
     private let grade: String
     private let disposeBag = DisposeBag()
-    
+
     init(gymName: String, grade: String) {
         self.gymName = gymName
         self.grade = grade
-        
-        self.input = Input(
-            holdSelected: holdSelectedSubject.asObserver(),
-            heightRangeSelected: heightRangeSubject.asObserver(),
-            armReachRangeSelected: armReachRangeSubject.asObserver(),
-            fetchFilteredPosts: fetchFilteredPostsSubject.asObserver()
-        )
-        
+
         self.output = Output(
             filteredPosts: filteredPostsSubject.asDriver(onErrorJustReturn: [])
         )
-        
-        // Combine filters and fetch posts
-//        fetchFilteredPostsSubject
-//            .withLatestFrom(
-//                Observable.combineLatest(
-//                    holdSelectedSubject.startWith(nil),
-//                    heightRangeSubject.startWith((120, 200)),
-//                    armReachRangeSubject.startWith((120, 200))
-//                )
-//            )
-//            .flatMapLatest { [weak self] hold, heightRange, armReachRange in
-//                guard let self = self else { return Observable.just([]) }
-//                return FirebaseManager.shared.getFilteredPost(
-//                    gymName: self.gymName,
-//                    grade: self.grade,
-//                    hold: hold,
-//                    height: [heightRange.0, heightRange.1],
-//                    armReach: [armReachRange.0, armReachRange.1],
-//                    completion: { _ in }
-//                ).asObservable() // Single -> Observable 변환
-//            }
-//            .bind(to: filteredPostsSubject) // PublishSubject와 연결
-//            .disposed(by: disposeBag)
+    }
+
+    func updateFilterCondition(holdColor: String? = nil, heightRange: (Int, Int)? = nil, armReachRange: (Int, Int)? = nil) {
+        // 현재 필터 조건 가져오기
+        var currentConditions = filterConditionsRelay.value
+
+        // 필요한 조건만 업데이트
+        if let holdColor = holdColor {
+            currentConditions.holdColor = holdColor
+        }
+        if let heightRange = heightRange {
+            currentConditions.heightRange = heightRange
+        }
+        if let armReachRange = armReachRange {
+            currentConditions.armReachRange = armReachRange
+        }
+
+        // Relay에 새로운 조건 전달
+        filterConditionsRelay.accept(currentConditions)
+    }
+
+    func fetchFilteredPosts() {
+        let filterConditions = filterConditionsRelay.value
+
+        FirebaseManager.shared.getFilteredPost(
+            gymName: gymName,
+            grade: grade,
+            hold: filterConditions.holdColor,
+            height: filterConditions.heightRange.map { [$0.0, $0.1] },
+            armReach: filterConditions.armReachRange.map { [$0.0, $0.1] }
+        ) { snapshot in
+            print("Snapshot fetched.")
+        }
+        .subscribe(onSuccess: { [weak self] posts in
+            self?.filteredPostsSubject.onNext(posts)
+        }, onFailure: { error in
+            print("Error fetching filtered posts: \(error)")
+        })
+        .disposed(by: disposeBag)
     }
 }
