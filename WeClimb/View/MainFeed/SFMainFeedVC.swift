@@ -168,9 +168,9 @@ class SFMainFeedVC: UIViewController{
             .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { [weak self] media in
                 guard let self, let media else { return }
-                guard let gymName = media.gym, let grade = media.grade else { return }
+                guard let gymName = media.gym, let grade = media.grade, let hold = media.hold else { return }
 
-//                print("전달된 데이터 - GymName: \(gymName), Grade: \(grade), Hold: \(media.hold ?? "없음")")
+                print("전달된 데이터 - GymName: \(gymName), Grade: \(grade), Hold: \(hold)")
                 
                 // Gym 정보 가져오기
                 FirebaseManager.shared.gymInfo(from: gymName) { gym in
@@ -182,7 +182,7 @@ class SFMainFeedVC: UIViewController{
 
                     // FilterConditions 설정
                     let initialFilterConditions = FilterConditions(
-                        holdColor: media.hold,
+                        holdColor: hold,
                         heightRange: nil,
                         armReachRange: nil
                     )
@@ -190,6 +190,7 @@ class SFMainFeedVC: UIViewController{
                     let detailViewModel = ClimbingDetailGymVM(
                         gym: gym,
                         grade: grade,
+                        hold: hold,
                         initialFilterConditions: initialFilterConditions
                     )
                     let climbingDetailGymVC = ClimbingDetailGymVC(viewModel: detailViewModel)
@@ -405,6 +406,11 @@ class SFMainFeedVC: UIViewController{
     
     //MARK: - 차단하기 관련 메서드
     private func blockUser(authorUID: String) {
+        guard !authorUID.isEmpty else {
+            print("차단 실패: authorUID가 비어 있음")
+            return
+        }
+        
         FirebaseManager.shared.addBlackList(blockedUser: authorUID) { [weak self] success in
             guard let self else { return }
             let alert = Alert()
@@ -435,6 +441,13 @@ class SFMainFeedVC: UIViewController{
         
         for feedCell in innerCollectionView.visibleCells {
             if let innerCell = feedCell as? SFFeedCell, let media = innerCell.media {
+//                print("내부 셀 미디어 URL: \(media.url)")
+                
+                if currentPageIndex == 0,
+                   collectionView.numberOfItems(inSection: 0) == 0 {
+//                    print("첫번째 셀 실행")
+//                    innerCell.playVideo(reStart: <#Bool#>)
+                }
                 
                 if let url = URL(string: media.url) {
                     let fileExtension = url.pathExtension.lowercased()
@@ -450,7 +463,7 @@ class SFMainFeedVC: UIViewController{
                             innerCell.rePlay = false
                         }
                     } else {
-                        print("비디오 파일이 아님: \(media.url)")
+//                        print("비디오 파일이 아님: \(media.url)")
                         innerCell.stopVideo()
                         innerCell.rePlay = false
                     }

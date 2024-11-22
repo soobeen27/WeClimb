@@ -37,17 +37,23 @@ class GymHeaderView: UIView {
     }()
     
     let socialStackView: UIStackView = {
-        let instagramImageView = UIImageView(image: UIImage(systemName: "camera.fill"))
-        instagramImageView.tintColor = .systemPink
+        // Instagram 이미지뷰
+        let instagramImageView = UIImageView(image: UIImage(named: "instagramLogo"))
+        instagramImageView.contentMode = .scaleAspectFit
         instagramImageView.snp.makeConstraints { $0.size.equalTo(CGSize(width: 20, height: 20)) }
         
-        let naverMapImageView = UIImageView(image: UIImage(systemName: "map.fill"))
-        naverMapImageView.tintColor = .systemGreen
+        // Naver Map 이미지뷰
+        let naverMapImageView = UIImageView(image: UIImage(named: "naverMap"))
+        naverMapImageView.contentMode = .scaleAspectFit
         naverMapImageView.snp.makeConstraints { $0.size.equalTo(CGSize(width: 20, height: 20)) }
         
+        // StackView 설정
         let stackView = UIStackView(arrangedSubviews: [naverMapImageView, instagramImageView])
         stackView.axis = .horizontal
         stackView.spacing = 16
+        
+        stackView.isHidden = true
+        
         return stackView
     }()
     
