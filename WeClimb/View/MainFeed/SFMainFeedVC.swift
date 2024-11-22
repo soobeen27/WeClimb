@@ -78,6 +78,8 @@ class SFMainFeedVC: UIViewController{
     private func feedLoading() {
         if feedType == .mainFeed {
             viewModel.mainFeed()
+        } else if feedType == .filterPage {
+            
         }
     }
     
@@ -304,7 +306,7 @@ class SFMainFeedVC: UIViewController{
         guard let user = Auth.auth().currentUser else { return }
         
         switch feedType {
-        case .mainFeed:
+        case .mainFeed, .filterPage:
             if post.authorUID == user.uid {
                 actionSheet = deleteActionSheet(post: post)
             } else {

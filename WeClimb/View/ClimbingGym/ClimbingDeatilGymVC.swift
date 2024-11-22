@@ -145,11 +145,12 @@ class ClimbingDetailGymVC: UIViewController {
             .disposed(by: disposeBag)
         
         // 썸네일 컬렉션 뷰 바인딩
-        viewModel.output.problemThumbnails
-            .drive(onNext: { [weak self] urls in
+        viewModel.output.posts
+            .asObservable()
+            .subscribe(onNext: { [weak self] posts in
                 guard let self = self else { return }
                 
-                if urls.isEmpty {
+                if posts.isEmpty {
                     // 썸네일이 없을 때 emptyPost 뷰를 보이고 컬렉션 뷰 숨기기
                     self.emptyPost.isHidden = false
                     self.thumbnailCollectionView.isHidden = true
@@ -160,13 +161,17 @@ class ClimbingDetailGymVC: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
-        
-        viewModel.output.problemThumbnails
-            .drive(thumbnailCollectionView.rx.items(
+
+        viewModel.output.posts
+            .asObservable()
+            .bind(to: thumbnailCollectionView.rx.items(
                 cellIdentifier: ThumbnailCell.className,
-            cellType: ThumbnailCell.self
-            )) { index, url, cell in
-                cell.configure(with: url.absoluteString)
+                cellType: ThumbnailCell.self
+            )) { index, post, cell in
+                // Post에서 썸네일 URL 가져와서 설정
+                if let thumbnailURL = post.thumbnail {
+                    cell.configure(with: thumbnailURL)
+                }
             }
             .disposed(by: disposeBag)
     }

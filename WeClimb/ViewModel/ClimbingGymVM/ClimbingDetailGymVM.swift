@@ -16,13 +16,14 @@ class ClimbingDetailGymVM {
     struct Output {
         let gymName: Driver<String>
         let logoImageURL: Driver<URL>
-        let problemThumbnails: Driver<[URL]>
+        let posts: Driver<[Post]>
     }
     
-    let gymNameRelay = BehaviorRelay<String>(value: "")
+    private let gymNameRelay = BehaviorRelay<String>(value: "")
     private let logoImageURLRelay = BehaviorRelay<URL?>(value: nil)
-    private let problemThumbnailsRelay = BehaviorRelay<[URL]>(value: [])
+    private let postRelay = PublishRelay<[Post]>()
     private var currentFilterConditions = FilterConditions()
+    private var lastSnapshot: QueryDocumentSnapshot? = nil
     private let disposeBag = DisposeBag()
     
     // Output
@@ -41,7 +42,7 @@ class ClimbingDetailGymVM {
         self.output = Output(
             gymName: gymNameRelay.asDriver(),
             logoImageURL: logoImageURLRelay.asDriver().compactMap { $0 },
-            problemThumbnails: problemThumbnailsRelay.asDriver()
+            posts: postRelay.asDriver(onErrorJustReturn: [])
         )
         
         gymNameRelay.accept(gym.gymName)
@@ -78,10 +79,6 @@ class ClimbingDetailGymVM {
 
         let heightCondition = filterConditions.heightRange.flatMap { $0 == (0, 200) ? nil : $0 }
         let armReachCondition = filterConditions.armReachRange.flatMap { $0 == (0, 200) ? nil : $0 }
-
-        print("[DEBUG] Applying Filters - GymName: \(gymNameRelay.value), Grade: \(grade), Hold: \(mappedHoldColor ?? "None")")
-        print("[DEBUG] HeightRange: \(String(describing: heightCondition)), ArmReachRange: \(String(describing: armReachCondition))")
-
         
         FirebaseManager.shared.getFilteredPost(
             gymName: gymNameRelay.value,
@@ -93,11 +90,8 @@ class ClimbingDetailGymVM {
         )
         .subscribe(onSuccess: { [weak self] filteredPosts in
             guard let self = self else { return }
-            print("Filtered Posts Count: \(filteredPosts.count)")
             let thumbnailURLs = filteredPosts.compactMap { URL(string: $0.thumbnail ?? "") }
-            print("[DEBUG] Filtered Thumbnail URLs: \(thumbnailURLs)")
-
-            self.problemThumbnailsRelay.accept(thumbnailURLs)
+            self.postRelay.accept(filteredPosts)
         }, onFailure: { error in
             print("필터링된 데이터 로드 실패: \(error)")
         })
@@ -116,7 +110,7 @@ class ClimbingDetailGymVM {
             let thumbnailURLs = medias.compactMap { media in
                 URL(string: media.thumbnail ?? "")
             }
-            self.problemThumbnailsRelay.accept(thumbnailURLs)
+            self.postRelay.accept(medias)
         }, onFailure: { error in
             print("초기 미디어 데이터 로드 실패: \(error)")
         })
