@@ -446,7 +446,7 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
         }
     }
     
-        // MARK: - Actions Setup
+    // MARK: - Actions Setup
     private func setupTabActions() {
         let holdTapGesture = UITapGestureRecognizer()
         let armReachTapGesture = UITapGestureRecognizer()
@@ -632,41 +632,12 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
         }
     }
     
-//    func heightSliderDidChange(minValue: Int, maxValue: Int) {
-//        let currentConditions = filterConditionsRelay.value
-//        
-//        // 새로운 필터 조건 생성 (키 업데이트)
-//        let updatedConditions = FilterConditions(
-//            holdColor: currentConditions.holdColor,
-//            heightRange: (minValue, maxValue),
-//            armReachRange: currentConditions.armReachRange
-//        )
-//        
-//        // Relay에 업데이트
-//        filterConditionsRelay.accept(updatedConditions)
-//        print("updatedConditions")
-//    }
-    
-//    func armReachSliderDidChange(minValue: Int, maxValue: Int) {
-//        let currentConditions = filterConditionsRelay.value
-//        
-//        // 새로운 필터 조건 생성 (암리치만 업데이트)
-//        let updatedConditions = FilterConditions(
-//            holdColor: currentConditions.holdColor,
-//            heightRange: currentConditions.heightRange,
-//            armReachRange: (minValue, maxValue)
-//        )
-//        
-//        // Relay에 업데이트
-//        filterConditionsRelay.accept(updatedConditions)
-//    }
-    
     // MARK: - Confirm Button Action
     private func setupConfirmButtonAction() {
         confirmButton.rx.tap
             .bind { [weak self] in
                 guard let self = self else { return }
-
+                
                 let filterConditions = FilterConditions(
                     holdColor: self.selectedHoldColor,
                     heightRange: (Int(self.heightSlider.lowerValue), Int(self.heightSlider.upperValue)),
@@ -675,7 +646,6 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
                 
                 // Relay를 통해 상위 컨트롤러에 전달
                 self.filterConditionsRelay.accept(filterConditions)
-
                 // 모달 닫기
                 self.dismiss(animated: true, completion: nil)
             }
@@ -695,10 +665,10 @@ extension ClimbingFilterVC: UICollectionViewDataSource {
         ) as? SelectSettingCell else {
             return UICollectionViewCell()
         }
-
+        
         let hold = Hold.allCases[indexPath.row]
         cell.configure(item: hold)
-
+        
         // 선택된 상태를 반영
         if hold.rawValue == selectedHoldColor {
             cell.layer.borderColor = UIColor.label.cgColor
@@ -713,28 +683,30 @@ extension ClimbingFilterVC: UICollectionViewDataSource {
 
 extension ClimbingFilterVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-            let selected = Hold.allCases[indexPath.row]
-            
-            if selectedHoldColor == selected.rawValue {
-                selectedHoldColor = nil
-                print("홀드 선택 해제: \(selected.rawValue)")
-            } else {
-                selectedHoldColor = selected.rawValue
-                print("홀드 선택됨: \(selected.rawValue)")
-            }
-
-            collectionView.reloadData()
-
-            let updatedConditions = FilterConditions(
-                holdColor: selectedHoldColor.map { "hold\($0.capitalized)" },
-                heightRange: filterConditionsRelay.value.heightRange,
-                armReachRange: filterConditionsRelay.value.armReachRange
-            )
-            
-            filterConditionsRelay.accept(updatedConditions)
-
-            print("현재 필터 조건: \(updatedConditions)")
+        let selected = Hold.allCases[indexPath.row]
+        
+        if selectedHoldColor == selected.rawValue {
+            selectedHoldColor = nil
+            print("홀드 선택 해제: \(selected.rawValue)")
+        } else {
+            selectedHoldColor = selected.rawValue
+            print("홀드 선택됨: \(selected.rawValue)")
         }
+        
+        collectionView.reloadData()
+        
+//        let formattedHoldColor = selectedHoldColor.map { "hold\($0.capitalized)" }
+        
+        let updatedConditions = FilterConditions(
+            holdColor: selectedHoldColor?.lowercased(),
+            heightRange: filterConditionsRelay.value.heightRange,
+            armReachRange: filterConditionsRelay.value.armReachRange
+        )
+        
+        filterConditionsRelay.accept(updatedConditions)
+        
+        print("현재 필터 조건: \(updatedConditions)")
+    }
 }
 
 enum SelectedTab {

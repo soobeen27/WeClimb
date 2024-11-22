@@ -167,9 +167,9 @@ class SFMainFeedVC: UIViewController{
             .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { [weak self] media in
                 guard let self, let media else { return }
-                guard let gymName = media.gym, let grade = media.grade else { return }
+                guard let gymName = media.gym, let grade = media.grade, let hold = media.hold else { return }
 
-//                print("전달된 데이터 - GymName: \(gymName), Grade: \(grade), Hold: \(media.hold ?? "없음")")
+                print("전달된 데이터 - GymName: \(gymName), Grade: \(grade), Hold: \(hold)")
                 
                 // Gym 정보 가져오기
                 FirebaseManager.shared.gymInfo(from: gymName) { gym in
@@ -177,11 +177,9 @@ class SFMainFeedVC: UIViewController{
                         print("Gym 정보 가져오기 실패")
                         return
                     }
-//                    print("가져온 Gym 정보: \(gym)")
 
-                    // FilterConditions 설정
                     let initialFilterConditions = FilterConditions(
-                        holdColor: media.hold,
+                        holdColor: hold,
                         heightRange: nil,
                         armReachRange: nil
                     )
@@ -189,6 +187,7 @@ class SFMainFeedVC: UIViewController{
                     let detailViewModel = ClimbingDetailGymVM(
                         gym: gym,
                         grade: grade,
+                        hold: hold,
                         initialFilterConditions: initialFilterConditions
                     )
                     let climbingDetailGymVC = ClimbingDetailGymVC(viewModel: detailViewModel)
@@ -435,11 +434,11 @@ class SFMainFeedVC: UIViewController{
         
         for feedCell in innerCollectionView.visibleCells {
             if let innerCell = feedCell as? SFFeedCell, let media = innerCell.media {
-                print("내부 셀 미디어 URL: \(media.url)")
+//                print("내부 셀 미디어 URL: \(media.url)")
                 
                 if currentPageIndex == 0,
                    collectionView.numberOfItems(inSection: 0) == 0 {
-                    print("첫번째 셀 실행")
+//                    print("첫번째 셀 실행")
                     innerCell.playVideo()
                 }
                 
@@ -448,14 +447,14 @@ class SFMainFeedVC: UIViewController{
                     
                     if fileExtension == "mp4" {
                         if playOrPause {
-                            print("비디오 재생: \(media.url)")
+//                            print("비디오 재생: \(media.url)")
                             innerCell.playVideo()
                         } else {
-                            print("비디오 정지: \(media.url)")
+//                            print("비디오 정지: \(media.url)")
                             innerCell.stopVideo()
                         }
                     } else {
-                        print("비디오 파일이 아님: \(media.url)")
+//                        print("비디오 파일이 아님: \(media.url)")
                         innerCell.stopVideo()
                     }
                 }

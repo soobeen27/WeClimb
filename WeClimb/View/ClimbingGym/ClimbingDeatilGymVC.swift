@@ -133,42 +133,41 @@ class ClimbingDetailGymVC: UIViewController {
     }
     
     private func bindViewModel() {
-        viewModel.output.gymName
+        viewModel.gymNameRelay
+            .asDriver()
             .drive(gymNameLabel.rx.text)
             .disposed(by: disposeBag)
         
-        viewModel.output.logoImageURL
+        viewModel.logoImageURLRelay
+            .compactMap { $0 }
+            .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { [weak self] url in
-                guard let self else { return }
+                guard let self = self else { return }
                 FirebaseManager.shared.loadImage(from: url.absoluteString, into: self.logoImageView)
             })
             .disposed(by: disposeBag)
         
-        // 썸네일 컬렉션 뷰 바인딩
-        viewModel.output.posts
+        viewModel.postRelay
             .asObservable()
             .subscribe(onNext: { [weak self] posts in
                 guard let self = self else { return }
                 
                 if posts.isEmpty {
-                    // 썸네일이 없을 때 emptyPost 뷰를 보이고 컬렉션 뷰 숨기기
                     self.emptyPost.isHidden = false
                     self.thumbnailCollectionView.isHidden = true
                 } else {
-                    // 썸네일이 있을 때 emptyPost 뷰 숨기고 컬렉션 뷰 보이기
                     self.emptyPost.isHidden = true
                     self.thumbnailCollectionView.isHidden = false
                 }
             })
             .disposed(by: disposeBag)
 
-        viewModel.output.posts
-            .asObservable()
-            .bind(to: thumbnailCollectionView.rx.items(
+        viewModel.postRelay
+            .asDriver(onErrorJustReturn: [])
+            .drive(thumbnailCollectionView.rx.items(
                 cellIdentifier: ThumbnailCell.className,
                 cellType: ThumbnailCell.self
             )) { index, post, cell in
-                // Post에서 썸네일 URL 가져와서 설정
                 if let thumbnailURL = post.thumbnail {
                     cell.configure(with: thumbnailURL)
                 }
@@ -176,17 +175,15 @@ class ClimbingDetailGymVC: UIViewController {
             .disposed(by: disposeBag)
         
         thumbnailCollectionView.rx.itemSelected
-            .withLatestFrom(viewModel.output.posts) { indexPath, posts in
+            .withLatestFrom(viewModel.postRelay) { indexPath, posts in
                 return (indexPath, posts)
             }
             .subscribe(onNext: { [weak self] indexPath, posts in
-                guard let self else { return }
-
-                // 선택된 Post의 indexPath.row를 startingIndex로 설정
+                guard let self = self else { return }
+                
                 let startingIndex = indexPath.row
 
-                // MainFeedVM 생성
-                let mainFeedVM = MainFeedVM() // 현재 ViewModel의 모든 Post 전달
+                let mainFeedVM = MainFeedVM()
                 mainFeedVM.posts.accept(posts)
                 
                 // MainFeedVC로 화면 전환
@@ -262,7 +259,7 @@ class ClimbingDetailGymVC: UIViewController {
                 
                 let currentFilter = self.viewModel.getCurrentFilterConditions()
                 let climbingFilterVC = ClimbingFilterVC(
-                    gymName: self.viewModel.gymName,
+                    gymName: self.viewModel.gym.gymName,
                     grade: self.viewModel.grade,
                     initialFilterConditions: currentFilter
                 )

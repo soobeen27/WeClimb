@@ -194,13 +194,13 @@ class SFFeedCell: UICollectionViewCell {
     }
     
     func stopVideo() {
-        print("Stop")
+//        print("Stop")
         player?.pause()
         isPlaying = false
     }
     
     func playVideo() {
-        print("Play")
+//        print("Play")
         //        player?.seek(to: .zero)
         player?.play()
         isPlaying = true
