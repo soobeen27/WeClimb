@@ -294,12 +294,11 @@ class UserPageVC: UIViewController {
         // 차단 기능 수행
         viewModel.blockUser(byUID: userUID) { [weak self] success in
             guard let self = self else { return }
+            let alert = Alert()
             if success {
-//                print("차단 완료!")
-                CommonManager.shared.showAlert(from: self, title: "차단완료", message: "")
+                alert.showAlert(from: self, title: "차단완료", message: "")
             } else {
-//                print("차단 실패")
-                CommonManager.shared.showAlert(from: self, title: "차단실패", message: "")
+                alert.showAlert(from: self, title: "차단실패", message: "")
             }
         }
     }
