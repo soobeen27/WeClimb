@@ -64,7 +64,8 @@ class BlackListVC: UIViewController {
                 
                 // 차단 해제 버튼 눌렀을 때 처리
                 cell.manageButton.rx.tap
-                    .bind {
+                    .bind { [weak self] in
+                        guard let self = self else { return }
                         let uid = self.viewModel.blackListedUIDs.value[row]
                         self.viewModel.unblockUser(uid: uid) { success in
                             if success {
