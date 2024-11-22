@@ -16,34 +16,27 @@ import RxSwift
 import RxCocoa
 
 class UploadVM {
-    let mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
-    let feedRelay = BehaviorRelay<[FeedCellModel]>(value: [])
-    let cellData = BehaviorRelay(value: [FeedCellModel]())
+    private let disposeBag = DisposeBag()
+    
+    var mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
+    var feedRelay = BehaviorRelay<[FeedCellModel]>(value: [])
+    var cellData = BehaviorRelay(value: [FeedCellModel]())
     
     let showAlert = PublishRelay<Void>()
     let isLoading = BehaviorRelay<Bool>(value: false)
     
-    // 피커뷰에서 선택한 항목을 저장
-    var selectedFeedItems = [FeedCellModel]()
-    
-    let pageChanged = BehaviorRelay<Int>(value: 0)
-    private var currentPageIndex = 0
+    var pageChanged = BehaviorRelay<Int>(value: 0)
+    var currentPageIndex = 0
     
     var shouldUpdateUI: Bool = true
     
-    var completedMediaCount = 0
-    private let compressionProgressRelay = BehaviorRelay<Float>(value: 0.0)
-    var compressionProgress: Driver<Float> {
-        return compressionProgressRelay.asDriver()
-    }
-    
     var gymRelay = BehaviorRelay<Gym?>(value: nil)
+    
     var gradeRelayArray: BehaviorRelay<[String]> = BehaviorRelay(value: [])
     
     var selectedGrade = BehaviorRelay<String?>(value: nil)
     var selectedHold = BehaviorRelay<Hold?>(value: nil)
     
-    var shouldStopProcessing = false
 }
 
 extension UploadVM {
@@ -70,6 +63,7 @@ extension UploadVM {
     // MARK: - 페이지 변경 이벤트 방출 YJ
     func pageChanged(to pageIndex: Int) {
         pageChanged.accept(pageIndex)
+        print("페이지 확인: \(pageChanged.value)")
         
         currentPageIndex = pageIndex
     }
@@ -79,6 +73,24 @@ extension UploadVM {
         
         let gradeParts = gym.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
         gradeRelayArray.accept(gradeParts)
+    }
+    
+    func bindGymDataToMedia() {
+        gymRelay
+            .compactMap { $0 }
+            .subscribe(onNext: { [weak self] gym in
+                guard let self else { return }
+                
+                var updatedFeedItems = self.feedRelay.value
+                
+                updatedFeedItems = updatedFeedItems.map { item in
+                    var updatedItem = item
+                    updatedItem.gym = gym.gymName
+                    return updatedItem
+                }
+                self.feedRelay.accept(updatedFeedItems)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -136,7 +148,6 @@ extension UploadVM {
                         if durationInSeconds > 60 {
                             self.showAlert.accept(())
                             print("비디오가 너무 깁니다. 알람을 보냅니다.")
-                            self.shouldStopProcessing = true
                             group.leave()
                             return
                         } else {
@@ -182,11 +193,6 @@ extension UploadVM {
             guard let self = self else { return }
             self.isLoading.accept(false) // 로딩 종료
             
-            if shouldStopProcessing {
-                print("비디오 길이 초과로 모든 미디어 항목 처리 중단")
-                return
-            }
-            
             if !models.isEmpty {
                 self.feedRelay.accept(models.compactMap { $0 })
                 self.cellData.accept(models.compactMap { $0 })
@@ -225,7 +231,7 @@ extension UploadVM {
                 if item.url.pathExtension == "jpg" || item.url.pathExtension == "png" {
                     // 이미지인 경우
                     if let image = UIImage(contentsOfFile: item.url.path) {
-                        if let compressedData = image.jpegData(compressionQuality: 0.6) {
+                        if let compressedData = image.jpegData(compressionQuality: 0.4) {
                             let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
                             do {
                                 try compressedData.write(to: tempImageURL)
@@ -274,8 +280,6 @@ extension UploadVM {
         
         let videoCompressor = LightCompressor()
         
-        let totalMediaCount = Float(feedRelay.value.count)
-        
         // 압축 작업 설정
         _ = videoCompressor.compressVideo(videos: [
             .init(
@@ -299,7 +303,6 @@ extension UploadVM {
             switch result {
             case .onSuccess(_, let path):
                 print("비디오 압축 완료: \(path)")
-                self.completedMediaCount += 1
                 completion(path)
             case .onStart:
                 print("압축 시작")

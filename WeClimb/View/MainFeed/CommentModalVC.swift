@@ -57,6 +57,7 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
         textField.leftViewMode = .always
         textField.rightView = paddingView
         textField.rightViewMode = .always
+        
         textField.delegate = self
         return textField
     }()
