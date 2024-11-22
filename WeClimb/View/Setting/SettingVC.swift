@@ -136,19 +136,28 @@ class SettingVC: UIViewController {
         
         let deleteAction = UIAlertAction(title: SettingNameSpace.accountRemove, style: .destructive) { [weak self] _ in
             guard let self else { return }
-            self.reAuth { [weak self] result in
+            let alert = Alert()
+            alert.showAlert(from: self, title: "계정 삭제",
+                            message: "삭제하시겠습니까?",
+                            includeCancel: true) { [weak self] in
                 guard let self else { return }
-                if result {
-                    FirebaseManager.shared.userDelete { error in
-                        if let error = error {
-                            print("Error - Deleting User: \(error)")
-                            return
+                self.reAuth { [weak self] result in
+                    guard let self else { return }
+                    if result {
+                        FirebaseManager.shared.userDelete { error in
+                            if let error = error {
+                                print("Error - Deleting User: \(error)")
+                                return
+                            }
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self else { return }
+                                self.navigateToLoginVC()
+                            }
                         }
-                        print("User Deleted Successfully")
-                        self.navigateToLoginVC()
+                    } else {
+                        let alert = Alert()
+                        alert.showAlert(from: self, title: "회원 탈퇴에 실패하였습니다.", message: "회원 탈퇴를 위해 재로그인 해주세요.")
                     }
-                } else {
-                    CommonManager.shared.showAlert(from: self, title: "회원 탈퇴에 실패하였습니다.", message: "회원 탈퇴를 위해 재로그인 해주세요.")
                 }
             }
         }

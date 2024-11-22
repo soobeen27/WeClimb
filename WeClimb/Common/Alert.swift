@@ -7,11 +7,7 @@
 
 import UIKit
 
-class CommonManager {
-    static let shared = CommonManager()
-
-    private init() {}
-    
+class Alert {
     // MARK: - 알럿 YJ
     // (파라미터 순서 → 사용할 뷰컨트롤러, 타이틀, 메세지, 취소 버튼 유무?)
     func showAlert(from viewController: UIViewController, title: String, message: String, includeCancel: Bool = false, completion: (() -> Void)? = nil) {
