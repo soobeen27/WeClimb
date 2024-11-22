@@ -253,7 +253,8 @@ class CreateNickNameVC: UIViewController {
                 
                 if isDuplicate {
                     // 닉네임 중복일 경우 알림 표시
-                    CommonManager.shared.showAlert(
+                    let alert = Alert()
+                    alert.showAlert(
                         from: self,
                         title: "중복된 닉네임",
                         message: "이미 사용중인 닉네임입니다. 다른 닉네임을 입력해주세요.",

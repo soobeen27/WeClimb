@@ -307,6 +307,10 @@ class SFMainFeedVC: UIViewController{
             actionSheet = reportBlockActionSheet(post: post)
         }
         
+        if user.uid == "KrDPnUeWkYOhQIRpaZb4uQ1Ma6l2" {
+            actionSheet = deleteActionSheet(post: post)
+        }
+        
         self.present(actionSheet, animated: true, completion: nil)
     }
     
@@ -314,15 +318,18 @@ class SFMainFeedVC: UIViewController{
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let deleteAction = UIAlertAction(title: "삭제하기", style: .destructive) { [weak self] _ in
             guard let self else { return }
-            self.viewModel.deletePost(uid: post.postUID)
-//                .asDriver(onErrorDriveWith: .empty())
-                .asSignal(onErrorSignalWith: .empty())
-                .emit(onNext: { _ in
-                    CommonManager.shared.showAlert(from: self, title: "알림", message: "게시물이 삭제되었습니다.") {
-                        self.navigationController?.popViewController(animated: true)
-                    }
-                })
-                .disposed(by: self.disposeBag)
+            let alert = Alert()
+            alert.showAlert(from: self, title: "게시물 삭제", message: "삭제하시겠습니까?", includeCancel: true) { [weak self] in
+                guard let self else { return }
+                self.viewModel.deletePost(uid: post.postUID)
+                    .asSignal(onErrorSignalWith: .empty())
+                    .emit(onNext: { _ in
+                        alert.showAlert(from: self, title: "알림", message: "게시물이 삭제되었습니다.") {
+                            self.navigationController?.popViewController(animated: true)
+                        }
+                    })
+                    .disposed(by: self.disposeBag)
+            }
         }
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
@@ -364,13 +371,13 @@ class SFMainFeedVC: UIViewController{
     private func blockUser(authorUID: String) {
         FirebaseManager.shared.addBlackList(blockedUser: authorUID) { [weak self] success in
             guard let self else { return }
-            
+            let alert = Alert()
             if success {
                 print("차단 성공: \(authorUID)")
-                CommonManager.shared.showAlert(from: self, title: "차단 완료", message: "")
+                alert.showAlert(from: self, title: "차단 완료", message: "")
             } else {
                 print("차단 실패: \(authorUID)")
-                CommonManager.shared.showAlert(from: self, title: "차단 실패", message: "차단을 실패했습니다. 다시 시도해주세요.")
+                alert.showAlert(from: self, title: "차단 실패", message: "차단을 실패했습니다. 다시 시도해주세요.")
             }
         }
     }
@@ -493,8 +500,6 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
 
 extension SFMainFeedVC {
     func setupCollectionView() {
-        collectionView.reloadData()
-//        if !viewModel.shouldFetch {
         if feedType != .mainFeed {
             DispatchQueue.main.async {
                 self.collectionView.isPagingEnabled = false

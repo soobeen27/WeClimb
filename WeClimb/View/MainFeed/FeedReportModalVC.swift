@@ -125,9 +125,10 @@ extension FeedReportModalVC: UITableViewDelegate, UITableViewDataSource {
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            CommonManager.shared.showAlert(from: self,
-                                           title: "알림",
-                                           message: "신고 완료")
+            let alert = Alert()
+            alert.showAlert(from: self,
+                            title: "알림",
+                            message: "신고 완료")
         }
     }
 }

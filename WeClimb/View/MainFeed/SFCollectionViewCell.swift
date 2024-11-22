@@ -424,6 +424,7 @@ class SFCollectionViewCell: UICollectionViewCell {
             }
         }
         self.post = post
+        feedCaptionLabel.text = post.caption
         FirebaseManager.shared.fetchMedias(for: post)
             .subscribe(onSuccess: { [weak self] medias in
                 guard let self else { return }
@@ -489,11 +490,11 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     // MARK: - 버튼 그림자 모드
     private func addShadow(to view: UIView) {
-//        view.layer.shadowColor = UIColor.black.cgColor
-//        view.layer.shadowOffset = CGSize(width: 1, height: 1)
-//        view.layer.shadowOpacity = 0.5
-//        view.layer.shadowRadius = 2
-//        view.layer.masksToBounds = false
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 1, height: 1)
+        view.layer.shadowOpacity = 0.5
+        view.layer.shadowRadius = 2
+        view.layer.masksToBounds = false
     }
 }
 // MARK: CollectionView Setting
