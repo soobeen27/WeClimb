@@ -228,7 +228,7 @@ class UploadVC: UIViewController {
     }
     
     @objc private func cancelButtonTapped() {
-        initUploadVC(                        )
+        initUploadVC()
     }
     
     private func setNotifications() {

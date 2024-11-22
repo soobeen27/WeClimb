@@ -17,7 +17,7 @@ import Kingfisher
 class SFFeedCell: UICollectionViewCell {
     var player: AVPlayer?
     var playerLayer: AVPlayerLayer?
-//    var isVideo: Bool = false
+    var isPlaying = false
     
     var disposeBag = DisposeBag()
     
@@ -27,15 +27,6 @@ class SFFeedCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         imageView.backgroundColor = .clear
         return imageView
-    }()
-    
-    let playButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(systemName: "play.circle"), for: .normal)
-        button.contentVerticalAlignment = .fill
-        button.contentHorizontalAlignment = .fill
-        button.tintColor = .gray
-        return button
     }()
     
     private lazy var gymImageView: UIImageView = {
@@ -73,13 +64,15 @@ class SFFeedCell: UICollectionViewCell {
         contentView.overrideUserInterfaceStyle = .dark
         contentView.backgroundColor = UIColor(hex: "#0B1013")
 //        contentView.backgroundColor = .clear
-        contentView.addSubview(playButton)
-        playButton.snp.makeConstraints {
-            $0.center.equalTo(contentView)
-            $0.size.equalTo(75)
-        }
+//        contentView.addSubview(playButton)
+//        playButton.snp.makeConstraints {
+//            $0.center.equalTo(contentView)
+//            $0.size.equalTo(75)
+//        }
         setLayout()
 //        gymHoldImageBind()
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleVideoPlayback))
+        self.addGestureRecognizer(tapGesture)
     }
     
     required init?(coder: NSCoder) {
@@ -113,7 +106,6 @@ class SFFeedCell: UICollectionViewCell {
         guard let url = URL(string: media.url) else { return }
         imageView.image = nil
         resetPlayer()
-        playButton.isHidden = true
         self.media = media
         
         if url.pathExtension == "mp4" {
@@ -126,8 +118,6 @@ class SFFeedCell: UICollectionViewCell {
     }
     
     private func loadImage(from url: URL) {
-//        self.isVideo = false
-        self.playButton.isHidden = true
         contentView.addSubview(imageView)
         contentView.sendSubviewToBack(imageView)
         imageView.kf.setImage(with: url)
@@ -179,9 +169,6 @@ class SFFeedCell: UICollectionViewCell {
             }
             CATransaction.commit()
         }
-        setupPlayButton()
-        playButton.isHidden = false
-        self.contentView.bringSubviewToFront(playButton)
         
         if let playerLayer = playerLayer {
 //            contentView.layer.insertSublayer(playerLayer, below: gymGradeStackView.layer)
@@ -191,41 +178,27 @@ class SFFeedCell: UICollectionViewCell {
         gymGradeImageBringToFront()
     }
     
-    func setupPlayButton() {
-        playButton.addTarget(self, action: #selector(playButtonTapped), for: .touchUpInside)
-    }
-    
-    @objc func playButtonTapped() {
-        player?.play()
-        playButton.isHidden = true
-        
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(playerDidFinishPlaying),
-                                               name: .AVPlayerItemDidPlayToEndTime,
-                                               object: player?.currentItem)
-    }
-    
-    @objc func playerDidFinishPlaying() {
-        playButton.isHidden = false
-        self.contentView.bringSubviewToFront(self.playButton)
-        player?.seek(to: .zero) // 비디오 끝나면 처음으로 돌려놓기
+    @objc func toggleVideoPlayback() {
+        if isPlaying {
+            stopVideo()
+            print("스탑 비디오")
+        } else {
+            playVideo()
+            print("플레이 비디오")
+        }
     }
     
     func stopVideo() {
         print("Stop")
-//        if isVideo {
-            playButton.isHidden = false
-            self.contentView.bringSubviewToFront(self.playButton)
-            player?.pause()
-//        }
+        player?.pause()
+        isPlaying = false
     }
     
     func playVideo() {
         print("Play")
-
-        player?.seek(to: .zero)
+        //        player?.seek(to: .zero)
         player?.play()
-        playButton.isHidden = true
+        isPlaying = true
     }
     
     private func resetPlayer() {
@@ -233,8 +206,6 @@ class SFFeedCell: UICollectionViewCell {
         playerLayer?.removeFromSuperlayer()
         player = nil
         playerLayer = nil
-//        isVideo = false
-        playButton.isHidden = true
     }
     
     func streamAndCacheVideo(with url: URL, cacheKey: String, completion: @escaping (URL?) -> Void) {

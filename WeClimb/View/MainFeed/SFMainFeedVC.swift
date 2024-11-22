@@ -45,15 +45,7 @@ class SFMainFeedVC: UIViewController{
         return indicator
     }()
     
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//
-//        print("현재 페이지 인덱스: \(currentPageIndex)")
-//        if currentPageIndex == 0 {
-////            innerCollectionViewPlayers(playOrPause: true)
-//            playFirstVisibleVideo()
-//        }
-//    }
+    private var isCurrentScreenActive: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -69,11 +61,19 @@ class SFMainFeedVC: UIViewController{
         feedLoading()
         gymImageTap()
         gradeImageTap()
+        setNotifications()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        innerCollectionViewPlayers(playOrPause: false) // 비디오 정지
+        stopAllVideos()
+        isCurrentScreenActive = false
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        playVisibleVideo()
+        isCurrentScreenActive = true
     }
     
     init(viewModel: MainFeedVM, startingIndex: Int = 0, feedType: FeedType) {
@@ -90,23 +90,6 @@ class SFMainFeedVC: UIViewController{
     private func feedLoading() {
         if feedType == .mainFeed {
             viewModel.mainFeed()
-        }
-    }
-    
-    private func playFirstVisibleVideo() {
-        
-        let indexPath = IndexPath(item: 0, section: 0)
-        if let cell = collectionView.cellForItem(at: indexPath) as? SFCollectionViewCell {
-            let innerCollectionView = cell.collectionView
-            
-            if let firstInnerCell = innerCollectionView.visibleCells.first as? SFFeedCell,
-               let media = firstInnerCell.media {
-                
-                if let url = URL(string: media.url), url.pathExtension.lowercased() == "mp4" {
-                    print("비디오 재생: \(media.url)")
-                    firstInnerCell.playVideo()
-                }
-            }
         }
     }
     
@@ -138,6 +121,22 @@ class SFMainFeedVC: UIViewController{
         collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
         collectionView.backgroundColor = UIColor(hex: "#0B1013")
         collectionView.addSubview(activityIndicator)
+    }
+    
+    private func setNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterForeground), name: UIApplication.didBecomeActiveNotification, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+    }
+    
+    @objc private func didEnterForeground() {
+        if isCurrentScreenActive {
+            self.playVisibleVideo()
+        }
+    }
+    
+    @objc private func didEnterBackground() {
+        self.stopAllVideos()
     }
     
     private func gymImageTap() {
@@ -280,7 +279,6 @@ class SFMainFeedVC: UIViewController{
         }
     }
     
-    
     //MARK: - 더보기 액션 시트
     private func actionSheet(for post: Post) {
         var actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -352,50 +350,6 @@ class SFMainFeedVC: UIViewController{
         presentModal(modalVC: modalVC)
     }
     
-    func innerCollectionViewPlayers(playOrPause: Bool) {
-        guard currentPageIndex < collectionView.numberOfItems(inSection: 0) else {
-            print("현재 페이지 인덱스가 잘못됨.")
-            return
-        }
-
-        let indexPath = IndexPath(item: currentPageIndex, section: 0)
-        
-        guard let cell = collectionView.cellForItem(at: indexPath) as? SFCollectionViewCell else {
-            print("현재 페이지의 셀을 찾을 수 없음.")
-            return
-        }
-
-        let innerCollectionView = cell.collectionView
-        
-        guard let firstInnerCell = innerCollectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? SFFeedCell else {
-            print("내부 컬렉션 뷰에서 첫 번째 셀이 없음.")
-            return
-        }
-
-        guard let media = firstInnerCell.media else {
-            print("내부 셀에 미디어가 없음.")
-            return
-        }
-
-        print("현재 페이지의 내부 셀 미디어 URL: \(media.url)")
-
-        if let url = URL(string: media.url) {
-            let fileExtension = url.pathExtension.lowercased()
-            if fileExtension == "mp4" {
-                if playOrPause {
-                    print("비디오 재생: \(media.url)")
-                    firstInnerCell.playVideo()
-                } else {
-                    print("비디오 정지: \(media.url)")
-                    firstInnerCell.stopVideo()
-                }
-            } else {
-                print("비디오 파일이 아님: \(media.url)")
-                firstInnerCell.stopVideo()
-            }
-        }
-    }
-    
     //MARK: - 차단하기 관련 메서드
     private func blockUser(authorUID: String) {
         FirebaseManager.shared.addBlackList(blockedUser: authorUID) { [weak self] success in
@@ -407,6 +361,73 @@ class SFMainFeedVC: UIViewController{
             } else {
                 print("차단 실패: \(authorUID)")
                 CommonManager.shared.showAlert(from: self, title: "차단 실패", message: "차단을 실패했습니다. 다시 시도해주세요.")
+            }
+        }
+    }
+    
+    func innerCollectionViewPlayers(playOrPause: Bool) {
+        guard currentPageIndex < collectionView.numberOfItems(inSection: 0) else {
+            print("현재 페이지 인덱스가 잘못됨.")
+            return
+        }
+        
+        let indexPath = IndexPath(item: currentPageIndex, section: 0)
+        
+        guard let cell = collectionView.cellForItem(at: indexPath) as? SFCollectionViewCell else {
+            print("현재 페이지의 셀을 찾을 수 없음.")
+            return
+        }
+        
+        let innerCollectionView = cell.collectionView
+        
+        for feedCell in innerCollectionView.visibleCells {
+            if let innerCell = feedCell as? SFFeedCell, let media = innerCell.media {
+                print("내부 셀 미디어 URL: \(media.url)")
+                
+                if let url = URL(string: media.url) {
+                    let fileExtension = url.pathExtension.lowercased()
+                    
+                    if fileExtension == "mp4" {
+                        if playOrPause {
+                            print("비디오 재생: \(media.url)")
+                            innerCell.playVideo()
+                        } else {
+                            print("비디오 정지: \(media.url)")
+                            innerCell.stopVideo()
+                        }
+                    } else {
+                        print("비디오 파일이 아님: \(media.url)")
+                        innerCell.stopVideo()
+                    }
+                }
+            }
+        }
+    }
+    
+    func stopAllVideos() {
+        for cell in collectionView.visibleCells {
+            if let feedCell = cell as? SFCollectionViewCell {
+                let innerCollectionView = feedCell.collectionView
+                for innerCell in innerCollectionView.visibleCells {
+                    if let feedCell = innerCell as? SFFeedCell, let media = feedCell.media {
+                        print("비디오 정지: \(media.url)")
+                        feedCell.stopVideo()
+                    }
+                }
+            }
+        }
+    }
+    
+    func playVisibleVideo() {
+        for cell in collectionView.visibleCells {
+            if let feedCell = cell as? SFCollectionViewCell {
+                let innerCollectionView = feedCell.collectionView
+                for innerCell in innerCollectionView.visibleCells {
+                    if let feedCell = innerCell as? SFFeedCell, let media = feedCell.media {
+                        print("비디오 재생: \(media.url)")
+                        feedCell.playVideo()
+                    }
+                }
             }
         }
     }
