@@ -40,6 +40,7 @@ class BlackListVM {
                         case .success(let blockedUser):
                             users.append(blockedUser)
                             uids.append(uid)
+
                         case .failure(let error):
                             print("차단된 유저 정보 가져오기 에러: \(error)")
                         }
@@ -59,11 +60,21 @@ class BlackListVM {
     
     // 차단 해제 기능
     func unblockUser(uid: String, completion: @escaping (Bool) -> Void) {
-        FirebaseManager.shared.removeBlackList(blockedUser: uid) { success in
+        FirebaseManager.shared.removeBlackList(blockedUser: uid) { [weak self] success in
+            guard let self = self else { return }
             if success {
-                print("차단 해제 완료!")
-            } else {
-                print("차단 해제 실패")
+                // 차단 목록에서 유저 삭제
+                var updatedUsers = self.blackListedUsers.value
+                var updatedUIDs = self.blackListedUIDs.value
+                
+                if let index = updatedUIDs.firstIndex(of: uid) {
+                    updatedUsers.remove(at: index)
+                    updatedUIDs.remove(at: index)
+                    
+                    // Relay 업데이트
+                    self.blackListedUsers.accept(updatedUsers)
+                    self.blackListedUIDs.accept(updatedUIDs)
+                }
             }
             completion(success)
         }
