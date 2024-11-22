@@ -205,7 +205,7 @@ class SFMainFeedVC: UIViewController{
     }
     
     private func bindLoadData() {
-        viewModel.completedLoad
+        mainFeedVM.completedLoad
             .take(1)
             .subscribe(onNext: { _ in
                 if self.currentPageIndex == 0 {
