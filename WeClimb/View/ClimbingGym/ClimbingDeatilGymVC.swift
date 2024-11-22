@@ -153,6 +153,7 @@ class ClimbingDetailGymVC: UIViewController {
                 guard let self = self else { return }
                 
                 if posts.isEmpty {
+                    // 썸네일이 없을 때 emptyPost 뷰를 보이고 컬렉션 뷰 숨기기
                     self.emptyPost.isHidden = false
                     self.thumbnailCollectionView.isHidden = true
                 } else {
@@ -168,6 +169,7 @@ class ClimbingDetailGymVC: UIViewController {
                 cellIdentifier: ThumbnailCell.className,
                 cellType: ThumbnailCell.self
             )) { index, post, cell in
+                // Post에서 썸네일 URL 가져와서 설정
                 if let thumbnailURL = post.thumbnail {
                     cell.configure(with: thumbnailURL)
                 }

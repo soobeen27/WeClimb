@@ -525,7 +525,7 @@ extension SFCollectionViewCell: UICollectionViewDelegateFlowLayout {
                 
                 if pathExtension == "mp4" {
                     print("비디오 URL로 확인됨")
-                    cell.playVideo()
+                    cell.playVideo(reStart: true)
                 } else {
                     print("이미지일 경우 비디오 멈춤")
                     cell.stopVideo()
