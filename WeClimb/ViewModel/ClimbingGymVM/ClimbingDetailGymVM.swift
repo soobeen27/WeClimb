@@ -26,6 +26,8 @@ class ClimbingDetailGymVM {
     private var lastSnapshot: QueryDocumentSnapshot? = nil
     private let disposeBag = DisposeBag()
     
+    private var isFetching = false
+    
     // Output
     let output: Output
     let grade: String
