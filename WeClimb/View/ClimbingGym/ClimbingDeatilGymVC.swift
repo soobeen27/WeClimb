@@ -174,6 +174,26 @@ class ClimbingDetailGymVC: UIViewController {
                 }
             }
             .disposed(by: disposeBag)
+        
+        thumbnailCollectionView.rx.itemSelected
+            .withLatestFrom(viewModel.output.posts) { indexPath, posts in
+                return (indexPath, posts)
+            }
+            .subscribe(onNext: { [weak self] indexPath, posts in
+                guard let self else { return }
+
+                // 선택된 Post의 indexPath.row를 startingIndex로 설정
+                let startingIndex = indexPath.row
+
+                // MainFeedVM 생성
+                let mainFeedVM = MainFeedVM() // 현재 ViewModel의 모든 Post 전달
+                mainFeedVM.posts.accept(posts)
+                
+                // MainFeedVC로 화면 전환
+                let mainFeedVC = SFMainFeedVC(viewModel: mainFeedVM, startingIndex: startingIndex, feedType: .filterPage)
+                self.navigationController?.pushViewController(mainFeedVC, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setLayout() {

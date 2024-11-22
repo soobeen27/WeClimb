@@ -79,7 +79,7 @@ class SFMainFeedVC: UIViewController{
         if feedType == .mainFeed {
             viewModel.mainFeed()
         } else if feedType == .filterPage {
-            
+            viewModel.filterFeed()
         }
     }
     
@@ -173,23 +173,6 @@ class SFMainFeedVC: UIViewController{
             .disposed(by: disposeBag)
     }
 
-
-
-
-//    private func gradeImageTap() {
-//        viewModel.gradeButtonTap
-//            .asDriver(onErrorDriveWith: .empty())
-//            .drive(onNext: { media in
-//                guard let media else { return }
-//                
-//                
-////                print(media.grade)
-////                print(media.hold)
-//                
-//            })
-//            .disposed(by: disposeBag)
-//    }
-//
     private func bindCollectionView() {
         viewModel.posts
             .asDriver()
