@@ -421,6 +421,7 @@ class SFCollectionViewCell: UICollectionViewCell {
             }
         }
         self.post = post
+        feedCaptionLabel.text = post.caption
         FirebaseManager.shared.fetchMedias(for: post)
             .subscribe(onSuccess: { [weak self] medias in
                 guard let self else { return }
@@ -486,44 +487,22 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     // MARK: - 버튼 그림자 모드
     private func addShadow(to view: UIView) {
-//        view.layer.shadowColor = UIColor.black.cgColor
-//        view.layer.shadowOffset = CGSize(width: 1, height: 1)
-//        view.layer.shadowOpacity = 0.5
-//        view.layer.shadowRadius = 2
-//        view.layer.masksToBounds = false
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 1, height: 1)
+        view.layer.shadowOpacity = 0.5
+        view.layer.shadowRadius = 2
+        view.layer.masksToBounds = false
     }
 }
-// MARK: CollectionView Setting
-//extension SFCollectionViewCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
 extension SFCollectionViewCell: UICollectionViewDelegateFlowLayout {
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        guard let medias else { return 0 }
-//        return medias.count
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SFFeedCell.className, for: indexPath) as? SFFeedCell else {
-//            return UICollectionViewCell()
-//        }
-//        guard let medias, let viewModel else { return cell }
-//        let currentMedia = medias[indexPath.row]
-//        cell.configure(with: currentMedia, viewModel: viewModel)
-//        cell.gymTap
-//            .bind(to: viewModel.gymButtonTap)
-//            .disposed(by: cell.disposeBag)
-//        cell.gradeTap
-//            .bind(to: viewModel.gradeButtonTap)
-//            .disposed(by: cell.disposeBag)
-//        return cell
-//    }
-    
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         stopVideos()
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let pageIndex = Int(round(scrollView.contentOffset.x / self.frame.width))
-        guard pageControl.currentPage != pageIndex else { return } // 페이지가 정확하게 넘어간것만 걸러내기
+        guard pageControl.currentPage != pageIndex else { return }
         pageControl.currentPage = pageIndex
     }
     
