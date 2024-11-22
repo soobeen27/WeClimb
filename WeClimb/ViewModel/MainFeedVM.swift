@@ -17,6 +17,8 @@ class MainFeedVM {
     let gymButtonTap = PublishRelay<String?>()
     let gradeButtonTap = PublishRelay<Media?>()
     
+    let completedLoad = PublishRelay<Void>()
+    
     struct Input {
         let reportDeleteButtonTap: Driver<Post?>
         let commentButtonTap: Driver<Post?>

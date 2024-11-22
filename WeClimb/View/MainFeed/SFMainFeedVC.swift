@@ -23,6 +23,8 @@ class SFMainFeedVC: UIViewController{
     private let feedType: FeedType
     private let loginNeeded = LoginNeeded()
     
+    var currentPageIndex: Int = 0
+    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -43,6 +45,8 @@ class SFMainFeedVC: UIViewController{
         return indicator
     }()
     
+    private var isCurrentScreenActive: Bool = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(hex: "#0B1013")
@@ -57,11 +61,20 @@ class SFMainFeedVC: UIViewController{
         feedLoading()
         gymImageTap()
         gradeImageTap()
+        setNotifications()
+        bindLoadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        innerCollectionViewPlayers(playOrPause: false) // 비디오 정지
+        stopAllVideos()
+        isCurrentScreenActive = false
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        playVisibleVideo()
+        isCurrentScreenActive = true
     }
     
     init(viewModel: MainFeedVM, startingIndex: Int = 0, feedType: FeedType) {
@@ -111,6 +124,22 @@ class SFMainFeedVC: UIViewController{
         collectionView.showsHorizontalScrollIndicator = false //스크롤바 숨김 옵션
         collectionView.backgroundColor = UIColor(hex: "#0B1013")
         collectionView.addSubview(activityIndicator)
+    }
+    
+    private func setNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterForeground), name: UIApplication.didBecomeActiveNotification, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+    }
+    
+    @objc private func didEnterForeground() {
+        if isCurrentScreenActive {
+            self.playVisibleVideo()
+        }
+    }
+    
+    @objc private func didEnterBackground() {
+        self.stopAllVideos()
     }
     
     private func gymImageTap() {
@@ -172,6 +201,15 @@ class SFMainFeedVC: UIViewController{
             })
             .disposed(by: disposeBag)
     }
+    
+    private func bindLoadData() {
+        viewModel.completedLoad
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { data in
+                self.innerCollectionViewPlayers(playOrPause: true)
+            })
+            .disposed(by: disposeBag)
+    }
 
     private func bindCollectionView() {
         viewModel.posts
@@ -181,10 +219,10 @@ class SFMainFeedVC: UIViewController{
                        cellType: SFCollectionViewCell.self)) { [weak self] index, post, cell in
                 guard let self else { return }
                 cell.configure(with: post, viewModel: self.viewModel)
-                if let _ = Auth.auth().currentUser {
-                    cell.setLikeButton()
-                } else {
-                    cell.likeButton.isEnabled = false
+                    if let _ = Auth.auth().currentUser {
+                        cell.setLikeButton()
+                    } else {
+                        cell.likeButton.isEnabled = false
                     cell.likeButton.isActivated = false
                     cell.likeButton.rx.tap
                         .asDriver()
@@ -282,7 +320,6 @@ class SFMainFeedVC: UIViewController{
         }
     }
     
-    
     //MARK: - 더보기 액션 시트
     private func actionSheet(for post: Post) {
         var actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -361,28 +398,6 @@ class SFMainFeedVC: UIViewController{
         presentModal(modalVC: modalVC)
     }
     
-    func innerCollectionViewPlayers(playOrPause: Bool) {
-        // 현재 보이는 셀을 가져옴
-        guard let visibleCells = collectionView.visibleCells as? [SFCollectionViewCell] else { return }
-        
-        // 각 셀 안의 AVPlayer 일시정지
-        visibleCells.forEach { cell in
-            let innerCollectionView = cell.collectionView
-            guard let innerVisibleCells = innerCollectionView.visibleCells as? [SFFeedCell] else { return }
-            
-            if playOrPause {
-                if let cell = innerVisibleCells.last {
-                    cell.playVideo()
-                }
-            } else {
-                innerVisibleCells.forEach { innerCell in
-                    innerCell.stopVideo()
-                }
-            }
-        }
-    }
-    
-    
     //MARK: - 차단하기 관련 메서드
     private func blockUser(authorUID: String) {
         FirebaseManager.shared.addBlackList(blockedUser: authorUID) { [weak self] success in
@@ -397,11 +412,82 @@ class SFMainFeedVC: UIViewController{
             }
         }
     }
+    
+    func innerCollectionViewPlayers(playOrPause: Bool) {
+        guard collectionView.numberOfItems(inSection: 0) > 0 else {
+            print("현재 컬렉션 뷰의 아이템 수 0, 데이터가 로드 전.")
+            return
+        }
+        
+        let indexPath = IndexPath(item: currentPageIndex, section: 0)
+        
+        guard let cell = collectionView.cellForItem(at: indexPath) as? SFCollectionViewCell else {
+            print("현재 페이지의 셀을 찾을 수 없음.")
+            return
+        }
+        
+        let innerCollectionView = cell.collectionView
+        
+        for feedCell in innerCollectionView.visibleCells {
+            if let innerCell = feedCell as? SFFeedCell, let media = innerCell.media {
+                print("내부 셀 미디어 URL: \(media.url)")
+                
+                if currentPageIndex == 0,
+                   collectionView.numberOfItems(inSection: 0) == 0 {
+                    print("첫번째 셀 실행")
+                    innerCell.playVideo()
+                }
+                
+                if let url = URL(string: media.url) {
+                    let fileExtension = url.pathExtension.lowercased()
+                    
+                    if fileExtension == "mp4" {
+                        if playOrPause {
+                            print("비디오 재생: \(media.url)")
+                            innerCell.playVideo()
+                        } else {
+                            print("비디오 정지: \(media.url)")
+                            innerCell.stopVideo()
+                        }
+                    } else {
+                        print("비디오 파일이 아님: \(media.url)")
+                        innerCell.stopVideo()
+                    }
+                }
+            }
+        }
+    }
+    
+    func stopAllVideos() {
+        for cell in collectionView.visibleCells {
+            if let feedCell = cell as? SFCollectionViewCell {
+                let innerCollectionView = feedCell.collectionView
+                for innerCell in innerCollectionView.visibleCells {
+                    if let feedCell = innerCell as? SFFeedCell, let media = feedCell.media {
+                        print("비디오 정지: \(media.url)")
+                        feedCell.stopVideo()
+                    }
+                }
+            }
+        }
+    }
+    
+    func playVisibleVideo() {
+        for cell in collectionView.visibleCells {
+            if let feedCell = cell as? SFCollectionViewCell {
+                let innerCollectionView = feedCell.collectionView
+                for innerCell in innerCollectionView.visibleCells {
+                    if let feedCell = innerCell as? SFFeedCell, let media = feedCell.media {
+                        print("비디오 재생: \(media.url)")
+                        feedCell.playVideo()
+                    }
+                }
+            }
+        }
+    }
 }
 
-
 //MARK: - 컬렉션뷰 델리게이트 설정
-
 extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
@@ -418,6 +504,7 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
                 isRefresh = true
             }
         }
+        innerCollectionViewPlayers(playOrPause: false)
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -425,8 +512,21 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
         if feedType == .mainFeed {
             isRefresh = false
         }
+        
+        if currentPageIndex == 0 {
+            print("로드 후 실행")
+            self.innerCollectionViewPlayers(playOrPause: true)
+        }
+        
+        let pageIndex = Int(round(scrollView.contentOffset.y / scrollView.frame.height))
+        print("인덱스 확인 \(pageIndex)")
+        guard currentPageIndex != pageIndex else { return }
+        innerCollectionViewPlayers(playOrPause: false)
+        currentPageIndex = pageIndex
+        print("인덱스 넘어감 \(currentPageIndex)")
+        
+        innerCollectionViewPlayers(playOrPause: true)
     }
-    
 }
 
 extension SFMainFeedVC {

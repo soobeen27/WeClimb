@@ -391,6 +391,9 @@ class SFCollectionViewCell: UICollectionViewCell {
             cell.gradeTap
                 .bind(to: viewModel.gradeButtonTap)
                 .disposed(by: cell.disposeBag)
+            cell.completedLoad
+                .bind(to: viewModel.completedLoad)
+                .disposed(by: cell.disposeBag)
         }
         .disposed(by: disposeBag)
         
@@ -494,16 +497,45 @@ class SFCollectionViewCell: UICollectionViewCell {
         view.layer.masksToBounds = false
     }
 }
-
+// MARK: CollectionView Setting
 extension SFCollectionViewCell: UICollectionViewDelegateFlowLayout {
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         stopVideos()
     }
     
+    // MARK: - 사용자가 스크롤을 할 때 호출
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let pageIndex = Int(round(scrollView.contentOffset.x / self.frame.width))
         guard pageControl.currentPage != pageIndex else { return }
         pageControl.currentPage = pageIndex
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        guard let cell = collectionView.cellForItem(at: IndexPath(row: pageControl.currentPage, section: 0)) as? SFFeedCell else {
+            print("셀을 찾을 수 없음")
+            return
+        }
+        
+        if let media = cell.media {
+            let mediaURL = media.url
+            print("미디어 URL: \(mediaURL)")
+            
+            if let url = URL(string: mediaURL) {
+                let pathExtension = url.pathExtension.lowercased()
+                
+                if pathExtension == "mp4" {
+                    print("비디오 URL로 확인됨")
+                    cell.playVideo()
+                } else {
+                    print("이미지일 경우 비디오 멈춤")
+                    cell.stopVideo()
+                }
+            } else {
+                print("URL이 잘못됨.")
+            }
+        } else {
+            print("미디어 없음")
+        }
     }
     
     private func stopVideos() {
