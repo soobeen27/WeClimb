@@ -165,7 +165,7 @@ class SFMainFeedVC: UIViewController{
     }
     
     func gradeImageTap() {
-        viewModel.gradeButtonTap
+        mainFeedVM.gradeButtonTap
             .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { [weak self] media in
                 guard let self, let media else { return }
@@ -446,7 +446,7 @@ class SFMainFeedVC: UIViewController{
                 if currentPageIndex == 0,
                    collectionView.numberOfItems(inSection: 0) == 0 {
 //                    print("첫번째 셀 실행")
-                    innerCell.playVideo()
+//                    innerCell.playVideo(reStart: <#Bool#>)
                 }
                 
                 if let url = URL(string: media.url) {
