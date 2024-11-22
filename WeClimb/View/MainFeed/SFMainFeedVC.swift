@@ -34,7 +34,7 @@ class SFMainFeedVC: UIViewController{
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = UIColor(hex: "#0B1013")
         collectionView.showsVerticalScrollIndicator = false
-        collectionView.scrollsToTop = false
+//        collectionView.scrollsToTop = false
         
         return collectionView
     }()
@@ -514,6 +514,7 @@ class SFMainFeedVC: UIViewController{
                             feedCell.playVideo(reStart: true)
                         } else {
                             print("리스타트 아닌 비디오 재생: \(media.url)")
+                            feedCell.rePlay = true
                             feedCell.playVideo(reStart: false)
                             feedCell.rePlay = false
                         }

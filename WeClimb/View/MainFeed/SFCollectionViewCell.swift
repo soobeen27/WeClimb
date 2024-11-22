@@ -45,7 +45,10 @@ class SFCollectionViewCell: UICollectionViewCell {
     
     private let reportDeleteButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+//        let image = UIImage(systemName: "ellipsis")?.resize(targetSize: CGSize(width: 50, height: 25))
+        let image = UIImage(systemName: "ellipsis")
+        button.setImage(image, for: .normal)
+//        button.setImage(UIImage(systemName: "ellipsis"), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
         button.tintColor = .white
         return button
@@ -371,8 +374,8 @@ class SFCollectionViewCell: UICollectionViewCell {
             $0.size.equalTo(CGSize(width: 25, height: 25))
         }
         reportDeleteButton.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 25, height: 25))
-            $0.trailing.equalToSuperview().offset(-10)
+            $0.size.equalTo(CGSize(width: 60, height: 60))
+            $0.trailing.equalToSuperview()
             $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * 0.1)
         }
     }
@@ -525,7 +528,8 @@ extension SFCollectionViewCell: UICollectionViewDelegateFlowLayout {
                 if pathExtension == "mp4" {
                     print("비디오 URL로 확인됨")
                     cell.rePlay = true
-                    cell.playVideo(reStart: false)
+                    cell.playVideo(reStart: true)
+
                 } else {
                     print("이미지일 경우 비디오 멈춤")
                     cell.stopVideo()
