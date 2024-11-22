@@ -16,8 +16,9 @@ class SFMainFeedVC: UIViewController{
     
     private let disposeBag = DisposeBag()
     
-    var viewModel: MainFeedVM
+    var mainFeedVM: MainFeedVM
     var likeVM: LikeViewModel?
+    var climbingDetailGymVM: ClimbingDetailGymVM?
     var isRefresh = false
     var startingIndex: Int
     private let feedType: FeedType
@@ -50,6 +51,7 @@ class SFMainFeedVC: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(hex: "#0B1013")
+        bindLoadData()
         setNavigationBar()
         setTabBar()
         setCollectionView()
@@ -62,7 +64,7 @@ class SFMainFeedVC: UIViewController{
         gymImageTap()
         gradeImageTap()
         setNotifications()
-        bindLoadData()
+//        bindLoadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -73,12 +75,12 @@ class SFMainFeedVC: UIViewController{
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        playVisibleVideo()
+        playVisibleVideo(reStart: false)
         isCurrentScreenActive = true
     }
     
     init(viewModel: MainFeedVM, startingIndex: Int = 0, feedType: FeedType) {
-        self.viewModel = viewModel
+        self.mainFeedVM = viewModel
         self.feedType = feedType
         self.startingIndex = startingIndex
         super.init(nibName: nil, bundle: nil)
@@ -90,9 +92,9 @@ class SFMainFeedVC: UIViewController{
     
     private func feedLoading() {
         if feedType == .mainFeed {
-            viewModel.mainFeed()
+            mainFeedVM.mainFeed()
         } else if feedType == .filterPage {
-            viewModel.filterFeed()
+            mainFeedVM.filterFeed()
         }
     }
     
@@ -134,7 +136,7 @@ class SFMainFeedVC: UIViewController{
     
     @objc private func didEnterForeground() {
         if isCurrentScreenActive {
-            self.playVisibleVideo()
+            self.playVisibleVideo(reStart: false)
         }
     }
     
@@ -143,7 +145,7 @@ class SFMainFeedVC: UIViewController{
     }
     
     private func gymImageTap() {
-        viewModel.gymButtonTap
+        mainFeedVM.gymButtonTap
             .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { gymName in
                 guard let gymName else { return }
@@ -163,7 +165,7 @@ class SFMainFeedVC: UIViewController{
     }
     
     func gradeImageTap() {
-        viewModel.gradeButtonTap
+        mainFeedVM.gradeButtonTap
             .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { [weak self] media in
                 guard let self, let media else { return }
@@ -204,21 +206,24 @@ class SFMainFeedVC: UIViewController{
     
     private func bindLoadData() {
         viewModel.completedLoad
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(onNext: { data in
-                self.innerCollectionViewPlayers(playOrPause: true)
+            .take(1)
+            .subscribe(onNext: { _ in
+                if self.currentPageIndex == 0 {
+                    print("커런트페이지인덱스: \(self.currentPageIndex)")
+                    self.playVisibleVideo(reStart: true)
+                }
             })
             .disposed(by: disposeBag)
     }
-
+    
     private func bindCollectionView() {
-        viewModel.posts
+        mainFeedVM.posts
             .asDriver()
             .drive(collectionView.rx
                 .items(cellIdentifier: SFCollectionViewCell.className,
                        cellType: SFCollectionViewCell.self)) { [weak self] index, post, cell in
                 guard let self else { return }
-                cell.configure(with: post, viewModel: self.viewModel)
+                cell.configure(with: post, viewModel: self.mainFeedVM)
                     if let _ = Auth.auth().currentUser {
                         cell.setLikeButton()
                     } else {
@@ -232,8 +237,8 @@ class SFMainFeedVC: UIViewController{
                         .disposed(by: cell.disposeBag)
                 }
             }
-            .disposed(by: disposeBag)
-
+                       .disposed(by: disposeBag)
+        
         collectionView.rx.setDelegate(self)
             .disposed(by: disposeBag)
     }
@@ -251,9 +256,9 @@ class SFMainFeedVC: UIViewController{
                 // 스크롤이 마지막 셀에 도달했는지 확인
                 if contentOffset.y >= scrollOffsetThreshold {
                     if self.collectionView.indexPathsForVisibleItems.sorted().last != nil {
-                        self.viewModel.isLastCell.accept(true)
+                        self.mainFeedVM.isLastCell.accept(true)
                     } else {
-                        self.viewModel.isLastCell.accept(false)
+                        self.mainFeedVM.isLastCell.accept(false)
                     }
                 }
             })
@@ -275,7 +280,7 @@ class SFMainFeedVC: UIViewController{
                     commentButtonTap: sfCell.commentButtonTap,
                     profileTap: sfCell.profileTap
                 )
-                let output = self.viewModel.transform(input: input)
+                let output = self.mainFeedVM.transform(input: input)
                 
                 output.presentReport.asSignal(onErrorSignalWith: .empty()).emit(onNext: { [weak self] post in
                     guard let self, let post else { return }
@@ -352,7 +357,7 @@ class SFMainFeedVC: UIViewController{
             let alert = Alert()
             alert.showAlert(from: self, title: "게시물 삭제", message: "삭제하시겠습니까?", includeCancel: true) { [weak self] in
                 guard let self else { return }
-                self.viewModel.deletePost(uid: post.postUID)
+                self.mainFeedVM.deletePost(uid: post.postUID)
                     .asSignal(onErrorSignalWith: .empty())
                     .emit(onNext: { _ in
                         alert.showAlert(from: self, title: "알림", message: "게시물이 삭제되었습니다.") {
@@ -430,23 +435,16 @@ class SFMainFeedVC: UIViewController{
         
         for feedCell in innerCollectionView.visibleCells {
             if let innerCell = feedCell as? SFFeedCell, let media = innerCell.media {
-                print("내부 셀 미디어 URL: \(media.url)")
-                
-                if currentPageIndex == 0,
-                   collectionView.numberOfItems(inSection: 0) == 0 {
-                    print("첫번째 셀 실행")
-                    innerCell.playVideo()
-                }
                 
                 if let url = URL(string: media.url) {
                     let fileExtension = url.pathExtension.lowercased()
                     
                     if fileExtension == "mp4" {
                         if playOrPause {
-                            print("비디오 재생: \(media.url)")
-                            innerCell.playVideo()
+//                            print("비디오 재생: \(media.url)")
+                            innerCell.playVideo(reStart: true)
                         } else {
-                            print("비디오 정지: \(media.url)")
+//                            print("비디오 정지: \(media.url)")
                             innerCell.stopVideo()
                         }
                     } else {
@@ -472,14 +470,19 @@ class SFMainFeedVC: UIViewController{
         }
     }
     
-    func playVisibleVideo() {
+    func playVisibleVideo(reStart: Bool) {
         for cell in collectionView.visibleCells {
             if let feedCell = cell as? SFCollectionViewCell {
                 let innerCollectionView = feedCell.collectionView
                 for innerCell in innerCollectionView.visibleCells {
                     if let feedCell = innerCell as? SFFeedCell, let media = feedCell.media {
-                        print("비디오 재생: \(media.url)")
-                        feedCell.playVideo()
+                        if reStart {
+                            print("리스타트 비디오 재생: \(media.url)")
+                            feedCell.playVideo(reStart: true)
+                        } else {
+                            print("리스타트 아닌 비디오 재생: \(media.url)")
+                            feedCell.playVideo(reStart: false)
+                        }
                     }
                 }
             }
@@ -500,11 +503,17 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
         if collectionView.contentOffset.y < -100 {
             activityIndicator.startAnimating()
             if feedType == .mainFeed {
-                viewModel.fetchInitialFeed()
+                mainFeedVM.fetchInitialFeed()
                 isRefresh = true
             }
         }
         innerCollectionViewPlayers(playOrPause: false)
+        
+        let pageIndex = Int(round(scrollView.contentOffset.y / scrollView.frame.height))
+        print("인덱스 확인 \(pageIndex)")
+        guard currentPageIndex != pageIndex else { return }
+        currentPageIndex = pageIndex
+        print("인덱스 넘어감 \(currentPageIndex)")
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -513,19 +522,13 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
             isRefresh = false
         }
         
+        innerCollectionViewPlayers(playOrPause: true)
+        
         if currentPageIndex == 0 {
             print("로드 후 실행")
             self.innerCollectionViewPlayers(playOrPause: true)
         }
         
-        let pageIndex = Int(round(scrollView.contentOffset.y / scrollView.frame.height))
-        print("인덱스 확인 \(pageIndex)")
-        guard currentPageIndex != pageIndex else { return }
-        innerCollectionViewPlayers(playOrPause: false)
-        currentPageIndex = pageIndex
-        print("인덱스 넘어감 \(currentPageIndex)")
-        
-        innerCollectionViewPlayers(playOrPause: true)
     }
 }
 

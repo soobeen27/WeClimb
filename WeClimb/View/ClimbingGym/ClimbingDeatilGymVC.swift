@@ -163,8 +163,7 @@ class ClimbingDetailGymVC: UIViewController {
             .disposed(by: disposeBag)
 
         viewModel.output.posts
-            .asObservable()
-            .bind(to: thumbnailCollectionView.rx.items(
+            .drive(thumbnailCollectionView.rx.items(
                 cellIdentifier: ThumbnailCell.className,
                 cellType: ThumbnailCell.self
             )) { index, post, cell in
