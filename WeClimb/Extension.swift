@@ -174,42 +174,42 @@ extension UIViewController {
 extension String {
     var colorInfo: (text: String, englishText: String, color: UIColor) {
         switch self {
-        case "빨":
+        case "빨", "Red":
             return ("빨강", "Red", UIColor(red: 224/255, green: 53/255, blue: 53/255, alpha: 1))
-        case "주":
+        case "주", "Orange":
             return ("주황", "Orange", UIColor(red: 253/255, green: 150/255, blue: 68/255, alpha: 1))
-        case "노":
+        case "노", "Yellow":
             return ("노랑", "Yellow", UIColor(red: 255/255, green: 235/255, blue: 26/255, alpha: 1))
-        case "연":
-            return ("연두", "Light Green", UIColor(red: 30/255, green: 212/255, blue: 90/255, alpha: 1))
-        case "초":
+        case "연", "LightGreen":
+            return ("연두", "LightGreen", UIColor(red: 30/255, green: 212/255, blue: 90/255, alpha: 1))
+        case "초", "Green":
             return ("초록", "Green", UIColor(red: 26/255, green: 120/255, blue: 14/255, alpha: 1))
-        case "하":
-            return ("하늘", "Sky Blue", UIColor(red: 19/255, green: 149/255, blue: 255/255, alpha: 1)) // "파"랑 같은 색
-        case "파":
+        case "하", "SkyBlue":
+            return ("하늘", "SkyBlue", UIColor(red: 19/255, green: 149/255, blue: 255/255, alpha: 1))
+        case "파", "Blue":
             return ("파랑", "Blue", UIColor(red: 35/255, green: 97/255, blue: 243/255, alpha: 1))
-        case "남":
+        case "남", "Indigo":
             return ("남색", "Indigo", UIColor(red: 15/255, green: 0/255, blue: 177/255, alpha: 1))
-        case "보":
+        case "보", "Purple":
             return ("보라", "Purple", UIColor(red: 160/255, green: 83/255, blue: 233/255, alpha: 1))
-        case "검":
+        case "검", "Black":
             return ("검정", "Black", UIColor(red: 11/255, green: 16/255, blue: 19/255, alpha: 1))
-        case "흰":
+        case "흰", "White":
             return ("흰색", "White", UIColor(red: 241/255, green: 239/255, blue: 239/255, alpha: 1))
-        case "민":
+        case "민", "Mint":
             return ("민트", "Mint", UIColor(red: 31/255, green: 223/255, blue: 213/255, alpha: 1))
-        case "회":
+        case "회", "Gray":
             return ("회색", "Gray", UIColor(red: 171/255, green: 171/255, blue: 171/255, alpha: 1))
-        case "핑":
+        case "핑", "Pink":
             return ("핑크", "Pink", UIColor(red: 255/255, green: 88/255, blue: 188/255, alpha: 1))
-        case "갈":
+        case "갈", "Brown":
             return ("갈색", "Brown", UIColor(red: 187/255, green: 120/255, blue: 58/255, alpha: 1))
-        case "노검":
-            return ("노랑", "Dark Yellow", UIColor(red: 133/255, green: 125/255, blue: 23/255, alpha: 1))
-        case "초검":
-            return ("초록", "Dark Green", UIColor(red: 21/255, green: 114/255, blue: 55/255, alpha: 1))
-        case "파검":
-            return ("파랑", "Dark Blue", UIColor(red: 6/255, green: 103/255, blue: 121/255, alpha: 1))
+        case "노검", "DarkYellow":
+            return ("노랑", "DarkYellow", UIColor(red: 133/255, green: 125/255, blue: 23/255, alpha: 1))
+        case "초검", "DarkGreen":
+            return ("초록", "DarkGreen", UIColor(red: 21/255, green: 114/255, blue: 55/255, alpha: 1))
+        case "파검", "DarkBlue":
+            return ("파랑", "DarkBlue", UIColor(red: 6/255, green: 103/255, blue: 121/255, alpha: 1))
         default:
             return ("기타", "Other", UIColor.clear)
         }

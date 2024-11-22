@@ -16,59 +16,122 @@ class ClimbingDetailGymVM {
     struct Output {
         let gymName: Driver<String>
         let logoImageURL: Driver<URL>
-        let problemThumbnails: Driver<[URL]>
+        let posts: Driver<[Post]>
     }
     
     private let gymNameRelay = BehaviorRelay<String>(value: "")
     private let logoImageURLRelay = BehaviorRelay<URL?>(value: nil)
-    private let problemThumbnailsRelay = BehaviorRelay<[URL]>(value: [])
+    private let postRelay = PublishRelay<[Post]>()
+    private var currentFilterConditions = FilterConditions()
+    private var lastSnapshot: QueryDocumentSnapshot? = nil
     private let disposeBag = DisposeBag()
     
-    let output: Output
+    private var isFetching = false
     
-    init(gym: Gym, grade: String) {
-        // Output 정의
-        output = Output(
+    // Output
+    let output: Output
+    let grade: String
+    
+    var gymName: String {
+        return gymNameRelay.value
+    }
+    
+    init(gym: Gym, grade: String, initialFilterConditions: FilterConditions) {
+        self.gymNameRelay.accept(gym.gymName)
+        self.grade = grade.colorInfo.englishText
+        self.currentFilterConditions = initialFilterConditions
+        
+        self.output = Output(
             gymName: gymNameRelay.asDriver(),
             logoImageURL: logoImageURLRelay.asDriver().compactMap { $0 },
-            problemThumbnails: problemThumbnailsRelay.asDriver()
+            posts: postRelay.asDriver(onErrorJustReturn: [])
         )
         
-        // Gym 정보 설정
         gymNameRelay.accept(gym.gymName)
         
-        // profileImage (gs:// URL) 변환하여 사용
         if let profileImage = gym.profileImage {
             FirebaseManager.shared.fetchImageURL(from: profileImage) { [weak self] url in
-                if let url = url {
-                    self?.logoImageURLRelay.accept(url)
-                }
+                self?.logoImageURLRelay.accept(url)
             }
         }
         
-        // 특정 Gym과 grade에 맞는 미디어 URL 로드
-                loadMediaURLs(for: gym.gymName, grade: grade)
-            }
-            
+//        if initialFilterConditions.holdColor == nil &&
+//            initialFilterConditions.heightRange == nil &&
+//            initialFilterConditions.armReachRange == nil {
+//            // 필터 조건이 없으면 기본 로드
+            loadMediaURLs(for: gymName, grade: grade)
+//        } else {
+//            // 필터 조건이 있으면 필터 적용
+//            applyFilters(filterConditions: initialFilterConditions)
+//        }
+    }
+    
+    func updateFilterConditions(_ newConditions: FilterConditions) {
+        currentFilterConditions = newConditions
+    }
+    
+    func getCurrentFilterConditions() -> FilterConditions {
+        return currentFilterConditions
+    }
+    
+    func applyFilters(filterConditions: FilterConditions) {
+        let mappedHoldColor = filterConditions.holdColor.map { holdColor in
+            "\(holdColor.capitalized)"
+        }
+
+        let heightCondition = filterConditions.heightRange.flatMap { $0 == (0, 200) ? nil : $0 }
+        let armReachCondition = filterConditions.armReachRange.flatMap { $0 == (0, 200) ? nil : $0 }
+        
+        FirebaseManager.shared.getFilteredPost(
+            gymName: gymNameRelay.value,
+            grade: grade,
+            hold: mappedHoldColor,
+            height: heightCondition.map { [$0.0, $0.1] },
+            armReach: armReachCondition.map { [$0.0, $0.1] },
+            completion: { _ in }
+        )
+        .subscribe(onSuccess: { [weak self] filteredPosts in
+            guard let self = self else { return }
+            let thumbnailURLs = filteredPosts.compactMap { URL(string: $0.thumbnail ?? "") }
+            self.postRelay.accept(filteredPosts)
+        }, onFailure: { error in
+            print("필터링된 데이터 로드 실패: \(error)")
+        })
+        .disposed(by: disposeBag)
+    }
+    
+    // 초기 미디어 데이터 로드
     private func loadMediaURLs(for gymName: String, grade: String) {
-//        FirebaseManager.shared.getFilteredPost(gymName: gymName, grade: grade)
-//            .subscribe(onSuccess: { [weak self] medias in
-//                guard let self = self else { return }
-//                
-//                // 각 Media 객체의 썸네일 URL을 HTTPS 형식으로 변환하여 저장
-////                let thumbnailURLs: [URL] = medias.compactMap { media in
-////                    if let thumbnailURLString = media.thumbnailURL {
-////                        return URL(string: thumbnailURLString)
-////                    }
-////                    return nil
-////                }
-////                
-////                print("Fetched Thumbnail URLs:", thumbnailURLs)
-////                self.problemThumbnailsRelay.accept(thumbnailURLs)
-//                
-//            }, onFailure: { error in
-//                print("미디어 URL 가져오기 오류: \(error)")
-//            })
-//            .disposed(by: disposeBag)
+        FirebaseManager.shared.getFilteredPost(
+            gymName: gymName,
+            grade: grade,
+            completion: { _ in}
+        )
+        .subscribe(onSuccess: { [weak self] medias in
+            guard let self = self else { return }
+            let thumbnailURLs = medias.compactMap { media in
+                URL(string: media.thumbnail ?? "")
+            }
+            self.postRelay.accept(medias)
+        }, onFailure: { error in
+            print("초기 미디어 데이터 로드 실패: \(error)")
+        })
+        .disposed(by: disposeBag)
+    }
+}
+
+extension ClimbingDetailGymVM {
+    static func create(gym: Gym, grade: String, hold: String?) -> ClimbingDetailGymVM {
+        let initialFilterConditions = FilterConditions(
+            holdColor: hold,
+            heightRange: nil,
+            armReachRange: nil
+        )
+        
+        return ClimbingDetailGymVM(
+            gym: gym,
+            grade: grade,
+            initialFilterConditions: initialFilterConditions
+        )
     }
 }

@@ -17,7 +17,7 @@ struct Gym {
 }
 
 struct FilterConditions {
-    let holdColor: String?
-    let heightRange: (Int, Int)?
-    let armReachRange: (Int, Int)?
+    var holdColor: String?
+    var heightRange: (Int, Int)?
+    var armReachRange: (Int, Int)?
 }

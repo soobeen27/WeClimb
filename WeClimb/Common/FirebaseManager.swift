@@ -528,54 +528,6 @@ final class FirebaseManager {
     
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
-//    func feedFirst(completion: @escaping ([Post]?) -> Void) {
-//        currentUserInfo { [weak self] result in
-//            guard let self else { return }
-//            switch result {
-//            case .success(let user):
-//                let postRef: Query
-//                if let blackList = user.blackList, let _ = user.blackList?.first {
-//                    postRef = self.db.collection("posts")
-//                        .order(by: "creationDate", descending: true)
-//                        .whereField("authorUID", notIn: blackList)
-//                        .limit(to: 5)
-//                } else {
-//                    postRef = self.db.collection("posts")
-//                        .order(by: "creationDate", descending: true)
-//                        .limit(to: 5)
-//                }
-//                postRef.getDocuments { snapshot, error in
-//                    if let error = error {
-//                        print("피드 가져오는중 에러: \(error)")
-//                        completion(nil)
-//                        return
-//                    }
-//                    
-//                    guard let documents = snapshot?.documents else {
-//                        print("현재 피드가 없음")
-//                        completion(nil)
-//                        return
-//                    }
-//                    
-//                    if let lastDocument = documents.last {
-//                        self.lastFeed = lastDocument
-//                    }
-//                    
-//                    let posts = documents.compactMap {
-//                        do {
-//                            return try $0.data(as: Post.self)
-//                        } catch {
-//                            return nil
-//                        }
-//                    }
-//                    completion(posts)
-//                }
-//                
-//            case .failure(let error):
-//                print("유저 정보 가져오는 중 에러: \(error)")
-//            }
-//        }
-//    }  
     func feedFirst(completion: @escaping ([Post]?) -> Void) {
         var postRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
@@ -585,112 +537,51 @@ final class FirebaseManager {
             guard let self else { return }
             switch result {
             case .success(let user):
-                guard let lastFeed else { return }
-                if let blackList = user.blackList, let _ = user.blackList?.first {
+                if let blackList = user.blackList, !blackList.isEmpty {
                     postRef = postRef
                         .whereField("authorUID", notIn: blackList)
+                    }
+                
+                self.getPost(postRef: postRef) { post in
+                    completion(post)
                 }
             case .failure(let error):
                 print("유저 정보 가져오는 중 에러: \(error)")
-            }
-        }
-        postRef.getDocuments { snapshot, error in
-            if let error = error {
-                print("피드 가져오는중 에러: \(error)")
-                completion(nil)
-                return
-            }
-            
-            guard let documents = snapshot?.documents else {
-                print("현재 피드가 없음")
-                completion(nil)
-                return
-            }
-            
-            if let lastDocument = documents.last {
-                self.lastFeed = lastDocument
-            }
-            
-            let posts = documents.compactMap {
-                do {
-                    return try $0.data(as: Post.self)
-                } catch {
-                    return nil
+                self.getPost(postRef: postRef) { post in
+                    completion(post)
                 }
             }
-            completion(posts)
         }
     }
-//    func feedLoading(completion: @escaping ([Post]?) -> Void) {
-//        currentUserInfo { [weak self] result in
-//            guard let self else { return }
-//            switch result {
-//            case .success(let user):
-//                guard let lastFeed else { return }
-//                let postRef: Query
-//                if let blackList = user.blackList, let _ = user.blackList?.first {
-//                    postRef = self.db.collection("posts")
-//                        .order(by: "creationDate", descending: true)
-//                        .whereField("authorUID", notIn: blackList)
-//                        .limit(to: 5)
-//                        .start(afterDocument: lastFeed)
-//                } else {
-//                    postRef = self.db.collection("posts")
-//                        .order(by: "creationDate", descending: true)
-//                        .limit(to: 5)
-//                        .start(afterDocument: lastFeed)
-//                }
-//                postRef.getDocuments { snapshot, error in
-//                    if let error = error {
-//                        print("피드 가져오는중 에러: \(error)")
-//                        completion(nil)
-//                        return
-//                    }
-//                    
-//                    guard let documents = snapshot?.documents else {
-//                        print("현재 피드가 없음")
-//                        completion(nil)
-//                        return
-//                    }
-//                    
-//                    if let lastDocument = documents.last {
-//                        self.lastFeed = lastDocument
-//                    }
-//                    
-//                    let posts = documents.compactMap {
-//                        do {
-//                            return try $0.data(as: Post.self)
-//                        } catch {
-//                            return nil
-//                        }
-//                    }
-//                    completion(posts)
-//                }
-//                
-//            case .failure(let error):
-//                print("유저 정보 가져오는 중 에러: \(error)")
-//            }
-//        }
-//    }
+    
     func feedLoading(completion: @escaping ([Post]?) -> Void) {
         guard let lastFeed else { return }
         var postRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
             .limit(to: 5)
             .start(afterDocument: lastFeed)
-
         
-        currentUserInfo { result in
+        currentUserInfo { [weak self] result in
+            guard let self else { return }
             switch result {
             case .success(let user):
-                if let blackList = user.blackList, let _ = user.blackList?.first {
+                if let blackList = user.blackList, !blackList.isEmpty {
                     postRef = postRef
                         .whereField("authorUID", notIn: blackList)
                 }
+                self.getPost(postRef: postRef) { post in
+                    completion(post)
+                }
             case .failure(let error):
                 print("유저 정보 가져오는 중 에러: \(error)")
+                self.getPost(postRef: postRef) { post in
+                    completion(post)
+                }
             }
         }
+    }
+    
+    private func getPost(postRef: Query, completion: @escaping ([Post]?) -> Void ) {
         postRef.getDocuments { snapshot, error in
             if let error = error {
                 print("피드 가져오는중 에러: \(error)")
@@ -715,34 +606,10 @@ final class FirebaseManager {
                     return nil
                 }
             }
+            print(posts)
             completion(posts)
         }
     }
-    
-//    func fetchMedias(for post: Post) async throws -> [Media] {
-//        // medias의 DocumentReference들을 한 번에 가져오기 위한 batch 작업
-//        let mediaRefs: [DocumentReference] = post.medias
-//        var medias: [Media] = []
-//        
-//        guard !mediaRefs.isEmpty else {
-//            return medias // 미디어가 없으면 빈 배열 반환
-//        }
-//        
-//        // Firestore에서 여러 DocumentReference를 한 번에 가져오기
-//        let batchQuery = try await db.getAllDocuments(from: mediaRefs)
-//        
-//        // 가져온 문서들을 Media 객체로 변환
-//        medias = batchQuery.compactMap { document in
-//            do {
-//                return try document.data(as: Media.self)
-//            } catch {
-//                print("Media 데이터를 파싱하는데 실패: \(error)")
-//                return nil
-//            }
-//        }
-//        
-//        return medias
-//    }
 
     func fetchMedias(for post: Post) -> Single<[Media]> {
         return Single.create { [weak self] single in
@@ -1137,7 +1004,7 @@ final class FirebaseManager {
             .whereField("gym", isEqualTo: gymName)
             .whereField("grade", isEqualTo: grade)
             .order(by: "creationDate", descending: true)
-            .limit(to: 20)
+//            .limit(to: 20)
         
         if let hold {
             answerQuery = answerQuery.whereField("hold", isEqualTo: hold)

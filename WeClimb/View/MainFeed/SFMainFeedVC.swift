@@ -16,8 +16,9 @@ class SFMainFeedVC: UIViewController{
     
     private let disposeBag = DisposeBag()
     
-    var viewModel: MainFeedVM
+    var mainFeedVM: MainFeedVM
     var likeVM: LikeViewModel?
+    var climbingDetailGymVM: ClimbingDetailGymVM?
     var isRefresh = false
     var startingIndex: Int
     private let feedType: FeedType
@@ -79,7 +80,7 @@ class SFMainFeedVC: UIViewController{
     }
     
     init(viewModel: MainFeedVM, startingIndex: Int = 0, feedType: FeedType) {
-        self.viewModel = viewModel
+        self.mainFeedVM = viewModel
         self.feedType = feedType
         self.startingIndex = startingIndex
         super.init(nibName: nil, bundle: nil)
@@ -91,7 +92,9 @@ class SFMainFeedVC: UIViewController{
     
     private func feedLoading() {
         if feedType == .mainFeed {
-            viewModel.mainFeed()
+            mainFeedVM.mainFeed()
+        } else if feedType == .filterPage {
+            mainFeedVM.filterFeed()
         }
     }
     
@@ -142,7 +145,7 @@ class SFMainFeedVC: UIViewController{
     }
     
     private func gymImageTap() {
-        viewModel.gymButtonTap
+        mainFeedVM.gymButtonTap
             .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { gymName in
                 guard let gymName else { return }
@@ -161,13 +164,42 @@ class SFMainFeedVC: UIViewController{
             .disposed(by: disposeBag)
     }
     
-    private func gradeImageTap() {
-        viewModel.gradeButtonTap
+    func gradeImageTap() {
+        mainFeedVM.gradeButtonTap
             .asDriver(onErrorDriveWith: .empty())
-            .drive(onNext: { media in
-                guard let media else { return }
-                print(media.grade)
-                print(media.hold)
+            .drive(onNext: { [weak self] media in
+                guard let self, let media else { return }
+                guard let gymName = media.gym, let grade = media.grade else { return }
+
+//                print("전달된 데이터 - GymName: \(gymName), Grade: \(grade), Hold: \(media.hold ?? "없음")")
+                
+                // Gym 정보 가져오기
+                FirebaseManager.shared.gymInfo(from: gymName) { gym in
+                    guard let gym else {
+                        print("Gym 정보 가져오기 실패")
+                        return
+                    }
+//                    print("가져온 Gym 정보: \(gym)")
+
+                    // FilterConditions 설정
+                    let initialFilterConditions = FilterConditions(
+                        holdColor: media.hold,
+                        heightRange: nil,
+                        armReachRange: nil
+                    )
+
+                    let detailViewModel = ClimbingDetailGymVM(
+                        gym: gym,
+                        grade: grade,
+                        initialFilterConditions: initialFilterConditions
+                    )
+                    let climbingDetailGymVC = ClimbingDetailGymVC(viewModel: detailViewModel)
+                    climbingDetailGymVC.configure(with: gymName, grade: grade)
+
+                    DispatchQueue.main.async {
+                        self.navigationController?.pushViewController(climbingDetailGymVC, animated: true)
+                    }
+                }
             })
             .disposed(by: disposeBag)
     }
@@ -185,17 +217,17 @@ class SFMainFeedVC: UIViewController{
     }
     
     private func bindCollectionView() {
-        viewModel.posts
+        mainFeedVM.posts
             .asDriver()
             .drive(collectionView.rx
                 .items(cellIdentifier: SFCollectionViewCell.className,
                        cellType: SFCollectionViewCell.self)) { [weak self] index, post, cell in
                 guard let self else { return }
-                cell.configure(with: post, viewModel: self.viewModel)
-                if let _ = Auth.auth().currentUser {
-                    cell.setLikeButton()
-                } else {
-                    cell.likeButton.isEnabled = false
+                cell.configure(with: post, viewModel: self.mainFeedVM)
+                    if let _ = Auth.auth().currentUser {
+                        cell.setLikeButton()
+                    } else {
+                        cell.likeButton.isEnabled = false
                     cell.likeButton.isActivated = false
                     cell.likeButton.rx.tap
                         .asDriver()
@@ -224,9 +256,9 @@ class SFMainFeedVC: UIViewController{
                 // 스크롤이 마지막 셀에 도달했는지 확인
                 if contentOffset.y >= scrollOffsetThreshold {
                     if self.collectionView.indexPathsForVisibleItems.sorted().last != nil {
-                        self.viewModel.isLastCell.accept(true)
+                        self.mainFeedVM.isLastCell.accept(true)
                     } else {
-                        self.viewModel.isLastCell.accept(false)
+                        self.mainFeedVM.isLastCell.accept(false)
                     }
                 }
             })
@@ -248,7 +280,7 @@ class SFMainFeedVC: UIViewController{
                     commentButtonTap: sfCell.commentButtonTap,
                     profileTap: sfCell.profileTap
                 )
-                let output = self.viewModel.transform(input: input)
+                let output = self.mainFeedVM.transform(input: input)
                 
                 output.presentReport.asSignal(onErrorSignalWith: .empty()).emit(onNext: { [weak self] post in
                     guard let self, let post else { return }
@@ -299,7 +331,7 @@ class SFMainFeedVC: UIViewController{
         guard let user = Auth.auth().currentUser else { return }
         
         switch feedType {
-        case .mainFeed:
+        case .mainFeed, .filterPage:
             if post.authorUID == user.uid {
                 actionSheet = deleteActionSheet(post: post)
             } else {
@@ -325,7 +357,7 @@ class SFMainFeedVC: UIViewController{
             let alert = Alert()
             alert.showAlert(from: self, title: "게시물 삭제", message: "삭제하시겠습니까?", includeCancel: true) { [weak self] in
                 guard let self else { return }
-                self.viewModel.deletePost(uid: post.postUID)
+                self.mainFeedVM.deletePost(uid: post.postUID)
                     .asSignal(onErrorSignalWith: .empty())
                     .emit(onNext: { _ in
                         alert.showAlert(from: self, title: "알림", message: "게시물이 삭제되었습니다.") {
@@ -471,7 +503,7 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
         if collectionView.contentOffset.y < -100 {
             activityIndicator.startAnimating()
             if feedType == .mainFeed {
-                viewModel.fetchInitialFeed()
+                mainFeedVM.fetchInitialFeed()
                 isRefresh = true
             }
         }
