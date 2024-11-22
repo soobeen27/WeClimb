@@ -57,6 +57,8 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
         textField.leftViewMode = .always
         textField.rightView = paddingView
         textField.rightViewMode = .always
+        
+        textField.delegate = self
         return textField
     }()
     
@@ -326,5 +328,15 @@ extension CommentModalVC: UITableViewDelegate {
             self.view.endEditing(true)
         }
         lastContentOffset = scrollView.contentOffset
+    }
+}
+
+extension CommentModalVC: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let maxLength = 30
+        let currentString: NSString = textField.text as NSString? ?? ""
+        let newString: NSString = currentString.replacingCharacters(in: range, with: string) as NSString
+
+        return newString.length <= maxLength
     }
 }

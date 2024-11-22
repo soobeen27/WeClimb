@@ -62,6 +62,7 @@ class SFMainFeedVC: UIViewController{
         gymImageTap()
         gradeImageTap()
         setNotifications()
+        bindLoadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -169,6 +170,15 @@ class SFMainFeedVC: UIViewController{
             })
             .disposed(by: disposeBag)
     }
+    
+    private func bindLoadData() {
+        viewModel.completedLoad
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { data in
+                self.innerCollectionViewPlayers(playOrPause: true)
+            })
+            .disposed(by: disposeBag)
+    }
 
     private func bindCollectionView() {
         viewModel.posts
@@ -178,10 +188,10 @@ class SFMainFeedVC: UIViewController{
                        cellType: SFCollectionViewCell.self)) { [weak self] index, post, cell in
                 guard let self else { return }
                 cell.configure(with: post, viewModel: self.viewModel)
-                if let _ = Auth.auth().currentUser {
-                    cell.setLikeButton()
-                } else {
-                    cell.likeButton.isEnabled = false
+                    if let _ = Auth.auth().currentUser {
+                        cell.setLikeButton()
+                    } else {
+                        cell.likeButton.isEnabled = false
                     cell.likeButton.isActivated = false
                     cell.likeButton.rx.tap
                         .asDriver()
@@ -366,8 +376,8 @@ class SFMainFeedVC: UIViewController{
     }
     
     func innerCollectionViewPlayers(playOrPause: Bool) {
-        guard currentPageIndex < collectionView.numberOfItems(inSection: 0) else {
-            print("현재 페이지 인덱스가 잘못됨.")
+        guard collectionView.numberOfItems(inSection: 0) > 0 else {
+            print("현재 컬렉션 뷰의 아이템 수 0, 데이터가 로드 전.")
             return
         }
         
@@ -383,6 +393,12 @@ class SFMainFeedVC: UIViewController{
         for feedCell in innerCollectionView.visibleCells {
             if let innerCell = feedCell as? SFFeedCell, let media = innerCell.media {
                 print("내부 셀 미디어 URL: \(media.url)")
+                
+                if currentPageIndex == 0,
+                   collectionView.numberOfItems(inSection: 0) == 0 {
+                    print("첫번째 셀 실행")
+                    innerCell.playVideo()
+                }
                 
                 if let url = URL(string: media.url) {
                     let fileExtension = url.pathExtension.lowercased()
@@ -459,6 +475,11 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
             isRefresh = false
         }
         
+        if currentPageIndex == 0 {
+            print("로드 후 실행")
+            self.innerCollectionViewPlayers(playOrPause: true)
+        }
+        
         let pageIndex = Int(round(scrollView.contentOffset.y / scrollView.frame.height))
         print("인덱스 확인 \(pageIndex)")
         guard currentPageIndex != pageIndex else { return }
@@ -467,7 +488,6 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
         print("인덱스 넘어감 \(currentPageIndex)")
         
         innerCollectionViewPlayers(playOrPause: true)
-        
     }
 }
 

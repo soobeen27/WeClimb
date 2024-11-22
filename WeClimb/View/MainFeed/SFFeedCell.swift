@@ -59,6 +59,8 @@ class SFFeedCell: UICollectionViewCell {
     
     var media: Media?
     
+    var completedLoad = PublishRelay<Void>()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.overrideUserInterfaceStyle = .dark
@@ -70,9 +72,6 @@ class SFFeedCell: UICollectionViewCell {
 //            $0.size.equalTo(75)
 //        }
         setLayout()
-//        gymHoldImageBind()
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleVideoPlayback))
-        self.addGestureRecognizer(tapGesture)
     }
     
     required init?(coder: NSCoder) {
@@ -122,6 +121,7 @@ class SFFeedCell: UICollectionViewCell {
         contentView.sendSubviewToBack(imageView)
         imageView.kf.setImage(with: url)
         
+        imageView.isUserInteractionEnabled = false
     }
     
     private func loadVideo(from media: Media) {
@@ -137,8 +137,13 @@ class SFFeedCell: UICollectionViewCell {
             
             DispatchQueue.main.async {
                 self.setupPlayer(with: cachedURL)
+                self.completedLoad.accept(())
+                print("데이터 로드 완료")
             }
         }
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleVideoPlayback))
+        self.addGestureRecognizer(tapGesture)
     }
     
     private func setupPlayer(with url: URL) {

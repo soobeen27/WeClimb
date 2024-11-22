@@ -391,6 +391,9 @@ class SFCollectionViewCell: UICollectionViewCell {
             cell.gradeTap
                 .bind(to: viewModel.gradeButtonTap)
                 .disposed(by: cell.disposeBag)
+            cell.completedLoad
+                .bind(to: viewModel.completedLoad)
+                .disposed(by: cell.disposeBag)
         }
         .disposed(by: disposeBag)
         
