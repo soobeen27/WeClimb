@@ -400,6 +400,11 @@ class SFMainFeedVC: UIViewController{
     
     //MARK: - 차단하기 관련 메서드
     private func blockUser(authorUID: String) {
+        guard !authorUID.isEmpty else {
+            print("차단 실패: authorUID가 비어 있음")
+            return
+        }
+        
         FirebaseManager.shared.addBlackList(blockedUser: authorUID) { [weak self] success in
             guard let self else { return }
             let alert = Alert()
