@@ -91,6 +91,8 @@ class SFMainFeedVC: UIViewController{
     private func feedLoading() {
         if feedType == .mainFeed {
             viewModel.mainFeed()
+        } else if feedType == .filterPage {
+            viewModel.filterFeed()
         }
     }
     
@@ -160,13 +162,42 @@ class SFMainFeedVC: UIViewController{
             .disposed(by: disposeBag)
     }
     
-    private func gradeImageTap() {
+    func gradeImageTap() {
         viewModel.gradeButtonTap
             .asDriver(onErrorDriveWith: .empty())
-            .drive(onNext: { media in
-                guard let media else { return }
-                print(media.grade)
-                print(media.hold)
+            .drive(onNext: { [weak self] media in
+                guard let self, let media else { return }
+                guard let gymName = media.gym, let grade = media.grade else { return }
+
+//                print("전달된 데이터 - GymName: \(gymName), Grade: \(grade), Hold: \(media.hold ?? "없음")")
+                
+                // Gym 정보 가져오기
+                FirebaseManager.shared.gymInfo(from: gymName) { gym in
+                    guard let gym else {
+                        print("Gym 정보 가져오기 실패")
+                        return
+                    }
+//                    print("가져온 Gym 정보: \(gym)")
+
+                    // FilterConditions 설정
+                    let initialFilterConditions = FilterConditions(
+                        holdColor: media.hold,
+                        heightRange: nil,
+                        armReachRange: nil
+                    )
+
+                    let detailViewModel = ClimbingDetailGymVM(
+                        gym: gym,
+                        grade: grade,
+                        initialFilterConditions: initialFilterConditions
+                    )
+                    let climbingDetailGymVC = ClimbingDetailGymVC(viewModel: detailViewModel)
+                    climbingDetailGymVC.configure(with: gymName, grade: grade)
+
+                    DispatchQueue.main.async {
+                        self.navigationController?.pushViewController(climbingDetailGymVC, animated: true)
+                    }
+                }
             })
             .disposed(by: disposeBag)
     }
@@ -295,7 +326,7 @@ class SFMainFeedVC: UIViewController{
         guard let user = Auth.auth().currentUser else { return }
         
         switch feedType {
-        case .mainFeed:
+        case .mainFeed, .filterPage:
             if post.authorUID == user.uid {
                 actionSheet = deleteActionSheet(post: post)
             } else {

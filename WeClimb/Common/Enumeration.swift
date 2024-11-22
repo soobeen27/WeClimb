@@ -120,4 +120,5 @@ enum FeedType {
     case mainFeed
     case myPage
     case userPage
+    case filterPage
 }

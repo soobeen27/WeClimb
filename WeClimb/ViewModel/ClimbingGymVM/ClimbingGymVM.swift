@@ -34,6 +34,7 @@ class ClimbingGymVM {
     private let gymDataRelay = BehaviorRelay<Gym?>(value: nil)
     private let gradesRelay = BehaviorRelay<[String]>(value: [])
     private let itemsRelay = BehaviorRelay<[(color: UIColor, grade: String)]>(value: [])
+    private let selectedHoldRelay = BehaviorRelay<String?>(value: nil)
     private let selectedSegmentRelay = BehaviorRelay<Int>(value: 0)  // 초기값 0
     
     init() {
@@ -64,6 +65,10 @@ class ClimbingGymVM {
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    func getSelectedHold() -> String? {
+        return selectedHoldRelay.value
     }
     
     func setGymInfo(gymName: String) {

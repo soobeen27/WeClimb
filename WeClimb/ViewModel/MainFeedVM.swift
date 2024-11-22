@@ -37,6 +37,7 @@ class MainFeedVM {
     
     let db = Firestore.firestore()
     
+    
     func transform(input: Input) -> Output {
         return Output(presentReport: input.reportDeleteButtonTap, 
                       presentComment: input.commentButtonTap,
@@ -54,6 +55,10 @@ class MainFeedVM {
                 }
         })
         .disposed(by: disposeBag)
+        
+    }
+    
+    func filterFeed() {
         
     }
     
