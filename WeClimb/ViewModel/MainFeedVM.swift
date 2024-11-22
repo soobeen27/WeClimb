@@ -19,6 +19,8 @@ class MainFeedVM {
     
     let completedLoad = PublishSubject<Void>()
     
+    let play = PublishSubject<Void>()
+    
     struct Input {
         let reportDeleteButtonTap: Driver<Post?>
         let commentButtonTap: Driver<Post?>

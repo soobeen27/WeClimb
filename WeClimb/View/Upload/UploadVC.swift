@@ -574,6 +574,8 @@ extension UploadVC {
                 
                 self.postButton.backgroundColor = UIColor.systemGray6
                 self.addLoadingOverlay()
+                
+                self.navigationController?.navigationBar.isUserInteractionEnabled = false
             })
             .subscribe(onNext: { [weak self] in
                 DispatchQueue.main.async {
@@ -673,6 +675,8 @@ extension UploadVC {
                     self.initUploadVC()
                     self.removeFromParent()
                     self.setNewUplodVC()
+                    
+                    self.navigationController?.navigationBar.isUserInteractionEnabled = true
                     
                     self.navigationController?.popToRootViewController(animated: true)
                     

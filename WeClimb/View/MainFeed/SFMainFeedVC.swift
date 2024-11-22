@@ -75,6 +75,7 @@ class SFMainFeedVC: UIViewController{
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         playVisibleVideo(reStart: false)
+        print("실행합니다.")
         isCurrentScreenActive = true
     }
     
@@ -215,6 +216,20 @@ class SFMainFeedVC: UIViewController{
                 }
             })
             .disposed(by: disposeBag)
+        
+        if feedType == .myPage || feedType == .userPage {
+//            if isplay {
+//                self.isplay = false
+                mainFeedVM.completedLoad
+                    .take(1)
+                    .subscribe(onNext: { [weak self] in
+                        guard let self else { return }
+                        print("마이페이지 혹은 유저페이지")
+                        self.playVisibleVideo(reStart: false)
+                    })
+                    .disposed(by: disposeBag)
+//            }
+        }
     }
     
     private func bindCollectionView() {
@@ -446,7 +461,7 @@ class SFMainFeedVC: UIViewController{
                 if currentPageIndex == 0,
                    collectionView.numberOfItems(inSection: 0) == 0 {
 //                    print("첫번째 셀 실행")
-//                    innerCell.playVideo(reStart: <#Bool#>)
+//                    innerCell.playVideo(reStart: true)
                 }
                 
                 if let url = URL(string: media.url) {
@@ -499,8 +514,8 @@ class SFMainFeedVC: UIViewController{
                             feedCell.playVideo(reStart: true)
                         } else {
                             print("리스타트 아닌 비디오 재생: \(media.url)")
-                            feedCell.rePlay = true
                             feedCell.playVideo(reStart: false)
+                            feedCell.rePlay = false
                         }
                     }
                 }
