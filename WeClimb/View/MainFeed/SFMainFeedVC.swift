@@ -153,13 +153,12 @@ class SFMainFeedVC: UIViewController{
                 if let _ = Auth.auth().currentUser {
                     cell.setLikeButton()
                 } else {
+                    cell.likeButton.isEnabled = false
+                    cell.likeButton.isActivated = false
                     cell.likeButton.rx.tap
                         .asDriver()
                         .drive(onNext: {
-                            if self.loginNeeded.loginAlert(vc: self) {
-                                cell.likeButton.isEnabled = false
-                                cell.likeButton.isActivated = false
-                            }
+                            self.loginNeeded.loginAlert(vc: self)
                         })
                         .disposed(by: cell.disposeBag)
                 }
@@ -243,6 +242,7 @@ class SFMainFeedVC: UIViewController{
 
     
     private func setLayout() {
+        view.overrideUserInterfaceStyle = .dark
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints {
             //            $0.edges.equalToSuperview()
@@ -393,7 +393,7 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
 
 extension SFMainFeedVC {
     func setupCollectionView() {
-        collectionView.reloadData()
+//        collectionView.reloadData()
 //        if !viewModel.shouldFetch {
         if feedType != .mainFeed {
             DispatchQueue.main.async {
