@@ -19,6 +19,8 @@ class SFFeedCell: UICollectionViewCell {
     var playerLayer: AVPlayerLayer?
     var isPlaying = false
     
+    private var firstVideo = true
+    
     var disposeBag = DisposeBag()
     
     lazy var imageView: UIImageView = {
@@ -59,7 +61,9 @@ class SFFeedCell: UICollectionViewCell {
     
     var media: Media?
     
-    var completedLoad = PublishRelay<Void>()
+    var completedLoad = PublishSubject<Void>()
+    
+    private var playerIsSetUp = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -72,6 +76,8 @@ class SFFeedCell: UICollectionViewCell {
 //            $0.size.equalTo(75)
 //        }
         setLayout()
+//        self.firstVideo = true
+        setNotifications()
     }
     
     required init?(coder: NSCoder) {
@@ -137,8 +143,11 @@ class SFFeedCell: UICollectionViewCell {
             
             DispatchQueue.main.async {
                 self.setupPlayer(with: cachedURL)
-                self.completedLoad.accept(())
-                print("데이터 로드 완료")
+                if self.firstVideo {
+                    self.firstVideo = false
+                    self.completedLoad.onNext(())
+                    print("데이터 로드 완료")
+                }
             }
         }
         
@@ -157,7 +166,7 @@ class SFFeedCell: UICollectionViewCell {
             print("비디오 트랙을 찾을 수 없습니다.")
             return
         }
-
+        
         let size = track.naturalSize.applying(track.preferredTransform)
         let width = abs(size.width)
         let height = abs(size.height)
@@ -183,25 +192,42 @@ class SFFeedCell: UICollectionViewCell {
         gymGradeImageBringToFront()
     }
     
+    private func setNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(restartVideo), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
+        print("AVPlayerItemDidPlayToEndTime 알림 등록")
+    }
+
+    @objc func restartVideo() {
+        print("restartVideo 호출됨")
+        guard let player = player else { return }
+        
+        player.seek(to: .zero)
+        player.play()
+        print("비디오 다시 재생 시작됨")
+    }
+
     @objc func toggleVideoPlayback() {
         if isPlaying {
             stopVideo()
             print("스탑 비디오")
         } else {
-            playVideo()
+            playVideo(reStart: true)
             print("플레이 비디오")
         }
     }
     
     func stopVideo() {
-        print("Stop")
+//        print("Stop")
         player?.pause()
         isPlaying = false
     }
     
-    func playVideo() {
+    func playVideo(reStart: Bool) {
         print("Play")
-        //        player?.seek(to: .zero)
+        if reStart {
+            player?.seek(to: .zero)
+            print("리스타트")
+        }
         player?.play()
         isPlaying = true
     }

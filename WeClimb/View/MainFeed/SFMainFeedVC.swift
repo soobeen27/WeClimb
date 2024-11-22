@@ -50,6 +50,7 @@ class SFMainFeedVC: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(hex: "#0B1013")
+        bindLoadData()
         setNavigationBar()
         setTabBar()
         setCollectionView()
@@ -62,7 +63,7 @@ class SFMainFeedVC: UIViewController{
         gymImageTap()
         gradeImageTap()
         setNotifications()
-        bindLoadData()
+//        bindLoadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -173,13 +174,16 @@ class SFMainFeedVC: UIViewController{
     
     private func bindLoadData() {
         viewModel.completedLoad
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(onNext: { data in
-                self.innerCollectionViewPlayers(playOrPause: true)
+            .take(1)
+            .subscribe(onNext: { _ in
+                if self.currentPageIndex == 0 {
+                    print("커런트페이지인덱스: \(self.currentPageIndex)")
+                    self.playVisibleVideo()
+                }
             })
             .disposed(by: disposeBag)
     }
-
+    
     private func bindCollectionView() {
         viewModel.posts
             .asDriver()
@@ -188,10 +192,10 @@ class SFMainFeedVC: UIViewController{
                        cellType: SFCollectionViewCell.self)) { [weak self] index, post, cell in
                 guard let self else { return }
                 cell.configure(with: post, viewModel: self.viewModel)
-                    if let _ = Auth.auth().currentUser {
-                        cell.setLikeButton()
-                    } else {
-                        cell.likeButton.isEnabled = false
+                if let _ = Auth.auth().currentUser {
+                    cell.setLikeButton()
+                } else {
+                    cell.likeButton.isEnabled = false
                     cell.likeButton.isActivated = false
                     cell.likeButton.rx.tap
                         .asDriver()
@@ -201,8 +205,8 @@ class SFMainFeedVC: UIViewController{
                         .disposed(by: cell.disposeBag)
                 }
             }
-            .disposed(by: disposeBag)
-
+                       .disposed(by: disposeBag)
+        
         collectionView.rx.setDelegate(self)
             .disposed(by: disposeBag)
     }
@@ -399,23 +403,16 @@ class SFMainFeedVC: UIViewController{
         
         for feedCell in innerCollectionView.visibleCells {
             if let innerCell = feedCell as? SFFeedCell, let media = innerCell.media {
-                print("내부 셀 미디어 URL: \(media.url)")
-                
-                if currentPageIndex == 0,
-                   collectionView.numberOfItems(inSection: 0) == 0 {
-                    print("첫번째 셀 실행")
-                    innerCell.playVideo()
-                }
                 
                 if let url = URL(string: media.url) {
                     let fileExtension = url.pathExtension.lowercased()
                     
                     if fileExtension == "mp4" {
                         if playOrPause {
-                            print("비디오 재생: \(media.url)")
-                            innerCell.playVideo()
+//                            print("비디오 재생: \(media.url)")
+                            innerCell.playVideo(reStart: true)
                         } else {
-                            print("비디오 정지: \(media.url)")
+//                            print("비디오 정지: \(media.url)")
                             innerCell.stopVideo()
                         }
                     } else {
@@ -448,7 +445,7 @@ class SFMainFeedVC: UIViewController{
                 for innerCell in innerCollectionView.visibleCells {
                     if let feedCell = innerCell as? SFFeedCell, let media = feedCell.media {
                         print("비디오 재생: \(media.url)")
-                        feedCell.playVideo()
+                        feedCell.playVideo(reStart: false)
                     }
                 }
             }
@@ -474,6 +471,12 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
             }
         }
         innerCollectionViewPlayers(playOrPause: false)
+        
+        let pageIndex = Int(round(scrollView.contentOffset.y / scrollView.frame.height))
+        print("인덱스 확인 \(pageIndex)")
+        guard currentPageIndex != pageIndex else { return }
+        currentPageIndex = pageIndex
+        print("인덱스 넘어감 \(currentPageIndex)")
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -482,19 +485,13 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
             isRefresh = false
         }
         
+        innerCollectionViewPlayers(playOrPause: true)
+        
         if currentPageIndex == 0 {
             print("로드 후 실행")
             self.innerCollectionViewPlayers(playOrPause: true)
         }
         
-        let pageIndex = Int(round(scrollView.contentOffset.y / scrollView.frame.height))
-        print("인덱스 확인 \(pageIndex)")
-        guard currentPageIndex != pageIndex else { return }
-        innerCollectionViewPlayers(playOrPause: false)
-        currentPageIndex = pageIndex
-        print("인덱스 넘어감 \(currentPageIndex)")
-        
-        innerCollectionViewPlayers(playOrPause: true)
     }
 }
 
