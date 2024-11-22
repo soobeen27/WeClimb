@@ -10,6 +10,7 @@ import KakaoSDKCommon
 import KakaoSDKAuth
 import KakaoSDKUser
 import FirebaseAuth
+import FirebaseRemoteConfig
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -35,12 +36,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 }
                 window.makeKeyAndVisible()
                 self.window = window
+                self.checkAppVersion()
             }
         } else {
             // 사용자가 로그인되어 있지 않으면 LoginVC로 이동
             window.rootViewController = UINavigationController(rootViewController: LoginVC())
             window.makeKeyAndVisible()
             self.window = window
+            self.checkAppVersion()
         }
     }
     
@@ -79,7 +82,50 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
     }
+    func checkAppVersion() {
+            let remoteConfig = RemoteConfig.remoteConfig()
+            
+            // Fetch remote config values
+            remoteConfig.fetchAndActivate { status, error in
+                if status == .successFetchedFromRemote || status == .successUsingPreFetchedData {
+                    self.evaluateVersion(remoteConfig: remoteConfig)
+                } else {
+                    print("Error fetching remote config: \(String(describing: error))")
+                }
+            }
+        }
     
+    func evaluateVersion(remoteConfig: RemoteConfig) {
+        let minimumVersion = remoteConfig["minimum_version"].stringValue
+        let forceUpdate = remoteConfig["force_update"].boolValue
+            
+        print(minimumVersion)
+        print(forceUpdate)
+        if forceUpdate && self.isVersionOutdated(minimumVersion: minimumVersion) {
+            self.promptForUpdate()
+        }
+    }
+    
+    func isVersionOutdated(minimumVersion: String) -> Bool {
+        guard let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
+            return false
+        }
+        print(currentVersion)
+        return currentVersion.compare(minimumVersion, options: .numeric) == .orderedAscending
+    }
+    
+    func promptForUpdate() {
+        let alert = UIAlertController(title: "업데이트가 필요합니다.", message: "앱을 업데이트 해주세요", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "업데이트", style: .default, handler: { _ in
+            if let url = URL(string: "https://apps.apple.com/kr/app/weclimb-%ED%95%A8%EA%BB%98-%EB%A7%8C%EB%93%9C%EB%8A%94-%ED%81%B4%EB%9D%BC%EC%9D%B4%EB%B0%8D-%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0/id6670149812") {
+                UIApplication.shared.open(url)
+            }
+        }))
+
+        DispatchQueue.main.async {
+            self.window?.rootViewController?.present(alert, animated: true, completion: nil)
+        }
+    }
     
 }
-
