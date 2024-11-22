@@ -606,10 +606,20 @@ extension UploadVC {
                         return nil
                     }
                     
+                    for item in media {
+                        if item.hold == nil || item.grade == nil {
+                            let alert = Alert()
+                            alert.showAlert(from: self, title: "알림", message: "모든 난이도 및 홀드색을 설정해주세요")
+                            self.removeLoadingOverlay()
+                            self.postButton.backgroundColor = UIColor.mainPurple
+                            return
+                        }
+                    }
+                    
                     var uploadStatus: UploadStatus = .success
                     let caption = self.textView.textColor == .secondaryLabel ? "" : (self.textView.text ?? "")
                     
-                    if media.isEmpty || self.gymView.selectedLabel.text == UploadNameSpace.selectGym {
+                    if media.isEmpty {
                         uploadStatus = .fail
                     }
                     
