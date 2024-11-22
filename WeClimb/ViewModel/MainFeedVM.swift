@@ -37,9 +37,6 @@ class MainFeedVM {
     
     let db = Firestore.firestore()
     
-//    init(posts: [Post]) {
-//        self.posts.accept(posts) // 초기 데이터를 Relay에 설정
-//    }
     
     func transform(input: Input) -> Output {
         return Output(presentReport: input.reportDeleteButtonTap, 

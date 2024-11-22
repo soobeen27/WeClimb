@@ -78,6 +78,7 @@ class ClimbingGymVC: UIViewController {
     
     private func navigateToClimbingDetailGymVC(with grade: String, hold: String? = nil) {
         guard let gymData = gymData else { return }
+        let convertedGrade = grade.colorInfo.englishText
         
         let initialFilterConditions = FilterConditions(
             holdColor: hold,
@@ -87,7 +88,7 @@ class ClimbingGymVC: UIViewController {
         
         let detailViewModel = ClimbingDetailGymVM(
             gym: gymData,
-            grade: grade,
+            grade: convertedGrade,
             initialFilterConditions: initialFilterConditions
         )
         
