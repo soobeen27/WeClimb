@@ -69,6 +69,7 @@ class CommentModalVC: UIViewController, UIScrollViewDelegate {
         button.layer.cornerRadius = 20
         button.layer.masksToBounds = true
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .bold)
+        button.isEnabled = false
         return button
     }()
     
