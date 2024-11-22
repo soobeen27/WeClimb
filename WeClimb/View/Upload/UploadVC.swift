@@ -698,12 +698,12 @@ extension UploadVC {
     
     // MARK: - 업로드뷰 초기화 YJ
     private func initUploadVC() {
+        self.feedView?.pauseAllVideo()
+        self.feedView = nil
+        
         self.viewModel.feedRelay = BehaviorRelay(value: [])
         
         self.viewModel.cellData = BehaviorRelay(value: [FeedCellModel]())
-        
-        self.feedView = nil
-        self.feedView?.pauseAllVideo()
         
         self.viewModel.selectedGrade = BehaviorRelay<String?>(value: nil)
         self.viewModel.selectedHold = BehaviorRelay<Hold?>(value: nil)
@@ -747,5 +747,7 @@ extension UploadVC {
         self.settingView.selectedLabel.isHidden = false
         self.settingView.nextImageView.isHidden = false
         self.holdButton.isHidden = true
+        
+        navigationItem.rightBarButtonItem?.isHidden = true
     }
 }
