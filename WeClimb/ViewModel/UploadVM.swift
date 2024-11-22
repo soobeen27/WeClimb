@@ -231,7 +231,7 @@ extension UploadVM {
                 if item.url.pathExtension == "jpg" || item.url.pathExtension == "png" {
                     // 이미지인 경우
                     if let image = UIImage(contentsOfFile: item.url.path) {
-                        if let compressedData = image.jpegData(compressionQuality: 0.4) {
+                        if let compressedData = image.jpegData(compressionQuality: 0.3) {
                             let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
                             do {
                                 try compressedData.write(to: tempImageURL)

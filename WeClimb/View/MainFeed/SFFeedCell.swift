@@ -21,6 +21,8 @@ class SFFeedCell: UICollectionViewCell {
     
     private var firstVideo = true
     
+    var rePlay = true
+    
     var disposeBag = DisposeBag()
     
     lazy var imageView: UIImageView = {
@@ -75,6 +77,8 @@ class SFFeedCell: UICollectionViewCell {
 //            $0.center.equalTo(contentView)
 //            $0.size.equalTo(75)
 //        }
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleVideoPlayback))
+        self.addGestureRecognizer(tapGesture)
         setLayout()
 //        self.firstVideo = true
         setNotifications()
@@ -150,9 +154,6 @@ class SFFeedCell: UICollectionViewCell {
                 }
             }
         }
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleVideoPlayback))
-        self.addGestureRecognizer(tapGesture)
     }
     
     private func setupPlayer(with url: URL) {
@@ -191,26 +192,28 @@ class SFFeedCell: UICollectionViewCell {
         
         gymGradeImageBringToFront()
     }
-    
-    private func setNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(restartVideo), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
-        print("AVPlayerItemDidPlayToEndTime 알림 등록")
-    }
 
-    @objc func restartVideo() {
-        print("restartVideo 호출됨")
-        guard let player = player else { return }
-        
-        player.seek(to: .zero)
-        player.play()
-        print("비디오 다시 재생 시작됨")
+    @objc func reStartVideo() {
+        if rePlay {
+            print("restartVideo 호출됨")
+            guard let player = player else { return }
+            player.seek(to: .zero)
+            player.play()
+            print("비디오 다시 재생 시작됨")
+        } else {
+            stopVideo()
+            self.rePlay = false
+        }
     }
 
     @objc func toggleVideoPlayback() {
         if isPlaying {
+//            self.rePlay = false
             stopVideo()
+            self.rePlay = false
             print("스탑 비디오")
         } else {
+            self.rePlay = true
             playVideo(reStart: false)
             print("플레이 비디오")
         }
@@ -218,18 +221,25 @@ class SFFeedCell: UICollectionViewCell {
     
     func stopVideo() {
 //        print("Stop")
+        self.rePlay = false
         player?.pause()
         isPlaying = false
     }
     
     func playVideo(reStart: Bool) {
-        print("Play")
-        if reStart {
-            player?.seek(to: .zero)
-            print("리스타트")
+        if rePlay {
+            self.rePlay = true
+            print("Play")
+            if reStart {
+                player?.seek(to: .zero)
+                print("리스타트")
+            }
+            player?.play()
+            isPlaying = true
+        } else {
+            stopVideo()
+            self.rePlay = false
         }
-        player?.play()
-        isPlaying = true
     }
     
     private func resetPlayer() {
@@ -237,6 +247,11 @@ class SFFeedCell: UICollectionViewCell {
         playerLayer?.removeFromSuperlayer()
         player = nil
         playerLayer = nil
+    }
+    
+    private func setNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(reStartVideo), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
+        print("AVPlayerItemDidPlayToEndTime 알림 등록")
     }
     
     func streamAndCacheVideo(with url: URL, cacheKey: String, completion: @escaping (URL?) -> Void) {

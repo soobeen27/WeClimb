@@ -64,7 +64,6 @@ class SFMainFeedVC: UIViewController{
         gymImageTap()
         gradeImageTap()
         setNotifications()
-//        bindLoadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -207,7 +206,8 @@ class SFMainFeedVC: UIViewController{
     private func bindLoadData() {
         mainFeedVM.completedLoad
             .take(1)
-            .subscribe(onNext: { _ in
+            .subscribe(onNext: { [weak self] in
+                guard let self else { return }
                 if self.currentPageIndex == 0 {
                     print("커런트페이지인덱스: \(self.currentPageIndex)")
                     self.playVisibleVideo(reStart: true)
@@ -442,14 +442,17 @@ class SFMainFeedVC: UIViewController{
                     if fileExtension == "mp4" {
                         if playOrPause {
 //                            print("비디오 재생: \(media.url)")
+                            innerCell.rePlay = true
                             innerCell.playVideo(reStart: true)
                         } else {
 //                            print("비디오 정지: \(media.url)")
                             innerCell.stopVideo()
+                            innerCell.rePlay = false
                         }
                     } else {
                         print("비디오 파일이 아님: \(media.url)")
                         innerCell.stopVideo()
+                        innerCell.rePlay = false
                     }
                 }
             }
@@ -464,6 +467,7 @@ class SFMainFeedVC: UIViewController{
                     if let feedCell = innerCell as? SFFeedCell, let media = feedCell.media {
                         print("비디오 정지: \(media.url)")
                         feedCell.stopVideo()
+                        feedCell.rePlay = false
                     }
                 }
             }
@@ -478,9 +482,11 @@ class SFMainFeedVC: UIViewController{
                     if let feedCell = innerCell as? SFFeedCell, let media = feedCell.media {
                         if reStart {
                             print("리스타트 비디오 재생: \(media.url)")
+                            feedCell.rePlay = true
                             feedCell.playVideo(reStart: true)
                         } else {
                             print("리스타트 아닌 비디오 재생: \(media.url)")
+                            feedCell.rePlay = true
                             feedCell.playVideo(reStart: false)
                         }
                     }
@@ -520,14 +526,16 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
         activityIndicator.stopAnimating()
         if feedType == .mainFeed {
             isRefresh = false
+            
+            if currentPageIndex == 0 {
+                print("로드 후 실행")
+                self.innerCollectionViewPlayers(playOrPause: true)
+                stopAllVideos()
+            }
         }
         
         innerCollectionViewPlayers(playOrPause: true)
-        
-        if currentPageIndex == 0 {
-            print("로드 후 실행")
-            self.innerCollectionViewPlayers(playOrPause: true)
-        }
+        print("두번 실행 ㅋ")
         
     }
 }
