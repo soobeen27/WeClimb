@@ -687,6 +687,7 @@ extension ClimbingFilterVC: UICollectionViewDelegate {
         
         if selectedHoldColor == selected.rawValue {
             selectedHoldColor = nil
+            
             print("홀드 선택 해제: \(selected.rawValue)")
         } else {
             selectedHoldColor = selected.rawValue
