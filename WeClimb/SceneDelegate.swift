@@ -84,9 +84,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     func checkAppVersion() {
             let remoteConfig = RemoteConfig.remoteConfig()
-            
+            let settings = RemoteConfigSettings()
+            settings.minimumFetchInterval = 43200
+            remoteConfig.configSettings = settings
             // Fetch remote config values
-            remoteConfig.fetchAndActivate { status, error in
+            remoteConfig.fetchAndActivate { [weak self] status, error in
+                guard let self else { return }
                 if status == .successFetchedFromRemote || status == .successUsingPreFetchedData {
                     self.evaluateVersion(remoteConfig: remoteConfig)
                 } else {
@@ -99,8 +102,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let minimumVersion = remoteConfig["minimum_version"].stringValue
         let forceUpdate = remoteConfig["force_update"].boolValue
             
-        print(minimumVersion)
-        print(forceUpdate)
         if forceUpdate && self.isVersionOutdated(minimumVersion: minimumVersion) {
             self.promptForUpdate()
         }
@@ -123,7 +124,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
         }))
 
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             self.window?.rootViewController?.present(alert, animated: true, completion: nil)
         }
     }
