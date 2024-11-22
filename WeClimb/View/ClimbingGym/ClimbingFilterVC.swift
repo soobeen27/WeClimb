@@ -713,18 +713,28 @@ extension ClimbingFilterVC: UICollectionViewDataSource {
 
 extension ClimbingFilterVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedHold = Hold.allCases[indexPath.row].rawValue
-        selectedHoldColor = selectedHold
-        collectionView.reloadData()
+            let selected = Hold.allCases[indexPath.row]
+            
+            if selectedHoldColor == selected.rawValue {
+                selectedHoldColor = nil
+                print("홀드 선택 해제: \(selected.rawValue)")
+            } else {
+                selectedHoldColor = selected.rawValue
+                print("홀드 선택됨: \(selected.rawValue)")
+            }
 
-        let currentConditions = filterConditionsRelay.value
-        let updatedConditions = FilterConditions(
-            holdColor: selectedHoldColor,
-            heightRange: currentConditions.heightRange,
-            armReachRange: currentConditions.armReachRange
-        )
-        filterConditionsRelay.accept(updatedConditions)
-    }
+            collectionView.reloadData()
+
+            let updatedConditions = FilterConditions(
+                holdColor: selectedHoldColor.map { "hold\($0.capitalized)" },
+                heightRange: filterConditionsRelay.value.heightRange,
+                armReachRange: filterConditionsRelay.value.armReachRange
+            )
+            
+            filterConditionsRelay.accept(updatedConditions)
+
+            print("현재 필터 조건: \(updatedConditions)")
+        }
 }
 
 enum SelectedTab {
