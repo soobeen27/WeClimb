@@ -582,7 +582,8 @@ final class FirebaseManager {
     }
     
     private func getPost(postRef: Query, completion: @escaping ([Post]?) -> Void ) {
-        postRef.getDocuments { snapshot, error in
+        postRef.getDocuments { [weak self] snapshot, error in
+            guard let self else { return }
             if let error = error {
                 print("피드 가져오는중 에러: \(error)")
                 completion(nil)
@@ -1025,8 +1026,9 @@ final class FirebaseManager {
     
     private func getFilteredMedia(query: Query,
                                   completionHandler: @escaping (QueryDocumentSnapshot?) -> Void) -> Single<[Media]> {
-        return Single.create { [weak self] single in
-            guard let self else { return Disposables.create() }
+        return Single.create { single in
+//        return Single.create { [weak self] single in
+//            guard let self else { return Disposables.create() }
             query.getDocuments { snapshot, error in
                 if let error = error {
                     single(.failure(error))
@@ -1046,7 +1048,6 @@ final class FirebaseManager {
                         print(error)
                     }
                 }
-                print("Fetched media documents:", medias)
                 single(.success(medias))
             }
             return Disposables.create()
