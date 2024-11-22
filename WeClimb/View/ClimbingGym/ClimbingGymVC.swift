@@ -76,17 +76,27 @@ class ClimbingGymVC: UIViewController {
         climbingGymInfoView.viewModel = viewModel
     }
     
-    private func navigateToClimbingDetailGymVC(with grade: String) {
-        //        print("선택된 난이도: \(grade)")
+    private func navigateToClimbingDetailGymVC(with grade: String, hold: String? = nil) {
         guard let gymData = gymData else { return }
         
-        let detailViewModel = ClimbingDetailGymVM(gym: gymData, grade: grade)
-        let climbingDetailGymVC = ClimbingDetailGymVC(viewModel: detailViewModel)
+        let initialFilterConditions = FilterConditions(
+            holdColor: hold,
+            heightRange: nil,
+            armReachRange: nil
+        )
         
+        let detailViewModel = ClimbingDetailGymVM(
+            gym: gymData,
+            grade: grade,
+            initialFilterConditions: initialFilterConditions
+        )
+        
+        let climbingDetailGymVC = ClimbingDetailGymVC(viewModel: detailViewModel)
         climbingDetailGymVC.configure(with: gymData.gymName, grade: grade)
         
         navigationController?.pushViewController(climbingDetailGymVC, animated: true)
     }
+
     
     // MARK: - 데이터 바인딩 - DS
     private func bindSectionData() {
@@ -115,7 +125,6 @@ class ClimbingGymVC: UIViewController {
         viewModel.output.items
             .drive(onNext: { [weak self] items in
                 guard let self else { return }
-                
                 self.colorStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
                 items.forEach { item in
                     let colorView = UIView()
@@ -126,15 +135,15 @@ class ClimbingGymVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        gradeTableView.rx.modelSelected((UIColor, String).self) // 셀 모델 직접 구독
+        gradeTableView.rx.modelSelected((UIColor, String).self)
             .subscribe(onNext: { [weak self] model in
-                guard let self = self else { return }
-                // 페이지 전환 로직 실행
-                self.navigateToClimbingDetailGymVC(with: model.1) // model.1: 선택된 난이도
+                guard let self else { return }
+                // 난이도 선택 및 홀드 정보 전달
+                let selectedHold = self.viewModel.getSelectedHold() // 필요시 ViewModel에서 가져옴
+                self.navigateToClimbingDetailGymVC(with: model.1, hold: selectedHold)
             })
             .disposed(by: disposeBag)
         
-        // Input 이벤트
         gradeTableView.rx.itemSelected
             .bind(to: viewModel.input.gradeSelected)
             .disposed(by: disposeBag)

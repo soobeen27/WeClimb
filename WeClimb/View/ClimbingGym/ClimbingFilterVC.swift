@@ -11,21 +11,31 @@ import SnapKit
 import RxCocoa
 import RxSwift
 
-class ClimbingFilterVC: UIViewController, UIScrollViewDelegate, UICollectionViewDelegate {
+class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
     
-//    // 필터 결과
-//    var filterApplied: ((FilterConditions) -> Void)?
+    private var selectedHoldColor: String?
     
     private let viewModel: ClimbingFilterVM
     private let disposeBag = DisposeBag()
+    
     private let selectedTabSubject = BehaviorSubject<SelectedTab>(value: .hold)
+    
+    let filterConditionsRelay = BehaviorRelay<FilterConditions>(value: FilterConditions(
+        holdColor: nil,
+        heightRange: (0, 200),
+        armReachRange: (0, 200)
+    ))
     
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     
-    init(gymName: String, grade: String) {
+    init(gymName: String, grade: String, initialFilterConditions: FilterConditions) {
         self.viewModel = ClimbingFilterVM(gymName: gymName, grade: grade)
         super.init(nibName: nil, bundle: nil)
+        
+        // 초기 필터 조건 설정
+        self.selectedHoldColor = initialFilterConditions.holdColor
+        self.filterConditionsRelay.accept(initialFilterConditions)
     }
     
     required init?(coder: NSCoder) {
@@ -121,17 +131,17 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate, UICollectionView
     
     private let heightSlider: CustomSlider = {
         let slider = CustomSlider()
-        slider.minimumValue = 120
+        slider.minimumValue = 0
         slider.maximumValue = 200
         slider.lowerValue = 0
-        slider.upperValue = 180
+        slider.upperValue = 200
         slider.backgroundColor = .clear
         return slider
     }()
     
     private lazy var heightMinTextField: UITextField = {
         let textField = createTextFieldWithCM()
-        textField.text = "120"
+        textField.text = "0"
         return textField
     }()
     
@@ -143,17 +153,17 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate, UICollectionView
     
     private let armReachSlider: CustomSlider = {
         let slider = CustomSlider()
-        slider.minimumValue = 120
+        slider.minimumValue = 0
         slider.maximumValue = 200
         slider.lowerValue = 0
-        slider.upperValue = 180
+        slider.upperValue = 200
         slider.backgroundColor = .clear
         return slider
     }()
     
     private lazy var armReachMinTextField: UITextField = {
         let textField = createTextFieldWithCM()
-        textField.text = "120"
+        textField.text = "0"
         return textField
     }()
     
@@ -231,9 +241,11 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate, UICollectionView
         setLayout()
         bindViewModel()
         setupBindings()
+        setupInitialSliderValues()
         setupTabActions()
         bindTabSelection()
         setupCloseButtonAction()
+        setupConfirmButtonAction()
         scrollView.delegate = self
     }
     
@@ -414,8 +426,27 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate, UICollectionView
         }
     }
     
+    private func setupInitialSliderValues() {
+        let currentConditions = filterConditionsRelay.value
+        
+        if let heightRange = currentConditions.heightRange {
+            heightSlider.lowerValue = Double(heightRange.0)
+            heightSlider.upperValue = Double(heightRange.1)
+            
+            heightMinTextField.text = "\(heightRange.0)"
+            heightMaxTextField.text = "\(heightRange.1)"
+        }
+        
+        if let armReachRange = currentConditions.armReachRange {
+            armReachSlider.lowerValue = Double(armReachRange.0)
+            armReachSlider.upperValue = Double(armReachRange.1)
+            
+            armReachMinTextField.text = "\(armReachRange.0)"
+            armReachMaxTextField.text = "\(armReachRange.1)"
+        }
+    }
     
-    //    // MARK: - Actions Setup
+        // MARK: - Actions Setup
     private func setupTabActions() {
         let holdTapGesture = UITapGestureRecognizer()
         let armReachTapGesture = UITapGestureRecognizer()
@@ -466,7 +497,7 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate, UICollectionView
             selectedTabSubject.onNext(.hold)
         }
     }
-
+    
     
     private func bindTabSelection() {
         selectedTabSubject
@@ -572,59 +603,84 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate, UICollectionView
     }
     
     private func bindViewModel() {
-        holdCollectionView.rx.itemSelected
-            .map { Hold.allCases[$0.item].rawValue }
-            .bind(to: viewModel.input.holdSelected)
-            .disposed(by: disposeBag)
-        
-        heightSlider.lowerValueChanged = { [weak self] value in
+        heightSlider.lowerValueChanged = { [weak self] lowerValue in
             guard let self = self else { return }
-            let min = Int(value)
-            self.heightMinTextField.text = "\(min)"
-            self.viewModel.input.heightRangeSelected.onNext((min, Int(self.heightSlider.upperValue)))
+            let lower = Int(lowerValue)
+            let upper = Int(self.heightSlider.upperValue)
+            self.viewModel.updateFilterCondition(heightRange: (lower, upper))
         }
         
-        heightSlider.upperValueChanged = { [weak self] value in
+        heightSlider.upperValueChanged = { [weak self] upperValue in
             guard let self = self else { return }
-            let max = Int(value)
-            self.heightMaxTextField.text = "\(max)"
-            self.viewModel.input.heightRangeSelected.onNext((Int(self.heightSlider.lowerValue), max))
+            let lower = Int(self.heightSlider.lowerValue)
+            let upper = Int(upperValue)
+            self.viewModel.updateFilterCondition(heightRange: (lower, upper))
         }
         
-        armReachSlider.lowerValueChanged = { [weak self] value in
+        armReachSlider.lowerValueChanged = { [weak self] lowerValue in
             guard let self = self else { return }
-            let min = Int(value)
-            self.armReachMinTextField.text = "\(min)"
-            self.viewModel.input.armReachRangeSelected.onNext((min, Int(self.armReachSlider.upperValue)))
+            let lower = Int(lowerValue)
+            let upper = Int(self.armReachSlider.upperValue)
+            self.viewModel.updateFilterCondition(armReachRange: (lower, upper))
         }
         
-        armReachSlider.upperValueChanged = { [weak self] value in
+        armReachSlider.upperValueChanged = { [weak self] upperValue in
             guard let self = self else { return }
-            let max = Int(value)
-            self.armReachMaxTextField.text = "\(max)"
-            self.viewModel.input.armReachRangeSelected.onNext((Int(self.armReachSlider.lowerValue), max))
+            let lower = Int(self.armReachSlider.lowerValue)
+            let upper = Int(upperValue)
+            self.viewModel.updateFilterCondition(armReachRange: (lower, upper))
         }
     }
     
-    // MARK: - Confirm Button Action
-//    private func setupConfirmButtonAction() {
-//        confirmButton.rx.tap
-//            .bind { [weak self] in
-//                guard let self else { return }
-//                
-//                let filterConditions = FilterConditions(
-//                    holdColor: try? self.viewModel.holdSelectedSubject.value(),
-//                    heightRange: try? self.viewModel.heightRangeSubject.value(),
-//                    armReachRange: try? self.viewModel.armReachRangeSubject.value()
-//                )
-//                
-//                // 조건 전달
-//                NotificationCenter.default.post(name: .filterConditionsUpdated, object: filterConditions)
-//                
-//                self.dismiss(animated: true, completion: nil)
-//            }
-//            .disposed(by: disposeBag)
+//    func heightSliderDidChange(minValue: Int, maxValue: Int) {
+//        let currentConditions = filterConditionsRelay.value
+//        
+//        // 새로운 필터 조건 생성 (키 업데이트)
+//        let updatedConditions = FilterConditions(
+//            holdColor: currentConditions.holdColor,
+//            heightRange: (minValue, maxValue),
+//            armReachRange: currentConditions.armReachRange
+//        )
+//        
+//        // Relay에 업데이트
+//        filterConditionsRelay.accept(updatedConditions)
+//        print("updatedConditions")
 //    }
+    
+//    func armReachSliderDidChange(minValue: Int, maxValue: Int) {
+//        let currentConditions = filterConditionsRelay.value
+//        
+//        // 새로운 필터 조건 생성 (암리치만 업데이트)
+//        let updatedConditions = FilterConditions(
+//            holdColor: currentConditions.holdColor,
+//            heightRange: currentConditions.heightRange,
+//            armReachRange: (minValue, maxValue)
+//        )
+//        
+//        // Relay에 업데이트
+//        filterConditionsRelay.accept(updatedConditions)
+//    }
+    
+    // MARK: - Confirm Button Action
+    private func setupConfirmButtonAction() {
+        confirmButton.rx.tap
+            .bind { [weak self] in
+                guard let self = self else { return }
+
+                let filterConditions = FilterConditions(
+                    holdColor: self.selectedHoldColor,
+                    heightRange: (Int(self.heightSlider.lowerValue), Int(self.heightSlider.upperValue)),
+                    armReachRange: (Int(self.armReachSlider.lowerValue), Int(self.armReachSlider.upperValue))
+                )
+                
+                // Relay를 통해 상위 컨트롤러에 전달
+                self.filterConditionsRelay.accept(filterConditions)
+
+                // 모달 닫기
+                self.dismiss(animated: true, completion: nil)
+            }
+            .disposed(by: disposeBag)
+    }
 }
 
 extension ClimbingFilterVC: UICollectionViewDataSource {
@@ -633,14 +689,41 @@ extension ClimbingFilterVC: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SelectSettingCell.className, for: indexPath) as? SelectSettingCell else {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: SelectSettingCell.className,
+            for: indexPath
+        ) as? SelectSettingCell else {
             return UICollectionViewCell()
         }
-        
-        let hold = Hold.allCases[indexPath.item]
+
+        let hold = Hold.allCases[indexPath.row]
         cell.configure(item: hold)
-        
+
+        // 선택된 상태를 반영
+        if hold.rawValue == selectedHoldColor {
+            cell.layer.borderColor = UIColor.label.cgColor
+            cell.layer.borderWidth = 2.0
+        } else {
+            cell.layer.borderColor = UIColor.clear.cgColor
+            cell.layer.borderWidth = 0.0
+        }
         return cell
+    }
+}
+
+extension ClimbingFilterVC: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedHold = Hold.allCases[indexPath.row].rawValue
+        selectedHoldColor = selectedHold
+        collectionView.reloadData()
+
+        let currentConditions = filterConditionsRelay.value
+        let updatedConditions = FilterConditions(
+            holdColor: selectedHoldColor,
+            heightRange: currentConditions.heightRange,
+            armReachRange: currentConditions.armReachRange
+        )
+        filterConditionsRelay.accept(updatedConditions)
     }
 }
 

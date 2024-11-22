@@ -305,39 +305,24 @@ class SFFeedCell: UICollectionViewCell {
     }
     
     func gymGradeImageBind(media: Media) {
-        print("Media grade: \(media.grade ?? "없음")")
-        
-        // 임시 테스트 이미지
-        if let gradeTestImage = UIImage(named: "gradeTEST") {
-            // 이미지를 리사이즈
-            let resizeImage = gradeTestImage.resize(targetSize: CGSize(width: 50, height: 50))
-            gradeImageView.image = resizeImage
-            gradeImageView.backgroundColor = UIColor.clear
-            print("gradeTEST 리사이즈 완료 및 설정")
-        } else {
-            print("gradeTEST 이미지 로드 실패")
-        }
-        
-        guard let gymName = media.gym else {
-            print("no Gym")
-            return
-        }
+        guard let gymName = media.gym else { return }
         FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
-            guard let self,
-                  let gymImageString = gym?.profileImage
-            else { return }
-            FirebaseManager.shared.loadImage(from: gymImageString, into: self.gymImageView)
-            print(gymImageString)
+            guard let self = self else { return }
+            if let gym = gym, let gymImageString = gym.profileImage {
+                FirebaseManager.shared.loadImage(from: gymImageString, into: self.gymImageView)
+            }
         }
-        if let hold = media.hold, let holdColor = Hold(rawValue: hold),
-           let holdImage = holdColor.image(),
-           let gradeColor = media.grade?.colorInfo
-        {
-            let resizeImage = holdImage.resize(targetSize: CGSize(width: 35, height: 35))
-            gradeImageView.image = resizeImage
-//            gradeImageView.backgroundColor = media.grade
-//            gradeImageView.backgroundColor = UIColo
-            gradeImageView.backgroundColor = gradeColor.color
+        
+        if let hold = media.hold?.replacingOccurrences(of: "hold", with: "").lowercased(),
+           let holdEnum = Hold(rawValue: hold),
+           let holdImage = UIImage(named: holdEnum.string) {
+            let resizedImage = holdImage.resize(targetSize: CGSize(width: 35, height: 35))
+            gradeImageView.image = resizedImage
+        }
+        
+        if let grade = media.grade {
+            let gradeColorInfo = grade.colorInfo
+            gradeImageView.backgroundColor = gradeColorInfo.color
         }
     }
     

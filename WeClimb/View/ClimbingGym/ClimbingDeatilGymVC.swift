@@ -16,8 +16,6 @@ class ClimbingDetailGymVC: UIViewController {
     private let viewModel: ClimbingDetailGymVM
     private let disposeBag = DisposeBag()
     
-//    let filterConditionsRelay = BehaviorRelay<FilterConditions?>(value: nil)
-    
     init(viewModel: ClimbingDetailGymVM) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -147,11 +145,12 @@ class ClimbingDetailGymVC: UIViewController {
             .disposed(by: disposeBag)
         
         // 썸네일 컬렉션 뷰 바인딩
-        viewModel.output.problemThumbnails
-            .drive(onNext: { [weak self] urls in
+        viewModel.output.posts
+            .asObservable()
+            .subscribe(onNext: { [weak self] posts in
                 guard let self = self else { return }
                 
-                if urls.isEmpty {
+                if posts.isEmpty {
                     // 썸네일이 없을 때 emptyPost 뷰를 보이고 컬렉션 뷰 숨기기
                     self.emptyPost.isHidden = false
                     self.thumbnailCollectionView.isHidden = true
@@ -162,11 +161,38 @@ class ClimbingDetailGymVC: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
-        
-        viewModel.output.problemThumbnails
-            .drive(thumbnailCollectionView.rx.items(cellIdentifier: ThumbnailCell.className, cellType: ThumbnailCell.self)) { index, url, cell in
-                cell.configure(with: url.absoluteString)
+
+        viewModel.output.posts
+            .asObservable()
+            .bind(to: thumbnailCollectionView.rx.items(
+                cellIdentifier: ThumbnailCell.className,
+                cellType: ThumbnailCell.self
+            )) { index, post, cell in
+                // Post에서 썸네일 URL 가져와서 설정
+                if let thumbnailURL = post.thumbnail {
+                    cell.configure(with: thumbnailURL)
+                }
             }
+            .disposed(by: disposeBag)
+        
+        thumbnailCollectionView.rx.itemSelected
+            .withLatestFrom(viewModel.output.posts) { indexPath, posts in
+                return (indexPath, posts)
+            }
+            .subscribe(onNext: { [weak self] indexPath, posts in
+                guard let self else { return }
+
+                // 선택된 Post의 indexPath.row를 startingIndex로 설정
+                let startingIndex = indexPath.row
+
+                // MainFeedVM 생성
+                let mainFeedVM = MainFeedVM() // 현재 ViewModel의 모든 Post 전달
+                mainFeedVM.posts.accept(posts)
+                
+                // MainFeedVC로 화면 전환
+                let mainFeedVC = SFMainFeedVC(viewModel: mainFeedVM, startingIndex: startingIndex, feedType: .filterPage)
+                self.navigationController?.pushViewController(mainFeedVC, animated: true)
+            })
             .disposed(by: disposeBag)
     }
     
@@ -232,13 +258,24 @@ class ClimbingDetailGymVC: UIViewController {
     private func setupActions() {
         filterButton.rx.tap
             .bind { [weak self] in
-                guard let self else { return }
+                guard let self = self else { return }
                 
-//                // 기본값으로 ClimbingFilterVC 초기화
-//                let climbingFilterVC = ClimbingFilterVC(gymName: "TestGym", grade: "빨")
+                let currentFilter = self.viewModel.getCurrentFilterConditions()
+                let climbingFilterVC = ClimbingFilterVC(
+                    gymName: self.viewModel.gymName,
+                    grade: self.viewModel.grade,
+                    initialFilterConditions: currentFilter
+                )
                 
-                // 모달 표시
-//                self.presentCustomHeightModal(modalVC: climbingFilterVC, heightRatio: 0.69)
+                climbingFilterVC.filterConditionsRelay
+                    .subscribe(onNext: { [weak self] newConditions in
+                        guard let self = self else { return }
+                        self.viewModel.updateFilterConditions(newConditions)
+                        self.viewModel.applyFilters(filterConditions: newConditions)
+                    })
+                    .disposed(by: self.disposeBag)
+                
+                self.presentCustomHeightModal(modalVC: climbingFilterVC, heightRatio: 0.69)
             }
             .disposed(by: disposeBag)
     }
