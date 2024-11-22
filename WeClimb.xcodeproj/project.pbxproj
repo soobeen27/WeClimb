@@ -83,6 +83,7 @@
 		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
 		91BFA9332C91962F0044D5AD /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BFA9322C91962F0044D5AD /* Post.swift */; };
+		91C562232CF0E48E00CBE1F3 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 91C562222CF0E48E00CBE1F3 /* FirebaseRemoteConfig */; };
 		91DC7D242CE0C721004CB66D /* GradeNamespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DC7D232CE0C721004CB66D /* GradeNamespace.swift */; };
 		91E21D112CE20017003269DD /* Hold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E21D102CE20017003269DD /* Hold.swift */; };
 		91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F566CD2CDB566700485F79 /* CommentCellVM.swift */; };
@@ -280,6 +281,7 @@
 				F4892C062C7C23FA00C5FF16 /* Kingfisher in Frameworks */,
 				6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */,
 				F4892BFF2C7C23AC00C5FF16 /* RxCocoa in Frameworks */,
+				91C562232CF0E48E00CBE1F3 /* FirebaseRemoteConfig in Frameworks */,
 				6BC91FB02C7EEB4E00B34083 /* FirebaseStorage in Frameworks */,
 				6BC91FAA2C7EEB4E00B34083 /* FirebaseDatabase in Frameworks */,
 				F4892BFC2C7C239900C5FF16 /* SnapKit in Frameworks */,
@@ -609,6 +611,7 @@
 				F4892C412C8038B500C5FF16 /* RxSwift */,
 				43EC6AD62C9171AA004A2E2F /* LightCompressor */,
 				917DA89D2CD4B0A0006FF6B9 /* RxBlocking */,
+				91C562222CF0E48E00CBE1F3 /* FirebaseRemoteConfig */,
 			);
 			productName = WeClimb;
 			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
@@ -1231,6 +1234,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F4892BFD2C7C23AC00C5FF16 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxBlocking;
+		};
+		91C562222CF0E48E00CBE1F3 /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
 		};
 		F4892BFB2C7C239900C5FF16 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -26,7 +26,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // 파이어베이스 설정
         FirebaseApp.configure()
         // Override point for customization after application launch.
-        
         // 파이어스토어 디비
         let db = Firestore.firestore()
         
@@ -73,5 +72,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
+    
 }
 
