@@ -135,7 +135,10 @@ final class FirebaseManager {
     
     // MARK: 현재 유저 정보 가져오기
     func currentUserInfo(completion: @escaping (Result<User, Error>) -> Void) {
-        guard let user = Auth.auth().currentUser else { return }
+        guard let user = Auth.auth().currentUser else { 
+            completion(.failure(UserError.logout))
+            return
+        }
         let userRef = db.collection("users").document(user.uid)
         
         userRef.getDocument(as: User.self) { result in
