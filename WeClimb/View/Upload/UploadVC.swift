@@ -312,11 +312,11 @@ class UploadVC: UIViewController {
             .drive(onNext: { [weak self] in
                 guard let self else { return }
                 print("알림 이벤트 발생")
-                
-                CommonManager.shared.showAlert(from: self,
-                                               title: "알림",
-                                               message: "1분 미만 비디오를 업로드해주세요.",
-                                               includeCancel: false)
+                let alert = Alert()
+                alert.showAlert(from: self,
+                                title: "알림",
+                                message: "1분 미만 비디오를 업로드해주세요.",
+                                includeCancel: false)
             })
             .disposed(by: disposeBag)
     }
@@ -578,7 +578,8 @@ extension UploadVC {
                     // 첫 번째 미디어 가져오기
                     guard let firstFeedItem = self.viewModel.feedRelay.value.first else {
                         print("첫 번째 미디어가 없습니다.")
-                        CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
+                        let alert = Alert()
+                        alert.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
                         return
                     }
                     
@@ -634,16 +635,17 @@ extension UploadVC {
     }
     
     private func uploadMedia(media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String, uploadStatus: UploadStatus) {
+        let alert = Alert()
         switch uploadStatus {
         case .fail:
-            CommonManager.shared.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
+            alert.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
         case .success:
             isUploading = true
             
             self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailURL)
                 .drive(onNext: {
                     print("업로드 성공")
-                    CommonManager.shared.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
+                    alert.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
                     self.initFeedView()
                     
                     self.removeLoadingOverlay()
