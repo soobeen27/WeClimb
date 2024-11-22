@@ -34,7 +34,7 @@ class SFMainFeedVC: UIViewController{
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = UIColor(hex: "#0B1013")
         collectionView.showsVerticalScrollIndicator = false
-        collectionView.scrollsToTop = false
+//        collectionView.scrollsToTop = false
         
         return collectionView
     }()
