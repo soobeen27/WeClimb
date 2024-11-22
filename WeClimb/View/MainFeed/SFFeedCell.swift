@@ -211,7 +211,7 @@ class SFFeedCell: UICollectionViewCell {
             stopVideo()
             print("스탑 비디오")
         } else {
-            playVideo(reStart: true)
+            playVideo(reStart: false)
             print("플레이 비디오")
         }
     }

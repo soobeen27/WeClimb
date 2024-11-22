@@ -74,7 +74,7 @@ class SFMainFeedVC: UIViewController{
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        playVisibleVideo()
+        playVisibleVideo(reStart: false)
         isCurrentScreenActive = true
     }
     
@@ -133,7 +133,7 @@ class SFMainFeedVC: UIViewController{
     
     @objc private func didEnterForeground() {
         if isCurrentScreenActive {
-            self.playVisibleVideo()
+            self.playVisibleVideo(reStart: false)
         }
     }
     
@@ -178,7 +178,7 @@ class SFMainFeedVC: UIViewController{
             .subscribe(onNext: { _ in
                 if self.currentPageIndex == 0 {
                     print("커런트페이지인덱스: \(self.currentPageIndex)")
-                    self.playVisibleVideo()
+                    self.playVisibleVideo(reStart: true)
                 }
             })
             .disposed(by: disposeBag)
@@ -438,14 +438,19 @@ class SFMainFeedVC: UIViewController{
         }
     }
     
-    func playVisibleVideo() {
+    func playVisibleVideo(reStart: Bool) {
         for cell in collectionView.visibleCells {
             if let feedCell = cell as? SFCollectionViewCell {
                 let innerCollectionView = feedCell.collectionView
                 for innerCell in innerCollectionView.visibleCells {
                     if let feedCell = innerCell as? SFFeedCell, let media = feedCell.media {
-                        print("비디오 재생: \(media.url)")
-                        feedCell.playVideo(reStart: false)
+                        if reStart {
+                            print("리스타트 비디오 재생: \(media.url)")
+                            feedCell.playVideo(reStart: true)
+                        } else {
+                            print("리스타트 아닌 비디오 재생: \(media.url)")
+                            feedCell.playVideo(reStart: false)
+                        }
                     }
                 }
             }
