@@ -89,6 +89,7 @@ class ClimbingGymVC: UIViewController {
         let detailViewModel = ClimbingDetailGymVM(
             gym: gymData,
             grade: convertedGrade,
+            hold: hold,
             initialFilterConditions: initialFilterConditions
         )
         
