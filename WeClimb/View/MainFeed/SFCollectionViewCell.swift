@@ -529,6 +529,7 @@ extension SFCollectionViewCell: UICollectionViewDelegateFlowLayout {
                     print("비디오 URL로 확인됨")
                     cell.rePlay = true
                     cell.playVideo(reStart: true)
+
                 } else {
                     print("이미지일 경우 비디오 멈춤")
                     cell.stopVideo()

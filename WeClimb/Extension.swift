@@ -211,7 +211,7 @@ extension String {
         case "파검", "DarkBlue":
             return ("파랑", "DarkBlue", UIColor(red: 6/255, green: 103/255, blue: 121/255, alpha: 1))
         default:
-            return ("기타", "Other", UIColor.clear)
+            return (self, "Other", UIColor.clear)
         }
     }
     

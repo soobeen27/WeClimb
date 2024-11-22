@@ -119,7 +119,7 @@ extension UploadVM {
                     }
                     
                     // 임시 디렉토리로 파일 복사
-                    let tempVideoURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("mov")
+                    let tempVideoURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("mp4")
                     do {
                         try FileManager.default.copyItem(at: url, to: tempVideoURL)
                         print("비디오 파일이 임시 디렉토리에 저장됨: \(tempVideoURL.path)")
@@ -308,7 +308,7 @@ extension UploadVM {
                 print("압축 시작")
             case .onFailure(_, let error):
                 print("비디오 압축 실패: \(error.localizedDescription)")
-                completion(nil)
+                completion(inputURL)
             case .onCancelled:
                 print("비디오 압축 취소됨")
                 completion(nil)
