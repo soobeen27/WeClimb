@@ -68,7 +68,16 @@ class UserPageVC: UIViewController {
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 5
+        button.isHidden = true
         return button
+    }()
+    
+    private let userInfoLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 13)
+        label.textColor = .gray
+        label.numberOfLines = 1
+        return label
     }()
     
     private let followCountLabel: UILabel = {
@@ -77,6 +86,7 @@ class UserPageVC: UIViewController {
         label.font = UIFont.boldSystemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
+        label.isHidden = true
         return label
     }()
     
@@ -86,6 +96,7 @@ class UserPageVC: UIViewController {
         label.font = UIFont.boldSystemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
+        label.isHidden = true
         return label
     }()
     
@@ -95,6 +106,7 @@ class UserPageVC: UIViewController {
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
+        label.isHidden = true
         return label
     }()
     
@@ -104,6 +116,7 @@ class UserPageVC: UIViewController {
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
+        label.isHidden = true
         return label
     }()
     
@@ -233,6 +246,7 @@ class UserPageVC: UIViewController {
     
     func configure(with data: User) {
         nameLabel.text = data.userName
+        userInfoLabel.text = "\(data.height ?? 0)cm  |  \(data.armReach ?? 0)cm"
 
 //            levelLabel.text = data.userRole
 //            infoLabel.text = "체형: \(data.height ?? "정보 없음") | 팔길이: \(data.armReach ?? "정보 없음")"
@@ -322,7 +336,7 @@ class UserPageVC: UIViewController {
         [profileImage, profileStackView, totalStackView, segmentControl, collectionView, emptyPost]
             .forEach{ view.addSubview($0) }
         
-        [nameStackView, infoLabel, followFollowingButton]
+        [nameStackView, userInfoLabel, infoLabel, followFollowingButton]
             .forEach{ profileStackView.addArrangedSubview($0) }
         
         [nameLabel, levelLabel]
@@ -448,5 +462,5 @@ class UserPageVC: UIViewController {
             })
             .disposed(by: disposeBag)
     }
-}
 
+}
