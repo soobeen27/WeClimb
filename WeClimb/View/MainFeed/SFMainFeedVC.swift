@@ -424,7 +424,7 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
 
 extension SFMainFeedVC {
     func setupCollectionView() {
-        collectionView.reloadData()
+//        collectionView.reloadData()
 //        if !viewModel.shouldFetch {
         if feedType != .mainFeed {
             DispatchQueue.main.async {
