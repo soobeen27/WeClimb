@@ -512,6 +512,9 @@ class SFMainFeedVC: UIViewController{
                             feedCell.playVideo(reStart: true)
                         } else {
                             print("리스타트 아닌 비디오 재생: \(media.url)")
+                            feedCell.rePlay = true
+                            feedCell.playVideo(reStart: false)
+                            feedCell.rePlay = false
                         }
                     }
                 }
