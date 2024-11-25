@@ -472,6 +472,7 @@ class UploadVC: UIViewController {
             $0.centerY.equalTo(selectedMediaView.snp.centerY).offset(-8)
             $0.size.equalTo(CGSize(width: 150, height: 150))
         }
+
         
         textView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(16)
