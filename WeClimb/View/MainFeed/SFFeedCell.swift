@@ -80,7 +80,6 @@ class SFFeedCell: UICollectionViewCell {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleVideoPlayback))
         self.addGestureRecognizer(tapGesture)
         setLayout()
-        setNotifications()
     }
     
     required init?(coder: NSCoder) {
@@ -225,6 +224,7 @@ class SFFeedCell: UICollectionViewCell {
     
     func playVideo(reStart: Bool) {
         guard let player = player else { return }
+        setNotifications()
         print("Play")
         if reStart {
             player.seek(to: .zero)
