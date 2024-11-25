@@ -38,7 +38,7 @@ class SelectSettingModalVC: UIViewController {
         let button = UIButton()
         button.setTitle(UploadNameSpace.okText, for: .normal)
         button.setTitleColor(.label, for: .normal)
-        button.layer.cornerRadius = 20
+        button.layer.cornerRadius = 8
         button.isEnabled = false
         
         button.backgroundColor = UIColor {
@@ -92,10 +92,10 @@ class SelectSettingModalVC: UIViewController {
         }
         
         okButton.snp.makeConstraints {
-            $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).inset(16)
-            $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).inset(16)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(16)
-            $0.height.equalTo(40)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
+            $0.leading.equalToSuperview().offset(16)
+            $0.trailing.equalToSuperview().offset(-16)
+            $0.height.equalTo(50)
         }
     }
     

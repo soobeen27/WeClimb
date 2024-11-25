@@ -464,7 +464,12 @@ class UploadVC: UIViewController {
         selectedMediaView.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(view.frame.width)
+            // SE 예외처리
+            if UIScreen.main.bounds.size.width <= 375 {
+                $0.height.equalTo(UIScreen.main.bounds.width * 0.9)
+            } else {
+                $0.height.equalTo(view.frame.width)
+            }
         }
         
         callPHPickerButton.snp.makeConstraints {
@@ -472,12 +477,16 @@ class UploadVC: UIViewController {
             $0.centerY.equalTo(selectedMediaView.snp.centerY).offset(-8)
             $0.size.equalTo(CGSize(width: 150, height: 150))
         }
-
         
         textView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.top.equalTo(selectedMediaView.snp.bottom).offset(8)
-            $0.height.equalTo(100)
+            
+            if UIScreen.main.bounds.size.width <= 375 {
+                $0.height.equalTo(UIScreen.main.bounds.height * 0.12)
+            } else {
+                $0.height.equalTo(UIScreen.main.bounds.height * 0.15)
+            }
         }
         
         gymView.snp.makeConstraints {
