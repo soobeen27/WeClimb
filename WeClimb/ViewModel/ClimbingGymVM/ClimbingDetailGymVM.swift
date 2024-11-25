@@ -52,7 +52,7 @@ class ClimbingDetailGymVM {
     func applyFilters(filterConditions: FilterConditions) {
         guard let holdColor = filterConditions.holdColor else {
             print("홀드 값이 없습니다.")
-            loadMediaURLs(for: gym.gymName, grade: grade, hold: hold)
+            loadMediaURLs(for: gym.gymName, grade: grade, hold: nil)
             return
         }
         let formattedHold = "hold\(holdColor.capitalized)"
