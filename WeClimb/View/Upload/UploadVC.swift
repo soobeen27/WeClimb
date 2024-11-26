@@ -557,19 +557,22 @@ extension UploadVC : UITextViewDelegate {
         return true
     }
 }
-
-extension UploadVC : PHPickerViewControllerDelegate {
+extension UploadVC: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        viewModel.mediaItems.accept(results)
+        let mediaData: [(index: Int, mediaItem: PHPickerResult)] = results.enumerated().map { (index, mediaItem) in
+            print("피커뷰에서 인덱스: \(index) 미디어아이템\(mediaItem.itemProvider)")
+            return (index, mediaItem)
+        }
+        
+        viewModel.mediaItems.accept(mediaData)
         
         picker.dismiss(animated: true) {
             self.viewModel.setMedia()
         }
         
         if !results.isEmpty {
-            bindSettingButton()
-            
-            let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelButtonTapped))
+            self.bindSettingButton()
+            let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(self.cancelButtonTapped))
             navigationItem.rightBarButtonItem = cancelButton
         }
     }
@@ -725,7 +728,7 @@ extension UploadVC {
         self.viewModel.pageChanged = BehaviorRelay<Int>(value: 0)
         
         self.viewModel.shouldUpdateUI = true
-        self.viewModel.mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
+        self.viewModel.mediaItems = BehaviorRelay<[(index: Int, mediaItem: PHPickerResult)]>(value: [])
         print("피드릴레이 확인하자: \(self.viewModel.feedRelay.value)")
         
         viewModel.feedRelay
