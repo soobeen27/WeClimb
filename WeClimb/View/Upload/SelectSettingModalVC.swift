@@ -152,6 +152,8 @@ class SelectSettingModalVC: UIViewController {
     }
 
     private func setCollectionLayout() -> UICollectionViewLayout {
+        let isSmallScreen = UIScreen.main.bounds.size.height <= 667
+        
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(0.6)
@@ -170,14 +172,17 @@ class SelectSettingModalVC: UIViewController {
         )
         let secondGroup = NSCollectionLayoutGroup.horizontal(layoutSize: secondGroupSize, subitem: item, count: 1)
         
+        let verticalGroupHeight: CGFloat = isSmallScreen ? 0.65 : 0.45
+        
         let verticalGroupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(0.23),
-            heightDimension: .fractionalHeight(0.4)
+            heightDimension: .fractionalHeight(verticalGroupHeight)
         )
         let verticalGroup = NSCollectionLayoutGroup.vertical(
             layoutSize: verticalGroupSize,
             subitems: [firstGroup, secondGroup]
         )
+        verticalGroup.interItemSpacing = .fixed(0)
         
         let section = NSCollectionLayoutSection(group: verticalGroup)
         section.orthogonalScrollingBehavior = .continuous

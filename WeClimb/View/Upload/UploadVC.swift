@@ -482,7 +482,7 @@ class UploadVC: UIViewController {
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.top.equalTo(selectedMediaView.snp.bottom).offset(8)
             
-            if UIScreen.main.bounds.size.width <= 375 {
+            if UIScreen.main.bounds.size.width <= 667 {
                 $0.height.equalTo(UIScreen.main.bounds.height * 0.12)
             } else {
                 $0.height.equalTo(UIScreen.main.bounds.height * 0.15)
