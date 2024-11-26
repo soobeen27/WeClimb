@@ -17,7 +17,7 @@ class FeedView : UIView {
     private let viewModel: UploadVM
     var isPlaying: Bool = true
     
-    private lazy var collectionView: UICollectionView = {
+    lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0
