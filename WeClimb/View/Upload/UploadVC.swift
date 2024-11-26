@@ -201,7 +201,7 @@ class UploadVC: UIViewController {
         setNotifications()
         bindPostButton()
         bindGymName()
-//        bindSettingButton()
+        bindSettingButton()
         self.viewModel.feedRelay.accept([])
         self.viewModel.cellData.accept([])
         
@@ -571,7 +571,6 @@ extension UploadVC: PHPickerViewControllerDelegate {
         }
         
         if !results.isEmpty {
-            self.bindSettingButton()
             let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(self.cancelButtonTapped))
             navigationItem.rightBarButtonItem = cancelButton
         }
@@ -587,6 +586,7 @@ extension UploadVC {
                 
                 self.postButton.backgroundColor = UIColor.systemGray6
                 self.addLoadingOverlay()
+                self.feedView?.pauseAllVideo()
                 
                 self.navigationController?.navigationBar.isUserInteractionEnabled = false
             })
