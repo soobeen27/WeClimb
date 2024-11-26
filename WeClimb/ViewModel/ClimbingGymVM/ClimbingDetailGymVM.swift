@@ -55,7 +55,7 @@ class ClimbingDetailGymVM {
             loadMediaURLs(for: gym.gymName, grade: grade, hold: nil)
             return
         }
-        let formattedHold = "hold\(holdColor.capitalized)"
+        let formattedHold = "\(holdColor)"
         print("적용된 홀드 값: \(formattedHold)")
 
         let heightCondition = filterConditions.heightRange.flatMap { $0 == (0, 200) ? nil : $0 }

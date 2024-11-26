@@ -565,7 +565,6 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
             .disposed(by: disposeBag)
     }
     
-    // 팔길이 관련
     private func bindArmReachSlider() {
         armReachSlider.lowerValueChanged = { [weak self] value in
             guard let self = self else { return }
@@ -644,9 +643,8 @@ class ClimbingFilterVC: UIViewController, UIScrollViewDelegate {
                     armReachRange: (Int(self.armReachSlider.lowerValue), Int(self.armReachSlider.upperValue))
                 )
                 
-                // Relay를 통해 상위 컨트롤러에 전달
                 self.filterConditionsRelay.accept(filterConditions)
-                // 모달 닫기
+                
                 self.dismiss(animated: true, completion: nil)
             }
             .disposed(by: disposeBag)
@@ -669,8 +667,7 @@ extension ClimbingFilterVC: UICollectionViewDataSource {
         let hold = Hold.allCases[indexPath.row]
         cell.configure(item: hold)
         
-        // 선택된 상태를 반영
-        if hold.rawValue == selectedHoldColor {
+        if hold.string == selectedHoldColor {
             cell.layer.borderColor = UIColor.label.cgColor
             cell.layer.borderWidth = 2.0
         } else {
@@ -685,21 +682,16 @@ extension ClimbingFilterVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selected = Hold.allCases[indexPath.row]
         
-        if selectedHoldColor == selected.rawValue {
+        if selectedHoldColor == selected.string {
             selectedHoldColor = nil
-            
-            print("홀드 선택 해제: \(selected.rawValue)")
         } else {
-            selectedHoldColor = selected.rawValue
-            print("홀드 선택됨: \(selected.rawValue)")
+            selectedHoldColor = selected.string
         }
         
         collectionView.reloadData()
         
-//        let formattedHoldColor = selectedHoldColor.map { "hold\($0.capitalized)" }
-        
         let updatedConditions = FilterConditions(
-            holdColor: selectedHoldColor?.lowercased(),
+            holdColor: selectedHoldColor,
             heightRange: filterConditionsRelay.value.heightRange,
             armReachRange: filterConditionsRelay.value.armReachRange
         )
