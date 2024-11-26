@@ -73,6 +73,11 @@ class SelectSettingModalVC: UIViewController {
         view.layer.cornerRadius = 20
         view.layer.masksToBounds = true
 
+//        bindSettingCell()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         bindSettingCell()
     }
     
@@ -118,8 +123,8 @@ class SelectSettingModalVC: UIViewController {
         .drive(onNext: { [weak self] pageIndex, feedItems in
             guard let self else { return }
 
-            self.viewModel.selectedGrade.accept("")
-            self.viewModel.selectedHold.accept(.none)
+//            self.viewModel.selectedGrade.accept("")
+//            self.viewModel.selectedHold.accept(.none)
 
             guard pageIndex >= 0 && pageIndex < feedItems.count else {
                 self.okButton.isEnabled = false
@@ -136,6 +141,10 @@ class SelectSettingModalVC: UIViewController {
 
             if isGradeSelected, isHoldSelected {
                 self.okButton.isEnabled = true
+            let currentHold = feedItem.hold
+
+            if let currentGrade = feedItem.grade {
+                self.viewModel.selectedGrade.accept(currentGrade)
             } else {
                 self.okButton.isEnabled = false
             }
@@ -147,6 +156,15 @@ class SelectSettingModalVC: UIViewController {
             } else {
                 self.viewModel.selectedHold.accept(.none)
             }
+
+        })
+        .disposed(by: disposeBag)
+
+        // selectedGrade와 selectedHold가 업데이트 될 때마다 OK 버튼 상태를 업데이트
+        Driver.combineLatest(
+            // 선택된 grade와 hold가 모두 있을 때만 OK 버튼 활성화
+            self.okButton.isEnabled = selectedGrade != nil && selectedHold != nil
+            print("OK Button Enabled: \(self.okButton.isEnabled)")
         })
         .disposed(by: disposeBag)
     }
