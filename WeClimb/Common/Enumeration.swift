@@ -10,6 +10,7 @@ import Foundation
 //MARK: 로그인 관련 enum
 enum LoginResult {
     case login
+    case noName
     case createAccount
 }
 
@@ -37,6 +38,7 @@ enum LoginType {
     case google
     case apple
     case kakao
+    case none
     
     var string: String {
         switch self {
@@ -46,6 +48,8 @@ enum LoginType {
             return "apple"
         case .kakao:
             return "kakao"
+        case .none:
+            return "undefined"
         }
     }
 }
@@ -67,11 +71,17 @@ enum Like {
 //MARK: 유저 관련 에러
 enum UserError: Error {
     case none
+    case logout
+    case noID
     
     var description: String {
         switch self {
         case .none:
             "해당 이름 유저 없음"
+        case .logout:
+            "로그인된 유저가 없음"
+        case .noID:
+            "로그인된 아이디를 찾을 수 없음"
         }
     }
 }
@@ -94,4 +104,21 @@ enum PostError: Error {
 enum UploadStatus {
     case fail
     case success
+}
+
+enum CommonError: Error {
+    case noSelf
+}
+
+enum GetDocumentError: Error {
+    case noField
+    case failDecoding
+}
+
+// MARK: Feed Type
+enum FeedType {
+    case mainFeed
+    case myPage
+    case userPage
+    case filterPage
 }

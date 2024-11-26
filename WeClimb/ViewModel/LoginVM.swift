@@ -36,7 +36,7 @@ class LoginVM {
         }
     }
     
-    func logIn(with credential: AuthCredential, loginType: LoginType ,completion: @escaping (LoginResult) -> Void) {
+    func logIn(with credential: AuthCredential, loginType: LoginType, completion: @escaping (LoginResult) -> Void) {
         Auth.auth().signIn(with: credential) { authResult, error in
             if let error = error {
                 print("로그인 에러!: \(error.localizedDescription)")
@@ -46,13 +46,18 @@ class LoginVM {
                 let tokenRef = self.db.collection("users").document(user.uid)
                 tokenRef.getDocument { document, error in
                     if let document = document, document.exists {
-                        completion(.login)
+                        if let userData = document.data(), let userName = userData["userName"] as? String {
+                            if userName.isEmpty {
+                                completion(.noName) // 닉네임이 비어 있으면 noName 처리
+                            } else {
+                                completion(.login)
+                            }
+                        } else {
+                            completion(.noName) // 유저가 존재하지만 userName 필드가 없을 경우에도 noName 처리
+                        }
                     } else {
                         do {
-//                            try tokenRef.setData(from: User(userUID: user.uid, lastModified: Date(), loginType: loginType.string,
-//                                                            registrationDate: Date(), userName: nil, userRole: "user", armReach: nil,
-//                                                            height: nil, followers: nil, following: nil, profileImage: nil))
-                            try tokenRef.setData(from: User(userName: nil, profileImage: nil, registerationDate: Date(), lastModified: Date(), userRole: "user", armReach: nil, height: nil, posts: nil, comments: nil, followers: nil, following: nil, blackList: nil))
+                            try tokenRef.setData(from: User(userName: nil, profileImage: nil, registerationDate: Date(), lastModified: Date(), userRole: "user", armReach: nil, height: nil, posts: nil, comments: nil, followers: nil, following: nil, snsConsent: false, blackList: nil))
                             completion(.createAccount)
                         } catch {
                             print("setData Error: \(error)")
@@ -69,7 +74,7 @@ class LoginVM {
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
         
-        GIDSignIn.sharedInstance.signIn(withPresenting: presenter) { [unowned self] result, error in
+        GIDSignIn.sharedInstance.signIn(withPresenting: presenter) { result, error in
             guard error == nil else {
                 print(#fileID, #function, #line, "- comment")
                 return
@@ -110,7 +115,7 @@ class LoginVM {
             UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
                 if let error = error {
                     print(error)
-                }
+                } 
                 else {
                     print("loginWithKakaoTalk() success.")
                     completion(oauthToken?.idToken)

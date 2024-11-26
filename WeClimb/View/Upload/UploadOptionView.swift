@@ -18,9 +18,9 @@ class UploadOptionView : UIView {
         return imageView
     }()
     
-    private let optionLabel: UILabel = {
+    var optionLabel: UILabel = {
         let label = UILabel()
-        label.text = UploadNameSpace.selectGym
+//        label.text = UploadNameSpace.selectGym
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = .label
         return label
@@ -32,7 +32,7 @@ class UploadOptionView : UIView {
         label.text = UploadNameSpace.select
         label.textColor = .secondaryLabel
         label.textAlignment = .right
-        label.isHidden = true
+//        label.isHidden = true
         return label
     }()
     
@@ -40,11 +40,17 @@ class UploadOptionView : UIView {
         let imageView = UIImageView(image: UIImage(systemName: "chevron.right"))
         imageView.tintColor = .systemGray
         imageView.contentMode = .scaleAspectFit
-        imageView.isHidden = true
+//        imageView.isHidden = true
         return imageView
     }()
     
-    private let separatorLine: UILabel = {
+    private let topSeparatorLine: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .secondarySystemBackground
+        return label
+    }()
+    
+    private let bottomSeparatorLine: UILabel = {
         let label = UILabel()
         label.backgroundColor = .secondarySystemBackground
         return label
@@ -71,10 +77,10 @@ class UploadOptionView : UIView {
     private func setLayout() {
         self.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
-        [symbolImageView, separatorLine, optionLabel]
+        [topSeparatorLine, symbolImageView, optionLabel, bottomSeparatorLine]
             .forEach { self.addSubview($0) }
         
-        separatorLine.snp.makeConstraints {
+        topSeparatorLine.snp.makeConstraints {
             $0.height.equalTo(1)
             $0.left.right.equalToSuperview()
             $0.top.equalToSuperview()
@@ -91,7 +97,7 @@ class UploadOptionView : UIView {
             $0.leading.equalTo(symbolImageView.snp.trailing).offset(8)
         }
         
-        if showSelectedLabel {
+        if !showSelectedLabel {
             [selectedLabel, nextImageView]
                 .forEach { self.addSubview($0) }
             
@@ -104,17 +110,12 @@ class UploadOptionView : UIView {
                 $0.trailing.equalToSuperview().offset(-16)
                 $0.centerY.equalToSuperview()
             }
-        }
-    }
-    
-    // MARK: - 암장 선택시 버튼 업데이트 YJ
-    func updateText(with gymName: String) {
-        selectedLabel.text = gymName
-        selectedLabel.textColor = .label
-        
-        nextImageView.isHidden = true
-        nextImageView.snp.makeConstraints {
-            $0.width.equalTo(0)
+            
+            bottomSeparatorLine.snp.makeConstraints {
+                $0.height.equalTo(1)
+                $0.left.right.equalToSuperview()
+                $0.bottom.equalToSuperview()
+            }
         }
     }
 }

@@ -5,6 +5,7 @@
 //  Created by Soo Jang on 8/26/24.
 //
 
+import AVFoundation
 import UIKit
 
 import FirebaseAuth
@@ -25,7 +26,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // 파이어베이스 설정
         FirebaseApp.configure()
         // Override point for customization after application launch.
-        
         // 파이어스토어 디비
         let db = Firestore.firestore()
         
@@ -36,6 +36,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         Thread.sleep(forTimeInterval: 0.7)
+        
+        // AVAudioSession (무음시에도 소리 출력)
+        do {
+                   try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+                   try AVAudioSession.sharedInstance().setActive(true)
+               } catch {
+                   print("Failed to set audio session category: \(error)")
+               }
         return true
     }
     
@@ -64,5 +72,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
+    
 }
 

@@ -9,38 +9,71 @@ import Foundation
 
 import RxCocoa
 import RxSwift
+import Firebase
+
 
 class MainFeedVM {
+    
+    let gymButtonTap = PublishRelay<String?>()
+    let gradeButtonTap = PublishRelay<Media?>()
+    
+    let completedLoad = PublishSubject<Void>()
+    
+    let play = PublishSubject<Void>()
+    
+    struct Input {
+        let reportDeleteButtonTap: Driver<Post?>
+        let commentButtonTap: Driver<Post?>
+        let profileTap: Driver<String?>
+    }
+    
+    struct Output {
+        let presentReport: Driver<Post?>
+        let presentComment: Driver<Post?>
+        let pushProfile: Driver<String?>
+    }
+    
     private let disposeBag = DisposeBag()
+    var posts = BehaviorRelay<[Post]>(value: [])
+    var isLastCell = BehaviorRelay<Bool>(value: false)
     
-//    let posts = PublishSubject<[(post: Post, media: [Media])]>() // 포스트 데이터 스트림
-    var posts = BehaviorRelay<[(post: Post, media: [Media])]>(value: [])
-//    var posts: [(post: Post, media: [Media])] = []
-    var isLastCell = false
-    var shouldFetch: Bool 
+    let db = Firestore.firestore()
     
-    init(shouldFetch: Bool) {
-        self.shouldFetch = shouldFetch
-        if shouldFetch {
-            fetchInitialFeed()
-        }
+    
+    func transform(input: Input) -> Output {
+        return Output(presentReport: input.reportDeleteButtonTap, 
+                      presentComment: input.commentButtonTap,
+                      pushProfile: input.profileTap
+                      )
+    }
+    
+    func mainFeed() {
+        fetchInitialFeed()
+        isLastCell
+            .subscribe(onNext: { [weak self] shouldLoad in
+                guard let self else { return }
+                if shouldLoad {
+                    self.fetchMoreFeed()
+                }
+        })
+        .disposed(by: disposeBag)
+        
+    }
+    
+    func filterFeed() {
+        
     }
     
     // 피드 데이터 초기 로드
     func fetchInitialFeed() {
         FirebaseManager.shared.feedFirst { [weak self] fetchedPosts in
             guard let self, let fetchedPosts = fetchedPosts else { return }
-//            print("******************************\(fetchedPosts)********************************************")
             self.posts.accept(fetchedPosts)
-            self.posts.value.forEach {
-                print($0.post.creationDate)
-            }
-//            self.posts = fetchedPosts
         }
     }
     
     // 추가 데이터 로드
-    func fetchMoreFeed() {
+    private func fetchMoreFeed() {
         FirebaseManager.shared.feedLoading { [weak self] fetchedPosts in
             guard let self, let fetchedPosts = fetchedPosts else { return }
             var loadedPosts = self.posts.value
@@ -49,9 +82,29 @@ class MainFeedVM {
             }
             
             self.posts.accept(loadedPosts)
-//            fetchedPosts.forEach {
-//                self.posts.append($0)
-//            }
         }
+    }
+    
+    func fetchMyPosts() {
+        FirebaseManager.shared.currentUserInfo { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let user):
+                guard let posts = user.posts else { return }
+                FirebaseManager.shared.postsFrom(postRefs: posts)
+                    .subscribe(onNext: { data in
+                        self.posts.accept(data)
+                    }, onError: { error in
+                        print("Error - while getting posts: \(error)")
+                    })
+                    .disposed(by: disposeBag)
+            case .failure(let error):
+                print("Error - while getting User Info: \(error)")
+            }
+        }
+    }
+    
+    func deletePost(uid: String) -> Single<Void> {
+        return FirebaseManager.shared.deletePost(uid: uid)
     }
 }

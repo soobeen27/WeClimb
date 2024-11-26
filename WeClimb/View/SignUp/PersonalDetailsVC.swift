@@ -16,6 +16,13 @@ class PersonalDetailsVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = PersonalDetailsVM()
     
+    private let logoView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "LogoText")?.withRenderingMode(.alwaysTemplate))
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = UIColor.mainPurple
+        return imageView
+    }()
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "정보를 더 알려주세요!"
@@ -40,14 +47,14 @@ class PersonalDetailsVC: UIViewController {
         return label
     }()
     
-    private let heightButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("cm", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.95)
-        button.layer.cornerRadius = 10
-        return button
+    private let heightTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "키를 입력하세요"
+        textField.font = UIFont.systemFont(ofSize: 18)
+        textField.textColor = .black
+        textField.borderStyle = .roundedRect
+        textField.keyboardType = .numberPad
+        return textField
     }()
     
     private let armReachLabel: UILabel = {
@@ -58,14 +65,14 @@ class PersonalDetailsVC: UIViewController {
         return label
     }()
     
-    private let armReachButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("cm", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.95)
-        button.layer.cornerRadius = 10
-        return button
+    private let armReachTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "팔길이를 입력하세요"
+        textField.font = UIFont.systemFont(ofSize: 18)
+        textField.textColor = .black
+        textField.borderStyle = .roundedRect
+        textField.keyboardType = .numberPad
+        return textField
     }()
     
     private let confirmButton: UIButton = {
@@ -74,14 +81,26 @@ class PersonalDetailsVC: UIViewController {
         button.backgroundColor = UIColor.mainPurple
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 8
-        //        button.isEnabled = false
+        button.isEnabled = true
         return button
     }()
+    
+    func cmLabel() -> UILabel {
+        let label = UILabel()
+        label.text = "cm"
+        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        label.textColor = .black
+        return label
+    }
+    
+    lazy var cmLabel1 = cmLabel()
+    lazy var cmLabel2 = cmLabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
         setupBindings()
+        addKeyboardObservers()
     }
     
     private func setLayout() {
@@ -89,19 +108,29 @@ class PersonalDetailsVC: UIViewController {
         self.overrideUserInterfaceStyle = .light
         
         [
+            logoView,
             titleLabel,
             titleDetailLabel,
             heightLabel,
-            heightButton,
+            heightTextField,
+            cmLabel1,
             armReachLabel,
-            armReachButton,
+            armReachTextField,
+            cmLabel2,
             confirmButton
         ].forEach { view.addSubview($0) }
         
-        titleLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(62)
-            $0.centerX.equalToSuperview()
+        logoView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
             $0.leading.equalToSuperview().offset(16)
+            $0.width.equalTo(120)
+            $0.height.equalTo(40)
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(logoView.snp.bottom).offset(8)
+            $0.leading.equalToSuperview().offset(16)
+            $0.height.equalTo(40)
         }
         
         titleDetailLabel.snp.makeConstraints {
@@ -114,9 +143,9 @@ class PersonalDetailsVC: UIViewController {
             $0.leading.equalToSuperview().offset(16)
         }
         
-        heightButton.snp.makeConstraints {
+        heightTextField.snp.makeConstraints {
             $0.centerY.equalTo(heightLabel)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.trailing.equalToSuperview().offset(-50)
             $0.width.equalTo(160)
             $0.height.equalTo(40)
         }
@@ -126,10 +155,24 @@ class PersonalDetailsVC: UIViewController {
             $0.leading.equalToSuperview().offset(16)
         }
         
-        armReachButton.snp.makeConstraints {
+        armReachTextField.snp.makeConstraints {
             $0.centerY.equalTo(armReachLabel)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.trailing.equalToSuperview().offset(-50)
             $0.width.equalTo(160)
+            $0.height.equalTo(40)
+        }
+        
+        cmLabel1.snp.makeConstraints {
+            $0.centerY.equalTo(heightTextField.snp.centerY)
+            $0.trailing.equalToSuperview().inset(16)
+            $0.width.equalTo(30)
+            $0.height.equalTo(40)
+        }
+        
+        cmLabel2.snp.makeConstraints {
+            $0.centerY.equalTo(armReachTextField.snp.centerY)
+            $0.trailing.equalToSuperview().inset(16)
+            $0.width.equalTo(30)
             $0.height.equalTo(40)
         }
         
@@ -142,119 +185,82 @@ class PersonalDetailsVC: UIViewController {
     }
     
     private func setupBindings() {
-        heightButton.rx.tap
-            .subscribe(onNext: { [weak self] in
+        let heightObservable = heightTextField.rx.text.orEmpty
+            .map { Int($0) }
+        
+        let armReachObservable = armReachTextField.rx.text.orEmpty
+            .map { Int($0) }
+        
+        // 확인 버튼 눌렀을 때 Firebase 업데이트 요청
+        confirmButton.rx.tap
+            .withLatestFrom(Observable.combineLatest(heightObservable, armReachObservable))
+            .subscribe(onNext: { [weak self] height, armReach in
                 guard let self = self else { return }
-                let rangePickerVC = RangePickerVC()
                 
-                rangePickerVC.modalPresentationStyle = .pageSheet
-                if let sheet = rangePickerVC.sheetPresentationController {
-                    sheet.detents = [.custom { _ in
-                        return 296
-                    }]
-                    sheet.preferredCornerRadius = 24
+                var data: [String: Any] = [:]
+                if let height = height { data["height"] = height }
+                if let armReach = armReach { data["armReach"] = armReach }
+                
+                self.viewModel.updateUserDetails(data: data)
+            })
+            .disposed(by: disposeBag)
+        
+        // Firebase 업데이트 성공 여부 구독
+        viewModel.updateSuccess
+            .asDriver(onErrorJustReturn: false)
+            .drive(onNext: { [weak self] success in
+                guard let self = self else { return }
+                
+                if success {
+                    print("사용자 정보 업데이트 성공!")
+                    
+                    let tabBarController = TabBarController()
+                    self.navigationController?.pushViewController(tabBarController, animated: true)
+                    self.navigationController?.setNavigationBarHidden(true, animated: true)
+                } else {
+                    print("사용자 정보 업데이트 실패.")
                 }
-                
-                rangePickerVC.selectedRange
-                    .subscribe(onNext: { [weak self] selectedRange in
-                        self?.heightButton.setTitle("\(selectedRange) cm", for: .normal)
-                        self?.viewModel.heightInput.accept(selectedRange)  // onNext 대신 accept 사용
-                    })
-                    .disposed(by: self.disposeBag)
-
-                self.present(rangePickerVC, animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
-        
-        //        heightButton.rx.tap
-        //            .subscribe(onNext: { [weak self] in
-        //                guard let self else { return }
-        //                let rangePickerVC = RangePickerVC()
-        //
-        //                rangePickerVC.modalPresentationStyle = .pageSheet
-        //                if let sheet = rangePickerVC.sheetPresentationController {
-        //                    sheet.detents = [.custom { _ in
-        //                        return 296
-        //                    }]
-        //                    sheet.preferredCornerRadius = 24
-        //                }
-        //
-        //                rangePickerVC.selectedRange
-        //                    .subscribe(onNext: { [weak self] selectedRange in
-        //                        self?.heightButton.setTitle("\(selectedRange) cm", for: .normal)
-        //                    })
-        //                    .disposed(by: self.disposeBag)
-        //
-        //                self.present(rangePickerVC, animated: true, completion: nil)
-        //            })
-        //            .disposed(by: disposeBag)
-        
-        armReachButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
-                let rangePickerVC = RangePickerVC()
-                
-                rangePickerVC.modalPresentationStyle = .pageSheet
-                if let sheet = rangePickerVC.sheetPresentationController {
-                    sheet.detents = [.custom { _ in
-                        return 296
-                    }]
-                    sheet.preferredCornerRadius = 24
-                }
-                
-                rangePickerVC.selectedRange
-                    .subscribe(onNext: { [weak self] selectedRange in
-                        self?.armReachButton.setTitle("\(selectedRange) cm", for: .normal)
-                        self?.viewModel.armReachInput.accept(selectedRange)
-                    })
-                    .disposed(by: self.disposeBag)
-                
-                self.present(rangePickerVC, animated: true, completion: nil)
-            })
-            .disposed(by: disposeBag)
-        
-        //        armReachButton.rx.tap
-        //            .subscribe(onNext: { [weak self] in
-        //                guard let self else { return }
-        //                let rangePickerVC = RangePickerVC()
-        //
-        //                rangePickerVC.modalPresentationStyle = .pageSheet
-        //                if let sheet = rangePickerVC.sheetPresentationController {
-        //                    sheet.detents = [.custom { _ in
-        //                        return 296
-        //                    }]
-        //                    sheet.preferredCornerRadius = 24
-        //                }
-        //
-        //                rangePickerVC.selectedRange
-        //                    .subscribe(onNext: { [weak self] selectedRange in
-        //                        self?.armReachButton.setTitle("\(selectedRange) cm", for: .normal)
-        //                    })
-        //                    .disposed(by: self.disposeBag)
-        //
-        //                self.present(rangePickerVC, animated: true, completion: nil)
-        //            })
-        //            .disposed(by: disposeBag)
-        
-        // heightInput과 armReachInput 결합
-        Observable.combineLatest(viewModel.heightInput, viewModel.armReachInput)
-            .subscribe(onNext: { [weak self] newHeight, newArmReach in
-                guard let self = self else { return }
-                
-                // confirmButton 눌렀을 때 두 값 Firebase로 넘기기
-                self.confirmButton.rx.tap
-                    .subscribe(onNext: {
-                        FirebaseManager.shared.updateAccount(with: newHeight, for: .height) {
-                            FirebaseManager.shared.updateAccount(with: newArmReach, for: .armReach) {
-                                let tabBarController = TabBarController()
-                                self.navigationController?.pushViewController(tabBarController, animated: true)
-                                //탭바로 넘어갈 때 네비게이션바 가리기
-                                self.navigationController?.setNavigationBarHidden(true, animated: true)
-                            }
-                        }
-                    })
-                    .disposed(by: self.disposeBag)
-            })
-            .disposed(by: disposeBag)
+    }
+    
+    
+    //MARK: - 키보드 on&off에 따른 버튼 애니메이션
+    private func addKeyboardObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    private func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc
+    private func keyboardWillShow(notification: NSNotification) {
+        if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRectangle = keyboardFrame.cgRectValue
+            let keyboardHeight = keyboardRectangle.height
+            UIView.animate(withDuration: 0.3) {
+                self.confirmButton.transform = CGAffineTransform(translationX: 0, y: -keyboardHeight + self.view.safeAreaInsets.bottom)
+            }
+        }
+    }
+    
+    @objc
+    private func keyboardWillHide(notification: NSNotification) {
+        UIView.animate(withDuration: 0.3) {
+            self.confirmButton.transform = .identity
+        }
+    }
+    
+    deinit {
+        removeKeyboardObservers()
+    }
+    
+    
+    //MARK: - 빈공간 터치 시 키보드 내리기
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+        super.touchesBegan(touches, with: event)
     }
 }

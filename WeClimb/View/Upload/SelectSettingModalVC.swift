@@ -1,0 +1,308 @@
+//
+//  SelectSettingModalVC.swift
+//  WeClimb
+//
+//  Created by 강유정 on 11/12/24.
+//
+
+import UIKit
+
+import SnapKit
+import RxCocoa
+import RxSwift
+
+class SelectSettingModalVC: UIViewController {
+    
+    private var viewModel: UploadVM
+    private let disposeBag = DisposeBag()
+    
+    private lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: setCollectionLayout())
+        collectionView.register(SelectSettingCell.self, forCellWithReuseIdentifier: SelectSettingCell.className)
+        collectionView.register(UploadHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: UploadHeaderView.className)
+        
+        collectionView.backgroundColor = UIColor {
+            switch $0.userInterfaceStyle {
+            case .dark:
+                return UIColor(named: "BackgroundColor") ?? .black
+            default:
+                return UIColor.systemGroupedBackground
+            }
+        }
+        collectionView.isScrollEnabled = true
+        
+        return collectionView
+    }()
+    
+    let okButton: UIButton = {
+        let button = UIButton()
+        button.setTitle(UploadNameSpace.okText, for: .normal)
+        button.setTitleColor(.label, for: .normal)
+        button.layer.cornerRadius = 20
+        button.isEnabled = false
+        
+        button.backgroundColor = UIColor {
+            switch $0.userInterfaceStyle {
+            case .dark:
+                return UIColor.secondarySystemBackground
+            default:
+                return UIColor.white
+            }
+        }
+        return button
+    }()
+    
+    init(viewModel: UploadVM) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setLayout()
+        setColor()
+        setNavigation()
+        
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        
+        view.layer.cornerRadius = 20
+        view.layer.masksToBounds = true
+
+        bindSettingCell()
+    }
+    
+    private func setNavigation() {
+        self.title = UploadNameSpace.setting
+    }
+    
+    private func setLayout() {
+        [collectionView, okButton]
+            .forEach {  view.addSubview($0) }
+        
+        collectionView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(16)
+            $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).inset(8)
+            $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).inset(8)
+            $0.bottom.equalTo(okButton.snp.top).offset(-16)
+        }
+        
+        okButton.snp.makeConstraints {
+            $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).inset(16)
+            $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).inset(16)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(16)
+            $0.height.equalTo(40)
+        }
+    }
+    
+    private func setColor() {
+        view.backgroundColor = UIColor {
+            switch $0.userInterfaceStyle {
+            case .dark:
+                return UIColor(named: "BackgroundColor") ?? .black
+            default:
+                return UIColor.systemGroupedBackground
+            }
+        }
+    }
+    
+    private func bindSettingCell() {
+        Driver.combineLatest(
+            viewModel.pageChanged.asDriver(onErrorJustReturn: 0),
+            viewModel.feedRelay.asDriver()
+        )
+        .drive(onNext: { [weak self] pageIndex, feedItems in
+            guard let self else { return }
+
+            self.viewModel.selectedGrade.accept("")
+            self.viewModel.selectedHold.accept(.none)
+
+            guard pageIndex >= 0 && pageIndex < feedItems.count else {
+                self.okButton.isEnabled = false
+                return
+            }
+
+            let feedItem = feedItems[pageIndex]
+            
+            let currentGrade = feedItem.grade
+            let currentHoldString = feedItem.hold
+
+            let isGradeSelected = currentGrade != nil
+            let isHoldSelected = currentHoldString != nil
+
+            if isGradeSelected, isHoldSelected {
+                self.okButton.isEnabled = true
+            } else {
+                self.okButton.isEnabled = false
+            }
+
+            self.viewModel.selectedGrade.accept(currentGrade ?? "")
+            
+            if let currentHold = Hold.allCases.first(where: { $0.string == currentHoldString }) {
+                self.viewModel.selectedHold.accept(currentHold)
+            } else {
+                self.viewModel.selectedHold.accept(.none)
+            }
+        })
+        .disposed(by: disposeBag)
+    }
+
+    private func setCollectionLayout() -> UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(0.6)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let firstGroupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(0.5)
+        )
+        let firstGroup = NSCollectionLayoutGroup.horizontal(layoutSize: firstGroupSize, subitem: item, count: 1)
+        
+        let secondGroupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(0.5)
+        )
+        let secondGroup = NSCollectionLayoutGroup.horizontal(layoutSize: secondGroupSize, subitem: item, count: 1)
+        
+        let verticalGroupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(0.23),
+            heightDimension: .fractionalHeight(0.4)
+        )
+        let verticalGroup = NSCollectionLayoutGroup.vertical(
+            layoutSize: verticalGroupSize,
+            subitems: [firstGroup, secondGroup]
+        )
+        
+        let section = NSCollectionLayoutSection(group: verticalGroup)
+        section.orthogonalScrollingBehavior = .continuous
+        section.interGroupSpacing = 16
+        section.contentInsets = .init(top: 8, leading: 16, bottom: 8, trailing: 16)
+        
+        let headerSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(40)
+        )
+        
+        let header = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: headerSize,
+            elementKind: UICollectionView.elementKindSectionHeader,
+            alignment: .top
+        )
+        
+        section.boundarySupplementaryItems = [header]
+        
+        return UICollectionViewCompositionalLayout(section: section)
+    }
+}
+
+enum Section: Int, CaseIterable {
+    case gradeSection
+    case holdSection
+    
+    var title: String {
+        switch self {
+        case .gradeSection : return "난이도를 선택해주세요"
+        case .holdSection : return "홀드를 선택해주세요"
+        }
+    }
+}
+
+extension SelectSettingModalVC : UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        switch Section(rawValue: section) {
+        case .gradeSection:
+            return viewModel.gradeRelayArray.value.count
+        case .holdSection:
+            return Hold.allCases.count
+        default:
+            return 0
+        }
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 2
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SelectSettingCell.className, for: indexPath) as? SelectSettingCell else {
+            return UICollectionViewCell()
+        }
+        
+        switch Section(rawValue: indexPath.section) {
+        case .gradeSection:
+            let grade = viewModel.gradeRelayArray.value[indexPath.row]
+            print("Grade: \(grade)")
+            cell.configure(item: grade)
+            
+            viewModel.selectedGrade
+                .asDriver(onErrorJustReturn: "")
+                .map { $0 == grade }
+                .drive(onNext: { isSelected in
+                    cell.layer.borderColor = isSelected ? UIColor.mainPurple.cgColor : UIColor.clear.cgColor
+                    cell.layer.borderWidth = isSelected ? 1 : 0
+                })
+                .disposed(by: disposeBag)
+            
+        case .holdSection:
+            let hold = Hold.allCases[indexPath.row]
+            print("Hold: \(hold)")
+            cell.configure(item: hold)
+            
+            viewModel.selectedHold
+                .asDriver(onErrorJustReturn: .none)
+                .map { $0 == hold }
+                .drive(onNext: { isSelected in
+                    cell.layer.borderColor = isSelected ? UIColor.mainPurple.cgColor : UIColor.clear.cgColor
+                    cell.layer.borderWidth = isSelected ? 1 : 0
+                })
+                .disposed(by: disposeBag)
+            
+        default:
+            return UICollectionViewCell()
+        }
+        
+        return cell
+    }
+}
+
+extension SelectSettingModalVC: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        switch Section(rawValue: indexPath.section) {
+        case .gradeSection:
+            let grade = viewModel.gradeRelayArray.value[indexPath.row]
+            viewModel.selectedGrade.accept(grade)
+            viewModel.optionSelected(optionText: grade, buttonType: "grade")
+        case .holdSection:
+            let hold = Hold.allCases[indexPath.row]
+            viewModel.selectedHold.accept(hold)
+            viewModel.optionSelected(optionText: hold.string, buttonType: "hold")
+        default:
+            break
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            return UICollectionReusableView()
+        }
+        
+        guard let headerView = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: UploadHeaderView.className,
+            for: indexPath
+        ) as? UploadHeaderView else {
+            return UICollectionReusableView()
+        }
+        
+        let sectionType = Section.allCases[indexPath.section]
+        headerView.configure(with: sectionType.title)
+        return headerView
+    }
+}

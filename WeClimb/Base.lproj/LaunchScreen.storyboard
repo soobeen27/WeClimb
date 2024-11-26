@@ -13,25 +13,33 @@
         <scene sceneID="EHf-IW-A2E">
             <objects>
                 <viewController id="01J-lp-oVM" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
+                    <view key="view" contentMode="scaleToFill" id="UFg-eg-5s8">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchScreenIMG" translatesAutoresizingMaskIntoConstraints="NO" id="XCG-9F-UAc">
-                                <rect key="frame" x="61" y="338" width="300" height="180"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LogoImage" translatesAutoresizingMaskIntoConstraints="NO" id="yIJ-rS-MoD">
+                                <rect key="frame" x="135" y="329.66666666666669" width="123" height="120"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="120" id="GgH-Fh-7dE"/>
+                                    <constraint firstAttribute="width" constant="123" id="UHF-Pt-EF3"/>
+                                </constraints>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LogoText" translatesAutoresizingMaskIntoConstraints="NO" id="ePv-cy-wnm">
+                                <rect key="frame" x="113" y="453.66666666666669" width="167" height="62.000000000000057"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="62" id="Rkm-hW-t1Z"/>
+                                </constraints>
                             </imageView>
                         </subviews>
-                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <viewLayoutGuide key="safeArea" id="exa-lS-8NF"/>
                         <color key="backgroundColor" name="BackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="XCG-9F-UAc" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="61" id="8w6-aC-wFl"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="XCG-9F-UAc" secondAttribute="bottom" constant="300" id="KqP-To-vaz"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="XCG-9F-UAc" secondAttribute="trailing" constant="32" id="drv-Fk-eOH"/>
-                            <constraint firstItem="XCG-9F-UAc" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="279" id="hMl-FH-9OY"/>
+                            <constraint firstItem="ePv-cy-wnm" firstAttribute="centerY" secondItem="yIJ-rS-MoD" secondAttribute="bottom" constant="35" id="GGG-T3-vfK"/>
+                            <constraint firstItem="yIJ-rS-MoD" firstAttribute="centerX" secondItem="ePv-cy-wnm" secondAttribute="centerX" id="IPo-m8-h6v"/>
+                            <constraint firstItem="exa-lS-8NF" firstAttribute="centerY" secondItem="ePv-cy-wnm" secondAttribute="top" constant="-15" id="TMk-uq-Zpw"/>
+                            <constraint firstItem="yIJ-rS-MoD" firstAttribute="centerX" secondItem="UFg-eg-5s8" secondAttribute="centerX" id="paM-F5-wR2"/>
+                            <constraint firstItem="ePv-cy-wnm" firstAttribute="leading" secondItem="exa-lS-8NF" secondAttribute="leading" constant="113" id="ygd-aT-vUc"/>
                         </constraints>
-                        <variation key="heightClass=regular-widthClass=compact">
-                            <nil key="backgroundColor"/>
-                        </variation>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -40,7 +48,8 @@
         </scene>
     </scenes>
     <resources>
-        <image name="LaunchScreenIMG" width="622" height="768"/>
+        <image name="LogoImage" width="266.66665649414062" height="266.66665649414062"/>
+        <image name="LogoText" width="796.33331298828125" height="147.33332824707031"/>
         <namedColor name="BackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

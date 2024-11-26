@@ -7,16 +7,19 @@
 
 import UIKit
 
+import RxCocoa
 import RxSwift
 import SnapKit
 
 class UserPageVC: UIViewController {
     
     private let disposeBag = DisposeBag()
-    private let viewModel = UserPageVM()
+    var viewModel: UserPageVM // 외부에서 주입받기
     
     private var isFollowing = false
-    private var userData: User?
+    
+    // 값이 계속 변동하기 때문에 var로함 - DS
+    var userUID: String?
     
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
@@ -65,7 +68,16 @@ class UserPageVC: UIViewController {
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 5
+        button.isHidden = true
         return button
+    }()
+    
+    private let userInfoLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 13)
+        label.textColor = .gray
+        label.numberOfLines = 1
+        return label
     }()
     
     private let followCountLabel: UILabel = {
@@ -74,6 +86,7 @@ class UserPageVC: UIViewController {
         label.font = UIFont.boldSystemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
+        label.isHidden = true
         return label
     }()
     
@@ -83,6 +96,7 @@ class UserPageVC: UIViewController {
         label.font = UIFont.boldSystemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
+        label.isHidden = true
         return label
     }()
     
@@ -92,6 +106,7 @@ class UserPageVC: UIViewController {
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
+        label.isHidden = true
         return label
     }()
     
@@ -101,6 +116,7 @@ class UserPageVC: UIViewController {
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .center
+        label.isHidden = true
         return label
     }()
     
@@ -164,9 +180,50 @@ class UserPageVC: UIViewController {
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(MyPageCell.self, forCellWithReuseIdentifier: MyPageCell.className)
+        collectionView.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         
         return collectionView
     }()
+    
+    private let emptyPost: UIView = {
+        let view = UIView()
+        view.isHidden = false
+        
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "no_Post") // 비어 있을 때 보여줄 이미지
+        
+        let label = UILabel()
+        label.text = "게시물이 없습니다."
+        label.textColor = .gray
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 13)
+        
+        [imageView, label]
+            .forEach { view.addSubview($0) }
+        
+        imageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview().offset(-20)
+            $0.width.height.equalTo(120)
+        }
+        
+        label.snp.makeConstraints {
+            $0.top.equalTo(imageView.snp.bottom).offset(8)
+            $0.centerX.equalToSuperview()
+        }
+        
+        return view
+    }()
+    
+    init(viewModel: UserPageVM) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -176,10 +233,20 @@ class UserPageVC: UIViewController {
         setLayout()
         bind()
         setNavigation()
+        bindPost()
+        bindCollectionView()
+        bindEmpty()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationController?.navigationBar.tintColor = .label
     }
     
     func configure(with data: User) {
         nameLabel.text = data.userName
+        userInfoLabel.text = "\(data.height ?? 0)cm  |  \(data.armReach ?? 0)cm"
 
 //            levelLabel.text = data.userRole
 //            infoLabel.text = "체형: \(data.height ?? "정보 없음") | 팔길이: \(data.armReach ?? "정보 없음")"
@@ -209,7 +276,10 @@ class UserPageVC: UIViewController {
         let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
             self?.reportModal()
         }
-        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive, handler: nil)
+        let deleteAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
+            self?.blackList()
+        }
+        
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
         [reportAction, deleteAction, cancelAction]
@@ -227,9 +297,26 @@ class UserPageVC: UIViewController {
     }
     
     //MARK: - 차단하기 기능
-    private func blackList(userUID: String) {
-        viewModel.blockUser(withUID: userUID)
+    private func blackList() {
+        guard let userUID = userUID else {
+            print("차단할 유저 UID가 없습니다.")
+            return
+        }
+        
+//        print("차단할 유저 UID: \(userUID)")
+        
+        // 차단 기능 수행
+        viewModel.blockUser(byUID: userUID) { [weak self] success in
+            guard let self = self else { return }
+            let alert = Alert()
+            if success {
+                alert.showAlert(from: self, title: "차단완료", message: "")
+            } else {
+                alert.showAlert(from: self, title: "차단실패", message: "")
+            }
+        }
     }
+
     
     private func buttonTapped() {
         isFollowing.toggle()
@@ -246,10 +333,10 @@ class UserPageVC: UIViewController {
     }
 
     private func setLayout() {
-        [profileImage, profileStackView, totalStackView, segmentControl, collectionView]
+        [profileImage, profileStackView, totalStackView, segmentControl, collectionView, emptyPost]
             .forEach{ view.addSubview($0) }
         
-        [nameStackView, infoLabel, followFollowingButton]
+        [nameStackView, userInfoLabel, infoLabel, followFollowingButton]
             .forEach{ profileStackView.addArrangedSubview($0) }
         
         [nameLabel, levelLabel]
@@ -296,6 +383,11 @@ class UserPageVC: UIViewController {
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
         }
+        
+        emptyPost.snp.makeConstraints {
+            $0.centerX.equalTo(collectionView.snp.centerX)
+            $0.centerY.equalTo(collectionView.snp.centerY).offset(-20)
+        }
     }
     
     private func bind() {
@@ -310,10 +402,65 @@ class UserPageVC: UIViewController {
         
         followFollowingButton.rx.tap
             .bind { [weak self] in
-                print("followFollowingButton tapped")
+//                print("followFollowingButton tapped")
                 self?.buttonTapped()
             }
             .disposed(by: disposeBag)
     }
-}
+    
 
+    private func bindPost() {
+        viewModel.posts
+            .asDriver()
+            .drive(collectionView.rx.items(cellIdentifier: MyPageCell.className, cellType: MyPageCell.self)) { index, post, cell in
+
+                if let thumbnailURL = post.thumbnail, !thumbnailURL.isEmpty {
+//                    print("유저페이지 썸네일 URL: \(thumbnailURL)")
+                    cell.configure(with: thumbnailURL)
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindEmpty() {
+        viewModel.posts
+            .asDriver()
+            .drive(onNext: { [weak self] posts in
+                guard let self = self else { return }
+                if posts.isEmpty {
+                    self.emptyPost.isHidden = false
+                    self.collectionView.isHidden = true
+                } else {
+                    self.emptyPost.isHidden = true
+                    self.collectionView.isHidden = false
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindCollectionView() {
+        collectionView.rx.itemSelected
+            .asDriver()
+            .drive(onNext: { [weak self] indexPath in
+                guard let self = self else { return }
+
+                let selectedIndex = indexPath.row
+                let allPosts = self.viewModel.posts.value
+
+//                let mainFeedVM = MainFeedVM(shouldFetch: false)
+                let mainFeedVM = MainFeedVM()
+
+                mainFeedVM.posts.accept(allPosts)
+
+                let mainFeedVC = SFMainFeedVC(viewModel: mainFeedVM, startingIndex: selectedIndex, feedType: .userPage)
+//                mainFeedVC.viewModel = mainFeedVM
+
+//                mainFeedVC.startingIndex = selectedIndex
+//                print("전달할 인데스: \(mainFeedVC.startingIndex)")
+
+                self.navigationController?.pushViewController(mainFeedVC, animated: true)
+            })
+            .disposed(by: disposeBag)
+    }
+
+}

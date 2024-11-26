@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "FA5F3E3B-1488-4031-A0FD-9F502F060246",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:WeClimb.xcodeproj",
+      "identifier" : "F4892BE22C7C237700C5FF16",
+      "name" : "WeClimb"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:WeClimb.xcodeproj",
+        "identifier" : "917DA8932CD4AE13006FF6B9",
+        "name" : "WeClimbTests"
+      }
+    }
+  ],
+  "version" : 1
+}

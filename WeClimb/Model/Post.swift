@@ -11,9 +11,14 @@ import FirebaseFirestore
 struct Media: Codable {
     let mediaUID: String
     let url: String
-    let sector: String?
+    let hold: String?
     let grade: String?
+    let gym: String?
+    let creationDate: Date?
     let postRef: DocumentReference
+    let thumbnailURL: String?
+    let height: Int?
+    let armReach: Int?
     //    let authorUID: String
     //    let postUID: String
     //    let gym: String?
@@ -29,6 +34,7 @@ struct Post: Codable {
     let gym: String?
     let medias: [DocumentReference]
     let thumbnail: String?
+    let commentCount: Int?
 //    let medias: [Media]?
 }
 
@@ -37,7 +43,7 @@ struct Comment: Codable {
     let commentUID: String
     let authorUID: String
     let content: String
-    let creationDate: Date;
+    let creationDate: Date
     let like: [String]?
     let postRef: DocumentReference
 }

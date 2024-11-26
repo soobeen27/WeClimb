@@ -5,45 +5,83 @@
 //  Created by Soobeen Jang on 9/26/24.
 //
 
-import UIKit
 import AVKit
+import AVFoundation
+import UIKit
 
 import SnapKit
+import RxSwift
+import RxCocoa
 import Kingfisher
 
 class SFFeedCell: UICollectionViewCell {
-    var imageView: UIImageView!
     var player: AVPlayer?
     var playerLayer: AVPlayerLayer?
-    var isVideo: Bool = false
+    var isPlaying = false
     
-    let playButton: UIButton = {
-        let button = UIButton()
-//        button.setImage(UIImage(named: "play.circle"), for: .normal)
-        button.setImage(UIImage(systemName: "play.circle"), for: .normal)
-        button.contentVerticalAlignment = .fill
-        button.contentHorizontalAlignment = .fill
-        button.tintColor = .gray
-        return button
+    private var firstVideo = true
+    
+    var rePlay = true
+    
+    var disposeBag = DisposeBag()
+    
+    lazy var imageView: UIImageView = {
+        let imageView = UIImageView(frame: contentView.bounds)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.backgroundColor = .clear
+        return imageView
     }()
+    
+    private lazy var gymImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFit
+        imageView.backgroundColor = .white
+        imageView.layer.cornerRadius = 16
+        return imageView
+    }()
+    
+    private lazy var gradeImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.clipsToBounds = true
+        imageView.contentMode = .center
+        imageView.backgroundColor = .white
+        imageView.layer.cornerRadius = 16
+        return imageView
+    }()
+    
+    private lazy var gymGradeStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [gymImageView, gradeImageView])
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        return stackView
+    }()
+    
+    var gymTap = PublishRelay<String?>()
+    var gradeTap = PublishRelay<Media?>()
     
     var media: Media?
     
+    var completedLoad = PublishSubject<Void>()
+    
+    private var playerIsSetUp = false
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        contentView.overrideUserInterfaceStyle = .dark
         contentView.backgroundColor = UIColor(hex: "#0B1013")
-        // 이미지 뷰 초기화
-        imageView = UIImageView(frame: contentView.bounds)
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        contentView.addSubview(imageView)
-        
-        contentView.addSubview(playButton)
-        playButton.snp.makeConstraints {
-            $0.center.equalTo(contentView)
-            $0.size.equalTo(75)
-        }
+//        contentView.backgroundColor = .clear
+//        contentView.addSubview(playButton)
+//        playButton.snp.makeConstraints {
+//            $0.center.equalTo(contentView)
+//            $0.size.equalTo(75)
+//        }
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleVideoPlayback))
+        self.addGestureRecognizer(tapGesture)
+        setLayout()
+//        self.firstVideo = true
+        setNotifications()
     }
     
     required init?(coder: NSCoder) {
@@ -52,127 +90,289 @@ class SFFeedCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        if let playerLayer = playerLayer {
+            playerLayer.removeFromSuperlayer()
+        }
+        imageView.removeFromSuperview()
+        resetPlayer()
+        gradeImageView.image = nil
+        gradeImageView.backgroundColor = nil
+        gymImageView.image = nil
         imageView.image = nil
-        stopVideo() // 셀 재사용 시 비디오 정지
+        imageView.backgroundColor = .clear
         media = nil
-        playerLayer?.removeFromSuperlayer()
-        playButton.isHidden = true
-        player = nil
-        playerLayer = nil
+        setLayout()
+        disposeBag = DisposeBag()
+//        imageViewGestureBind()
     }
     
-    func configure(with media: Media) {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        playerLayer?.frame = self.contentView.bounds
+    }
+    
+    func configure(with media: Media, viewModel: MainFeedVM) {
         guard let url = URL(string: media.url) else { return }
         imageView.image = nil
-        playerLayer?.removeFromSuperlayer()
-        player = nil // 플레이어 해제
-         playerLayer = nil // 레이어 해제
-        playButton.isHidden = true
+        resetPlayer()
         self.media = media
+        
         if url.pathExtension == "mp4" {
             loadVideo(from: media)
         } else {
             loadImage(from: url)
         }
+        gymGradeImageBind(media: media)
+        imageViewGestureBind()
     }
     
     private func loadImage(from url: URL) {
-        self.isVideo = false
-        self.playButton.isHidden = true
+        contentView.addSubview(imageView)
+        contentView.sendSubviewToBack(imageView)
         imageView.kf.setImage(with: url)
+        
+        imageView.isUserInteractionEnabled = false
     }
     
     private func loadVideo(from media: Media) {
         guard let videoURL = URL(string: media.url) else { return }
+        resetPlayer()
         let cacheKey = "\(media.mediaUID).mp4" // 예: userUID 또는 postID
         
-        downloadAndCacheVideo(with: videoURL, cacheKey: cacheKey) { [weak self] cachedURL in
-            guard let cachedURL = cachedURL,
-                  let self
-            else {
+        streamAndCacheVideo(with: videoURL, cacheKey: cacheKey) { [weak self] cachedURL in
+            guard let self = self, let cachedURL = cachedURL else {
                 print("비디오 다운로드 또는 캐싱 실패")
                 return
             }
             
             DispatchQueue.main.async {
-                self.player = AVPlayer(url: cachedURL)
-                self.playerLayer = AVPlayerLayer(player: self.player)
-                self.playerLayer?.frame = self.contentView.bounds
-                self.playerLayer?.videoGravity = .resizeAspect
-                if let playerLayer = self.playerLayer {
-                    self.contentView.layer.addSublayer(playerLayer)
+                self.setupPlayer(with: cachedURL)
+                if self.firstVideo {
+                    self.firstVideo = false
+                    self.completedLoad.onNext(())
+                    print("데이터 로드 완료")
                 }
-                self.setupPlayButton()
-                self.isVideo = true
-                self.playButton.isHidden = false
-                self.contentView.bringSubviewToFront(self.playButton)
-//                self.player?.seek(to: .zero)
-//                self.player?.play()
-//                self.playVideo()
             }
         }
     }
-    func setupPlayButton() {
-        playButton.addTarget(self, action: #selector(playButtonTapped), for: .touchUpInside)
-     }
-    @objc func playButtonTapped() {
-        player?.play()
-        playButton.isHidden = true
-        
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(playerDidFinishPlaying),
-                                               name: .AVPlayerItemDidPlayToEndTime,
-                                               object: player?.currentItem)
-    }
-    @objc func playerDidFinishPlaying() {
-        playButton.isHidden = false
-        self.contentView.bringSubviewToFront(self.playButton)
-        player?.seek(to: .zero) // 비디오 끝나면 처음으로 돌려놓기
-    }
     
-    func stopVideo() {
-        if isVideo {
-            playButton.isHidden = false
-            self.contentView.bringSubviewToFront(self.playButton)
-            player?.pause()
-        }
-    }
-    func playVideo() {
-        print("Play")
-
-        player?.seek(to: .zero)
-        player?.play()
-        playButton.isHidden = true
-
-    }
-    func downloadAndCacheVideo(with url: URL, cacheKey: String, completion: @escaping (URL?) -> Void) {
-        let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        let fileURL = cacheDirectory.appendingPathComponent(cacheKey)
-        
-        // 이미 캐싱된 파일이 있는지 확인
-        if FileManager.default.fileExists(atPath: fileURL.path) {
-            completion(fileURL)
+    private func setupPlayer(with url: URL) {
+        let asset = AVAsset(url: url)
+        player = AVPlayer(url: url)
+        playerLayer = AVPlayerLayer(player: player)
+        playerLayer?.frame = self.contentView.bounds
+        playerLayer?.opacity = 1.0
+        playerLayer?.backgroundColor = UIColor(hex: "#0B1013").cgColor
+        guard let track = asset.tracks(withMediaType: .video).first else {
+            print("비디오 트랙을 찾을 수 없습니다.")
             return
         }
         
-        // URLSession을 사용하여 비디오 파일 다운로드
-        let task = URLSession.shared.downloadTask(with: url) { localURL, response, error in
-            guard let localURL = localURL, error == nil else {
+        let size = track.naturalSize.applying(track.preferredTransform)
+        let width = abs(size.width)
+        let height = abs(size.height)
+        let ratio = height / width
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            if width >= height {
+                self.playerLayer?.videoGravity = .resizeAspect
+            } else {
+                self.playerLayer?.videoGravity = .resizeAspectFill
+            }
+            CATransaction.commit()
+        }
+        
+        if let playerLayer = playerLayer {
+//            contentView.layer.insertSublayer(playerLayer, below: gymGradeStackView.layer)
+            contentView.layer.insertSublayer(playerLayer, at: 0)
+        }
+        
+        gymGradeImageBringToFront()
+    }
+
+    @objc func reStartVideo() {
+        if rePlay {
+            print("restartVideo 호출됨")
+            guard let player = player else { return }
+            player.seek(to: .zero)
+            player.play()
+            print("비디오 다시 재생 시작됨")
+        } else {
+            stopVideo()
+            self.rePlay = false
+        }
+    }
+
+    @objc func toggleVideoPlayback() {
+        if isPlaying {
+//            self.rePlay = false
+            stopVideo()
+            self.rePlay = false
+            print("스탑 비디오")
+        } else {
+            self.rePlay = true
+            playVideo(reStart: false)
+            print("플레이 비디오")
+        }
+    }
+    
+    func stopVideo() {
+//        print("Stop")
+        self.rePlay = false
+        player?.pause()
+        isPlaying = false
+    }
+    
+    func playVideo(reStart: Bool) {
+        if rePlay {
+            self.rePlay = true
+            print("Play")
+            if reStart {
+                player?.seek(to: .zero)
+                print("리스타트")
+            }
+            player?.play()
+            isPlaying = true
+        } else {
+            stopVideo()
+            self.rePlay = false
+        }
+    }
+    
+    private func resetPlayer() {
+        player?.pause()
+        playerLayer?.removeFromSuperlayer()
+        player = nil
+        playerLayer = nil
+    }
+    
+    private func setNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(reStartVideo), name: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
+        print("AVPlayerItemDidPlayToEndTime 알림 등록")
+    }
+    
+    func streamAndCacheVideo(with url: URL, cacheKey: String, completion: @escaping (URL?) -> Void) {
+        guard let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+            print("캐시 디렉토리를 찾을 수 없음.")
+            completion(nil)
+            return
+        }
+        
+        let cachedFileURL = cacheDirectory.appendingPathComponent(cacheKey)
+        
+        if FileManager.default.fileExists(atPath: cachedFileURL.path) {
+            print("이미 캐시된 파일이 존재: \(cachedFileURL.path)")
+            completion(cachedFileURL)
+            return
+        }
+        
+        let task = URLSession.shared.downloadTask(with: url) { (location, response, error) in
+            if let error = error {
+                print("Error downloading video: \(error.localizedDescription)")
                 completion(nil)
                 return
             }
             
+            guard let location = location else {
+                print("다운로드된 파일이 없습니다.")
+                completion(nil)
+                return
+            }
+            
+            print("다운로드 완료, 파일 위치: \(location.path)")
+            
             do {
-                // 파일을 캐시 디렉토리에 저장
-                try FileManager.default.moveItem(at: localURL, to: fileURL)
-                completion(fileURL)
+                try FileManager.default.moveItem(at: location, to: cachedFileURL)
+                print("파일을 캐시 디렉토리로 이동 완료: \(cachedFileURL.path)")
+                completion(cachedFileURL)
             } catch {
-                print("파일 저장 에러: \(error)")
+                print("파일 이동 중 오류 발생: \(error.localizedDescription)")
                 completion(nil)
             }
         }
+        
+        print("다운로드 시작: \(url.absoluteString)")
         task.resume()
     }
     
+    func imageViewGestureBind() {
+        let gymImageTapGesture = UITapGestureRecognizer()
+        gymImageView.isUserInteractionEnabled = true
+        gymImageView.addGestureRecognizer(gymImageTapGesture)
+        gymImageTapGesture.rx.event
+            .throttle(.milliseconds(1000), scheduler: MainScheduler.instance)
+            .map { [weak self] _ in
+//                print(self?.media?.gym)
+                return self?.media?.gym
+            }
+            .bind(to: gymTap)
+            .disposed(by: disposeBag)
+        
+        let gradeImageTapGesture = UITapGestureRecognizer()
+        gradeImageView.isUserInteractionEnabled = true
+        gradeImageView.addGestureRecognizer(gradeImageTapGesture)
+        gradeImageTapGesture.rx.event
+            .throttle(.milliseconds(1000), scheduler: MainScheduler.instance)
+            .map { [weak self] _ in
+//                print(self?.media?.gym)
+                return self?.media
+            }
+            .bind(to: gradeTap)
+            .disposed(by: disposeBag)
+    }
+    
+    func gymGradeImageBind(media: Media) {
+        guard let gymName = media.gym else { return }
+        FirebaseManager.shared.gymInfo(from: gymName) { [weak self] gym in
+            guard let self = self else { return }
+            if let gym = gym, let gymImageString = gym.profileImage {
+                FirebaseManager.shared.loadImage(from: gymImageString, into: self.gymImageView)
+            }
+        }
+        
+        if let hold = media.hold?.replacingOccurrences(of: "hold", with: "").lowercased(),
+           let holdEnum = Hold(rawValue: hold),
+           let holdImage = UIImage(named: holdEnum.string) {
+            let resizedImage = holdImage.resize(targetSize: CGSize(width: 35, height: 35))
+            gradeImageView.image = resizedImage
+        }
+        
+        if let grade = media.grade {
+            let gradeColorInfo = grade.colorInfo
+            gradeImageView.backgroundColor = gradeColorInfo.color
+        }
+    }
+    
+    func gymGradeImageBringToFront() {
+        contentView.bringSubviewToFront(gradeImageView)
+        contentView.bringSubviewToFront(gymImageView)
+    }
+    
+    func setLayout() {
+//        [
+//            gymImageView
+//        ].forEach {
+//            self.contentView.addSubview($0)
+//        }
+        [
+            gymGradeStackView
+        ].forEach {
+            self.contentView.addSubview($0)
+        }
+        gymImageView.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 50, height: 50))
+//            $0.bottom.equalToSuperview().offset(-16)
+//            $0.trailing.equalToSuperview().offset(-16)
+        }
+        gradeImageView.snp.makeConstraints {
+            $0.size.equalTo(CGSize(width: 50, height: 50))
+        }
+        gymGradeStackView.snp.makeConstraints {
+            $0.bottom.equalToSuperview().offset(-16)
+            $0.trailing.equalToSuperview().offset(-16)
+        }
+    }
 }
-

@@ -19,6 +19,13 @@ class CreateNickNameVC: UIViewController {
     
     var selectedImage: UIImage?
     
+    private let logoView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "LogoText")?.withRenderingMode(.alwaysTemplate))
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = UIColor.mainPurple
+        return imageView
+    }()
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "어떤 프로필로 참여할까요?"
@@ -69,30 +76,15 @@ class CreateNickNameVC: UIViewController {
         return button
     }()
     
+    // MARK: - 라이프 사이클
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
         bindViewModel()
-        setNavigationBar()
         addProfileImageButtonTap()
         
         nicknameTextField.delegate = self
         registerForKeyboardNotifications()
-    }
-    
-    private func setNavigationBar() {
-        self.title = ""
-        self.navigationController?.navigationBar.prefersLargeTitles = true
-        
-        let appearance = UINavigationBarAppearance()
-        appearance.shadowColor = .clear
-        
-        appearance.largeTitleTextAttributes = [
-            NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 1),
-            NSAttributedString.Key.foregroundColor: UIColor.mainPurple
-        ]
-        
-        navigationController?.navigationBar.standardAppearance = appearance
     }
     
     // 키보드 알림 등록
@@ -127,6 +119,7 @@ class CreateNickNameVC: UIViewController {
         self.overrideUserInterfaceStyle = .light
         
         [
+            logoView,
             titleLabel,
             profileImageView,
             addProfileImageButton,
@@ -135,8 +128,15 @@ class CreateNickNameVC: UIViewController {
             confirmButton
         ].forEach { view.addSubview($0) }
         
+        logoView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
+            $0.leading.equalToSuperview().offset(16)
+            $0.width.equalTo(120)
+            $0.height.equalTo(40)
+        }
+        
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(52)
+            $0.top.equalTo(logoView.snp.bottom).offset(8)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.width.height.equalTo(40)
@@ -239,6 +239,8 @@ class CreateNickNameVC: UIViewController {
         // 닉네임 중복 여부 확인
         confirmButton.rx.tap
             .subscribe(onNext: { [weak self] in
+                // 키보드 숨기기
+                self?.nicknameTextField.resignFirstResponder()
                 self?.viewModel.checkNicknameDuplication()
             })
             .disposed(by: disposeBag)
@@ -251,7 +253,8 @@ class CreateNickNameVC: UIViewController {
                 
                 if isDuplicate {
                     // 닉네임 중복일 경우 알림 표시
-                    CommonManager.shared.showAlert(
+                    let alert = Alert()
+                    alert.showAlert(
                         from: self,
                         title: "중복된 닉네임",
                         message: "이미 사용중인 닉네임입니다. 다른 닉네임을 입력해주세요.",

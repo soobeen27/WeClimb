@@ -11,12 +11,16 @@ import FirebaseAuth
 class TabBarController: UITabBarController {
     
     private let viewModel = MyPageVM()
-    var myPage: UIViewController = UIViewController()
+    private var isLoggedIn: Bool = Auth.auth().currentUser != nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let sfMainFeedVC = UINavigationController(rootViewController: SFMainFeedVC())
+        setView()
+    }
+    
+    private func setView() {
+//        let sfMainFeedVC = UINavigationController(rootViewController: SFMainFeedVC())
+        let sfMainFeedVC = UINavigationController(rootViewController: SFMainFeedVC(viewModel: MainFeedVM(), startingIndex: 0, feedType: .mainFeed))
         let searchVC = UINavigationController(rootViewController: SearchVC())
         
         // 선택된 아이템 색상 설정
@@ -33,11 +37,12 @@ class TabBarController: UITabBarController {
         
         let myPageVC: UIViewController
         let uploadVC: UIViewController
-        if Auth.auth().currentUser != nil {
+        
+        if isLoggedIn {
             myPageVC = UINavigationController(rootViewController: MyPageVC())
             myPageVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "person"), selectedImage: nil)
             
-            uploadVC = UINavigationController(rootViewController: UploadVC())
+            uploadVC = UINavigationController(rootViewController: SelectGymVC())
             uploadVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "plus.app"), selectedImage: nil)
         } else {
             myPageVC = UINavigationController(rootViewController: GuestVC())
@@ -51,11 +56,17 @@ class TabBarController: UITabBarController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        let currentIsLoggedIn = Auth.auth().currentUser != nil
+        if currentIsLoggedIn != isLoggedIn {
+            isLoggedIn = currentIsLoggedIn
+            setView()
+        }
+        
         if self == self.tabBarController?.viewControllers?[0] {
             self.tabBarController?.tabBar.tintColor = .white
         } else {
             self.tabBarController?.tabBar.tintColor = UIColor.label
         }
     }
-    
 }

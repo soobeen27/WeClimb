@@ -14,12 +14,12 @@ struct User: Codable {
     let registerationDate: Date
     let lastModified: Date
     let userRole: String
-    let armReach: String?
-    let height: String?
+    let armReach: Int?
+    let height: Int?
     let posts: [DocumentReference]?
     let comments: [DocumentReference]?
-    let followers: [DocumentReference]?
-    let following: [DocumentReference]?
-    let blackList: [String]?
+    let followers: [String]?
+    let following: [String]?
+    let snsConsent: Bool?
+    var blackList: [String]?
 }
-

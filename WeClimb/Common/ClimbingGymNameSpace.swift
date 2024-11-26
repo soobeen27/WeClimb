@@ -24,9 +24,9 @@ enum ClimbingGymNameSpace {
     // ClimbingGymInfoView
     static let hours = "운영정보"
     static let facility = "시설정보"
-    static let difficulty = "난이도"
+    static let grade = "난이도"
     static let parkingInfo = "주차정보"
-    static let difficultyDescription = "총 8개의 난이도가 있어요!"
+    static let gradeDescription = "총 8개의 난이도가 있어요!"
     static let noInfo = "정보가 없거나 잘못된 정보가 있다면 알려주세요!"
     
     static let FacilityFirst = "지구력"

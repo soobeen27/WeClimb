@@ -14,8 +14,8 @@ import RxSwift
 
 class FeedView : UIView {
     private var disposeBag = DisposeBag()
-    
     private let viewModel: UploadVM
+    var isPlaying: Bool = true
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -42,7 +42,6 @@ class FeedView : UIView {
         return pageControl
     }()
     
-    
     private lazy var loadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.hidesWhenStopped = true
@@ -53,7 +52,8 @@ class FeedView : UIView {
         self.viewModel = viewModel
         super.init(frame: frame)
         setLayout()
-        bind()
+        bindCell()
+        setGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -77,7 +77,6 @@ class FeedView : UIView {
     
     // MARK: - 모든 셀의 비디오를 멈추는 메서드 YJ
     func pauseAllVideo() {
-        
         collectionView.visibleCells     // 현재 화면에 표시되고 있는 셀들 가져오기
             .forEach { cell in          // 각 셀 순회해서 비디오 멈추기
                 if let feedCell = cell as? FeedCell {
@@ -88,7 +87,6 @@ class FeedView : UIView {
     
     // MARK: - 현재 셀의 비디오를 실행시키는 메서드 YJ
     func playAllVideo() {
-        
         collectionView.visibleCells
             .forEach { cell in
                 if let feedCell = cell as? FeedCell {
@@ -97,13 +95,35 @@ class FeedView : UIView {
             }
     }
     
-    private func bind() {
+    private func setGesture() {
+        let TapGesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap))
+        self.addGestureRecognizer(TapGesture)
+    }
+    
+    @objc private func handleDoubleTap() {
+        let visibleCells = collectionView.visibleCells
+        if isPlaying {
+            for cell in visibleCells {
+                if let feedCell = cell as? FeedCell {
+                    feedCell.stopVideo()
+                }
+            }
+        } else {
+            for cell in visibleCells {
+                if let feedCell = cell as? FeedCell {
+                    feedCell.playVideo()
+                }
+            }
+            print("비디오 재생")
+        }
+    }
+    
+    private func bindCell() {
         viewModel.cellData
             .bind(to: collectionView.rx.items(
                 cellIdentifier: FeedCell.className, cellType: FeedCell.self)
             ) { row, data, cell in
                 print("data: \(data)")
-                // 셀에 데이터 설정
                 cell.configure(with: data)
                 
                 if self.pageControl.currentPage == row,
@@ -125,6 +145,8 @@ extension FeedView : UICollectionViewDelegate {
         
         // 페이지 변경 시 클로저 호출
         viewModel.pageChanged(to: pageIndex)
+        
+        isPlaying = true
         
         let changedItem = viewModel.feedRelay.value[pageIndex]
         
