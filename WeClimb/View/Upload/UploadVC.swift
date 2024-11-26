@@ -353,6 +353,13 @@ class UploadVC: UIViewController {
             .drive(onNext: { [weak self] _ in
                 guard let self else { return }
                 
+                if self.viewModel.mediaItems.value.isEmpty {
+                    let alert = UIAlertController(title: "알림", message: "미디어를 먼저 선택해주세요", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                    return
+                }
+                
                 self.presentCustomHeightModal(modalVC: navigationModal, heightRatio: 0.6)
             })
             .disposed(by: disposeBag)
