@@ -101,21 +101,13 @@ class FeedView : UIView {
     }
     
     @objc private func handleDoubleTap() {
-        let visibleCells = collectionView.visibleCells
         if isPlaying {
-            for cell in visibleCells {
-                if let feedCell = cell as? FeedCell {
-                    feedCell.stopVideo()
-                }
-            }
+            pauseAllVideo()
         } else {
-            for cell in visibleCells {
-                if let feedCell = cell as? FeedCell {
-                    feedCell.playVideo()
-                }
-            }
-            print("비디오 재생")
+            playAllVideo()
         }
+        
+        isPlaying.toggle()
     }
     
     private func bindCell() {
