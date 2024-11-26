@@ -40,7 +40,7 @@ class SelectGymVC: UIViewController {
         let button = UIButton()
         button.setTitle(UploadNameSpace.okText, for: .normal)
         button.setTitleColor(.black, for: .normal)
-        button.layer.cornerRadius = 23
+        button.layer.cornerRadius = 8
         button.backgroundColor = .white
         button.isEnabled = false
         return button
@@ -86,10 +86,10 @@ class SelectGymVC: UIViewController {
         }
         
         okButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-view.frame.height * 0.03)
-            $0.centerX.equalToSuperview()
-            $0.width.equalToSuperview().multipliedBy(0.9)
-            $0.height.equalTo(view.frame.height * 0.055)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
+            $0.leading.equalToSuperview().offset(16)
+            $0.trailing.equalToSuperview().offset(-16)
+            $0.height.equalTo(50)
         }
     }
     

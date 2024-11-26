@@ -532,8 +532,6 @@ extension SFCollectionViewCell: UICollectionViewDelegateFlowLayout {
 
                 } else {
                     print("이미지일 경우 비디오 멈춤")
-                    cell.stopVideo()
-                    cell.rePlay = false
                 }
             } else {
                 print("URL이 잘못됨.")
@@ -547,7 +545,6 @@ extension SFCollectionViewCell: UICollectionViewDelegateFlowLayout {
         for cell in collectionView.visibleCells {
             if let verticalCell = cell as? SFFeedCell {
                 verticalCell.stopVideo()
-                verticalCell.rePlay = false
             }
         }
     }

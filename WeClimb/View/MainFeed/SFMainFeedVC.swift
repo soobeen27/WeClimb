@@ -48,6 +48,8 @@ class SFMainFeedVC: UIViewController{
     
     private var isCurrentScreenActive: Bool = false
     
+    private var isNotMain = true
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(hex: "#0B1013")
@@ -225,7 +227,8 @@ class SFMainFeedVC: UIViewController{
                     .subscribe(onNext: { [weak self] in
                         guard let self else { return }
                         print("마이페이지 혹은 유저페이지")
-                        self.playVisibleVideo(reStart: false)
+                        stopAllVideos()
+                        self.playVisibleVideo(reStart: true)
                     })
                     .disposed(by: disposeBag)
 //            }
@@ -456,12 +459,12 @@ class SFMainFeedVC: UIViewController{
         
         for feedCell in innerCollectionView.visibleCells {
             if let innerCell = feedCell as? SFFeedCell, let media = innerCell.media {
-//                print("내부 셀 미디어 URL: \(media.url)")
+                //                print("내부 셀 미디어 URL: \(media.url)")
                 
                 if currentPageIndex == 0,
                    collectionView.numberOfItems(inSection: 0) == 0 {
-//                    print("첫번째 셀 실행")
-//                    innerCell.playVideo(reStart: true)
+                    //                    print("첫번째 셀 실행")
+                    //                    innerCell.playVideo(reStart: true)
                 }
                 
                 if let url = URL(string: media.url) {
@@ -469,18 +472,15 @@ class SFMainFeedVC: UIViewController{
                     
                     if fileExtension == "mp4" {
                         if playOrPause {
-//                            print("비디오 재생: \(media.url)")
-                            innerCell.rePlay = true
+                            //                            print("비디오 재생: \(media.url)")
                             innerCell.playVideo(reStart: true)
                         } else {
-//                            print("비디오 정지: \(media.url)")
+                            //                            print("비디오 정지: \(media.url)")
                             innerCell.stopVideo()
-                            innerCell.rePlay = false
                         }
                     } else {
-//                        print("비디오 파일이 아님: \(media.url)")
+                        //                        print("비디오 파일이 아님: \(media.url)")
                         innerCell.stopVideo()
-                        innerCell.rePlay = false
                     }
                 }
             }
@@ -495,7 +495,6 @@ class SFMainFeedVC: UIViewController{
                     if let feedCell = innerCell as? SFFeedCell, let media = feedCell.media {
                         print("비디오 정지: \(media.url)")
                         feedCell.stopVideo()
-                        feedCell.rePlay = false
                     }
                 }
             }
@@ -510,7 +509,6 @@ class SFMainFeedVC: UIViewController{
                     if let feedCell = innerCell as? SFFeedCell, let media = feedCell.media {
                         if reStart {
                             print("리스타트 비디오 재생: \(media.url)")
-                            feedCell.rePlay = true
                             feedCell.playVideo(reStart: true)
                         } else {
                             print("리스타트 아닌 비디오 재생: \(media.url)")
@@ -539,10 +537,10 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
             activityIndicator.startAnimating()
             if feedType == .mainFeed {
                 mainFeedVM.fetchInitialFeed()
+                self.innerCollectionViewPlayers(playOrPause: true)
                 isRefresh = true
             }
         }
-        innerCollectionViewPlayers(playOrPause: false)
         
         let pageIndex = Int(round(scrollView.contentOffset.y / scrollView.frame.height))
         print("인덱스 확인 \(pageIndex)")
@@ -555,16 +553,10 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
         activityIndicator.stopAnimating()
         if feedType == .mainFeed {
             isRefresh = false
-            
-            if currentPageIndex == 0 {
-                print("로드 후 실행")
-                self.innerCollectionViewPlayers(playOrPause: true)
-                stopAllVideos()
-            }
         }
         
         innerCollectionViewPlayers(playOrPause: true)
-        print("두번 실행 ㅋ")
+        print("위아래 스크롤 실행")
         
     }
 }

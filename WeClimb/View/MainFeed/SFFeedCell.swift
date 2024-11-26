@@ -17,7 +17,7 @@ import Kingfisher
 class SFFeedCell: UICollectionViewCell {
     var player: AVPlayer?
     var playerLayer: AVPlayerLayer?
-    var isPlaying = false
+    var stopToggle = false
     
     private var firstVideo = true
     
@@ -80,8 +80,6 @@ class SFFeedCell: UICollectionViewCell {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleVideoPlayback))
         self.addGestureRecognizer(tapGesture)
         setLayout()
-//        self.firstVideo = true
-        setNotifications()
     }
     
     required init?(coder: NSCoder) {
@@ -94,6 +92,7 @@ class SFFeedCell: UICollectionViewCell {
             playerLayer.removeFromSuperlayer()
         }
         imageView.removeFromSuperview()
+        NotificationCenter.default.removeObserver(self)
         resetPlayer()
         gradeImageView.image = nil
         gradeImageView.backgroundColor = nil
@@ -186,60 +185,56 @@ class SFFeedCell: UICollectionViewCell {
         }
         
         if let playerLayer = playerLayer {
-//            contentView.layer.insertSublayer(playerLayer, below: gymGradeStackView.layer)
+            //            contentView.layer.insertSublayer(playerLayer, below: gymGradeStackView.layer)
             contentView.layer.insertSublayer(playerLayer, at: 0)
         }
         
         gymGradeImageBringToFront()
     }
-
+    
     @objc func reStartVideo() {
+        guard let player = player else { return }
         if rePlay {
             print("restartVideo 호출됨")
-            guard let player = player else { return }
-            player.seek(to: .zero)
-            player.play()
-            print("비디오 다시 재생 시작됨")
+            playVideo(reStart: true)
+            print("또 리플레이 할거임")
         } else {
             stopVideo()
-            self.rePlay = false
         }
     }
-
+    
     @objc func toggleVideoPlayback() {
-        if isPlaying {
-//            self.rePlay = false
+        if stopToggle {
             stopVideo()
             self.rePlay = false
             print("스탑 비디오")
         } else {
-            self.rePlay = true
             playVideo(reStart: false)
+            self.rePlay = true
             print("플레이 비디오")
         }
     }
     
     func stopVideo() {
-//        print("Stop")
-        self.rePlay = false
+        print("Stop")
         player?.pause()
-        isPlaying = false
+        self.rePlay = false
+        stopToggle = false
     }
     
     func playVideo(reStart: Bool) {
-        if rePlay {
-            self.rePlay = true
-            print("Play")
-            if reStart {
-                player?.seek(to: .zero)
-                print("리스타트")
-            }
-            player?.play()
-            isPlaying = true
+        guard let player = player else { return }
+        setNotifications()
+        print("Play")
+        if reStart {
+            player.seek(to: .zero)
+            player.play()
+            print("처음으로 돌아갈거에요")
         } else {
-            stopVideo()
-            self.rePlay = false
+            player.play()
         }
+        
+        stopToggle = true
     }
     
     private func resetPlayer() {
