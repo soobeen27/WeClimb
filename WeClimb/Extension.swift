@@ -193,7 +193,7 @@ extension String {
         case "보", "Purple":
             return ("보라", "Purple", UIColor(red: 160/255, green: 83/255, blue: 233/255, alpha: 1))
         case "검", "Black":
-            return ("검정", "Black", UIColor(red: 11/255, green: 16/255, blue: 19/255, alpha: 1))
+            return ("검정", "Black", UIColor(red: 0/255, green: 0/255, blue: 0/255, alpha: 1))
         case "흰", "White":
             return ("흰색", "White", UIColor(red: 241/255, green: 239/255, blue: 239/255, alpha: 1))
         case "민", "Mint":
@@ -210,6 +210,26 @@ extension String {
             return ("초록", "DarkGreen", UIColor(red: 21/255, green: 114/255, blue: 55/255, alpha: 1))
         case "파검", "DarkBlue":
             return ("파랑", "DarkBlue", UIColor(red: 6/255, green: 103/255, blue: 121/255, alpha: 1))
+        case "B1":
+            return ("B1", "B1", UIColor(red: 241/255, green: 239/255, blue: 239/255, alpha: 1))
+        case "B2":
+            return ("B2", "B2", UIColor(red: 255/255, green: 235/255, blue: 26/255, alpha: 1))
+        case "B3":
+            return ("B3", "B3", UIColor(red: 253/255, green: 150/255, blue: 68/255, alpha: 1))
+        case "B4":
+            return ("B4", "B4", UIColor(red: 26/255, green: 120/255, blue: 14/255, alpha: 1))
+        case "B5":
+            return ("B5", "B5", UIColor(red: 35/255, green: 97/255, blue: 243/255, alpha: 1))
+        case "B6":
+            return ("B6", "B6", UIColor(red: 224/255, green: 53/255, blue: 53/255, alpha: 1))
+        case "B7":
+            return ("B7", "B7", UIColor(red: 160/255, green: 83/255, blue: 233/255, alpha: 1))
+        case "B8":
+            return ("B8", "B8", UIColor(red: 171/255, green: 171/255, blue: 171/255, alpha: 1))
+        case "B9":
+            return ("B9", "B9", UIColor(red: 187/255, green: 120/255, blue: 58/255, alpha: 1))
+        case "별":
+            return ("Star", "Star", UIColor(red: 241/255, green: 239/255, blue: 239/255, alpha: 1))
         default:
             return (self, "Other", UIColor.clear)
         }
