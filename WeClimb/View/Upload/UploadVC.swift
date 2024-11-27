@@ -36,7 +36,7 @@ class UploadVC: UIViewController {
     private lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        [selectedMediaView, callPHPickerButton, gradeButton, textView, gymView, settingView, loadingIndicator, gymView, gymLabel, holdButton]
+        [selectedMediaView, callPHPickerButton, gradeButton, holdButton, textView, gymView, settingView, loadingIndicator, gymView, gymLabel]
             .forEach {
                 view.addSubview($0)
             }
@@ -82,16 +82,16 @@ class UploadVC: UIViewController {
     private let gradeButton: UIButton = {
         var configuration = UIButton.Configuration.plain()
         
-        var titleAttr = AttributedString(UploadNameSpace.select)
+        var titleAttr = AttributedString()
         titleAttr.font = .systemFont(ofSize: 15.0)
         configuration.attributedTitle = titleAttr
         
-        let image = UIImage(systemName: "circle.fill")?
+        let image = UIImage(systemName: "square.fill")?
             .withConfiguration(UIImage.SymbolConfiguration(pointSize: 23, weight: .regular, scale: .large))
         configuration.image = image
         configuration.imagePadding = 5
         configuration.imagePlacement = .leading
-        configuration.baseForegroundColor = .systemGray
+        configuration.baseForegroundColor = .clear
         
         let button = UIButton(configuration: configuration)
         button.layer.borderWidth = 0.5
@@ -100,14 +100,15 @@ class UploadVC: UIViewController {
         button.layer.zPosition = 1
         button.isHidden = true
         button.setTitleColor(.label, for: .normal)
-        button.backgroundColor = UIColor {
-            switch $0.userInterfaceStyle {
-            case .dark:
-                return UIColor.secondarySystemBackground
-            default:
-                return UIColor.white
-            }
-        }
+        button.backgroundColor = .clear
+//        button.backgroundColor = UIColor {
+//            switch $0.userInterfaceStyle {
+//            case .dark:
+//                return UIColor.secondarySystemBackground
+//            default:
+//                return UIColor.white
+//            }
+//        }
         
         return button
     }()
@@ -115,17 +116,17 @@ class UploadVC: UIViewController {
     private let holdButton: UIButton = {
         var configuration = UIButton.Configuration.plain()
         
-        var titleAttr = AttributedString(UploadNameSpace.select)
+        var titleAttr = AttributedString()
         titleAttr.font = .systemFont(ofSize: 15.0)
         configuration.attributedTitle = titleAttr
 
-         if let defaultImage = UIImage(named: "holdOther") {
+         if let defaultImage = UIImage(named: "square.fill") {
              let resizedImage = defaultImage.resize(targetSize: CGSize(width: 25, height: 25))
              configuration.image = resizedImage
          }
         configuration.imagePadding = 5
         configuration.imagePlacement = .leading
-//        configuration.baseForegroundColor = .systemGray
+        configuration.baseForegroundColor = .clear
         
         let button = UIButton(configuration: configuration)
         button.layer.borderWidth = 0.5
@@ -135,14 +136,15 @@ class UploadVC: UIViewController {
         button.isHidden = true
         button.imageView?.contentMode = .scaleAspectFit
         button.setTitleColor(.label, for: .normal)
-        button.backgroundColor = UIColor {
-            switch $0.userInterfaceStyle {
-            case .dark:
-                return UIColor.secondarySystemBackground
-            default:
-                return UIColor.systemGroupedBackground
-            }
-        }
+        button.backgroundColor = .clear
+//        button.backgroundColor = UIColor {
+//            switch $0.userInterfaceStyle {
+//            case .dark:
+//                return UIColor.secondarySystemBackground
+//            default:
+//                return UIColor.white
+//            }
+//        }
         
         return button
     }()
@@ -191,6 +193,11 @@ class UploadVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.viewModel.feedRelay.accept([])
+        self.viewModel.cellData.accept([])
+        
+        self.viewModel.bindGymDataToMedia()
+        
         textView.delegate = self
         setLayout()
         mediaItemsBind()
@@ -201,11 +208,7 @@ class UploadVC: UIViewController {
         setNotifications()
         bindPostButton()
         bindGymName()
-//        bindSettingButton()
-        self.viewModel.feedRelay.accept([])
-        self.viewModel.cellData.accept([])
-        
-        self.viewModel.bindGymDataToMedia()
+        bindSettingButton()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -353,6 +356,18 @@ class UploadVC: UIViewController {
             .drive(onNext: { [weak self] _ in
                 guard let self else { return }
                 
+                print("피드릴레이 ㅜ\(self.viewModel.feedRelay.value)")
+                
+                if self.viewModel.cellData.value.isEmpty {
+                    let alert = UIAlertController(title: "알림", message: "미디어를 먼저 선택해주세요", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                    return
+                }
+                
+//                self.viewModel.shouldUpdateUI = true
+//                self.feedView?.collectionView.reloadData()
+                
                 self.presentCustomHeightModal(modalVC: navigationModal, heightRatio: 0.6)
             })
             .disposed(by: disposeBag)
@@ -377,6 +392,9 @@ class UploadVC: UIViewController {
             guard let self else { return }
             let pageIndex = self.viewModel.pageChanged.value
             
+            let selectedGrade = self.viewModel.selectedGrade
+            let selectedHold = self.viewModel.selectedHold
+            
             guard pageIndex >= 0 && pageIndex < feedItems.count else {
                 print("잘못된 페이지 인덱스")
                 return
@@ -387,7 +405,7 @@ class UploadVC: UIViewController {
             print("feeItem: \(feedItem)")
             print("feeItem즈: \(feedItems)")
             
-            if feedItem.grade == nil, feedItem.hold == nil || feedItems.isEmpty {
+            if feedItem.grade == nil, feedItem.hold == nil || feedItems.isEmpty || selectedGrade.value == nil || selectedHold.value == nil {
                 self.gradeButton.isHidden = true
                 self.settingView.selectedLabel.isHidden = false
                 self.settingView.nextImageView.isHidden = false
@@ -557,19 +575,21 @@ extension UploadVC : UITextViewDelegate {
         return true
     }
 }
-
-extension UploadVC : PHPickerViewControllerDelegate {
+extension UploadVC: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        viewModel.mediaItems.accept(results)
+        let mediaData: [(index: Int, mediaItem: PHPickerResult)] = results.enumerated().map { (index, mediaItem) in
+            print("피커뷰에서 인덱스: \(index) 미디어아이템\(mediaItem.itemProvider)")
+            return (index, mediaItem)
+        }
+        
+        viewModel.mediaItems.accept(mediaData)
         
         picker.dismiss(animated: true) {
             self.viewModel.setMedia()
         }
         
         if !results.isEmpty {
-            bindSettingButton()
-            
-            let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelButtonTapped))
+            let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(self.cancelButtonTapped))
             navigationItem.rightBarButtonItem = cancelButton
         }
     }
@@ -582,10 +602,6 @@ extension UploadVC {
             .do(onNext: { [weak self] in
                 guard let self else { return }
                 
-                self.postButton.backgroundColor = UIColor.systemGray6
-                self.addLoadingOverlay()
-                
-                self.navigationController?.navigationBar.isUserInteractionEnabled = false
             })
             .subscribe(onNext: { [weak self] in
                 DispatchQueue.main.async {
@@ -596,6 +612,12 @@ extension UploadVC {
                         return
                     }
                     
+                    self.postButton.backgroundColor = UIColor.systemGray6
+                    self.addLoadingOverlay()
+                    self.feedView?.pauseAllVideo()
+                    
+                    self.navigationController?.navigationBar.isUserInteractionEnabled = false
+                    
                     print("업로드 버튼 클릭.")
                     
                     // 첫 번째 미디어 가져오기
@@ -603,6 +625,8 @@ extension UploadVC {
                         print("첫 번째 미디어가 없습니다.")
                         let alert = Alert()
                         alert.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
+                        self.removeLoadingOverlay()
+                        self.postButton.backgroundColor = UIColor.mainPurple
                         return
                     }
                     
@@ -676,21 +700,22 @@ extension UploadVC {
             isUploading = true
             
             self.viewModel.upload(media: media, caption: caption, gym: gym, thumbnailURL: thumbnailURL)
-                .drive(onNext: {
+                .drive(onNext: { [weak self] in
+                    guard let self else { return }
+                    
                     print("업로드 성공")
                     alert.showAlert(from: self, title: "알림", message: "성공적으로 업로드되었습니다.")
                     
                     self.tabBarController?.selectedIndex = 0
-                    
-                    self.initUploadVC()
-                    self.removeFromParent()
-                    self.setNewUplodVC()
-                    
                     self.navigationController?.navigationBar.isUserInteractionEnabled = true
-                    
                     self.navigationController?.popToRootViewController(animated: true)
                     
+                    self.initUploadVC()
+                    self.setNewUplodVC()
                     self.removeLoadingOverlay()
+                    
+                    self.removeFromParent()
+                    
                     self.isUploading = false
                 })
                 .disposed(by: self.disposeBag)
@@ -707,7 +732,6 @@ extension UploadVC {
         }
         
         self.viewModel.gymRelay.accept(nil)
-
     }
     
     // MARK: - 업로드뷰 초기화 YJ
@@ -715,17 +739,17 @@ extension UploadVC {
         self.feedView?.pauseAllVideo()
         self.feedView = nil
         
-        self.viewModel.feedRelay = BehaviorRelay(value: [])
-        
-        self.viewModel.cellData = BehaviorRelay(value: [FeedCellModel]())
+        self.viewModel.pageChanged = BehaviorRelay<Int>(value: 0)
         
         self.viewModel.selectedGrade = BehaviorRelay<String?>(value: nil)
         self.viewModel.selectedHold = BehaviorRelay<Hold?>(value: nil)
         
-        self.viewModel.pageChanged = BehaviorRelay<Int>(value: 0)
+        self.viewModel.feedRelay = BehaviorRelay(value: [])
+        
+        self.viewModel.cellData = BehaviorRelay(value: [FeedCellModel]())
         
         self.viewModel.shouldUpdateUI = true
-        self.viewModel.mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
+        self.viewModel.mediaItems = BehaviorRelay<[(index: Int, mediaItem: PHPickerResult)]>(value: [])
         print("피드릴레이 확인하자: \(self.viewModel.feedRelay.value)")
         
         viewModel.feedRelay

@@ -17,7 +17,7 @@ class FeedView : UIView {
     private let viewModel: UploadVM
     var isPlaying: Bool = true
     
-    private lazy var collectionView: UICollectionView = {
+    lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0
@@ -101,21 +101,13 @@ class FeedView : UIView {
     }
     
     @objc private func handleDoubleTap() {
-        let visibleCells = collectionView.visibleCells
         if isPlaying {
-            for cell in visibleCells {
-                if let feedCell = cell as? FeedCell {
-                    feedCell.stopVideo()
-                }
-            }
+            pauseAllVideo()
         } else {
-            for cell in visibleCells {
-                if let feedCell = cell as? FeedCell {
-                    feedCell.playVideo()
-                }
-            }
-            print("비디오 재생")
+            playAllVideo()
         }
+        
+        isPlaying.toggle()
     }
     
     private func bindCell() {

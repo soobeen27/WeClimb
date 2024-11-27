@@ -18,7 +18,10 @@ import RxCocoa
 class UploadVM {
     private let disposeBag = DisposeBag()
     
-    var mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
+//    var mediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
+    var mediaItems = BehaviorRelay<[(index: Int, mediaItem: PHPickerResult)]>(value: [])
+
+    
     var feedRelay = BehaviorRelay<[FeedCellModel]>(value: [])
     var cellData = BehaviorRelay(value: [FeedCellModel]())
     
@@ -106,9 +109,14 @@ extension UploadVM {
             print("암장 이름이 설정되지 않았습니다.")
             return
         }
+        mediaItems.value.forEach { mediaData in
+            let index = mediaData.index
+            let mediaItem = mediaData.mediaItem
+            print("셋미디어 인덱스: \(index), 미디어: \(mediaItem)")
+            group.enter()  // 비동기 작업 시작 알려줌
         
-        mediaItems.value.enumerated().forEach { (index, mediaItem) in
-            group.enter()   // 비동기 작업 시작 알려줌
+//        mediaItems.value.enumerated().forEach { (index, mediaItem) in
+//            group.enter()   // 비동기 작업 시작 알려줌
             
             if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
                 mediaItem.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { [weak self] (url, error) in
@@ -154,7 +162,9 @@ extension UploadVM {
                             models[index] = FeedCellModel(
                                 imageURL: nil,
                                 videoURL: tempVideoURL,
-                                grade: self.selectedGrade.value, hold: self.selectedHold.value?.koreanHold, gym: gymName
+                                grade: self.selectedGrade.value,
+                                hold: self.selectedHold.value?.koreanHold,
+                                gym: gymName
                             )
                         }
                         group.leave()
@@ -177,7 +187,9 @@ extension UploadVM {
                             models[index] = FeedCellModel(
                                 imageURL: tempImageURL,
                                 videoURL: nil,
-                                grade: self.selectedGrade.value, hold: self.selectedHold.value?.koreanHold, gym: gymName
+                                grade: self.selectedGrade.value, 
+                                hold: self.selectedHold.value?.koreanHold,
+                                gym: gymName
                             )
                         } catch {
                             print("이미지 저장 실패: \(error.localizedDescription)")
@@ -223,9 +235,9 @@ extension UploadVM {
     func upload(media: [(url: URL, hold: String?, grade: String?)], caption: String?, gym: String?, thumbnailURL: String) -> Driver<Void> {
         return Observable.create { observer in
             let dispatchGroup = DispatchGroup()
-            var uploadMedia: [(url: URL, hold: String?, grade: String?, thumbnailURL: String?)] = []
+            var uploadMedia: [(url: URL, hold: String?, grade: String?, thumbnailURL: String?, index: Int)] = []
             
-            for item in media {
+            for (index, item) in media.enumerated() {
                 dispatchGroup.enter()
                 
                 if item.url.pathExtension == "jpg" || item.url.pathExtension == "png" {
@@ -235,8 +247,7 @@ extension UploadVM {
                             let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
                             do {
                                 try compressedData.write(to: tempImageURL)
-                                // 이미지 URL을 그대로 썸네일 URL로 지정
-                                uploadMedia.append((url: tempImageURL, hold: item.hold, grade: item.grade, thumbnailURL: item.url.absoluteString))
+                                uploadMedia.append((url: tempImageURL, hold: item.hold, grade: item.grade, thumbnailURL: item.url.absoluteString, index: index))
                             } catch {
                                 print("이미지 저장 실패: \(error.localizedDescription)")
                             }
@@ -251,9 +262,8 @@ extension UploadVM {
                             return
                         }
                         
-                        // 비디오 썸네일 생성
                         self.getThumbnailImage(from: compressedURL) { thumbnailURL in
-                            uploadMedia.append((url: compressedURL, hold: item.hold, grade: item.grade, thumbnailURL: thumbnailURL))
+                            uploadMedia.append((url: compressedURL, hold: item.hold, grade: item.grade, thumbnailURL: thumbnailURL, index: index))
                             dispatchGroup.leave()
                         }
                     }
@@ -261,9 +271,13 @@ extension UploadVM {
             }
             
             dispatchGroup.notify(queue: .main) {
-                Task { [uploadMedia, caption, gym] in
+                let sortedMedia = uploadMedia.sorted { $0.index < $1.index }
+                
+                let finalUploadMedia = sortedMedia.map { (url: $0.url, hold: $0.hold, grade: $0.grade, thumbnailURL: $0.thumbnailURL) }
+                
+                Task { [finalUploadMedia, caption, gym] in
                     let myUID = FirebaseManager.shared.currentUserUID()
-                    await FirebaseManager.shared.uploadPost(myUID: myUID, media: uploadMedia, caption: caption, gym: gym, thumbnail: thumbnailURL)
+                    await FirebaseManager.shared.uploadPost(myUID: myUID, media: finalUploadMedia, caption: caption, gym: gym, thumbnail: thumbnailURL)
                     
                     observer.onNext(())
                     observer.onCompleted()

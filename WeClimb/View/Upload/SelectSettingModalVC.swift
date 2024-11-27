@@ -76,6 +76,17 @@ class SelectSettingModalVC: UIViewController {
         bindSettingCell()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        resetSetting()
+        bindSettingCell()
+    }
+    
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        bindSettingCell()
+//    }
+    
     private func setNavigation() {
         self.title = UploadNameSpace.setting
     }
@@ -110,6 +121,22 @@ class SelectSettingModalVC: UIViewController {
         }
     }
     
+    private func resetSetting() {
+        Driver.combineLatest(
+            viewModel.pageChanged.asDriver(onErrorJustReturn: 0),
+            viewModel.feedRelay.asDriver()
+        )
+        .drive(onNext: { [weak self] pageIndex, feedItems in
+            guard let self else { return }
+            
+            self.viewModel.selectedGrade.accept("")
+            self.viewModel.selectedHold.accept(.none)
+            self.collectionView.reloadData()
+            
+        })
+        .disposed(by: disposeBag)
+    }
+    
     private func bindSettingCell() {
         Driver.combineLatest(
             viewModel.pageChanged.asDriver(onErrorJustReturn: 0),
@@ -117,36 +144,45 @@ class SelectSettingModalVC: UIViewController {
         )
         .drive(onNext: { [weak self] pageIndex, feedItems in
             guard let self else { return }
-
-            self.viewModel.selectedGrade.accept("")
-            self.viewModel.selectedHold.accept(.none)
-
+            
+//            self.viewModel.selectedGrade.accept("")
+//            self.viewModel.selectedHold.accept(.none)
+//            collectionView.reloadData()
+            
             guard pageIndex >= 0 && pageIndex < feedItems.count else {
                 self.okButton.isEnabled = false
                 return
             }
-
+            
             let feedItem = feedItems[pageIndex]
-            
-            let currentGrade = feedItem.grade
-            let currentHoldString = feedItem.hold
+            print("오케이버튼 눌렀을때: \(feedItems)")
 
-            let isGradeSelected = currentGrade != nil
-            let isHoldSelected = currentHoldString != nil
+//            let currentGrade = feedItem.grade
+            let currentHold = feedItem.hold
 
-            if isGradeSelected, isHoldSelected {
-                self.okButton.isEnabled = true
+            if let currentGrade = feedItem.grade {
+                self.viewModel.selectedGrade.accept(currentGrade)
             } else {
-                self.okButton.isEnabled = false
+                self.viewModel.selectedGrade.accept(nil)
             }
-
-            self.viewModel.selectedGrade.accept(currentGrade ?? "")
             
-            if let currentHold = Hold.allCases.first(where: { $0.string == currentHoldString }) {
+            if let currentHold = Hold.allCases.first(where: { $0.string == currentHold }) {
                 self.viewModel.selectedHold.accept(currentHold)
             } else {
-                self.viewModel.selectedHold.accept(.none)
+                self.viewModel.selectedHold.accept(nil)
             }
+        })
+        .disposed(by: disposeBag)
+
+        Driver.combineLatest(
+            viewModel.selectedGrade.asDriver(onErrorJustReturn: nil),
+            viewModel.selectedHold.asDriver(onErrorJustReturn: nil)
+        )
+        .drive(onNext: { [weak self] selectedGrade, selectedHold in
+            guard let self else { return }
+            
+            self.okButton.isEnabled = selectedGrade != nil && selectedHold != nil
+            self.collectionView.reloadData()
         })
         .disposed(by: disposeBag)
     }
@@ -242,13 +278,13 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
         switch Section(rawValue: indexPath.section) {
         case .gradeSection:
             let grade = viewModel.gradeRelayArray.value[indexPath.row]
-            print("Grade: \(grade)")
             cell.configure(item: grade)
             
             viewModel.selectedGrade
-                .asDriver(onErrorJustReturn: "")
+                .asDriver(onErrorJustReturn: nil)
                 .map { $0 == grade }
                 .drive(onNext: { isSelected in
+                    print("Grade: \(grade), 셀렉트\(isSelected)")
                     cell.layer.borderColor = isSelected ? UIColor.mainPurple.cgColor : UIColor.clear.cgColor
                     cell.layer.borderWidth = isSelected ? 1 : 0
                 })
@@ -256,13 +292,13 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
             
         case .holdSection:
             let hold = Hold.allCases[indexPath.row]
-            print("Hold: \(hold)")
             cell.configure(item: hold)
             
             viewModel.selectedHold
-                .asDriver(onErrorJustReturn: .none)
+                .asDriver(onErrorJustReturn: nil)
                 .map { $0 == hold }
                 .drive(onNext: { isSelected in
+                    print("Hold: \(hold), 셀렉트\(isSelected)")
                     cell.layer.borderColor = isSelected ? UIColor.mainPurple.cgColor : UIColor.clear.cgColor
                     cell.layer.borderWidth = isSelected ? 1 : 0
                 })
@@ -271,7 +307,6 @@ extension SelectSettingModalVC : UICollectionViewDataSource {
         default:
             return UICollectionViewCell()
         }
-        
         return cell
     }
 }
@@ -282,12 +317,28 @@ extension SelectSettingModalVC: UICollectionViewDelegate {
         switch Section(rawValue: indexPath.section) {
         case .gradeSection:
             let grade = viewModel.gradeRelayArray.value[indexPath.row]
-            viewModel.selectedGrade.accept(grade)
-            viewModel.optionSelected(optionText: grade, buttonType: "grade")
+            
+            if viewModel.selectedGrade.value == grade {
+                viewModel.selectedGrade.accept(nil)
+                viewModel.optionSelected(optionText: "", buttonType: "grade")
+            } else {
+                viewModel.selectedGrade.accept(grade)
+                viewModel.optionSelected(optionText: grade, buttonType: "grade")
+            }
+            print("중간 확인 그레이드: \(String(describing: viewModel.selectedGrade.value)), \(grade)")
+            
         case .holdSection:
             let hold = Hold.allCases[indexPath.row]
-            viewModel.selectedHold.accept(hold)
-            viewModel.optionSelected(optionText: hold.string, buttonType: "hold")
+            
+            if viewModel.selectedHold.value == hold {
+                viewModel.selectedHold.accept(nil)
+                viewModel.optionSelected(optionText: "", buttonType: "hold")
+            } else {
+                viewModel.selectedHold.accept(hold)
+                viewModel.optionSelected(optionText: hold.string, buttonType: "hold")
+            }
+            print("중간 확인 홀드: \(String(describing: viewModel.selectedHold.value)), \(hold)")
+            
         default:
             break
         }
