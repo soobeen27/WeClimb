@@ -104,7 +104,7 @@ class SFCollectionViewCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 13)
         label.textColor = .white
         label.textAlignment = .left
-        label.numberOfLines = 1
+        label.numberOfLines = 2
         label.lineBreakMode = .byTruncatingTail
         return label
     }()
@@ -112,6 +112,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     private let feedUserProfileImage: UIImageView = {
         let image = UIImageView()
         image.layer.cornerRadius = 20
+        image.contentMode = .scaleAspectFill
         image.clipsToBounds = true
         image.layer.borderColor = UIColor.systemGray3.cgColor
         return image
