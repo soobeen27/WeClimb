@@ -151,6 +151,7 @@ class EditNickNameVC: UIViewController, UITextFieldDelegate {
     private func setLayout() {
         view.backgroundColor = .white
         navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.tintColor = UIColor.black
         self.overrideUserInterfaceStyle = .light
         
         [
