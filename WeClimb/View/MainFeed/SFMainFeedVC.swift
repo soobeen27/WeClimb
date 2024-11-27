@@ -463,7 +463,7 @@ class SFMainFeedVC: UIViewController{
                 
                 if currentPageIndex == 0,
                    collectionView.numberOfItems(inSection: 0) == 0 {
-                    //                    print("첫번째 셀 실행")
+                    print("첫번째 셀 실행")
                     //                    innerCell.playVideo(reStart: true)
                 }
                 
@@ -472,14 +472,14 @@ class SFMainFeedVC: UIViewController{
                     
                     if fileExtension == "mp4" {
                         if playOrPause {
-                            //                            print("비디오 재생: \(media.url)")
+                            print("비디오 재생: \(media.url)")
                             innerCell.playVideo(reStart: true)
                         } else {
-                            //                            print("비디오 정지: \(media.url)")
+                            print("비디오 정지: \(media.url)")
                             innerCell.stopVideo()
                         }
                     } else {
-                        //                        print("비디오 파일이 아님: \(media.url)")
+                        print("비디오 파일이 아님: \(media.url)")
                         innerCell.stopVideo()
                     }
                 }
@@ -540,10 +540,11 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
                 self.innerCollectionViewPlayers(playOrPause: true)
                 isRefresh = true
             }
+            self.stopAllVideos()
         }
         
         let pageIndex = Int(round(scrollView.contentOffset.y / scrollView.frame.height))
-        print("인덱스 확인 \(pageIndex)")
+//        print("인덱스 확인 \(pageIndex)")
         guard currentPageIndex != pageIndex else { return }
         currentPageIndex = pageIndex
         print("인덱스 넘어감 \(currentPageIndex)")

@@ -73,7 +73,7 @@ class SelectSettingModalVC: UIViewController {
         view.layer.cornerRadius = 20
         view.layer.masksToBounds = true
 
-//        bindSettingCell()
+        bindSettingCell()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -131,7 +131,7 @@ class SelectSettingModalVC: UIViewController {
             
             self.viewModel.selectedGrade.accept("")
             self.viewModel.selectedHold.accept(.none)
-            collectionView.reloadData()
+            self.collectionView.reloadData()
             
         })
         .disposed(by: disposeBag)
@@ -182,7 +182,7 @@ class SelectSettingModalVC: UIViewController {
             guard let self else { return }
             
             self.okButton.isEnabled = selectedGrade != nil && selectedHold != nil
-            collectionView.reloadData()
+            self.collectionView.reloadData()
         })
         .disposed(by: disposeBag)
     }
@@ -342,8 +342,6 @@ extension SelectSettingModalVC: UICollectionViewDelegate {
         default:
             break
         }
-        
-//        collectionView.reloadData()
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {

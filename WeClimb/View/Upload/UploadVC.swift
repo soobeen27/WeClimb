@@ -193,6 +193,11 @@ class UploadVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.viewModel.feedRelay.accept([])
+        self.viewModel.cellData.accept([])
+        
+        self.viewModel.bindGymDataToMedia()
+        
         textView.delegate = self
         setLayout()
         mediaItemsBind()
@@ -204,10 +209,6 @@ class UploadVC: UIViewController {
         bindPostButton()
         bindGymName()
         bindSettingButton()
-        self.viewModel.feedRelay.accept([])
-        self.viewModel.cellData.accept([])
-        
-        self.viewModel.bindGymDataToMedia()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -357,12 +358,15 @@ class UploadVC: UIViewController {
                 
                 print("피드릴레이 ㅜ\(self.viewModel.feedRelay.value)")
                 
-                if self.viewModel.mediaItems.value.isEmpty {
+                if self.viewModel.cellData.value.isEmpty {
                     let alert = UIAlertController(title: "알림", message: "미디어를 먼저 선택해주세요", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
                     self.present(alert, animated: true, completion: nil)
                     return
                 }
+                
+//                self.viewModel.shouldUpdateUI = true
+//                self.feedView?.collectionView.reloadData()
                 
                 self.presentCustomHeightModal(modalVC: navigationModal, heightRatio: 0.6)
             })
@@ -598,11 +602,6 @@ extension UploadVC {
             .do(onNext: { [weak self] in
                 guard let self else { return }
                 
-                self.postButton.backgroundColor = UIColor.systemGray6
-                self.addLoadingOverlay()
-                self.feedView?.pauseAllVideo()
-                
-                self.navigationController?.navigationBar.isUserInteractionEnabled = false
             })
             .subscribe(onNext: { [weak self] in
                 DispatchQueue.main.async {
@@ -613,6 +612,12 @@ extension UploadVC {
                         return
                     }
                     
+                    self.postButton.backgroundColor = UIColor.systemGray6
+                    self.addLoadingOverlay()
+                    self.feedView?.pauseAllVideo()
+                    
+                    self.navigationController?.navigationBar.isUserInteractionEnabled = false
+                    
                     print("업로드 버튼 클릭.")
                     
                     // 첫 번째 미디어 가져오기
@@ -620,6 +625,8 @@ extension UploadVC {
                         print("첫 번째 미디어가 없습니다.")
                         let alert = Alert()
                         alert.showAlert(from: self, title: "알림", message: "정보가 부족합니다.")
+                        self.removeLoadingOverlay()
+                        self.postButton.backgroundColor = UIColor.mainPurple
                         return
                     }
                     

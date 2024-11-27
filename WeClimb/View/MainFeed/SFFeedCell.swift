@@ -223,9 +223,23 @@ class SFFeedCell: UICollectionViewCell {
     }
     
     func playVideo(reStart: Bool) {
-        guard let player = player else { return }
+        guard let player = player else {
+            print("Player가 아직 준비되지 않음. 데이터를 로드하고 완료된 후 재실행.")
+            
+            completedLoad
+                .asDriver(onErrorJustReturn: ())
+                .drive(onNext: { [weak self] in
+                    print("비디오 다시 전달 구독 실행됨")
+                    self?.playVideo(reStart: false)
+                    print("비디오 다시 전달")
+                })
+                .disposed(by: disposeBag)
+            return
+        }
+        
         setNotifications()
         print("Play")
+        
         if reStart {
             player.seek(to: .zero)
             player.play()
