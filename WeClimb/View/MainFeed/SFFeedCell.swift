@@ -36,7 +36,7 @@ class SFFeedCell: UICollectionViewCell {
     private lazy var gymImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .white
         imageView.layer.cornerRadius = 16
         return imageView
