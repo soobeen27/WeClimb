@@ -103,6 +103,7 @@ extension UploadVM {
         
         let group = DispatchGroup() // 비동기 작업을 추적하기 위한 그룹
         var models = [FeedCellModel?](repeating: nil, count: mediaItems.value.count)
+        var shouldStopProcessing = false
         
         // 암장 이름을 미리 가져옵니다.
         guard let gymName = gymRelay.value?.gymName else {
@@ -156,6 +157,7 @@ extension UploadVM {
                         if durationInSeconds > 60 {
                             self.showAlert.accept(())
                             print("비디오가 너무 깁니다. 알람을 보냅니다.")
+                            shouldStopProcessing = true
                             group.leave()
                             return
                         } else {
@@ -205,7 +207,7 @@ extension UploadVM {
             guard let self = self else { return }
             self.isLoading.accept(false) // 로딩 종료
             
-            if !models.isEmpty {
+            if !models.isEmpty, !shouldStopProcessing {
                 self.feedRelay.accept(models.compactMap { $0 })
                 self.cellData.accept(models.compactMap { $0 })
             }
