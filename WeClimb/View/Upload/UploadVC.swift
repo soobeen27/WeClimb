@@ -187,6 +187,10 @@ class UploadVC: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
+    deinit {
+        unregisterForKeyboardNotifications()
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -199,6 +203,7 @@ class UploadVC: UIViewController {
         self.viewModel.bindGymDataToMedia()
         
         textView.delegate = self
+        scrollView.delegate = self
         setLayout()
         mediaItemsBind()
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(sender:))))
@@ -209,6 +214,7 @@ class UploadVC: UIViewController {
         bindPostButton()
         bindGymName()
         bindSettingButton()
+        registerForKeyboardNotifications()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -271,16 +277,55 @@ class UploadVC: UIViewController {
     func handleTap(sender: UITapGestureRecognizer) {
         if sender.state == .ended {
             textView.resignFirstResponder()
-            scrollToTop()
         }
         sender.cancelsTouchesInView = false
     }
     
-    func scrollToTop() {
-        let offset = CGPoint(x: 0, y: selectedMediaView.frame.origin.y)
-        scrollView.setContentOffset(offset, animated: true)
+    // MARK: - 텍스트필드 키보드 관련
+    
+    @objc private func keyboardWillShow(_ notification: Notification) {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        let keyboardHeight = keyboardFrame.height
+
+        let textViewFrame = textView.convert(textView.bounds, to: self.view)
+        let textViewBottomY = textViewFrame.maxY
+
+        if textViewBottomY > (view.frame.height - keyboardHeight) {
+            let offset = textViewBottomY - (view.frame.height - keyboardHeight) + 120
+            scrollView.setContentOffset(CGPoint(x: 0, y: offset), animated: true)
+        }
     }
     
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        scrollView.setContentOffset(.zero, animated: true)
+    }
+
+    private func registerForKeyboardNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow(_:)),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide(_:)),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+    
+    private func unregisterForKeyboardNotifications() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.contentOffset.y <= 0 {
+            view.endEditing(true)
+        }
+    }
+
     func phpickerVCPresent() {
         var configuration = PHPickerConfiguration()
         configuration.selectionLimit = 10
@@ -471,7 +516,8 @@ class UploadVC: UIViewController {
     
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        
+        scrollView.contentSize = contentView.frame.size
+
         [scrollView, postButton]
             .forEach {
                 view.addSubview($0)
@@ -564,11 +610,11 @@ class UploadVC: UIViewController {
 //MARK: TexViewDelegate
 extension UploadVC : UITextViewDelegate {
     
-    func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-        let offset = CGPoint(x: 0, y: textView.frame.origin.y)
-        scrollView.setContentOffset(offset, animated: true)
-        return true
-    }
+//    func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+//        let offset = CGPoint(x: 0, y: textView.frame.origin.y)
+//        scrollView.setContentOffset(offset, animated: true)
+//        return true
+//    }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
         guard textView.textColor == .secondaryLabel else { return }
@@ -586,7 +632,6 @@ extension UploadVC : UITextViewDelegate {
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         if (text == "\n") {
             textView.resignFirstResponder()
-            scrollToTop()
         }
         return true
     }
