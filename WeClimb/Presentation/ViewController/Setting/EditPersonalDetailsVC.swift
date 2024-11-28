@@ -166,6 +166,7 @@ class EditPersonalDetailsVC: UIViewController {
     private func setLayout() {
         view.backgroundColor = .white
         self.overrideUserInterfaceStyle = .light
+        navigationController?.navigationBar.tintColor = UIColor.black
         
         [
             titleLabel,

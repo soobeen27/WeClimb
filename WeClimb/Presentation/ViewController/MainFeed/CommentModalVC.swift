@@ -342,9 +342,17 @@ extension CommentModalVC: UITableViewDelegate {
 extension CommentModalVC: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let maxLength = 30
-        let currentString: NSString = textField.text as NSString? ?? ""
-        let newString: NSString = currentString.replacingCharacters(in: range, with: string) as NSString
+        guard let currentText = textField.text else { return true }
         
-        return newString.length <= maxLength
+        guard let textRange = Range(range, in: currentText) else { return true }
+        
+        let updatedText = currentText.replacingCharacters(in: textRange, with: string)
+
+        if let markedTextRange = textField.markedTextRange,
+           let _ = textField.position(from: markedTextRange.start, offset: 0) {
+            return true
+        }
+        
+        return updatedText.count <= maxLength
     }
 }

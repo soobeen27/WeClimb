@@ -55,6 +55,7 @@ class SFCollectionViewCell: UICollectionViewCell {
     }()
     
     private let profileTapGesture = UITapGestureRecognizer()
+    private let captionTapGesture = UITapGestureRecognizer()
     
     var profileTap: Driver<String?> {
         return profileTapGesture.rx.event
@@ -104,14 +105,16 @@ class SFCollectionViewCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 13)
         label.textColor = .white
         label.textAlignment = .left
-        label.numberOfLines = 1
+        label.numberOfLines = 2
         label.lineBreakMode = .byTruncatingTail
+        label.isUserInteractionEnabled = true
         return label
     }()
     
     private let feedUserProfileImage: UIImageView = {
         let image = UIImageView()
         image.layer.cornerRadius = 20
+        image.contentMode = .scaleAspectFill
         image.clipsToBounds = true
         image.layer.borderColor = UIColor.systemGray3.cgColor
         return image
@@ -345,8 +348,8 @@ class SFCollectionViewCell: UICollectionViewCell {
 //        }
         feedCaptionLabel.snp.makeConstraints {
             $0.top.equalTo(feedProfileStackView.snp.bottom).offset(15)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(20)
+            $0.leading.equalToSuperview().inset(16)
+            $0.width.equalToSuperview().multipliedBy(0.6)
             $0.bottom.equalToSuperview().offset(-16)
         }
         likeStackView.snp.makeConstraints {
@@ -404,6 +407,23 @@ class SFCollectionViewCell: UICollectionViewCell {
             .disposed(by: disposeBag)
     }
     
+    private func setupCaptionTapAction() {
+        feedCaptionLabel.addGestureRecognizer(captionTapGesture)
+        
+        captionTapGesture.rx.event
+            .bind { [weak self] _ in
+                guard let self = self else { return }
+                
+                self.feedCaptionLabel.numberOfLines = 0
+                self.feedCaptionLabel.lineBreakMode = .byWordWrapping
+                
+                UIView.animate(withDuration: 0.3) {
+                    self.layoutIfNeeded()
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+    
     // MARK: - configure 메서드
     func configure(with post: Post, viewModel: MainFeedVM) {
         self.viewModel = viewModel
@@ -449,7 +469,12 @@ class SFCollectionViewCell: UICollectionViewCell {
             })
             .disposed(by: disposeBag)
         
+        feedCaptionLabel.text = post.caption
+        feedCaptionLabel.numberOfLines = 2
+        feedCaptionLabel.lineBreakMode = .byTruncatingTail
+        
         bindCollectionView()
+        setupCaptionTapAction()
     }
     
     func fetchLike() {
