@@ -228,7 +228,22 @@ class UploadVC: UIViewController {
     
     private func setNavigation() {
         navigationItem.title = UploadNameSpace.title
+        
+        let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(self.cancelButtonTapped))
+        navigationItem.rightBarButtonItem = cancelButton
+        
+        viewModel.cellData
+            .asDriver()
+            .drive(onNext: { data in
+                if data.isEmpty {
+                    cancelButton.isHidden = true
+                } else {
+                    cancelButton.isHidden = false
+                }
+            })
+            .disposed(by: disposeBag)
     }
+
     
     @objc private func cancelButtonTapped() {
         initUploadVC()
@@ -323,6 +338,7 @@ class UploadVC: UIViewController {
                                 title: "알림",
                                 message: "1분 미만 비디오를 업로드해주세요.",
                                 includeCancel: false)
+                self.initUploadVC()
             })
             .disposed(by: disposeBag)
     }
@@ -587,11 +603,6 @@ extension UploadVC: PHPickerViewControllerDelegate {
         picker.dismiss(animated: true) {
             self.viewModel.setMedia()
         }
-        
-        if !results.isEmpty {
-            let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(self.cancelButtonTapped))
-            navigationItem.rightBarButtonItem = cancelButton
-        }
     }
 }
 
@@ -745,7 +756,6 @@ extension UploadVC {
         self.viewModel.selectedHold = BehaviorRelay<Hold?>(value: nil)
         
         self.viewModel.feedRelay = BehaviorRelay(value: [])
-        
         self.viewModel.cellData = BehaviorRelay(value: [FeedCellModel]())
         
         self.viewModel.shouldUpdateUI = true
@@ -780,6 +790,7 @@ extension UploadVC {
             .disposed(by: disposeBag)
         
         self.viewModel.setMedia()
+        self.setNavigation()
         
         self.gradeButton.isHidden = true
         self.settingView.selectedLabel.isHidden = false
