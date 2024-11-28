@@ -210,6 +210,8 @@ extension String {
             return ("초록", "DarkGreen", UIColor(red: 21/255, green: 114/255, blue: 55/255, alpha: 1))
         case "파검", "DarkBlue":
             return ("파랑", "DarkBlue", UIColor(red: 6/255, green: 103/255, blue: 121/255, alpha: 1))
+        case "검빨", "DarkRed":
+            return ("검정빨강", "DarkRed", UIColor(red: 122/255, green: 0/255, blue: 0/255, alpha: 1))
         case "B1":
             return ("B1", "B1", UIColor(red: 241/255, green: 239/255, blue: 239/255, alpha: 1))
         case "B2":
