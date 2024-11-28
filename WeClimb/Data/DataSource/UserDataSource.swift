@@ -12,27 +12,20 @@ import FirebaseStorage
 
 enum FuncError: Error {
     case wrongArgument
+    case unknown
 }
 
 protocol UserDataSource {
-    func userInfo(name: String?, uid: String?) throws -> Single<User>
+//    func userInfo(name: String?, uid: String?) throws -> Single<User>
+    func userInfoFromUID(uid: String) -> Single<User>
+    func userInfoFromName(name: String) -> Single<User>
 }
 
 final class DefaultUserDataSource: UserDataSource {
     private let db = Firestore.firestore()
     private let disposeBag = DisposeBag()
-        
-    func userInfo(name: String? = nil, uid: String? = nil) throws -> Single<User> {
-        if let name, let uid {
-            throw FuncError.wrongArgument
-        } else if let uid {
-            return userInfoFromUID(uid: uid)
-        } else if let name {
-            return userInfoFromName(name: name)
-        }
-    }
-    
-    private func userInfoFromUID(uid: String) -> Single<User> {
+
+    func userInfoFromUID(uid: String) -> Single<User> {
         return Single.create { [weak self] single in
             guard let self else { return Disposables.create() }
             
@@ -49,7 +42,7 @@ final class DefaultUserDataSource: UserDataSource {
         }
     }
     
-    private func userInfoFromName(name: String) -> Single<User> {
+    func userInfoFromName(name: String) -> Single<User> {
         return Single.create { [weak self] single in
             guard let self else { return Disposables.create() }
             let userRef = self.db.collection("users").whereField("userName", isEqualTo: name)
@@ -70,4 +63,16 @@ final class DefaultUserDataSource: UserDataSource {
             return Disposables.create()
         }
     }
+    //일단 폐기
+//    func userInfo(name: String? = nil, uid: String? = nil) throws -> Single<User> {
+//        if let name, let uid {
+//            throw FuncError.wrongArgument
+//        } else if let uid {
+//            return userInfoFromUID(uid: uid)
+//        } else if let name {
+//            return userInfoFromName(name: name)
+//        }
+//        throw FuncError.unknown
+//    }
+    
 }

@@ -11,11 +11,12 @@ import Firebase
 import FirebaseStorage
 
 protocol UserUpdateDataSource {
-    
+    func updateUser(with data: String, for field: String, userRef: DocumentReference) -> Single<Void>
+    func uploadProfileImage(image: URL) -> Observable<URL>
 }
 
 class DefaultUserUpdateDataSource {
-    
+
     func updateUser(with data: String, for field: String, userRef: DocumentReference) -> Single<Void> {
         return Single.create { [weak self] single in
             guard let self else { return Disposables.create() }
@@ -50,7 +51,8 @@ class DefaultUserUpdateDataSource {
                             return
                         }
                         guard let url else {
-                            observer.onError(NetworkError.nil)
+                            observer.onError(NetworkError.dataNil)
+                            return
                         }
                         observer.onNext(url)
                     }
