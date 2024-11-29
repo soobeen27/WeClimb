@@ -11,22 +11,23 @@ import Firebase
 import FirebaseStorage
 
 protocol UserUpdateDataSource {
-    func updateUser(with data: String, for field: String, userRef: DocumentReference) -> Single<Void>
+    func updateUser<T>(with data: T, for field: UserField, userRef: DocumentReference) -> Single<Void>
     func uploadProfileImage(image: URL) -> Observable<URL>
 }
 
 class UserUpdateDataSourceImpl {
 
-    func updateUser(with data: String, for field: String, userRef: DocumentReference) -> Single<Void> {
-        return Single.create { [weak self] single in
-            guard let self else { return Disposables.create() }
-                userRef.updateData([field : data]) { error in
-                    if let error {
-                        single(.failure(error))
-                        return
-                    }
-                    single(.success(()))
+    func updateUser<T>(with data: T, for field: UserField, userRef: DocumentReference) -> Completable {
+        return Completable.create { [weak self] completable in
+            guard let self = self else { return Disposables.create() }
+            
+            userRef.updateData([field : data]) { error in
+                if let error {
+                    completable(.error(error))
+                    return
                 }
+                completable(.completed)
+            }
             return Disposables.create()
         }
     }
@@ -64,3 +65,18 @@ class UserUpdateDataSourceImpl {
         }
     }
 }
+
+//    func updateUser(with data: String, for field: String, userRef: DocumentReference) -> Single<Void> {
+//        return Single.create { [weak self] single in
+//            guard let self else { return Disposables.create() }
+//                userRef.updateData([field : data]) { error in
+//                    if let error {
+//                        single(.failure(error))
+//                        return
+//                    }
+//                    single(.success(()))
+//                }
+//            return Disposables.create()
+//        }
+//    }
+    

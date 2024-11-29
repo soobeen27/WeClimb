@@ -23,3 +23,19 @@ struct User: Codable {
     let snsConsent: Bool?
     var blackList: [String]?
 }
+
+enum UserField: String {
+    case userName
+    case profileImage
+    case registerationDate
+    case lastModified
+    case userRole
+    case armReach
+    case height
+    case posts
+    case comments
+    case followers
+    case following
+    case snsConsent
+    case blackList
+}
