@@ -7,10 +7,10 @@
 
 import Foundation
 
-public protocol DeleteAccountUseCaseProtocol {
+public protocol DeleteAccountUseCase {
     func execute(deleteData: Bool) -> Completable
 }
 
-public struct DeleteAccountUseCase {
+public struct DeleteAccountUseCaseImpl {
     
 }

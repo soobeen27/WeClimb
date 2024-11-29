@@ -7,10 +7,10 @@
 
 import Foundation
 
-public protocol WebPageOpenUseCaseProtocol {
+public protocol WebPageOpenUseCase {
     func execute(urlString: String)
 }
 
-public struct WebPageOpenUseCase {
+public struct WebPageOpenUseCaseImpl {
     
 }
