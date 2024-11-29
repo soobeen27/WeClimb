@@ -7,10 +7,10 @@
 
 import RxSwift
 
-public protocol LogoutUseCase {
+public protocol LogoutUseCaseProtocol {
     func executeLogout() -> Observable<Void>
 }
 
-public struct LogoutUseCaseImpl {
+public struct LogoutUseCase {
     
 }
