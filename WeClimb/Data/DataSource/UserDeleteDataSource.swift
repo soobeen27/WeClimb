@@ -16,7 +16,7 @@ protocol UserDeleteDataSource {
     func userDelete() -> Completable
 }
 
-class UserDeleteDataSourceImpl {
+final class UserDeleteDataSourceImpl: UserDeleteDataSource {
     
     private let db = Firestore.firestore()
     

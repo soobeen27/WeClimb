@@ -27,6 +27,7 @@ struct User: Codable {
 enum UserUpdate: String {
     case userName
     case armReach
+    case profileImage
     case height
     case snsConsent
     
@@ -36,6 +37,8 @@ enum UserUpdate: String {
             return "userName"
         case .armReach:
             return "armReach"
+        case .profileImage:
+            return "profileImage"
         case .height:
             return "height"
         case .snsConsent:
