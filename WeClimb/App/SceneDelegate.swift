@@ -111,7 +111,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
             return false
         }
-        print(currentVersion)
         return currentVersion.compare(minimumVersion, options: .numeric) == .orderedAscending
     }
     

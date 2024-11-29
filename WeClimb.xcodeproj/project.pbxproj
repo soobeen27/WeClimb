@@ -85,6 +85,7 @@
 		91995F202CA4A24100BCC004 /* SFFeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */; };
 		919D056D2CF81966004314AC /* CommentDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D056C2CF81966004314AC /* CommentDataSource.swift */; };
 		919D056F2CF837E7004314AC /* UserBlockDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D056E2CF837E7004314AC /* UserBlockDataSource.swift */; };
+		919D05712CF83997004314AC /* GymDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D05702CF83997004314AC /* GymDataSource.swift */; };
 		91A717002CEA0D25007F825C /* LoginNeeded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A716FF2CEA0D25007F825C /* LoginNeeded.swift */; };
 		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
@@ -217,6 +218,7 @@
 		91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFFeedCell.swift; sourceTree = "<group>"; };
 		919D056C2CF81966004314AC /* CommentDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentDataSource.swift; sourceTree = SOURCE_ROOT; };
 		919D056E2CF837E7004314AC /* UserBlockDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBlockDataSource.swift; sourceTree = "<group>"; };
+		919D05702CF83997004314AC /* GymDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymDataSource.swift; sourceTree = "<group>"; };
 		91A716FF2CEA0D25007F825C /* LoginNeeded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginNeeded.swift; sourceTree = "<group>"; };
 		91AF25602C8C15FC002283BD /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
 		91AF25622C8D771A002283BD /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
@@ -429,6 +431,7 @@
 				911E1F5E2CF70463007B9A52 /* UserUpdateDataSource.swift */,
 				911E1F622CF71B4F007B9A52 /* PostDataSource.swift */,
 				919D056E2CF837E7004314AC /* UserBlockDataSource.swift */,
+				919D05702CF83997004314AC /* GymDataSource.swift */,
 			);
 			path = DataSource;
 			sourceTree = "<group>";
@@ -479,6 +482,21 @@
 				917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */,
 			);
 			path = WeClimbTests;
+			sourceTree = "<group>";
+		};
+		919D05722CF94D90004314AC /* App */ = {
+			isa = PBXGroup;
+			children = (
+				6BC91FB52C7F16D800B34083 /* WeClimb.entitlements */,
+				F4892BE62C7C237700C5FF16 /* AppDelegate.swift */,
+				F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */,
+				F4892BF12C7C237900C5FF16 /* LaunchScreen.storyboard */,
+				6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */,
+				F4892BEF2C7C237900C5FF16 /* Assets.xcassets */,
+				F4892BF42C7C237900C5FF16 /* Info.plist */,
+				6BC91FB22C7F016A00B34083 /* Config.xcconfig */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 		C45DC9D32C80502E00FC4C1D /* MainFeed */ = {
@@ -537,18 +555,11 @@
 		F4892BE52C7C237700C5FF16 /* WeClimb */ = {
 			isa = PBXGroup;
 			children = (
-				6BC91FB52C7F16D800B34083 /* WeClimb.entitlements */,
-				F4892BE62C7C237700C5FF16 /* AppDelegate.swift */,
-				F4892BE82C7C237700C5FF16 /* SceneDelegate.swift */,
+				919D05722CF94D90004314AC /* App */,
 				911E1F532CF6DCD2007B9A52 /* Data */,
 				911E1F512CF6DB63007B9A52 /* Domain */,
 				911E1F502CF6DB37007B9A52 /* Presentation */,
 				F4892C0C2C7C27A800C5FF16 /* Common */,
-				F4892BF12C7C237900C5FF16 /* LaunchScreen.storyboard */,
-				F4892BEF2C7C237900C5FF16 /* Assets.xcassets */,
-				F4892BF42C7C237900C5FF16 /* Info.plist */,
-				6BC91FB22C7F016A00B34083 /* Config.xcconfig */,
-				6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */,
 			);
 			path = WeClimb;
 			sourceTree = "<group>";
@@ -812,6 +823,7 @@
 				F4892C3E2C7EFD4700C5FF16 /* UploadVC.swift in Sources */,
 				911E1F632CF71B4F007B9A52 /* PostDataSource.swift in Sources */,
 				912613292CD8FE1300CD5E74 /* CommentVM.swift in Sources */,
+				919D05712CF83997004314AC /* GymDataSource.swift in Sources */,
 				C47A0AFD2C90310B0068173A /* FeedReportModalVC.swift in Sources */,
 				911E1F612CF7081D007B9A52 /* NetworkError.swift in Sources */,
 				F4892C1A2C7C984A00C5FF16 /* SearchVC.swift in Sources */,
@@ -1069,7 +1081,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = WeClimb/WeClimb.entitlements;
+				CODE_SIGN_ENTITLEMENTS = WeClimb/App/WeClimb.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
@@ -1077,7 +1089,7 @@
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = WeClimb/Info.plist;
+				INFOPLIST_FILE = WeClimb/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "위클";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진앱 권한을 확인해주세요";
@@ -1111,7 +1123,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = WeClimb/WeClimb.entitlements;
+				CODE_SIGN_ENTITLEMENTS = WeClimb/App/WeClimb.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
@@ -1119,7 +1131,7 @@
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = WeClimb/Info.plist;
+				INFOPLIST_FILE = WeClimb/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "위클";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진앱 권한을 확인해주세요";
