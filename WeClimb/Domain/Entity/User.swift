@@ -26,27 +26,18 @@ struct User: Codable {
 
 enum UserUpdate: String {
     case userName
-    case profileImage
     case armReach
     case height
-    case followers
-    case following
     case snsConsent
     
     var key: String {
         switch self {
         case .userName:
             return "userName"
-        case .profileImage:
-            return "profileImage"
         case .armReach:
             return "armReach"
         case .height:
             return "height"
-        case .followers:
-            return "followers"
-        case .following:
-            return "following"
         case .snsConsent:
             return "snsConsent"
         }
