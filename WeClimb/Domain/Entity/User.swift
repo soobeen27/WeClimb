@@ -24,18 +24,31 @@ struct User: Codable {
     var blackList: [String]?
 }
 
-enum UserField: String {
+enum UserUpdate: String {
     case userName
     case profileImage
-    case registerationDate
-    case lastModified
-    case userRole
     case armReach
     case height
-    case posts
-    case comments
     case followers
     case following
     case snsConsent
-    case blackList
+    
+    var key: String {
+        switch self {
+        case .userName:
+            return "userName"
+        case .profileImage:
+            return "profileImage"
+        case .armReach:
+            return "armReach"
+        case .height:
+            return "height"
+        case .followers:
+            return "followers"
+        case .following:
+            return "following"
+        case .snsConsent:
+            return "snsConsent"
+        }
+    }
 }
