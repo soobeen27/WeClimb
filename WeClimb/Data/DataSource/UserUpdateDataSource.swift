@@ -17,10 +17,10 @@ protocol UserUpdateDataSource {
     func uploadProfileImageToStorage(imageURL: URL, userUID: String) -> Single<URL>
 }
 
-private let db = Firestore.firestore()
-private let storage = Storage.storage()
-
 final class UserUpdateDataSourceImpl: UserUpdateDataSource {
+    
+    private let db = Firestore.firestore()
+    private let storage = Storage.storage()
     
     func updateUser<T>(with data: T, for field: UserUpdate, userRef: DocumentReference) -> Completable {
         return Completable.create { [weak self] completable in
@@ -39,7 +39,7 @@ final class UserUpdateDataSourceImpl: UserUpdateDataSource {
     
     func uploadProfileImageToStorage(imageURL: URL, userUID: String) -> Single<URL> {
         return Single<URL>.create { single in
-            let profileImageRef = storage.reference().child("users/\(userUID)/profileImage.jpg")
+            let profileImageRef = self.storage.reference().child("users/\(userUID)/profileImage.jpg")
             
             profileImageRef.putFile(from: imageURL, metadata: nil) { _, error in
                 if let error = error {
@@ -78,7 +78,7 @@ enum UserUpdateError: Error {
 }
 
 /*
- // 유즈케이스에 프로필이미지 구현부분
+  유즈케이스에 프로필이미지 구현부분
  func uploadAndUpdateProfileImage(imageURL: URL, userUID: String) -> Completable {
      return uploadProfileImageToStorage(imageURL: imageURL, userUID: userUID)
          .flatMapCompletable { url in
