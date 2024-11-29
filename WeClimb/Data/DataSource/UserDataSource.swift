@@ -21,7 +21,7 @@ protocol UserDataSource {
     func userInfoFromName(name: String) -> Single<User>
 }
 
-final class DefaultUserDataSource: UserDataSource {
+final class UserDataSourceImpl: UserDataSource {
     private let db = Firestore.firestore()
     private let disposeBag = DisposeBag()
 

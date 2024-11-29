@@ -15,7 +15,7 @@ protocol CommentDataSource {
     func deleteComments(postUID: String, commentUID: String) -> Single<Void>
 }
 
-class DefaultCommentDataSource: CommentDataSource {
+class CommentDataSourceImpl: CommentDataSource {
     private let db = Firestore.firestore()
     // MARK: 댓글달기
     func addComment(fromPostUid postUid: String, content: String) -> Single<Void> {

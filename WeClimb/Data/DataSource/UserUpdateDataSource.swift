@@ -15,7 +15,7 @@ protocol UserUpdateDataSource {
     func uploadProfileImage(image: URL) -> Observable<URL>
 }
 
-class DefaultUserUpdateDataSource {
+class UserUpdateDataSourceImpl {
 
     func updateUser(with data: String, for field: String, userRef: DocumentReference) -> Single<Void> {
         return Single.create { [weak self] single in

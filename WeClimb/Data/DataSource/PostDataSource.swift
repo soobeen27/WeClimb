@@ -15,7 +15,7 @@ protocol PostDataSource {
     
 }
 
-class DefaultPostDataSource {
+class PostDataSourceImpl {
     private let db = Firestore.firestore()
     private let disposeBag = DisposeBag()
     private let storage = Storage.storage()

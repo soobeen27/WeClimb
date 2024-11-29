@@ -13,7 +13,7 @@ protocol GymDataSource {
     
 }
 
-class DefaultGymDataSource {
+class GymDataSourceImpl {
     private let db = Firestore.firestore()
     
     func allGymName() -> Single<[String]> {

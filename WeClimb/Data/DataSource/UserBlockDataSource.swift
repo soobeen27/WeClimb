@@ -14,7 +14,7 @@ protocol UserBlockDataSource {
     func removeBlackList(blockedUser uid: String) -> Single<Void>
 }
 
-class DefaultUserBlockDataSource {
+class UserBlockDataSourceImpl {
     private let db = Firestore.firestore()
     
     func addBlackList(blockedUser uid: String) -> Single<Void> {
