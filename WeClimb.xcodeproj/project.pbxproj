@@ -86,6 +86,8 @@
 		919D056D2CF81966004314AC /* CommentDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D056C2CF81966004314AC /* CommentDataSource.swift */; };
 		919D056F2CF837E7004314AC /* UserBlockDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D056E2CF837E7004314AC /* UserBlockDataSource.swift */; };
 		919D05712CF83997004314AC /* GymDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D05702CF83997004314AC /* GymDataSource.swift */; };
+		919D05742CF97C9F004314AC /* UploadPostDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D05732CF97C9F004314AC /* UploadPostDataSource.swift */; };
+		919D05762CF9AB49004314AC /* CommonError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D05752CF9AB49004314AC /* CommonError.swift */; };
 		91A717002CEA0D25007F825C /* LoginNeeded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A716FF2CEA0D25007F825C /* LoginNeeded.swift */; };
 		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
@@ -219,6 +221,8 @@
 		919D056C2CF81966004314AC /* CommentDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentDataSource.swift; sourceTree = SOURCE_ROOT; };
 		919D056E2CF837E7004314AC /* UserBlockDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBlockDataSource.swift; sourceTree = "<group>"; };
 		919D05702CF83997004314AC /* GymDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymDataSource.swift; sourceTree = "<group>"; };
+		919D05732CF97C9F004314AC /* UploadPostDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPostDataSource.swift; sourceTree = "<group>"; };
+		919D05752CF9AB49004314AC /* CommonError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonError.swift; sourceTree = "<group>"; };
 		91A716FF2CEA0D25007F825C /* LoginNeeded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginNeeded.swift; sourceTree = "<group>"; };
 		91AF25602C8C15FC002283BD /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
 		91AF25622C8D771A002283BD /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
@@ -409,6 +413,7 @@
 				C45DC9D42C80519100FC4C1D /* FeedModel.swift */,
 				91E21D102CE20017003269DD /* Hold.swift */,
 				911E1F602CF7081D007B9A52 /* NetworkError.swift */,
+				919D05752CF9AB49004314AC /* CommonError.swift */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -432,6 +437,7 @@
 				911E1F622CF71B4F007B9A52 /* PostDataSource.swift */,
 				919D056E2CF837E7004314AC /* UserBlockDataSource.swift */,
 				919D05702CF83997004314AC /* GymDataSource.swift */,
+				919D05732CF97C9F004314AC /* UploadPostDataSource.swift */,
 			);
 			path = DataSource;
 			sourceTree = "<group>";
@@ -783,6 +789,7 @@
 				435A1EBC2CE262670076D9A0 /* SelectSettingCell.swift in Sources */,
 				436AEAEE2C7EC1F500E0D85A /* MypageNameSpace.swift in Sources */,
 				6B8F38CB2C8955350018C40D /* PrivacyPolicyVM.swift in Sources */,
+				919D05742CF97C9F004314AC /* UploadPostDataSource.swift in Sources */,
 				C440789E2CA319B200B747A6 /* GuestVC.swift in Sources */,
 				6B8467BE2C86129B006B062D /* ClimbingGymNameSpace.swift in Sources */,
 				F4892C1E2C7C98A100C5FF16 /* MyPageVC.swift in Sources */,
@@ -864,6 +871,7 @@
 				6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */,
 				916D64D02C848A540064B766 /* FeedView.swift in Sources */,
 				6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */,
+				919D05762CF9AB49004314AC /* CommonError.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
 				F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */,
 				C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */,
