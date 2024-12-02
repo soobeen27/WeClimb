@@ -23,9 +23,7 @@ final class UserUpdateDataSourceImpl: UserUpdateDataSource {
     private let storage = Storage.storage()
     
     func updateUser<T>(with data: T, for field: UserUpdate, userRef: DocumentReference) -> Completable {
-        return Completable.create { [weak self] completable in
-            guard let self = self else { return Disposables.create() }
-            
+        return Completable.create { completable in
             userRef.updateData([field : data]) { error in
                 if let error {
                     completable(.error(error))
