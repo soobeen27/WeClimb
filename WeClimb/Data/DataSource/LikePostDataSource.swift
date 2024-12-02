@@ -10,10 +10,10 @@ import RxSwift
 import Firebase
 
 protocol LikePostDataSource {
-    
+    func likePost(myUID: String, postUID: String) -> Single<[String]>
 }
 
-class LikePostDataSourceImpl {
+class LikePostDataSourceImpl: LikePostDataSource {
     private let db = Firestore.firestore()
     
     func likePost(myUID: String, postUID: String) -> Single<[String]>  {
@@ -29,7 +29,6 @@ class LikePostDataSourceImpl {
                     postSnapshot = try transaction.getDocument(postRef)
                 } catch let fetchError as NSError {
                     errorPointer?.pointee = fetchError
-                    
                     return nil
                 }
                 var currentLikeList = postSnapshot.data()?["like"] as? [String] ?? []
@@ -53,6 +52,5 @@ class LikePostDataSourceImpl {
             return Disposables.create()
         }
     }
-    
 }
 
