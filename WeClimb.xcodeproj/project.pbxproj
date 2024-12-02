@@ -41,6 +41,9 @@
 		6B7F76992CA4A8E900B05B3F /* BlackListVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7F76982CA4A8E900B05B3F /* BlackListVM.swift */; };
 		6B8467BC2C85DDE9006B062D /* ClimbingGymInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */; };
 		6B8467BE2C86129B006B062D /* ClimbingGymNameSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */; };
+		6B87F9302CFD9405005905EA /* ImageDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B87F92F2CFD9405005905EA /* ImageDataSource.swift */; };
+		6B87F9322CFD9D85005905EA /* ImageDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B87F9312CFD9D85005905EA /* ImageDataRepository.swift */; };
+		6B87F9342CFD9D9C005905EA /* ImageDataRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B87F9332CFD9D9C005905EA /* ImageDataRepositoryImpl.swift */; };
 		6B8F38B92C888F6B0018C40D /* PrivacyPolicyVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38B82C888F6A0018C40D /* PrivacyPolicyVC.swift */; };
 		6B8F38C72C894BC50018C40D /* CreateNickNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38C62C894BC50018C40D /* CreateNickNameVC.swift */; };
 		6B8F38CB2C8955350018C40D /* PrivacyPolicyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */; };
@@ -198,6 +201,9 @@
 		6B7F76982CA4A8E900B05B3F /* BlackListVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackListVM.swift; sourceTree = "<group>"; };
 		6B8467BB2C85DDE9006B062D /* ClimbingGymInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymInfoView.swift; sourceTree = "<group>"; };
 		6B8467BD2C86129B006B062D /* ClimbingGymNameSpace.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ClimbingGymNameSpace.swift; sourceTree = "<group>"; tabWidth = 4; };
+		6B87F92F2CFD9405005905EA /* ImageDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDataSource.swift; sourceTree = "<group>"; };
+		6B87F9312CFD9D85005905EA /* ImageDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDataRepository.swift; sourceTree = "<group>"; };
+		6B87F9332CFD9D9C005905EA /* ImageDataRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDataRepositoryImpl.swift; sourceTree = "<group>"; };
 		6B8F38B82C888F6A0018C40D /* PrivacyPolicyVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyVC.swift; sourceTree = "<group>"; };
 		6B8F38C62C894BC50018C40D /* CreateNickNameVC.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = CreateNickNameVC.swift; sourceTree = "<group>"; tabWidth = 4; };
 		6B8F38CA2C8955350018C40D /* PrivacyPolicyVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyVM.swift; sourceTree = "<group>"; tabWidth = 4; };
@@ -401,6 +407,7 @@
 				6B9402102CFD75DE00F1DC2D /* PostRepository.swift */,
 				6B9402122CFD75F400F1DC2D /* UserBlockRepository.swift */,
 				6B9402142CFD760700F1DC2D /* GymDataRepository.swift */,
+				6B87F9312CFD9D85005905EA /* ImageDataRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -415,6 +422,7 @@
 				6B94021E2CFD775E00F1DC2D /* PostRepositoryImpl.swift */,
 				6B9402202CFD776600F1DC2D /* UserBlockRepositoryImpl.swift */,
 				6B9402222CFD776E00F1DC2D /* GymDataRepositoryImpl.swift */,
+				6B87F9332CFD9D9C005905EA /* ImageDataRepositoryImpl.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -451,7 +459,6 @@
 			children = (
 				911E1F522CF6DC85007B9A52 /* Entity */,
 				6B9402082CFD5C1700F1DC2D /* Repositories */,
-				43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -463,6 +470,7 @@
 				91AF25622C8D771A002283BD /* Gym.swift */,
 				91F71CE22C89844900405778 /* User.swift */,
 				43A79AE12C85BD3B00B960A2 /* SettingModel.swift */,
+				43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */,
 				43A79AD52C853EC100B960A2 /* EditModel.swift */,
 				436AEAF72C7F0EEE00E0D85A /* SearchModel.swift */,
 				C45DC9D42C80519100FC4C1D /* FeedModel.swift */,
@@ -493,6 +501,7 @@
 				911E1F622CF71B4F007B9A52 /* PostDataSource.swift */,
 				919D056E2CF837E7004314AC /* UserBlockDataSource.swift */,
 				919D05702CF83997004314AC /* GymDataSource.swift */,
+				6B87F92F2CFD9405005905EA /* ImageDataSource.swift */,
 			);
 			path = DataSource;
 			sourceTree = "<group>";
@@ -906,6 +915,7 @@
 				436AEAE02C7D69CB00E0D85A /* GymTableViewCell.swift in Sources */,
 				6B8F38C72C894BC50018C40D /* CreateNickNameVC.swift in Sources */,
 				C4E29C172C806F170076BCA6 /* MainFeedVM.swift in Sources */,
+				6B87F9322CFD9D85005905EA /* ImageDataRepository.swift in Sources */,
 				C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */,
 				916D64D32C848BE00064B766 /* FeedCell.swift in Sources */,
 				6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */,
@@ -927,6 +937,7 @@
 				43A79AD82C85481300B960A2 /* DetailEditVM.swift in Sources */,
 				6B9402032CF986C900F1DC2D /* UserDeleteDataSource.swift in Sources */,
 				435A1EB82CE262210076D9A0 /* SelectGymVC.swift in Sources */,
+				6B87F9342CFD9D9C005905EA /* ImageDataRepositoryImpl.swift in Sources */,
 				91F71CE12C89835700405778 /* FirebaseManager.swift in Sources */,
 				F4892C142C7C973800C5FF16 /* TabBarController.swift in Sources */,
 				6B94020F2CFD75BE00F1DC2D /* UserDeleteRepository.swift in Sources */,
@@ -939,6 +950,7 @@
 				6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
 				6B9402252CFD777800F1DC2D /* CommentRepositoryImpl.swift in Sources */,
+				6B87F9302CFD9405005905EA /* ImageDataSource.swift in Sources */,
 				F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */,
 				C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */,
 				43A0E72A2CE3888800F15682 /* UploadHeaderView.swift in Sources */,
