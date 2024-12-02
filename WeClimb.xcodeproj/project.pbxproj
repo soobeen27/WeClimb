@@ -87,6 +87,8 @@
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
 		917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */; };
 		917DA89E2CD4B0A0006FF6B9 /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 917DA89D2CD4B0A0006FF6B9 /* RxBlocking */; };
+		918D2A3C2CFD8A9400F54716 /* PostFilterDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918D2A3B2CFD8A9400F54716 /* PostFilterDataSource.swift */; };
+		918D2A3E2CFD8DD600F54716 /* MainFeedDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918D2A3D2CFD8DD600F54716 /* MainFeedDataSource.swift */; };
 		91995F202CA4A24100BCC004 /* SFFeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */; };
 		919D056D2CF81966004314AC /* CommentDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D056C2CF81966004314AC /* CommentDataSource.swift */; };
 		919D056F2CF837E7004314AC /* UserBlockDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D056E2CF837E7004314AC /* UserBlockDataSource.swift */; };
@@ -227,6 +229,8 @@
 		917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeClimbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeClimbTests.swift; sourceTree = "<group>"; };
 		917DA89F2CD4B340006FF6B9 /* WeClimb.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = WeClimb.xctestplan; sourceTree = "<group>"; };
+		918D2A3B2CFD8A9400F54716 /* PostFilterDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostFilterDataSource.swift; sourceTree = "<group>"; };
+		918D2A3D2CFD8DD600F54716 /* MainFeedDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFeedDataSource.swift; sourceTree = "<group>"; };
 		91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFFeedCell.swift; sourceTree = "<group>"; };
 		919D056C2CF81966004314AC /* CommentDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentDataSource.swift; sourceTree = SOURCE_ROOT; };
 		919D056E2CF837E7004314AC /* UserBlockDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBlockDataSource.swift; sourceTree = "<group>"; };
@@ -468,6 +472,8 @@
 				919D056E2CF837E7004314AC /* UserBlockDataSource.swift */,
 				919D05702CF83997004314AC /* GymDataSource.swift */,
 				919D05732CF97C9F004314AC /* UploadPostDataSource.swift */,
+				918D2A3B2CFD8A9400F54716 /* PostFilterDataSource.swift */,
+				918D2A3D2CFD8DD600F54716 /* MainFeedDataSource.swift */,
 			);
 			path = DataSource;
 			sourceTree = "<group>";
@@ -850,6 +856,7 @@
 				6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */,
 				436AEAEA2C7DCD1100E0D85A /* MyPageCell.swift in Sources */,
 				F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */,
+				918D2A3C2CFD8A9400F54716 /* PostFilterDataSource.swift in Sources */,
 				436AEAF42C7EEE9900E0D85A /* UserPageVC.swift in Sources */,
 				C43197902CAAC3FD00029E3C /* ProfileManager.swift in Sources */,
 				434227732CF97C9C003523EF /* LogoutUseCase.swift in Sources */,
@@ -887,6 +894,7 @@
 				6BC91F932C7CC81400B34083 /* DifficultyTableViewCell.swift in Sources */,
 				C47A0AFF2C9038990068173A /* FeedNameSpace.swift in Sources */,
 				F4892C1C2C7C988B00C5FF16 /* ClimbingGymVC.swift in Sources */,
+				918D2A3E2CFD8DD600F54716 /* MainFeedDataSource.swift in Sources */,
 				91AF25632C8D771A002283BD /* Gym.swift in Sources */,
 				43A79AD62C853EC100B960A2 /* EditModel.swift in Sources */,
 				91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */,
