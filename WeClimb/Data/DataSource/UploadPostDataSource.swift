@@ -11,19 +11,84 @@ import Firebase
 import FirebaseStorage
 
 protocol UploadPostDataSource {
-    
+    func uploadPost(user: User, gym: String?, caption: String?,
+                    datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Completable
 }
 
 class UploadPostDataSourceImpl {
-    //미디어 올리기 -> 미디어 레퍼런스
-    //포스트 올리기 -> 포스트 레퍼런스
-    //포스트 업데이트
-    //미디어 업데이트
-    //업로드
+
     private let db = Firestore.firestore()
     private let disposebag = DisposeBag()
     
-    private func mediasUpload(user: User, gym: String?, datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL)]) -> Single<[DocumentReference]> {
+    func uploadPost(user: User, gym: String?, caption: String?,
+                    datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Completable {
+        return Completable.create { [weak self] completable in
+            guard let self else {
+                completable(.error(CommonError.selfNil))
+                return Disposables.create()
+            }
+            guard let authorUID = try? FirestoreHelper.userUID() else {
+                completable(.error(UserStateError.nonmeber))
+                return Disposables.create()
+            }
+            let creationDate = Date()
+            mediasUpload(user: user, gym: gym, datas: datas)
+                .subscribe(onSuccess: { [weak self] references, batch in
+                    guard let self else {
+                        completable(.error(UserStateError.nonmeber))
+                        return
+                    }
+                    do {
+                        let postUID = UUID().uuidString
+                        let postRef = self.db.collection("posts").document(postUID)
+                        let post = Post(postUID: postUID,
+                                        authorUID: authorUID,
+                                        creationDate: creationDate,
+                                        caption: caption,
+                                        like: nil,
+                                        gym: gym,
+                                        medias: references,
+                                        thumbnail: datas.first?.thumbnailURL?.absoluteString,
+                                        commentCount: nil)
+                        try self.createPost(batch: batch, post: post, postRef: postRef)
+                        self.userUpdatePost(batch: batch, postRef: postRef, userUID: authorUID)
+                        self.mediaUpdate(batch: batch, postRef: postRef, mediaRefs: references)
+                        batch.commit { error in
+                            if let error {
+                                completable(.error(error))
+                            } else {
+                                completable(.completed)
+                            }
+                        }
+                    } catch {
+                        completable(.error(error))
+                    }
+                }, onFailure: { error in
+                    completable(.error(error))
+                })
+                .disposed(by: disposebag)
+            
+            return Disposables.create()
+        }
+    }
+    
+    private func createPost(batch: WriteBatch, post: Post, postRef: DocumentReference) throws {
+        let encodedPost = try Firestore.Encoder().encode(post)
+        batch.setData(encodedPost, forDocument: postRef)
+    }
+    
+    private func userUpdatePost(batch: WriteBatch, postRef: DocumentReference, userUID: String) {
+        let userRef = db.collection("users").document(userUID)
+        batch.updateData(["posts": FieldValue.arrayUnion([postRef])], forDocument: userRef)
+    }
+    
+    private func mediaUpdate(batch: WriteBatch, postRef: DocumentReference, mediaRefs: [DocumentReference]) {
+        mediaRefs.forEach { reference in
+            batch.updateData(["postRef" : postRef], forDocument: reference)
+        }
+    }
+    
+    private func mediasUpload(user: User, gym: String?, datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Single<(references: [DocumentReference], batch: WriteBatch )> {
         return Single.create { [weak self] single in
             guard let self else {
                 single(.failure(CommonError.selfNil))
@@ -47,7 +112,7 @@ class UploadPostDataSourceImpl {
                                 gym: gym,
                                 creationDate: creationDate,
                                 postRef: nil,
-                                thumbnailURL: data.thumbnailURL.absoluteString,
+                                thumbnailURL: data.thumbnailURL?.absoluteString,
                                 height: user.height,
                                 armReach: user.armReach
                             )
@@ -67,16 +132,10 @@ class UploadPostDataSourceImpl {
             
             Single.zip(uploadTasks)
                 .map { results -> [DocumentReference] in
-                    results.sorted(by: { $0.0 < $1.0 }).map { $0.1 } // 인덱스 기준으로 정렬
+                    results.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
                 }
                 .subscribe(onSuccess: { sortedRefs in
-                    batch.commit { error in
-                        if let error = error {
-                            single(.failure(error))
-                            return
-                        }
-                        single(.success(sortedRefs))
-                    }
+                    single(.success((sortedRefs, batch)))
                 }, onFailure: { error in
                     single(.failure(error))
                 })
@@ -107,6 +166,7 @@ class UploadPostDataSourceImpl {
                         }
                     }
                 }
+                uploadTask.resume()
             } catch {
                 single(.failure(error))
             }
@@ -126,7 +186,7 @@ class UploadPostDataSourceImpl {
             let myUID = try FirestoreHelper.userUID()
             let storage = Storage.storage()
             let storageRef = storage.reference()
-            let mediaRef = storageRef.child("(users/\(myUID)/\(fileName)")
+            let mediaRef = storageRef.child("users/\(myUID)/\(fileName)")
             return mediaRef
         } catch {
             throw error
