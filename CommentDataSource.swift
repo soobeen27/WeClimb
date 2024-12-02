@@ -87,8 +87,7 @@ class CommentDataSourceImpl: CommentDataSource {
                 .collection("comments")
                 .document(commentUID)
             
-            commentRef.delete { [weak self] error in
-                guard let self else { return }
+            commentRef.delete { error in
                 if let error = error {
                     single(.failure(error))
                     return

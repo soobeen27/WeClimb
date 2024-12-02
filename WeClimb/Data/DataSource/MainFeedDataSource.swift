@@ -16,14 +16,12 @@ enum FirebaseError: Error {
         switch self {
         case .documentNil:
             "도큐멘트가 없음"
-        default:
-            "unknown"
         }
     }
 }
 
 protocol MainFeedDataSource {
-    
+    func getFeed(user: User?) -> Single<[Post]>
 }
 
 class MainFeedDataSourceImpl {
@@ -32,19 +30,13 @@ class MainFeedDataSourceImpl {
     private let disposeBag = DisposeBag()
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
-    func getFeed(user: User? = nil) -> Single<[Post]> {
+    func getFeed(user: User?) -> Single<[Post]> {
         return Single.create { [weak self] single in
             guard let self else {
                 single(.failure(CommonError.selfNil))
                 return Disposables.create()
             }
-            var postRef = self.getPostRef()
-            if let user {
-                if let blackList = user.blackList, !blackList.isEmpty {
-                    postRef = postRef
-                        .whereField("authorUID", notIn: blackList)
-                }
-            }
+            var postRef = self.getPostRef(user: user)
             self.getPost(postRef: postRef)
                 .subscribe(onSuccess: { posts in
                     single(.success(posts))
@@ -58,19 +50,29 @@ class MainFeedDataSourceImpl {
     
     
     
-    private func getPostRef() -> Query {
-        var postsRef = db.collection("posts").order(by: "creationDate", descending: true).limit(to: 50)
+    private func getPostRef(user: User? = nil) -> Query {
+        var postsRef = db.collection("posts")
+            .order(by: "creationDate", descending: true)
+            .limit(to: 50)
         
+        if let user {
+            postsRef = checkBlackList(quary: postsRef, user: user)
+        }
         if let lastFeed {
             postsRef = postsRef.start(afterDocument: lastFeed)
         }
         return postsRef
     }
     
-//    private func checkBlackList
-        
+    private func checkBlackList(quary: Query, user: User) -> Query {
+        if let blackList = user.blackList, !blackList.isEmpty {
+            return quary.whereField("authorUID", notIn: blackList)
+        }
+        return quary
+    }
+
     private func getPost(postRef: Query) -> Single<[Post]> {
-        return Single.create { single in
+        return Single.create { [weak self] single in
             postRef.getDocuments { [weak self] snapshot, error in
                 guard let self else { return }
                 if let error = error {
