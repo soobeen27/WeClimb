@@ -11,6 +11,7 @@
 		434227752CF984C9003523EF /* WebPageOpenUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227742CF984C9003523EF /* WebPageOpenUseCase.swift */; };
 		434227772CF98D5D003523EF /* DeleteAccountUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */; };
 		434227792CF99746003523EF /* SettingVMBefore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227782CF99746003523EF /* SettingVMBefore.swift */; };
+		4342277B2CFD7E6D003523EF /* ReAuthUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */; };
 		435A1EB82CE262210076D9A0 /* SelectGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB72CE262210076D9A0 /* SelectGymVC.swift */; };
 		435A1EBA2CE262460076D9A0 /* SelectSettingModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */; };
 		435A1EBC2CE262670076D9A0 /* SelectSettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */; };
@@ -158,6 +159,7 @@
 		434227742CF984C9003523EF /* WebPageOpenUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPageOpenUseCase.swift; sourceTree = "<group>"; };
 		434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountUseCase.swift; sourceTree = "<group>"; };
 		434227782CF99746003523EF /* SettingVMBefore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingVMBefore.swift; sourceTree = "<group>"; };
+		4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReAuthUseCase.swift; sourceTree = "<group>"; };
 		435A1EB72CE262210076D9A0 /* SelectGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGymVC.swift; sourceTree = "<group>"; };
 		435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingModalVC.swift; sourceTree = "<group>"; };
 		435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingCell.swift; sourceTree = "<group>"; };
@@ -328,6 +330,7 @@
 				434227722CF97C9C003523EF /* LogoutUseCase.swift */,
 				434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */,
 				434227742CF984C9003523EF /* WebPageOpenUseCase.swift */,
+				4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -884,6 +887,7 @@
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */,
 				911E1F5B2CF6E97B007B9A52 /* FirestoreHelper.swift in Sources */,
+				4342277B2CFD7E6D003523EF /* ReAuthUseCase.swift in Sources */,
 				43A79AD82C85481300B960A2 /* DetailEditVM.swift in Sources */,
 				435A1EB82CE262210076D9A0 /* SelectGymVC.swift in Sources */,
 				91F71CE12C89835700405778 /* FirebaseManager.swift in Sources */,
