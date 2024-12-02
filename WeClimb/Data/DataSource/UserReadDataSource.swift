@@ -1,5 +1,5 @@
 //
-//  UserDataSource.swift
+//  UserReadDataSource.swift
 //  WeClimb
 //
 //  Created by Soobeen Jang on 11/27/24.
@@ -15,13 +15,13 @@ enum FuncError: Error {
     case unknown
 }
 
-protocol UserDataSource {
+protocol UserReadDataSource {
 //    func userInfo(name: String?, uid: String?) throws -> Single<User>
     func userInfoFromUID(uid: String) -> Single<User>
     func userInfoFromName(name: String) -> Single<User>
 }
 
-final class UserDataSourceImpl: UserDataSource {
+final class UserReadDataSourceImpl: UserReadDataSource {
     private let db = Firestore.firestore()
     private let disposeBag = DisposeBag()
 
