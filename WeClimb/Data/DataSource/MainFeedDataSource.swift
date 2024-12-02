@@ -24,7 +24,7 @@ protocol MainFeedDataSource {
     func getFeed(user: User?) -> Single<[Post]>
 }
 
-class MainFeedDataSourceImpl {
+class MainFeedDataSourceImpl: MainFeedDataSource {
     private let db = Firestore.firestore()
     private var lastFeed: QueryDocumentSnapshot?
     private let disposeBag = DisposeBag()

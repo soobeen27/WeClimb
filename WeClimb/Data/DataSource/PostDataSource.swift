@@ -12,15 +12,15 @@ import RxSwift
 import UIKit
 
 protocol PostDataSource {
-    
+    func posts(postRefs: [DocumentReference]) -> Observable<[Post]>
 }
 
-class PostDataSourceImpl {
+class PostDataSourceImpl: PostDataSource {
     private let db = Firestore.firestore()
     private let disposeBag = DisposeBag()
     private let storage = Storage.storage()
     
-    func postsFrom(postRefs: [DocumentReference]) -> Observable<[Post]> {
+    func posts(postRefs: [DocumentReference]) -> Observable<[Post]> {
         let posts = postRefs.map { ref in
             return Observable<Post>.create { observer in
                 ref.getDocument { document, error in

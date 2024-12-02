@@ -10,10 +10,11 @@ import Firebase
 import RxSwift
 
 protocol GymDataSource {
-    
+    func allGymName() -> Single<[String]>
+    func gymInfo(from name: String, completion: @escaping (Gym?) -> Void)
 }
 
-class GymDataSourceImpl {
+class GymDataSourceImpl: GymDataSource {
     private let db = Firestore.firestore()
     
     func allGymName() -> Single<[String]> {

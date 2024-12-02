@@ -15,7 +15,7 @@ protocol UploadPostDataSource {
                     datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Completable
 }
 
-class UploadPostDataSourceImpl {
+class UploadPostDataSourceImpl: UploadPostDataSource {
 
     private let db = Firestore.firestore()
     private let disposebag = DisposeBag()
