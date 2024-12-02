@@ -1,31 +1,31 @@
-////
-////  SettingVM.swift
-////  WeClimb
-////
-////  Created by 강유정 on 9/2/24.
-////
 //
+//  SettingVM.swift
+//  WeClimb
+//
+//  Created by 강유정 on 9/2/24.
+//
+
 //import FirebaseAuth
 //import FirebaseCore
 //import GoogleSignIn
 //import RxSwift
-//
+
 //protocol SettingViewModelProtocol {
-//    func tranform(input: SettingViewModel.Input) -> SettingViewModel.Output
+//    func tranform(input: UserListViewModel.Input) -> UserListViewModel.Output
 //}
 //
 //class SettingViewModel: SettingViewModelProtocol {
 //    
-//    private let webPageUseCase: WebPageOpenUseCase
-//    private let logoutUseCase: LogoutUseCase
-//    private let deleteAccountUseCase: DeleteAccountUseCase
+//    private let webPageUseCase: WebPageOpenUseCaseProtocol
+//    private let logoutUseCase: LogoutUseCaseProtocol
+//    private let deleteAccountUseCase: DeleteAccountUseCaseProtocol
 //    
 //    private let disposeBag = DisposeBag()
 //    
 //    init(
-//        webPageUseCase: WebPageOpenUseCase,
-//        logoutUseCase: LogoutUseCase,
-//        deleteAccountUseCase: DeleteAccountUseCase
+//        webPageUseCase: WebPageOpenUseCaseProtocol,
+//        logoutUseCase: LogoutUseCaseProtocol,
+//        deleteAccountUseCase: DeleteAccountUseCaseProtocol,
 //    ) {
 //        self.webPageUseCase = webPageUseCase
 //        self.logoutUseCase = logoutUseCase
@@ -33,7 +33,7 @@
 //    }
 //    
 //    struct Input {
-//        let selectedCell: Observable<CellType>
+//        let selectedCell: PublishRelay<CellType>
 ////        let currentUser: Observable<User>
 //    }
 //    
@@ -88,3 +88,110 @@
 //        }
 //    }
 //}
+
+import Foundation
+import RxSwift
+import RxCocoa
+
+protocol SettingViewModel {
+    func transform(input: SettingViewModelImpl.Input) -> SettingViewModelImpl.Output
+}
+
+public final class SettingViewModelImpl: SettingViewModel {
+    private let logoutUseCase: LogoutUseCase
+    private let deleteUserUseCase: DeleteAccountUseCase
+    private let reAuthUseCase: ReAuthUseCase
+    private let webNavigationUseCase: WebPageOpenUseCase
+    
+    private let disposeBag = DisposeBag()
+    private let error = PublishRelay<String>()
+    
+    init(
+        logoutUseCase: LogoutUseCase,
+        deleteUserUseCase: DeleteAccountUseCase,
+        reAuthUseCase: ReAuthUseCase,
+        webNavigationUseCase: WebPageOpenUseCase
+    ) {
+        self.logoutUseCase = logoutUseCase
+        self.deleteUserUseCase = deleteUserUseCase
+        self.reAuthUseCase = reAuthUseCase
+        self.webNavigationUseCase = webNavigationUseCase
+    }
+    
+    public struct Input {
+        let logout: Observable<Void>
+        let deleteUser: Observable<Void>
+        let reAuth: Observable<Void>
+        let openWeb: Observable<String>
+    }
+    
+    public struct Output {
+        let logoutResult: Observable<Void>
+        let deleteUserResult: Observable<Void>
+        let reAuthResult: Observable<Bool>
+        let webNavigationResult: Observable<Void>
+        let error: Observable<String>
+    }
+    
+    public func transform(input: Input) -> Output {
+        let logoutResult = input.logout
+            .flatMap { [weak self] _ -> Observable<Void> in
+                guard let self = self else { return .just(()) }
+                return self.logoutUseCase.execute()
+                    .catch { error in
+                        self.error.accept("로그아웃 실패: \(error.localizedDescription)")
+                        return .just(()) 
+                    }
+            }
+        
+        let deleteUserResult = input.deleteUser
+            .flatMap { [weak self] _ -> Observable<Void> in
+                guard let self = self else { return .just(()) }
+                return self.reAuthUseCase.execute()
+                    .flatMap { isAuthenticated -> Observable<Void> in
+                        guard isAuthenticated else {
+                            self.error.accept("재인증 실패")
+                            return .just(())
+                        }
+                        return self.deleteUserUseCase.execute()
+                            .catch { error in
+                                self.error.accept("회원 탈퇴 실패: \(error.localizedDescription)")
+                                return .just(())
+                            }
+                    }
+                    .catch { error in
+                        self.error.accept("회원 탈퇴 과정에서 오류 발생: \(error.localizedDescription)")
+                        return .just(())
+                    }
+            }
+        
+        let reAuthResult = input.reAuth
+            .flatMap { [weak self] _ -> Observable<Bool> in
+                guard let self = self else { return .just(false) }
+                return self.reAuthUseCase.execute()
+                    .catch { error in
+                        self.error.accept("재인증 실패: \(error.localizedDescription)")
+                        return .just(false)
+                    }
+            }
+        
+        let webNavigationResult = input.openWeb
+            .flatMap { [weak self] urlString -> Observable<Void> in
+                guard let self = self else { return .just(()) }
+                
+                return self.webNavigationUseCase.openWeb(urlString: urlString)
+                    .catch { error in
+                        self.error.accept("웹 페이지 열기 실패: \(error.localizedDescription)")
+                        return Observable.empty()
+                    }
+            }
+        
+        return Output(
+            logoutResult: logoutResult,
+            deleteUserResult: deleteUserResult,
+            reAuthResult: reAuthResult,
+            webNavigationResult: webNavigationResult,
+            error: error.asObservable()
+        )
+    }
+}
