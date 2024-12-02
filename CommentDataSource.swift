@@ -10,7 +10,7 @@ import Firebase
 import RxSwift
 
 protocol CommentDataSource {
-    func addComment(fromPostUid postUid: String, content: String) -> Single<Void>
+    func addComment(postUID: String, content: String) -> Single<Void>
     func fetchComments(postUID: String, postOwner: String) -> Single<[Comment]>
     func deleteComments(postUID: String, commentUID: String) -> Single<Void>
 }
@@ -18,16 +18,16 @@ protocol CommentDataSource {
 class CommentDataSourceImpl: CommentDataSource {
     private let db = Firestore.firestore()
     // MARK: 댓글달기
-    func addComment(fromPostUid postUid: String, content: String) -> Single<Void> {
+    func addComment(postUID: String, content: String) -> Single<Void> {
         return Single.create { [weak self] single in
             guard let self,
                   let uid = try? FirestoreHelper.userUID()
             else { return Disposables.create() }
             
             let commentUID = UUID().uuidString
-            let postRef = db.collection("posts").document(postUid)
+            let postRef = db.collection("posts").document(postUID)
             let userRef = self.db.collection("users").document(uid)
-            let commentRef = db.collection("posts").document(postUid).collection("comments").document(commentUID)
+            let commentRef = db.collection("posts").document(postUID).collection("comments").document(commentUID)
             let comment = Comment(commentUID: commentUID, authorUID: uid, content: content, creationDate: Date(), like: nil, postRef: postRef)
             do {
                 try commentRef.setData(from: comment) { error in
