@@ -14,7 +14,7 @@ public protocol LogoutUseCase {
 
 public struct LogoutUseCaseImpl: LogoutUseCase {
     
-    public func executeLogout() -> Observable<Void> {
+    public func execute() -> Observable<Void> {
         return Observable.create { observer in
             do {
                 try Auth.auth().signOut()

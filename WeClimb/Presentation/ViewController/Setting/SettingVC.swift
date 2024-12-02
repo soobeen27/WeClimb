@@ -309,7 +309,7 @@ import RxSwift
 class SettingVC: UIViewController {
     
     private let disposeBag = DisposeBag()
-    private var viewModel: SettingViewModel
+    private let viewModel: SettingViewModel
     
     private let tableView: UITableView = {
         let tableView = UITableView()
@@ -333,24 +333,23 @@ class SettingVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-//        setNavigation()
-//        setLayout()
         bindViewModel()
+        setLayout()
     }
     
     private func bindViewModel() {
         let input = SettingViewModelImpl.Input(
             logout: tableView.rx.itemSelected
-                .filter { $0.row == 2 }  // 로그아웃 버튼 클릭
+                .filter { $0.row == 2 }
                 .map { _ in },
             deleteUser: tableView.rx.itemSelected
-                .filter { $0.row == 3 }  // 계정 삭제 버튼 클릭
+                .filter { $0.row == 3 }
                 .map { _ in },
             reAuth: tableView.rx.itemSelected
-                .filter { $0.row == 4 }  // 재인증 버튼 클릭
+                .filter { $0.row == 4 }
                 .map { _ in },
             openWeb: tableView.rx.itemSelected
-                .filter { $0.row == 0 }  // 웹 링크 버튼 클릭
+                .filter { $0.row == 0 }
                 .map { _ in "https://example.com" }
         )
         
@@ -358,14 +357,12 @@ class SettingVC: UIViewController {
         
         output.logoutResult
             .subscribe(onNext: { [weak self] in
-                // 로그아웃 후 처리
                 self?.navigateToLoginVC()
             })
             .disposed(by: disposeBag)
         
         output.deleteUserResult
             .subscribe(onNext: { [weak self] in
-                // 회원탈퇴 후 처리
                 self?.navigateToLoginVC()
             })
             .disposed(by: disposeBag)
@@ -382,16 +379,27 @@ class SettingVC: UIViewController {
         
         output.webNavigationResult
             .subscribe(onNext: { _ in
-                // 웹 페이지 여는 동작
             })
             .disposed(by: disposeBag)
         
         output.error
             .subscribe(onNext: { [weak self] error in
-                // 에러 처리
                 self?.showError(error)
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func setLayout() {
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        view.addSubview(tableView)
+        
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(8)
+        }
+//        tableView.dataSource = self
+//        tableView.delegate = self
     }
     
     private func navigateToLoginVC() {

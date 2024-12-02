@@ -100,13 +100,13 @@ protocol SettingViewModel {
 public final class SettingViewModelImpl: SettingViewModel {
     private let logoutUseCase: LogoutUseCase
     private let deleteUserUseCase: DeleteAccountUseCase
-    private let reAuthUseCase: ReAuthUseCaseProtocol
+    private let reAuthUseCase: ReAuthUseCase
     private let webNavigationUseCase: WebPageOpenUseCase
     
     private let disposeBag = DisposeBag()
     private let error = PublishRelay<String>()
     
-    public init(
+    init(
         logoutUseCase: LogoutUseCase,
         deleteUserUseCase: DeleteAccountUseCase,
         reAuthUseCase: ReAuthUseCase,
@@ -117,8 +117,6 @@ public final class SettingViewModelImpl: SettingViewModel {
         self.reAuthUseCase = reAuthUseCase
         self.webNavigationUseCase = webNavigationUseCase
     }
-    
-    // MARK: - Input/Output 구조화
     
     public struct Input {
         let logout: Observable<Void>
@@ -142,7 +140,7 @@ public final class SettingViewModelImpl: SettingViewModel {
                 return self.logoutUseCase.execute()
                     .catch { error in
                         self.error.accept("로그아웃 실패: \(error.localizedDescription)")
-                        return .just(())  // 빈 Observable을 반환
+                        return .just(()) 
                     }
             }
         
@@ -153,17 +151,17 @@ public final class SettingViewModelImpl: SettingViewModel {
                     .flatMap { isAuthenticated -> Observable<Void> in
                         guard isAuthenticated else {
                             self.error.accept("재인증 실패")
-                            return .just(())  // 빈 Observable을 반환
+                            return .just(())
                         }
                         return self.deleteUserUseCase.execute()
                             .catch { error in
                                 self.error.accept("회원 탈퇴 실패: \(error.localizedDescription)")
-                                return .just(())  // 빈 Observable을 반환
+                                return .just(())
                             }
                     }
                     .catch { error in
                         self.error.accept("회원 탈퇴 과정에서 오류 발생: \(error.localizedDescription)")
-                        return .just(())  // 빈 Observable을 반환
+                        return .just(())
                     }
             }
         
@@ -183,9 +181,8 @@ public final class SettingViewModelImpl: SettingViewModel {
                 
                 return self.webNavigationUseCase.openWeb(urlString: urlString)
                     .catch { error in
-                        // 웹 페이지 열기 실패시 오류 메시지를 처리하고 빈 Observable을 반환
                         self.error.accept("웹 페이지 열기 실패: \(error.localizedDescription)")
-                        return Observable.empty()  // 빈 Observable을 반환
+                        return Observable.empty()
                     }
             }
         
