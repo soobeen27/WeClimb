@@ -15,7 +15,7 @@ struct Media: Codable {
     let grade: String?
     let gym: String?
     let creationDate: Date?
-    let postRef: DocumentReference
+    let postRef: DocumentReference?
     let thumbnailURL: String?
     let height: Int?
     let armReach: Int?
@@ -32,7 +32,7 @@ struct Post: Codable {
     let caption: String?
     let like: [String]?
     let gym: String?
-    let medias: [DocumentReference]
+    let medias: [DocumentReference]?
     let thumbnail: String?
     let commentCount: Int?
 //    let medias: [Media]?

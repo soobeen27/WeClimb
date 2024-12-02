@@ -14,25 +14,25 @@ enum LoginResult {
     case createAccount
 }
 
-enum UserUpdate {
-    case userName
-    case height
-    case armReach
-    case profileImage
-    
-    var key: String {
-        switch self {
-        case .userName:
-            return "userName"
-        case .height:
-            return "height"
-        case .armReach:
-            return "armReach"
-        case .profileImage:
-            return "profileImage"
-        }
-    }
-}
+//enum UserUpdate {
+//    case userName
+//    case height
+//    case armReach
+//    case profileImage
+//    
+//    var key: String {
+//        switch self {
+//        case .userName:
+//            return "userName"
+//        case .height:
+//            return "height"
+//        case .armReach:
+//            return "armReach"
+//        case .profileImage:
+//            return "profileImage"
+//        }
+//    }
+//}
 
 enum LoginType {
     case google
@@ -104,10 +104,6 @@ enum PostError: Error {
 enum UploadStatus {
     case fail
     case success
-}
-
-enum CommonError: Error {
-    case noSelf
 }
 
 enum GetDocumentError: Error {

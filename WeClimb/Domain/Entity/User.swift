@@ -23,3 +23,26 @@ struct User: Codable {
     let snsConsent: Bool?
     var blackList: [String]?
 }
+
+enum UserUpdate: String {
+    case userName
+    case armReach
+    case profileImage
+    case height
+    case snsConsent
+    
+    var key: String {
+        switch self {
+        case .userName:
+            return "userName"
+        case .armReach:
+            return "armReach"
+        case .profileImage:
+            return "profileImage"
+        case .height:
+            return "height"
+        case .snsConsent:
+            return "snsConsent"
+        }
+    }
+}
