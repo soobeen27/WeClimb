@@ -466,7 +466,7 @@ final class FirebaseManager {
     func like(myUID: String, targetUID: String, type: Like) -> Single<[String]> {
         return Single.create(subscribe: { [weak self] single in
             guard let self else {
-                single(.failure(CommonError.noSelf))
+                single(.failure(CommonError.selfNil))
                 return Disposables.create()
             }
             let targetRef = self.db.collection("posts").document(targetUID)
@@ -505,7 +505,7 @@ final class FirebaseManager {
     func fetchLike(from uid: String, type: Like) -> Observable<[String]> {
         return Observable<[String]>.create { [weak self] observer in
             guard let self else {
-                observer.onError(CommonError.noSelf)
+                observer.onError(CommonError.selfNil)
                 return Disposables.create()
             }
             let contentRef = self.db.collection(type.string).document(uid)
@@ -621,7 +621,7 @@ final class FirebaseManager {
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    let mediaRefs: [DocumentReference] = post.medias
+                    let mediaRefs: [DocumentReference] = post.medias!
                     var medias: [Media] = []
                     
                     guard !mediaRefs.isEmpty else {
@@ -666,7 +666,7 @@ final class FirebaseManager {
     func follow(myUID: String, targetUID: String) -> Single<[String]>{
         return Single.create { [weak self] single in
             guard let self else {
-                single(.failure(CommonError.noSelf))
+                single(.failure(CommonError.selfNil))
                 return Disposables.create()
             }
             
@@ -1061,7 +1061,7 @@ final class FirebaseManager {
         let postObservables = medias.map { [weak self] media -> Single<Post?> in
             guard let self = self else { return .just(nil) }
             return Single<Post?>.create { single in
-                media.postRef.getDocument { snapshot, error in
+                media.postRef!.getDocument { snapshot, error in
                     if let error = error {
                         print("Error - get post \(error)")
                         single(.success(nil)) // 오류 발생 시 nil 반환하여 계속 진행

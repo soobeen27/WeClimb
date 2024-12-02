@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		434227732CF97C9C003523EF /* LogoutUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227722CF97C9C003523EF /* LogoutUseCase.swift */; };
+		434227752CF984C9003523EF /* WebPageOpenUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227742CF984C9003523EF /* WebPageOpenUseCase.swift */; };
+		434227772CF98D5D003523EF /* DeleteAccountUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */; };
+		434227792CF99746003523EF /* SettingVMBefore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227782CF99746003523EF /* SettingVMBefore.swift */; };
+		4342277B2CFD7E6D003523EF /* ReAuthUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */; };
 		435A1EB82CE262210076D9A0 /* SelectGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB72CE262210076D9A0 /* SelectGymVC.swift */; };
 		435A1EBA2CE262460076D9A0 /* SelectSettingModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */; };
 		435A1EBC2CE262670076D9A0 /* SelectSettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */; };
@@ -104,6 +109,8 @@
 		919D056D2CF81966004314AC /* CommentDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D056C2CF81966004314AC /* CommentDataSource.swift */; };
 		919D056F2CF837E7004314AC /* UserBlockDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D056E2CF837E7004314AC /* UserBlockDataSource.swift */; };
 		919D05712CF83997004314AC /* GymDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D05702CF83997004314AC /* GymDataSource.swift */; };
+		919D05742CF97C9F004314AC /* UploadPostDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D05732CF97C9F004314AC /* UploadPostDataSource.swift */; };
+		919D05762CF9AB49004314AC /* CommonError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D05752CF9AB49004314AC /* CommonError.swift */; };
 		91A717002CEA0D25007F825C /* LoginNeeded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A716FF2CEA0D25007F825C /* LoginNeeded.swift */; };
 		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
@@ -168,6 +175,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		434227722CF97C9C003523EF /* LogoutUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutUseCase.swift; sourceTree = "<group>"; };
+		434227742CF984C9003523EF /* WebPageOpenUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPageOpenUseCase.swift; sourceTree = "<group>"; };
+		434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountUseCase.swift; sourceTree = "<group>"; };
+		434227782CF99746003523EF /* SettingVMBefore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingVMBefore.swift; sourceTree = "<group>"; };
+		4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReAuthUseCase.swift; sourceTree = "<group>"; };
 		435A1EB72CE262210076D9A0 /* SelectGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGymVC.swift; sourceTree = "<group>"; };
 		435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingModalVC.swift; sourceTree = "<group>"; };
 		435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingCell.swift; sourceTree = "<group>"; };
@@ -255,6 +267,8 @@
 		919D056C2CF81966004314AC /* CommentDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentDataSource.swift; sourceTree = SOURCE_ROOT; };
 		919D056E2CF837E7004314AC /* UserBlockDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBlockDataSource.swift; sourceTree = "<group>"; };
 		919D05702CF83997004314AC /* GymDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymDataSource.swift; sourceTree = "<group>"; };
+		919D05732CF97C9F004314AC /* UploadPostDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPostDataSource.swift; sourceTree = "<group>"; };
+		919D05752CF9AB49004314AC /* CommonError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonError.swift; sourceTree = "<group>"; };
 		91A716FF2CEA0D25007F825C /* LoginNeeded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginNeeded.swift; sourceTree = "<group>"; };
 		91AF25602C8C15FC002283BD /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
 		91AF25622C8D771A002283BD /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
@@ -342,6 +356,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		434227702CF979D9003523EF /* UseCase */ = {
+			isa = PBXGroup;
+			children = (
+				434227712CF97BD3003523EF /* Setting */,
+			);
+			path = UseCase;
+			sourceTree = "<group>";
+		};
+		434227712CF97BD3003523EF /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+				434227722CF97C9C003523EF /* LogoutUseCase.swift */,
+				434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */,
+				434227742CF984C9003523EF /* WebPageOpenUseCase.swift */,
+				4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */,
+			);
+			path = Setting;
+			sourceTree = "<group>";
+		};
 		436AEAF12C7EEC7900E0D85A /* MyPage */ = {
 			isa = PBXGroup;
 			children = (
@@ -457,6 +490,7 @@
 		911E1F512CF6DB63007B9A52 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				434227702CF979D9003523EF /* UseCase */,
 				911E1F522CF6DC85007B9A52 /* Entity */,
 				6B9402082CFD5C1700F1DC2D /* Repositories */,
 			);
@@ -476,6 +510,7 @@
 				C45DC9D42C80519100FC4C1D /* FeedModel.swift */,
 				91E21D102CE20017003269DD /* Hold.swift */,
 				911E1F602CF7081D007B9A52 /* NetworkError.swift */,
+				919D05752CF9AB49004314AC /* CommonError.swift */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -501,6 +536,7 @@
 				911E1F622CF71B4F007B9A52 /* PostDataSource.swift */,
 				919D056E2CF837E7004314AC /* UserBlockDataSource.swift */,
 				919D05702CF83997004314AC /* GymDataSource.swift */,
+				919D05732CF97C9F004314AC /* UploadPostDataSource.swift */,
 				6B87F92F2CFD9405005905EA /* ImageDataSource.swift */,
 			);
 			path = DataSource;
@@ -533,6 +569,7 @@
 			isa = PBXGroup;
 			children = (
 				911E1F582CF6E0DD007B9A52 /* ViewGroup.swift */,
+				43A79AE32C85C3B800B960A2 /* SettingCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -586,7 +623,6 @@
 			isa = PBXGroup;
 			children = (
 				43A79ADB2C85AA7400B960A2 /* SettingVC.swift */,
-				43A79AE32C85C3B800B960A2 /* SettingCell.swift */,
 				435B7E412C8024AB00EB9816 /* EditPageVC.swift */,
 				43A79AC92C81717500B960A2 /* EditPageCell.swift */,
 				C49FC7082C9F1B0E00CD66D9 /* EditNickNameVC.swift */,
@@ -667,6 +703,7 @@
 				43A79ACB2C819CB200B960A2 /* EditPageVM.swift */,
 				43A79AD72C85481300B960A2 /* DetailEditVM.swift */,
 				43A79ADF2C85BB7E00B960A2 /* SettingVM.swift */,
+				434227782CF99746003523EF /* SettingVMBefore.swift */,
 				91F71CDE2C88A3C400405778 /* LoginVM.swift */,
 				6B16C0EC2C9AE121004249AF /* UserPageVM.swift */,
 				91FF42CB2CC5F37C003D9279 /* SNSAuthVM.swift */,
@@ -853,9 +890,11 @@
 				435A1EBC2CE262670076D9A0 /* SelectSettingCell.swift in Sources */,
 				436AEAEE2C7EC1F500E0D85A /* MypageNameSpace.swift in Sources */,
 				6B8F38CB2C8955350018C40D /* PrivacyPolicyVM.swift in Sources */,
+				919D05742CF97C9F004314AC /* UploadPostDataSource.swift in Sources */,
 				C440789E2CA319B200B747A6 /* GuestVC.swift in Sources */,
 				6B8467BE2C86129B006B062D /* ClimbingGymNameSpace.swift in Sources */,
 				F4892C1E2C7C98A100C5FF16 /* MyPageVC.swift in Sources */,
+				434227772CF98D5D003523EF /* DeleteAccountUseCase.swift in Sources */,
 				6B8F38B92C888F6B0018C40D /* PrivacyPolicyVC.swift in Sources */,
 				435B7E422C8024AB00EB9816 /* EditPageVC.swift in Sources */,
 				6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */,
@@ -885,6 +924,7 @@
 				F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */,
 				436AEAF42C7EEE9900E0D85A /* UserPageVC.swift in Sources */,
 				C43197902CAAC3FD00029E3C /* ProfileManager.swift in Sources */,
+				434227732CF97C9C003523EF /* LogoutUseCase.swift in Sources */,
 				6B94021D2CFD775200F1DC2D /* UserDeleteRepositoryImpl.swift in Sources */,
 				6B9CEA5A2CE1095C004166DE /* ClimbingFilterVC.swift in Sources */,
 				F4892BE72C7C237700C5FF16 /* AppDelegate.swift in Sources */,
@@ -918,6 +958,7 @@
 				6B87F9322CFD9D85005905EA /* ImageDataRepository.swift in Sources */,
 				C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */,
 				916D64D32C848BE00064B766 /* FeedCell.swift in Sources */,
+				434227752CF984C9003523EF /* WebPageOpenUseCase.swift in Sources */,
 				6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */,
 				91DC7D242CE0C721004CB66D /* GradeNamespace.swift in Sources */,
 				C4E29C1B2C8874780076BCA6 /* MyPageDetailFeedVC.swift in Sources */,
@@ -934,12 +975,14 @@
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */,
 				911E1F5B2CF6E97B007B9A52 /* FirestoreHelper.swift in Sources */,
+				4342277B2CFD7E6D003523EF /* ReAuthUseCase.swift in Sources */,
 				43A79AD82C85481300B960A2 /* DetailEditVM.swift in Sources */,
 				6B9402032CF986C900F1DC2D /* UserDeleteDataSource.swift in Sources */,
 				435A1EB82CE262210076D9A0 /* SelectGymVC.swift in Sources */,
 				6B87F9342CFD9D9C005905EA /* ImageDataRepositoryImpl.swift in Sources */,
 				91F71CE12C89835700405778 /* FirebaseManager.swift in Sources */,
 				F4892C142C7C973800C5FF16 /* TabBarController.swift in Sources */,
+				434227792CF99746003523EF /* SettingVMBefore.swift in Sources */,
 				6B94020F2CFD75BE00F1DC2D /* UserDeleteRepository.swift in Sources */,
 				91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */,
 				911E1F5D2CF6F63B007B9A52 /* UserReadDataSource.swift in Sources */,
@@ -948,6 +991,7 @@
 				6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */,
 				916D64D02C848A540064B766 /* FeedView.swift in Sources */,
 				6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */,
+				919D05762CF9AB49004314AC /* CommonError.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
 				6B9402252CFD777800F1DC2D /* CommentRepositoryImpl.swift in Sources */,
 				6B87F9302CFD9405005905EA /* ImageDataSource.swift in Sources */,

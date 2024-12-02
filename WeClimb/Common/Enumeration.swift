@@ -106,10 +106,6 @@ enum UploadStatus {
     case success
 }
 
-enum CommonError: Error {
-    case noSelf
-}
-
 enum GetDocumentError: Error {
     case noField
     case failDecoding

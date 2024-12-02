@@ -295,11 +295,21 @@ class MyPageVC: UIViewController {
     }
     
     @objc private func rightBarButtonTapped() {
-        let settingsVC = SettingVC()
-        //        settingsVC.hidesBottomBarWhenPushed = true
+        let logoutUseCase: LogoutUseCase = LogoutUseCaseImpl()
+        let deleteUserUseCase: DeleteAccountUseCase = DeleteAccountUseCaseImpl()
+        let reAuthUseCase: ReAuthUseCase = ReAuthUseCaseImpl()
+        let webNavigationUseCase: WebPageOpenUseCase = WebPageOpenUseCaseImpl()
+
+        let viewModel: SettingViewModel = SettingViewModelImpl(
+            logoutUseCase: logoutUseCase,
+            deleteUserUseCase: deleteUserUseCase,
+            reAuthUseCase: reAuthUseCase,
+            webNavigationUseCase: webNavigationUseCase
+        )
+
+        let settingsVC = SettingVC(viewModel: viewModel)
         navigationController?.pushViewController(settingsVC, animated: true)
     }
-    
     
     //MARK: - 레이아웃
     private func setLayout() {
