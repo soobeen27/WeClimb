@@ -105,6 +105,11 @@
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
 		917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */; };
 		917DA89E2CD4B0A0006FF6B9 /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 917DA89D2CD4B0A0006FF6B9 /* RxBlocking */; };
+		91831B372CFE9E2A006BAB61 /* GoogleLoginDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91831B362CFE9E2A006BAB61 /* GoogleLoginDataSource.swift */; };
+		91831B3A2CFEA5D9006BAB61 /* KakaoLoginDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91831B392CFEA5D9006BAB61 /* KakaoLoginDataSource.swift */; };
+		91831B3C2CFEC228006BAB61 /* LoginFirebaseDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91831B3B2CFEC228006BAB61 /* LoginFirebaseDataSource.swift */; };
+		91831B3E2CFED4E2006BAB61 /* AppleLoginDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91831B3D2CFED4E2006BAB61 /* AppleLoginDataSource.swift */; };
+		91831B412CFEE053006BAB61 /* AppleLoginDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91831B402CFEE053006BAB61 /* AppleLoginDelegate.swift */; };
 		918D2A3C2CFD8A9400F54716 /* PostFilterDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918D2A3B2CFD8A9400F54716 /* PostFilterDataSource.swift */; };
 		918D2A3E2CFD8DD600F54716 /* MainFeedDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918D2A3D2CFD8DD600F54716 /* MainFeedDataSource.swift */; };
 		918D2A402CFDA38200F54716 /* LikePostDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918D2A3F2CFDA38200F54716 /* LikePostDataSource.swift */; };
@@ -266,6 +271,11 @@
 		917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeClimbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeClimbTests.swift; sourceTree = "<group>"; };
 		917DA89F2CD4B340006FF6B9 /* WeClimb.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = WeClimb.xctestplan; sourceTree = "<group>"; };
+		91831B362CFE9E2A006BAB61 /* GoogleLoginDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleLoginDataSource.swift; sourceTree = "<group>"; };
+		91831B392CFEA5D9006BAB61 /* KakaoLoginDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoLoginDataSource.swift; sourceTree = "<group>"; };
+		91831B3B2CFEC228006BAB61 /* LoginFirebaseDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginFirebaseDataSource.swift; sourceTree = "<group>"; };
+		91831B3D2CFED4E2006BAB61 /* AppleLoginDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleLoginDataSource.swift; sourceTree = "<group>"; };
+		91831B402CFEE053006BAB61 /* AppleLoginDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleLoginDelegate.swift; sourceTree = "<group>"; };
 		918D2A3B2CFD8A9400F54716 /* PostFilterDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostFilterDataSource.swift; sourceTree = "<group>"; };
 		918D2A3D2CFD8DD600F54716 /* MainFeedDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFeedDataSource.swift; sourceTree = "<group>"; };
 		918D2A3F2CFDA38200F54716 /* LikePostDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikePostDataSource.swift; sourceTree = "<group>"; };
@@ -533,6 +543,7 @@
 		911E1F542CF6DCDA007B9A52 /* DataSource */ = {
 			isa = PBXGroup;
 			children = (
+				91831B382CFEA5C9006BAB61 /* Login */,
 				919D056C2CF81966004314AC /* CommentDataSource.swift */,
 				91F71CE02C89835700405778 /* FirebaseManager.swift */,
 				911E1F5A2CF6E97B007B9A52 /* FirestoreHelper.swift */,
@@ -598,6 +609,26 @@
 				917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */,
 			);
 			path = WeClimbTests;
+			sourceTree = "<group>";
+		};
+		91831B382CFEA5C9006BAB61 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				91831B362CFE9E2A006BAB61 /* GoogleLoginDataSource.swift */,
+				91831B392CFEA5D9006BAB61 /* KakaoLoginDataSource.swift */,
+				91831B3B2CFEC228006BAB61 /* LoginFirebaseDataSource.swift */,
+				91831B3F2CFEE036006BAB61 /* AppleLogin */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		91831B3F2CFEE036006BAB61 /* AppleLogin */ = {
+			isa = PBXGroup;
+			children = (
+				91831B3D2CFED4E2006BAB61 /* AppleLoginDataSource.swift */,
+				91831B402CFEE053006BAB61 /* AppleLoginDelegate.swift */,
+			);
+			path = AppleLogin;
 			sourceTree = "<group>";
 		};
 		919D05722CF94D90004314AC /* App */ = {
@@ -967,6 +998,7 @@
 				6B8F38C72C894BC50018C40D /* CreateNickNameVC.swift in Sources */,
 				C4E29C172C806F170076BCA6 /* MainFeedVM.swift in Sources */,
 				6B87F9322CFD9D85005905EA /* ImageDataRepository.swift in Sources */,
+				91831B372CFE9E2A006BAB61 /* GoogleLoginDataSource.swift in Sources */,
 				C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */,
 				916D64D32C848BE00064B766 /* FeedCell.swift in Sources */,
 				434227752CF984C9003523EF /* WebPageOpenUseCase.swift in Sources */,
@@ -982,7 +1014,9 @@
 				918D2A3E2CFD8DD600F54716 /* MainFeedDataSource.swift in Sources */,
 				91AF25632C8D771A002283BD /* Gym.swift in Sources */,
 				43A79AD62C853EC100B960A2 /* EditModel.swift in Sources */,
+				91831B3C2CFEC228006BAB61 /* LoginFirebaseDataSource.swift in Sources */,
 				91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */,
+				91831B412CFEE053006BAB61 /* AppleLoginDelegate.swift in Sources */,
 				436AEAF02C7EE63C00E0D85A /* SearchNameSpace.swift in Sources */,
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */,
@@ -1005,6 +1039,7 @@
 				6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */,
 				919D05762CF9AB49004314AC /* CommonError.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
+				91831B3E2CFED4E2006BAB61 /* AppleLoginDataSource.swift in Sources */,
 				6B9402252CFD777800F1DC2D /* CommentRepositoryImpl.swift in Sources */,
 				6B87F9302CFD9405005905EA /* ImageDataSource.swift in Sources */,
 				F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */,
@@ -1016,6 +1051,7 @@
 				C47A0B012C9115760068173A /* CommentCell.swift in Sources */,
 				91995F202CA4A24100BCC004 /* SFFeedCell.swift in Sources */,
 				6B9402112CFD75DE00F1DC2D /* PostRepository.swift in Sources */,
+				91831B3A2CFEA5D9006BAB61 /* KakaoLoginDataSource.swift in Sources */,
 				43EC6ACB2C8B5026004A2E2F /* FeedCellModel.swift in Sources */,
 				919D056F2CF837E7004314AC /* UserBlockDataSource.swift in Sources */,
 				6B9402152CFD760700F1DC2D /* GymDataRepository.swift in Sources */,
@@ -1229,7 +1265,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.0;
+				CURRENT_PROJECT_VERSION = 1.1.0;
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1247,7 +1283,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1271,7 +1307,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.0;
+				CURRENT_PROJECT_VERSION = 1.1.0;
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1289,7 +1325,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";

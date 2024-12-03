@@ -36,7 +36,7 @@ class MainFeedDataSourceImpl: MainFeedDataSource {
                 single(.failure(CommonError.selfNil))
                 return Disposables.create()
             }
-            var postRef = self.getPostRef(user: user)
+            let postRef = self.getPostRef(user: user)
             self.getPost(postRef: postRef)
                 .subscribe(onSuccess: { posts in
                     single(.success(posts))
@@ -50,7 +50,7 @@ class MainFeedDataSourceImpl: MainFeedDataSource {
     
     
     
-    private func getPostRef(user: User? = nil) -> Query {
+    private func getPostRef(user: User?) -> Query {
         var postsRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
             .limit(to: 50)
