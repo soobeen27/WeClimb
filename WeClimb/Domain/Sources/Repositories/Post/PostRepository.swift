@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+import Firebase
+import RxSwift
+
+protocol PostRepository {
+    func posts(postRefs: [DocumentReference]) -> Observable<[Post]>
+}
