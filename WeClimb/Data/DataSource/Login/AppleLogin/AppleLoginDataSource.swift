@@ -49,7 +49,7 @@ class AppleLoginDataSourceImpl: AppleLoginDataSource {
         }
     }
     
-    func appleLoginRequest() -> ASAuthorizationAppleIDRequest {
+    private func appleLoginRequest() -> ASAuthorizationAppleIDRequest {
         let request = ASAuthorizationAppleIDProvider().createRequest()
         request.requestedScopes = [.fullName, .email]
         let nonce = randomNonceString()
