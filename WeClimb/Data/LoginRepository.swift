@@ -7,18 +7,18 @@
 
 import Foundation
 
-protocol LoginRepository {
+public protocol LoginRepository {
     func getLoginType() -> LoginType
 }
 
-final class LoginRepositoryImpl: LoginRepository {
+public struct LoginRepositoryImpl: LoginRepository {
     private let loginDataSource: LoginDataSource
     
     init(loginDataSource: LoginDataSource) {
         self.loginDataSource = loginDataSource
     }
     
-    func getLoginType() -> LoginType {
+    public func getLoginType() -> LoginType {
         guard let user = loginDataSource.currentUser else {
             return .none
         }

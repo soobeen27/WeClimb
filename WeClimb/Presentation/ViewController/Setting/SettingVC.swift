@@ -10,12 +10,16 @@ import UIKit
 import RxSwift
 import RxCocoa
 import SnapKit
+import AuthenticationServices
+import FirebaseAuth
 
 class SettingVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private let viewModel: SettingViewModel
     private var datas: [SettingItem] = []
+
+    private let snsAuthVM = SNSAuthVM()
     
     private let tableView: UITableView = {
         let tableView = UITableView()
@@ -50,37 +54,20 @@ class SettingVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        // 2. ViewModel의 transform 메서드 호출
-        let output = viewModel.transform(input: SettingViewModelImpl.Input(cellSelection: Observable.empty()))  // 초기값
-        
-        // 3. Output에서 action 구독
-        output.action
-            .subscribe(onNext: { [weak self] action in
-                switch action {
-                case .navigateToProfile:
-                    self?.navigateToProfile()
-                case .navigateToBlackList:
-                    self?.navigateToBlackList()
-                case .logout:
-                    self?.setAlert()
-                    self?.navigateToLogin()
-                case .removeAccount:
-                    self?.removeAccount()
-                default:
-                    break
-                }
-                print("셀 클릭 처리 완료")
+        viewModel._navigateToLogin
+            .subscribe(onNext: { [weak self] in
+                self?.navigateToLogin()
             })
             .disposed(by: disposeBag)
-
-        // 4. 에러 처리
-        output.error
-            .subscribe(onNext: { [weak self] errorMessage in
-                let alert = UIAlertController(title: "Error", message: errorMessage, preferredStyle: .alert)
-                alert.addAction(.init(title: "OK", style: .default))
-                self?.present(alert, animated: true)
-            })
-            .disposed(by: disposeBag)
+    }
+    
+    private func startAppleReAuth() {
+        // Apple 로그인 재인증을 처리하는 메서드 호출
+        let request = ASAuthorizationAppleIDProvider().createRequest()
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        controller.delegate = self
+        controller.presentationContextProvider = self
+        controller.performRequests()
     }
     
     private func setLayout() {
@@ -107,6 +94,18 @@ class SettingVC: UIViewController {
         self.navigationController?.pushViewController(blackListVC, animated: true)
     }
     
+    private func showLogoutAlert() {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let logoutAction = UIAlertAction(title: SettingNameSpace.logout, style: .default) { [weak self] _ in
+            self?.viewModel.triggerLogout()
+        }
+        
+        let closeAction = UIAlertAction(title: "Close", style: .cancel)
+        [logoutAction, closeAction].forEach { actionSheet.addAction($0) }
+        present(actionSheet, animated: true)
+    }
+
     private func navigateToLogin() {
         let loginVC = LoginVC()
         let navigationController = UINavigationController(rootViewController: loginVC)
@@ -117,15 +116,6 @@ class SettingVC: UIViewController {
                 window.makeKeyAndVisible()
             }
         }
-    }
-    
-    private func setAlert() {
-        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        let logoutAction = UIAlertAction(title: SettingNameSpace.logout, style: .default)
-        let closeAction = UIAlertAction(title: "Close", style: .cancel)
-        [logoutAction, closeAction].forEach { actionSheet.addAction($0) }
-        present(actionSheet, animated: true)
     }
     
     private func removeAccount() {
@@ -190,13 +180,12 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
                 case .navigateToBlackList:
                     self?.navigateToBlackList()
                 case .logout:
-                    self?.navigateToLogin()
+                    self?.showLogoutAlert()
                 case .removeAccount:
                     self?.removeAccount()
                 default:
                     break
                 }
-                print("셀 클릭 처리 완료")
             })
             .disposed(by: disposeBag)
 
@@ -209,7 +198,59 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
             })
             .disposed(by: disposeBag)
 
-        // 셀 클릭 후 선택 상태 해제
-        tableView.deselectRow(at: indexPath, animated: true)
+        // 재인증 요청 구독
+        output.requestReAuth
+            .subscribe(onNext: { [weak self] in
+                self?.startAppleReAuth()
+            })
+            .disposed(by: disposeBag)
+    }
+}
+
+extension SettingVC: ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
+    }
+}
+
+extension SettingVC: ASAuthorizationControllerDelegate {
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+            guard let nonce = snsAuthVM.currentNonce else {
+                fatalError("Invalid state: A login callback was received, but no login request was sent.")
+            }
+            guard let appleIDToken = appleIDCredential.identityToken else {
+                print("Unable to fetch identity token")
+                return
+            }
+            guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
+                return
+            }
+            // Initialize a Firebase credential, including the user's full name.
+            let credential = OAuthProvider.appleCredential(withIDToken: idTokenString,
+                                                           rawNonce: nonce,
+                                                           fullName: appleIDCredential.fullName)
+            // 파이어베이스 재인증
+            snsAuthVM.reAuthenticate(with: credential, completion: { error in
+                if let error = error {
+                    print("Error - firebase reAuthenticate while deleting Account : \(error)")
+                    return
+                }
+                print("Apple ReAuth Succeed!")
+                FirebaseManager.shared.userDelete { [weak self] error in
+                    guard let self else { return }
+                    if let error = error {
+                        print("Error - deleting apple account \(error)")
+                    }
+                    print("account from apple deleted")
+                    self.navigateToLogin()
+                }
+            })
+        }
+    }
+    
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        print("Sign in with Apple errored: \(error)")
     }
 }
