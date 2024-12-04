@@ -28,12 +28,16 @@ class AppleLoginDataSourceImpl: AppleLoginDataSource {
                 return Disposables.create()
             }
             
-            let request = appleLoginRequest()
+            let nonce = self.randomNonceString()
+            self.currentNonce = nonce
+            
+            let request = ASAuthorizationAppleIDProvider().createRequest()
+            request.requestedScopes = [.fullName, .email]
+            request.nonce = self.sha256(nonce)
             
             let controller = ASAuthorizationController(authorizationRequests: [request])
-            controller.performRequests()
             
-            let delegate = AppleLoginDelegate { result in
+            let delegate = AppleLoginDelegate(nonce: nonce) { result in
                 switch result {
                 case .success(let credential):
                     single(.success(credential))
@@ -44,18 +48,10 @@ class AppleLoginDataSourceImpl: AppleLoginDataSource {
             
             controller.delegate = delegate
             controller.presentationContextProvider = delegate
+            controller.performRequests()
             
             return Disposables.create()
         }
-    }
-    
-    private func appleLoginRequest() -> ASAuthorizationAppleIDRequest {
-        let request = ASAuthorizationAppleIDProvider().createRequest()
-        request.requestedScopes = [.fullName, .email]
-        let nonce = randomNonceString()
-        currentNonce = nonce
-        request.nonce = sha256(nonce)
-        return request
     }
     
     private func randomNonceString(length: Int = 32) -> String {
@@ -63,12 +59,9 @@ class AppleLoginDataSourceImpl: AppleLoginDataSource {
         var randomBytes = [UInt8](repeating: 0, count: length)
         let errorCode = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
         if errorCode != errSecSuccess {
-            fatalError(
-                "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
-            )
+            fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
         }
-        let charset: [Character] =
-        Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+        let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
         let nonce = randomBytes.map { byte in
             charset[Int(byte) % charset.count]
         }
@@ -78,10 +71,6 @@ class AppleLoginDataSourceImpl: AppleLoginDataSource {
     private func sha256(_ input: String) -> String {
         let inputData = Data(input.utf8)
         let hashedData = SHA256.hash(data: inputData)
-        let hashString = hashedData.compactMap {
-            String(format: "%02x", $0)
-        }.joined()
-        
-        return hashString
+        return hashedData.compactMap { String(format: "%02x", $0) }.joined()
     }
 }
