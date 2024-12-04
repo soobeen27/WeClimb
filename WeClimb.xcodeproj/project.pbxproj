@@ -12,6 +12,8 @@
 		434227772CF98D5D003523EF /* DeleteAccountUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */; };
 		434227792CF99746003523EF /* SettingVMBefore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227782CF99746003523EF /* SettingVMBefore.swift */; };
 		4342277B2CFD7E6D003523EF /* ReAuthUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */; };
+		4342277D2CFFEFBF003523EF /* LoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4342277C2CFFEFBF003523EF /* LoginRepository.swift */; };
+		4342277F2CFFF4BC003523EF /* LoginDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4342277E2CFFF4BC003523EF /* LoginDataSource.swift */; };
 		435A1EB82CE262210076D9A0 /* SelectGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB72CE262210076D9A0 /* SelectGymVC.swift */; };
 		435A1EBA2CE262460076D9A0 /* SelectSettingModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */; };
 		435A1EBC2CE262670076D9A0 /* SelectSettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */; };
@@ -163,6 +165,8 @@
 		434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountUseCase.swift; sourceTree = "<group>"; };
 		434227782CF99746003523EF /* SettingVMBefore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingVMBefore.swift; sourceTree = "<group>"; };
 		4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReAuthUseCase.swift; sourceTree = "<group>"; };
+		4342277C2CFFEFBF003523EF /* LoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRepository.swift; sourceTree = "<group>"; };
+		4342277E2CFFF4BC003523EF /* LoginDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginDataSource.swift; sourceTree = "<group>"; };
 		435A1EB72CE262210076D9A0 /* SelectGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGymVC.swift; sourceTree = "<group>"; };
 		435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingModalVC.swift; sourceTree = "<group>"; };
 		435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingCell.swift; sourceTree = "<group>"; };
@@ -454,6 +458,7 @@
 			isa = PBXGroup;
 			children = (
 				911E1F542CF6DCDA007B9A52 /* DataSource */,
+				4342277C2CFFEFBF003523EF /* LoginRepository.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -465,6 +470,7 @@
 				91F71CE02C89835700405778 /* FirebaseManager.swift */,
 				911E1F5A2CF6E97B007B9A52 /* FirestoreHelper.swift */,
 				911E1F5C2CF6F63B007B9A52 /* UserDataSource.swift */,
+				4342277E2CFFF4BC003523EF /* LoginDataSource.swift */,
 				911E1F5E2CF70463007B9A52 /* UserUpdateDataSource.swift */,
 				6B9402022CF986C900F1DC2D /* UserDeleteDataSource.swift */,
 				911E1F622CF71B4F007B9A52 /* PostDataSource.swift */,
@@ -893,6 +899,7 @@
 				91AF25632C8D771A002283BD /* Gym.swift in Sources */,
 				43A79AD62C853EC100B960A2 /* EditModel.swift in Sources */,
 				91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */,
+				4342277D2CFFEFBF003523EF /* LoginRepository.swift in Sources */,
 				436AEAF02C7EE63C00E0D85A /* SearchNameSpace.swift in Sources */,
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */,
@@ -913,6 +920,7 @@
 				6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */,
 				919D05762CF9AB49004314AC /* CommonError.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
+				4342277F2CFFF4BC003523EF /* LoginDataSource.swift in Sources */,
 				F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */,
 				C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */,
 				43A0E72A2CE3888800F15682 /* UploadHeaderView.swift in Sources */,

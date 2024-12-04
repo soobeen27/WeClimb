@@ -34,7 +34,7 @@ enum LoginResult {
 //    }
 //}
 
-enum LoginType {
+public enum LoginType {
     case google
     case apple
     case kakao
