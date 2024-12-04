@@ -11,6 +11,8 @@ import RxSwift
 import FirebaseAuth
 import FirebaseCore
 
+public typealias PresenterProvider = () -> UIViewController
+
 enum LoginError: Error {
     case invaildClientID
     case invalidResponse
@@ -20,11 +22,11 @@ enum LoginError: Error {
 }
 
 protocol GoogleLoginDataSource {
-    func googleLogin(presenterProvider: @escaping () -> UIViewController) -> Single<AuthCredential>
+    func googleLogin(presenterProvider: @escaping PresenterProvider) -> Single<AuthCredential>
 }
 
 class GoogleLoginDataSourceImpl: GoogleLoginDataSource {
-    func googleLogin(presenterProvider: @escaping () -> UIViewController) -> Single<AuthCredential> {
+    func googleLogin(presenterProvider: @escaping PresenterProvider) -> Single<AuthCredential> {
         return Single.create { single in
             guard let clientID = FirebaseApp.app()?.options.clientID else {
                 single(.failure(LoginError.invaildClientID))

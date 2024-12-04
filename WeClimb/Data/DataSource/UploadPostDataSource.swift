@@ -11,8 +11,7 @@ import Firebase
 import FirebaseStorage
 
 protocol UploadPostDataSource {
-    func uploadPost(user: User, gym: String?, caption: String?,
-                    datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Completable
+    func uploadPost(data: PostUploadData) -> Completable
 }
 
 class UploadPostDataSourceImpl: UploadPostDataSource {
@@ -20,8 +19,7 @@ class UploadPostDataSourceImpl: UploadPostDataSource {
     private let db = Firestore.firestore()
     private let disposebag = DisposeBag()
     
-    func uploadPost(user: User, gym: String?, caption: String?,
-                    datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Completable {
+    func uploadPost(data: PostUploadData) -> Completable {
         return Completable.create { [weak self] completable in
             guard let self else {
                 completable(.error(CommonError.selfNil))
@@ -32,7 +30,7 @@ class UploadPostDataSourceImpl: UploadPostDataSource {
                 return Disposables.create()
             }
             let creationDate = Date()
-            mediasUpload(user: user, gym: gym, datas: datas)
+            mediasUpload(user: data.user, gym: data.gym, datas: data.medias)
                 .subscribe(onSuccess: { [weak self] references, batch in
                     guard let self else {
                         completable(.error(UserStateError.nonmeber))
@@ -44,11 +42,12 @@ class UploadPostDataSourceImpl: UploadPostDataSource {
                         let post = Post(postUID: postUID,
                                         authorUID: authorUID,
                                         creationDate: creationDate,
-                                        caption: caption,
+                                        caption: data.caption,
                                         like: nil,
-                                        gym: gym,
+                                        gym: data.gym,
                                         medias: references,
-                                        thumbnail: datas.first?.thumbnailURL?.absoluteString,
+                                        thumbnail: data.medias.first?.thumbnailURL?.absoluteString,
+//                                        thumbnail: datas.first?.thumbnailURL?.absoluteString,
                                         commentCount: nil)
                         try self.createPost(batch: batch, post: post, postRef: postRef)
                         self.userUpdatePost(batch: batch, postRef: postRef, userUID: authorUID)
@@ -88,7 +87,7 @@ class UploadPostDataSourceImpl: UploadPostDataSource {
         }
     }
     
-    private func mediasUpload(user: User, gym: String?, datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Single<(references: [DocumentReference], batch: WriteBatch )> {
+    private func mediasUpload(user: User, gym: String?, datas: [MediaUploadData]) -> Single<(references: [DocumentReference], batch: WriteBatch )> {
         return Single.create { [weak self] single in
             guard let self else {
                 single(.failure(CommonError.selfNil))

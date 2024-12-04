@@ -19,9 +19,6 @@ struct Media: Codable {
     let thumbnailURL: String?
     let height: Int?
     let armReach: Int?
-    //    let authorUID: String
-    //    let postUID: String
-    //    let gym: String?
 }
 
 //게시글
@@ -46,5 +43,20 @@ struct Comment: Codable {
     let creationDate: Date
     let like: [String]?
     let postRef: DocumentReference
+}
+
+// 업로드용
+struct PostUploadData {
+    let user: User
+    let gym: String?
+    let caption: String?
+    let medias: [MediaUploadData]
+}
+
+struct MediaUploadData {
+    let url: URL
+    let hold: String?
+    let grade: String?
+    let thumbnailURL: URL?
 }
 
