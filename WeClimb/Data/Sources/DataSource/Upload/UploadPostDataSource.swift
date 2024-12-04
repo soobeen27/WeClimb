@@ -9,50 +9,59 @@ import Foundation
 import RxSwift
 import Firebase
 import FirebaseStorage
+// 업로드용
+struct PostUploadData {
+    let user: User
+    let gym: String?
+    let caption: String?
+    let medias: [MediaUploadData]
+}
+
+struct MediaUploadData {
+    let url: URL
+    let hold: String?
+    let grade: String?
+    let thumbnailURL: URL?
+}
 
 protocol UploadPostDataSource {
-    func uploadPost(user: User, gym: String?, caption: String?,
-                    datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Completable
+    func uploadPost(data: PostUploadData) -> Completable
 }
 
 class UploadPostDataSourceImpl: UploadPostDataSource {
 
     private let db = Firestore.firestore()
     private let disposebag = DisposeBag()
+
+    private lazy var postRef: DocumentReference = {
+        let postUID = UUID().uuidString
+        let postRef = db.collection("posts").document(postUID)
+        return postRef
+    }()
     
-    func uploadPost(user: User, gym: String?, caption: String?,
-                    datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Completable {
-        return Completable.create { [weak self] completable in
-            guard let self else {
-                completable(.error(CommonError.selfNil))
-                return Disposables.create()
-            }
-            guard let authorUID = try? FirestoreHelper.userUID() else {
-                completable(.error(UserStateError.nonmeber))
-                return Disposables.create()
-            }
-            let creationDate = Date()
-            mediasUpload(user: user, gym: gym, datas: datas)
-                .subscribe(onSuccess: { [weak self] references, batch in
-                    guard let self else {
-                        completable(.error(UserStateError.nonmeber))
-                        return
-                    }
-                    do {
-                        let postUID = UUID().uuidString
-                        let postRef = self.db.collection("posts").document(postUID)
-                        let post = Post(postUID: postUID,
-                                        authorUID: authorUID,
-                                        creationDate: creationDate,
-                                        caption: caption,
-                                        like: nil,
-                                        gym: gym,
-                                        medias: references,
-                                        thumbnail: datas.first?.thumbnailURL?.absoluteString,
-                                        commentCount: nil)
-                        try self.createPost(batch: batch, post: post, postRef: postRef)
-                        self.userUpdatePost(batch: batch, postRef: postRef, userUID: authorUID)
-                        self.mediaUpdate(batch: batch, postRef: postRef, mediaRefs: references)
+    func uploadPost(data: PostUploadData) -> Completable {
+        return mediasUpload(user: data.user, gym: data.gym, datas: data.medias)
+            .flatMapCompletable { [weak self] references, batch in
+                guard let self else { return Completable.error(CommonError.selfNil) }
+                do {
+                    let creationDate = Date()
+                    let authorUID = try FirestoreHelper.userUID()
+                    let postUID = UUID().uuidString
+                    let postRef = self.db.collection("posts").document(postUID)
+                    let post = Post(postUID: postUID,
+                                    authorUID: authorUID,
+                                    creationDate: creationDate,
+                                    caption: data.caption,
+                                    like: nil,
+                                    gym: data.gym,
+                                    medias: references,
+                                    thumbnail: data.medias.first?.thumbnailURL?.absoluteString,
+                                    commentCount: nil)
+                    try self.createPost(batch: batch, post: post, postRef: postRef)
+                    self.userUpdatePost(batch: batch, postRef: postRef, userUID: authorUID)
+                    self.mediaUpdate(batch: batch, postRef: postRef, mediaRefs: references)
+                    
+                    return Completable.create { completable in
                         batch.commit { error in
                             if let error {
                                 completable(.error(error))
@@ -60,16 +69,12 @@ class UploadPostDataSourceImpl: UploadPostDataSource {
                                 completable(.completed)
                             }
                         }
-                    } catch {
-                        completable(.error(error))
+                        return Disposables.create()
                     }
-                }, onFailure: { error in
-                    completable(.error(error))
-                })
-                .disposed(by: disposebag)
-            
-            return Disposables.create()
-        }
+                } catch {
+                    return Completable.error(error)
+                }
+            }
     }
     
     private func createPost(batch: WriteBatch, post: Post, postRef: DocumentReference) throws {
@@ -88,7 +93,7 @@ class UploadPostDataSourceImpl: UploadPostDataSource {
         }
     }
     
-    private func mediasUpload(user: User, gym: String?, datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Single<(references: [DocumentReference], batch: WriteBatch )> {
+    private func mediasUpload(user: User, gym: String?, datas: [MediaUploadData]) -> Single<(references: [DocumentReference], batch: WriteBatch )> {
         return Single.create { [weak self] single in
             guard let self else {
                 single(.failure(CommonError.selfNil))
