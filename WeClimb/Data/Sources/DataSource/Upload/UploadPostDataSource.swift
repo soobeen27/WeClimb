@@ -28,14 +28,14 @@ class UploadPostDataSourceImpl: UploadPostDataSource {
                 return Disposables.create()
             }
             guard let authorUID = try? FirestoreHelper.userUID() else {
-                completable(.error(UserStateError.nonmeber))
+                completable(.error(UserStateError.nonmember))
                 return Disposables.create()
             }
             let creationDate = Date()
             mediasUpload(user: user, gym: gym, datas: datas)
                 .subscribe(onSuccess: { [weak self] references, batch in
                     guard let self else {
-                        completable(.error(UserStateError.nonmeber))
+                        completable(.error(UserStateError.nonmember))
                         return
                     }
                     do {

@@ -9,16 +9,7 @@ import Foundation
 import RxSwift
 import Firebase
 
-enum FirebaseError: Error {
-    case documentNil
-    
-    var description: String {
-        switch self {
-        case .documentNil:
-            "도큐멘트가 없음"
-        }
-    }
-}
+
 
 protocol MainFeedDataSource {
     func getFeed(user: User?) -> Single<[Post]>

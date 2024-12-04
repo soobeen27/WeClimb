@@ -13,23 +13,11 @@ import FirebaseFunctions
 import FirebaseStorage
 import RxSwift
 
-enum UserStateError: Error {
-    case nonmeber
-    case unknown
-    
-    var description: String {
-        switch self {
-        case .nonmeber: "비회원입니다"
-        case .unknown: "알수없는 에러"
-        }
-    }
-}
-
 final class FirestoreHelper {
     
     static func userUID() throws -> String {
         guard let user = Auth.auth().currentUser else {
-            throw UserStateError.nonmeber
+            throw UserStateError.nonmember
         }
         return user.uid
     }

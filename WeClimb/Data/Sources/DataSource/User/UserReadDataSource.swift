@@ -10,10 +10,7 @@ import RxSwift
 import Firebase
 import FirebaseStorage
 
-enum FuncError: Error {
-    case wrongArgument
-    case unknown
-}
+
 
 protocol UserReadDataSource {
 //    func userInfo(name: String?, uid: String?) throws -> Single<User>
@@ -63,16 +60,4 @@ final class UserReadDataSourceImpl: UserReadDataSource {
             return Disposables.create()
         }
     }
-    //일단 폐기
-//    func userInfo(name: String? = nil, uid: String? = nil) throws -> Single<User> {
-//        if let name, let uid {
-//            throw FuncError.wrongArgument
-//        } else if let uid {
-//            return userInfoFromUID(uid: uid)
-//        } else if let name {
-//            return userInfoFromName(name: name)
-//        }
-//        throw FuncError.unknown
-//    }
-    
 }

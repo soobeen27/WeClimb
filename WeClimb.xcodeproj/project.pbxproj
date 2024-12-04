@@ -89,6 +89,9 @@
 		6BA5EB952CFF006E00F247FB /* PostFilterRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB942CFF006E00F247FB /* PostFilterRepositoryImpl.swift */; };
 		6BA5EB972CFF007D00F247FB /* MainFeedRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB962CFF007D00F247FB /* MainFeedRepositoryImpl.swift */; };
 		6BA5EB992CFF008300F247FB /* MainFeedRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB982CFF008300F247FB /* MainFeedRepository.swift */; };
+		6BA5EB9C2D003CE800F247FB /* DomainError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB9B2D003CE800F247FB /* DomainError.swift */; };
+		6BA5EB9F2D003D8500F247FB /* FeaturesError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB9E2D003D8500F247FB /* FeaturesError.swift */; };
+		6BA5EBA22D003E8400F247FB /* DataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EBA12D003E8400F247FB /* DataError.swift */; };
 		6BC91F932C7CC81400B34083 /* DifficultyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F922C7CC81400B34083 /* DifficultyTableViewCell.swift */; };
 		6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */; };
 		6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F972C7EEA3F00B34083 /* GoogleSignIn */; };
@@ -108,7 +111,6 @@
 		911E1F5B2CF6E97B007B9A52 /* FirestoreHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911E1F5A2CF6E97B007B9A52 /* FirestoreHelper.swift */; };
 		911E1F5D2CF6F63B007B9A52 /* UserReadDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911E1F5C2CF6F63B007B9A52 /* UserReadDataSource.swift */; };
 		911E1F5F2CF70463007B9A52 /* UserUpdateDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911E1F5E2CF70463007B9A52 /* UserUpdateDataSource.swift */; };
-		911E1F612CF7081D007B9A52 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911E1F602CF7081D007B9A52 /* NetworkError.swift */; };
 		911E1F632CF71B4F007B9A52 /* PostDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911E1F622CF71B4F007B9A52 /* PostDataSource.swift */; };
 		912613292CD8FE1300CD5E74 /* CommentVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912613282CD8FE1300CD5E74 /* CommentVM.swift */; };
 		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
@@ -122,7 +124,6 @@
 		919D056F2CF837E7004314AC /* UserBlockDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D056E2CF837E7004314AC /* UserBlockDataSource.swift */; };
 		919D05712CF83997004314AC /* GymDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D05702CF83997004314AC /* GymDataSource.swift */; };
 		919D05742CF97C9F004314AC /* UploadPostDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D05732CF97C9F004314AC /* UploadPostDataSource.swift */; };
-		919D05762CF9AB49004314AC /* CommonError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919D05752CF9AB49004314AC /* CommonError.swift */; };
 		91A717002CEA0D25007F825C /* LoginNeeded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A716FF2CEA0D25007F825C /* LoginNeeded.swift */; };
 		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
@@ -267,6 +268,9 @@
 		6BA5EB942CFF006E00F247FB /* PostFilterRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostFilterRepositoryImpl.swift; sourceTree = "<group>"; };
 		6BA5EB962CFF007D00F247FB /* MainFeedRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFeedRepositoryImpl.swift; sourceTree = "<group>"; };
 		6BA5EB982CFF008300F247FB /* MainFeedRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFeedRepository.swift; sourceTree = "<group>"; };
+		6BA5EB9B2D003CE800F247FB /* DomainError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainError.swift; sourceTree = "<group>"; };
+		6BA5EB9E2D003D8500F247FB /* FeaturesError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturesError.swift; sourceTree = "<group>"; };
+		6BA5EBA12D003E8400F247FB /* DataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataError.swift; sourceTree = "<group>"; };
 		6BC91F922C7CC81400B34083 /* DifficultyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyTableViewCell.swift; sourceTree = "<group>"; };
 		6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVM.swift; sourceTree = "<group>"; };
 		6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -276,7 +280,6 @@
 		911E1F5A2CF6E97B007B9A52 /* FirestoreHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreHelper.swift; sourceTree = "<group>"; };
 		911E1F5C2CF6F63B007B9A52 /* UserReadDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserReadDataSource.swift; sourceTree = "<group>"; };
 		911E1F5E2CF70463007B9A52 /* UserUpdateDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserUpdateDataSource.swift; sourceTree = "<group>"; };
-		911E1F602CF7081D007B9A52 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		911E1F622CF71B4F007B9A52 /* PostDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDataSource.swift; sourceTree = "<group>"; };
 		912613282CD8FE1300CD5E74 /* CommentVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = CommentVM.swift; sourceTree = "<group>"; tabWidth = 4; };
 		916D64CF2C848A540064B766 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
@@ -291,7 +294,6 @@
 		919D056E2CF837E7004314AC /* UserBlockDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBlockDataSource.swift; sourceTree = "<group>"; };
 		919D05702CF83997004314AC /* GymDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymDataSource.swift; sourceTree = "<group>"; };
 		919D05732CF97C9F004314AC /* UploadPostDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPostDataSource.swift; sourceTree = "<group>"; };
-		919D05752CF9AB49004314AC /* CommonError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonError.swift; sourceTree = "<group>"; };
 		91A716FF2CEA0D25007F825C /* LoginNeeded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginNeeded.swift; sourceTree = "<group>"; };
 		91AF25602C8C15FC002283BD /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
 		91AF25622C8D771A002283BD /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
@@ -401,6 +403,7 @@
 		6B87F93E2CFED2F7005905EA /* Feature */ = {
 			isa = PBXGroup;
 			children = (
+				6BA5EB9D2D003D7400F247FB /* Error */,
 				6B87F96E2CFEE471005905EA /* Login */,
 				6B87F9522CFEE138005905EA /* SignUp */,
 				6B87F9532CFEE14A005905EA /* MainFeed */,
@@ -942,6 +945,7 @@
 		6B87F9832CFEED63005905EA /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				6BA5EBA02D003E7A00F247FB /* Error */,
 				911E1F542CF6DCDA007B9A52 /* DataSource */,
 				6B9402092CFD5C2F00F1DC2D /* Repository */,
 			);
@@ -1186,9 +1190,34 @@
 			path = Cell;
 			sourceTree = "<group>";
 		};
+		6BA5EB9A2D003CDC00F247FB /* Error */ = {
+			isa = PBXGroup;
+			children = (
+				6BA5EB9B2D003CE800F247FB /* DomainError.swift */,
+			);
+			path = Error;
+			sourceTree = "<group>";
+		};
+		6BA5EB9D2D003D7400F247FB /* Error */ = {
+			isa = PBXGroup;
+			children = (
+				6BA5EB9E2D003D8500F247FB /* FeaturesError.swift */,
+			);
+			path = Error;
+			sourceTree = "<group>";
+		};
+		6BA5EBA02D003E7A00F247FB /* Error */ = {
+			isa = PBXGroup;
+			children = (
+				6BA5EBA12D003E8400F247FB /* DataError.swift */,
+			);
+			path = Error;
+			sourceTree = "<group>";
+		};
 		911E1F512CF6DB63007B9A52 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				6BA5EB9A2D003CDC00F247FB /* Error */,
 				6B87F9812CFEED24005905EA /* Sources */,
 				6B87F9822CFEED33005905EA /* Test */,
 			);
@@ -1202,8 +1231,6 @@
 				91AF25622C8D771A002283BD /* Gym.swift */,
 				91F71CE22C89844900405778 /* User.swift */,
 				91E21D102CE20017003269DD /* Hold.swift */,
-				911E1F602CF7081D007B9A52 /* NetworkError.swift */,
-				919D05752CF9AB49004314AC /* CommonError.swift */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -1460,6 +1487,7 @@
 				F4892C2F2C7D9EA700C5FF16 /* UploadNameSpace.swift in Sources */,
 				C4E29C1D2C898AFB0076BCA6 /* SFMainFeedVC.swift in Sources */,
 				F4892C2B2C7CCDF200C5FF16 /* Identifiers.swift in Sources */,
+				6BA5EBA22D003E8400F247FB /* DataError.swift in Sources */,
 				6B16C0ED2C9AE121004249AF /* UserPageVM.swift in Sources */,
 				43A79ACC2C819CB200B960A2 /* EditPageVM.swift in Sources */,
 				435A1EBA2CE262460076D9A0 /* SelectSettingModalVC.swift in Sources */,
@@ -1497,7 +1525,6 @@
 				919D05712CF83997004314AC /* GymDataSource.swift in Sources */,
 				C47A0AFD2C90310B0068173A /* FeedReportModalVC.swift in Sources */,
 				918D2A402CFDA38200F54716 /* LikePostDataSource.swift in Sources */,
-				911E1F612CF7081D007B9A52 /* NetworkError.swift in Sources */,
 				6B94020B2CFD758E00F1DC2D /* UserReadRepository.swift in Sources */,
 				6B9402212CFD776600F1DC2D /* UserBlockRepositoryImpl.swift in Sources */,
 				F4892C1A2C7C984A00C5FF16 /* SearchVC.swift in Sources */,
@@ -1550,10 +1577,11 @@
 				911E1F5D2CF6F63B007B9A52 /* UserReadDataSource.swift in Sources */,
 				F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */,
 				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
+				6BA5EB9C2D003CE800F247FB /* DomainError.swift in Sources */,
 				6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */,
 				916D64D02C848A540064B766 /* FeedView.swift in Sources */,
+				6BA5EB9F2D003D8500F247FB /* FeaturesError.swift in Sources */,
 				6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */,
-				919D05762CF9AB49004314AC /* CommonError.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
 				6B9402252CFD777800F1DC2D /* CommentRepositoryImpl.swift in Sources */,
 				6B87F9302CFD9405005905EA /* ImageDataSource.swift in Sources */,

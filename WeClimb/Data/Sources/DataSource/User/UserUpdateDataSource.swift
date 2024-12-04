@@ -51,26 +51,12 @@ final class UserUpdateDataSourceImpl: UserUpdateDataSource {
                     } else if let url = url {
                         single(.success(url))
                     } else {
-                        single(.failure(UserUpdateError.missingURL))
+                        single(.failure(UserStateError.missingURL))
                     }
                 }
             }
             
             return Disposables.create()
-        }
-    }
-}
-
-enum UserUpdateError: Error {
-    case notAuthenticated
-    case missingURL
-    
-    var localizedDescription: String {
-        switch self {
-        case .notAuthenticated:
-            return "사용자가 인증되지 않았습니다."
-        case .missingURL:
-            return "업로드된 이미지의 URL을 가져오지 못했습니다."
         }
     }
 }
