@@ -8,6 +8,7 @@
 import AVFoundation
 import UIKit
 
+import FirebaseAnalytics
 import FirebaseAuth
 import FirebaseCore
 import FirebaseFirestore
@@ -28,6 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         // 파이어스토어 디비
         let db = Firestore.firestore()
+        Analytics.setAnalyticsCollectionEnabled(true)
         
         if let nativeAppKey =
             Bundle.main.infoDictionary?["KAKAO_NATIVE_APP_KEY"] as? String {
