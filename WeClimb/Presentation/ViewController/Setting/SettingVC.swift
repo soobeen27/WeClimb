@@ -45,6 +45,7 @@ class SettingVC: UIViewController {
         bindSectionData()
         bindNavigateToLogin()
         setLayout()
+        bindrequestReAuth()
     }
     
     private func bindSectionData() {
@@ -64,6 +65,13 @@ class SettingVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    private func bindrequestReAuth() {
+        viewModel.requestReAuth
+            .subscribe(onNext: { [weak self] in
+                self?.startAppleReAuth()
+            })
+            .disposed(by: disposeBag)
+    }
     
     private func navigateToProfile() {
         let editPageVC = EditPageVC()
@@ -195,10 +203,7 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedTitle = datas[indexPath.section].titles[indexPath.row]
         
-        print("선택된 셀: \(selectedTitle)")
-
         let input = SettingViewModelImpl.Input(cellSelection: Observable.just(selectedTitle))
-        
         let output = viewModel.transform(input: input)
 
         output.action
@@ -223,12 +228,6 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
                 let alert = UIAlertController(title: "Error", message: errorMessage, preferredStyle: .alert)
                 alert.addAction(.init(title: "OK", style: .default))
                 self?.present(alert, animated: true)
-            })
-            .disposed(by: disposeBag)
-
-        output.requestReAuth
-            .subscribe(onNext: { [weak self] in
-                self?.startAppleReAuth()
             })
             .disposed(by: disposeBag)
     }
