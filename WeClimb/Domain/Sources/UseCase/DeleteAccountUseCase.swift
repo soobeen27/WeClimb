@@ -5,26 +5,21 @@
 //  Created by 강유정 on 11/29/24.
 //
 
-import RxSwift
+import Foundation
 
 public protocol DeleteAccountUseCase {
-    func execute() -> Observable<Void>
+    func execute(completion: @escaping (Bool) -> Void)
 }
 
 public struct DeleteAccountUseCaseImpl: DeleteAccountUseCase {
-    
-    public func execute() -> Observable<Void> {
-        return Observable.create { observer in
-            // FirebaseManager의 userDelete 메서드 호출 (예시)
-            FirebaseManager.shared.userDelete { error in
-                if let error = error {
-                    observer.onError(error)
-                } else {
-                    observer.onNext(())
-                    observer.onCompleted()
-                }
+    public func execute(completion: @escaping (Bool) -> Void) {
+        FirebaseManager.shared.userDelete { error in
+            if let error = error {
+                print("사용자 삭제에 실패: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                completion(true)
             }
-            return Disposables.create()
         }
     }
 }

@@ -8,23 +8,25 @@
 import RxSwift
 import SafariServices
 
+import WebKit
+import UIKit
+
 public protocol WebPageOpenUseCase {
-    func openWeb(urlString: String) -> Observable<Void>
+    func openWeb(urlString: String)
 }
 
 public struct WebPageOpenUseCaseImpl: WebPageOpenUseCase {
-
-    public func openWeb(urlString: String) -> Observable<Void> {
-            // 웹 페이지 여는 로직
-            return Observable.create { observer in
-                // 웹 페이지 로딩 성공 처리
-                observer.onNext(())
-                observer.onCompleted()
-
-                // 또는 실패 처리 예시
-                // observer.onError(SomeError)
-
-                return Disposables.create()
-            }
+    
+    public func openWeb(urlString: String) {
+        guard let url = URL(string: urlString) else {
+            print("잘못된 URL")
+            return
         }
+
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else {
+            print("URL을 열 수 없음")
+        }
+    }
 }
