@@ -5,193 +5,165 @@
 //  Created by 강유정 on 9/2/24.
 //
 
-//import FirebaseAuth
-//import FirebaseCore
-//import GoogleSignIn
-//import RxSwift
-
-//protocol SettingViewModelProtocol {
-//    func tranform(input: UserListViewModel.Input) -> UserListViewModel.Output
-//}
-//
-//class SettingViewModel: SettingViewModelProtocol {
-//    
-//    private let webPageUseCase: WebPageOpenUseCaseProtocol
-//    private let logoutUseCase: LogoutUseCaseProtocol
-//    private let deleteAccountUseCase: DeleteAccountUseCaseProtocol
-//    
-//    private let disposeBag = DisposeBag()
-//    
-//    init(
-//        webPageUseCase: WebPageOpenUseCaseProtocol,
-//        logoutUseCase: LogoutUseCaseProtocol,
-//        deleteAccountUseCase: DeleteAccountUseCaseProtocol,
-//    ) {
-//        self.webPageUseCase = webPageUseCase
-//        self.logoutUseCase = logoutUseCase
-//        self.deleteAccountUseCase = deleteAccountUseCase
-//    }
-//    
-//    struct Input {
-//        let selectedCell: PublishRelay<CellType>
-////        let currentUser: Observable<User>
-//    }
-//    
-//    struct Output {
-//        
-//        let error: Observable<Error>
-//    }
-//    
-//    public func tranform(input: Input) -> Output {
-//        input.selectedCell.bind { [weak self] cell in
-//            guard let self else { return }
-//            switch self.CellType {
-//            case SettingNameSpace.termsOfService:
-//                return webPageUseCase.openWebPage(urlString: "https://www.notion.so/iosclimber/104292bf48c947b2b3b7a8cacdf1d130")
-//            case SettingNameSpace.privacyPolic:
-//                return webPageUseCase.openWebPage(urlString: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928")
-//            case SettingNameSpace.inquiry:
-//                return webPageUseCase.openWebPage(urlString: "https://forms.gle/UUaJmFeLAyuFXFFS9")
-//            case SettingNameSpace.editProfile:
-//                return Observable.just(.editProfile)
-//            case SettingNameSpace.blackList:
-//                return Observable.just(.blackList)
-//            case SettingNameSpace.logout:
-//                return logoutUser()
-//            case SettingNameSpace.accountRemove:
-//                return deleteUser(currentUser: currentUser)
-//            default:
-//                return Observable.just(.none)
-//            }
-//        }
-//    }
-//}
-//
-//public enum CellType: String {
-//    case var termsOfService = "termsOfService"
-//    case privacyPolic = "privacyPolic"
-//    case inquiry = "inquiry"
-//    case editProfile = "editProfile"
-//    case blackList = "blackList"
-//    case logout = "logout"
-//    case deleteAccount = "deleteAccount"
-//    
-//    var title: String {
-//        switch self {
-//        case .termsOfService: return "이용 약관"
-//        case .privacyPolic: return "개인 정보 처리 방침"
-//        case .inquiry: return "문의하기"
-//        case .editProfile: return "프로필 수정"
-//        case .blackList: return "차단 목록"
-//        case .logout: return "로그아웃"
-//        case .deleteAccount: return "계정 삭제"
-//        }
-//    }
-//}
-
 import Foundation
 import RxSwift
 import RxCocoa
 
 protocol SettingViewModel {
     func transform(input: SettingViewModelImpl.Input) -> SettingViewModelImpl.Output
+    
+    var sectionData: Driver<[SettingItem]> { get }
+    
+    var error: Observable<String> { get }
+    
+    func triggerLogout()
+    var navigateToLogin: Observable<Void> { get }
+    
+    func triggerAccountDeletion()
+    var accountDeletionResult: Observable<Bool> { get }
+    
+    var requestReAuth: Observable<Void> { get }
 }
 
-public final class SettingViewModelImpl: SettingViewModel {
+enum SettingAction {
+    case openTermsOfService
+    case openPrivacyPolicy
+    case openInquiry
+    case navigateToProfile
+    case navigateToBlackList
+    case logout
+    case removeAccount
+}
+
+final class SettingViewModelImpl: SettingViewModel {
+    
     private let logoutUseCase: LogoutUseCase
     private let deleteUserUseCase: DeleteAccountUseCase
-    private let reAuthUseCase: ReAuthUseCase
     private let webNavigationUseCase: WebPageOpenUseCase
+    private let loginRepository: LoginRepository
     
     private let disposeBag = DisposeBag()
-    private let error = PublishRelay<String>()
+    private let errorRelay = PublishRelay<String>()
+    
+    private let datas: [SettingItem] = [
+        SettingItem(section: .policy, titles: [SettingNameSpace.termsOfService, SettingNameSpace.privacyPolic, SettingNameSpace.inquiry]),
+        SettingItem(section: .account, titles: [SettingNameSpace.editProfile, SettingNameSpace.blackList, SettingNameSpace.logout, SettingNameSpace.accountRemove]),
+    ]
+    
+    private let navigateToProfileSubject = PublishSubject<Void>()
+    private let navigateToBlackListSubject = PublishSubject<Void>()
+    private let navigateToLoginSubject = PublishSubject<Void>()
+    private let showAlertSubject = PublishSubject<String>()
+    private let requestReAuthSubject = PublishSubject<Void>()
+    private let accountDeletionResultSubject = PublishSubject<Bool>()
+    
+    var navigateToProfile: Observable<Void> { return navigateToProfileSubject.asObservable() }
+    var navigateToBlackList: Observable<Void> { return navigateToBlackListSubject.asObservable() }
+    var navigateToLogin: Observable<Void> { return navigateToLoginSubject.asObservable() }
+    var showAlert: Observable<String> { return showAlertSubject.asObservable() }
+    var requestReAuth: Observable<Void> { return requestReAuthSubject.asObservable() }
+    var accountDeletionResult: Observable<Bool> { return accountDeletionResultSubject.asObservable() }
+    
+    var sectionData: Driver<[SettingItem]> {
+        return Observable.just(datas).asDriver(onErrorJustReturn: [])
+    }
+    
+    var error: Observable<String> {
+        return errorRelay.asObservable()
+    }
     
     init(
         logoutUseCase: LogoutUseCase,
         deleteUserUseCase: DeleteAccountUseCase,
-        reAuthUseCase: ReAuthUseCase,
-        webNavigationUseCase: WebPageOpenUseCase
+        webNavigationUseCase: WebPageOpenUseCase,
+        loginRepository: LoginRepository
     ) {
         self.logoutUseCase = logoutUseCase
         self.deleteUserUseCase = deleteUserUseCase
-        self.reAuthUseCase = reAuthUseCase
         self.webNavigationUseCase = webNavigationUseCase
+        self.loginRepository = loginRepository
     }
     
-    public struct Input {
-        let logout: Observable<Void>
-        let deleteUser: Observable<Void>
-        let reAuth: Observable<Void>
-        let openWeb: Observable<String>
+    struct Input {
+        let cellSelection: Observable<String>
     }
     
-    public struct Output {
-        let logoutResult: Observable<Void>
-        let deleteUserResult: Observable<Void>
-        let reAuthResult: Observable<Bool>
-        let webNavigationResult: Observable<Void>
+    struct Output {
+        let action: Observable<SettingAction>
         let error: Observable<String>
     }
     
-    public func transform(input: Input) -> Output {
-        let logoutResult = input.logout
-            .flatMap { [weak self] _ -> Observable<Void> in
-                guard let self = self else { return .just(()) }
-                return self.logoutUseCase.execute()
-                    .catch { error in
-                        self.error.accept("로그아웃 실패: \(error.localizedDescription)")
-                        return .just(()) 
-                    }
-            }
-        
-        let deleteUserResult = input.deleteUser
-            .flatMap { [weak self] _ -> Observable<Void> in
-                guard let self = self else { return .just(()) }
-                return self.reAuthUseCase.execute()
-                    .flatMap { isAuthenticated -> Observable<Void> in
-                        guard isAuthenticated else {
-                            self.error.accept("재인증 실패")
-                            return .just(())
-                        }
-                        return self.deleteUserUseCase.execute()
-                            .catch { error in
-                                self.error.accept("회원 탈퇴 실패: \(error.localizedDescription)")
-                                return .just(())
-                            }
-                    }
-                    .catch { error in
-                        self.error.accept("회원 탈퇴 과정에서 오류 발생: \(error.localizedDescription)")
-                        return .just(())
-                    }
-            }
-        
-        let reAuthResult = input.reAuth
-            .flatMap { [weak self] _ -> Observable<Bool> in
-                guard let self = self else { return .just(false) }
-                return self.reAuthUseCase.execute()
-                    .catch { error in
-                        self.error.accept("재인증 실패: \(error.localizedDescription)")
-                        return .just(false)
-                    }
-            }
-        
-        let webNavigationResult = input.openWeb
-            .flatMap { [weak self] urlString -> Observable<Void> in
-                guard let self = self else { return .just(()) }
+    func transform(input: Input) -> Output {
+        let action = input.cellSelection
+            .flatMap { [weak self] title -> Observable<SettingAction> in
+                guard let self = self else { return .just(.logout) }
                 
-                return self.webNavigationUseCase.openWeb(urlString: urlString)
-                    .catch { error in
-                        self.error.accept("웹 페이지 열기 실패: \(error.localizedDescription)")
-                        return Observable.empty()
-                    }
+                switch title {
+                case SettingNameSpace.termsOfService:
+                    self.webNavigationUseCase.openWeb(urlString: "https://www.notion.so/iosclimber/104292bf48c947b2b3b7a8cacdf1d130")
+                    return .just(.openTermsOfService)
+                case SettingNameSpace.privacyPolic:
+                    self.webNavigationUseCase.openWeb(urlString: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928")
+                    return .just(.openPrivacyPolicy)
+                case SettingNameSpace.inquiry:
+                    self.webNavigationUseCase.openWeb(urlString: "https://forms.gle/UUaJmFeLAyuFXFFS9")
+                    return .just(.openInquiry)
+                case SettingNameSpace.editProfile:
+                    self.navigateToProfileSubject.onNext(())
+                    return .just(.navigateToProfile)
+                case SettingNameSpace.blackList:
+                    self.navigateToBlackListSubject.onNext(())
+                    return .just(.navigateToBlackList)
+                case SettingNameSpace.logout:
+                    return .just(.logout)
+                case SettingNameSpace.accountRemove:
+                    return .just(.removeAccount)
+                default:
+                    return .just(.logout)
+                }
+            }
+            .catch { [weak self] error in
+                self?.handleError(error)
+                return .just(.logout)
             }
         
-        return Output(
-            logoutResult: logoutResult,
-            deleteUserResult: deleteUserResult,
-            reAuthResult: reAuthResult,
-            webNavigationResult: webNavigationResult,
-            error: error.asObservable()
-        )
+        return Output(action: action, error: showAlertSubject.asObservable())
+    }
+    
+    internal func triggerLogout() {
+        self.logoutUseCase.execute()
+            .subscribe(onNext: { [weak self] in
+                self?.navigateToLoginSubject.onNext(())
+            }, onError: { error in
+                print("로그아웃 실패: \(error.localizedDescription)")
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    internal func triggerAccountDeletion() {
+        let loginType = loginRepository.getLoginType()
+        
+        if loginType == .apple {
+            self.requestReAuthSubject.onNext(())
+        } else {
+            deleteUserUseCase.execute { [weak self] success in
+                self?.handleAccountDeletionResult(success)
+            }
+        }
+    }
+    
+    private func handleAccountDeletionResult(_ success: Bool) {
+        accountDeletionResultSubject.onNext(success)
+        
+        if success {
+            self.accountDeletionResultSubject.onNext(true)
+        } else {
+            self.accountDeletionResultSubject.onNext(false)
+        }
+    }
+    
+    private func handleError(_ error: Error) {
+        showAlertSubject.onNext("An error occurred: \(error.localizedDescription)")
     }
 }
+
