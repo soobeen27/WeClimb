@@ -42,24 +42,28 @@ class SettingVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        bindViewModel()
+        bindSectionData()
+        bindNavigateToLogin()
         setLayout()
     }
     
-    private func bindViewModel() {
+    private func bindSectionData() {
         viewModel.sectionData
             .asDriver()
             .drive(onNext: { [weak self] data in
                 self?.datas = data
             })
             .disposed(by: disposeBag)
-        
-        viewModel.navigateToLoginSubject
+    }
+    
+    private func bindNavigateToLogin() {
+        viewModel.navigateToLogin
             .subscribe(onNext: { [weak self] in
                 self?.navigateToLogin()
             })
             .disposed(by: disposeBag)
     }
+    
     
     private func navigateToProfile() {
         let editPageVC = EditPageVC()
@@ -99,42 +103,44 @@ class SettingVC: UIViewController {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let deleteAction = UIAlertAction(title: SettingNameSpace.accountRemove, style: .destructive) { [weak self] _ in
-            guard let self else { return }
-            
-            let alert = Alert()
-            alert.showAlert(from: self, title: "계정 삭제",
-                            message: "삭제하시겠습니까?",
-                            includeCancel: true) { [weak self] in
-                guard let self = self else { return }
-                
-                self.viewModel.triggerAccountDeletion()
-                
-                self.viewModel.accountDeletionResultSubject
-                    .subscribe(onNext: { [weak self] result in
-                        guard let self else { return }
-                        if result {
-                            self.navigateToLogin()
-                        } else {
-                            let alert = Alert()
-                            alert.showAlert(from: self, title: "회원 탈퇴 실패", message: "회원 탈퇴를 위해 재로그인 해주세요.")
-                        }
-                    })
-                    .disposed(by: self.disposeBag)
-            }
+            self?.confirmAccountDeletion()
         }
         
         let closeAction = UIAlertAction(title: "Close", style: .cancel)
+        
         [deleteAction, closeAction].forEach { actionSheet.addAction($0) }
         present(actionSheet, animated: true)
     }
+
+    private func confirmAccountDeletion() {
+        let alert = Alert()
+        alert.showAlert(from: self, title: "계정 삭제", message: "삭제하시겠습니까?", includeCancel: true) { [weak self] in
+            self?.triggerAccountDeletion()
+        }
+    }
+
+    private func triggerAccountDeletion() {
+        viewModel.triggerAccountDeletion()
+        
+        viewModel.accountDeletionResult
+            .subscribe(onNext: { [weak self] result in
+                guard let self else { return }
+                self.handleAccountDeletionResult(result)
+            })
+            .disposed(by: disposeBag)
+    }
+
+    private func handleAccountDeletionResult(_ result: Bool) {
+        if result {
+            navigateToLogin()
+        } else {
+            let alert = Alert()
+            alert.showAlert(from: self, title: "회원 탈퇴 실패", message: "회원 탈퇴를 위해 재로그인 해주세요.")
+        }
+    }
     
     private func startAppleReAuth() {
-        snsAuthVM.appleLogin(delegate: self, provider: self)
-        let request = ASAuthorizationAppleIDProvider().createRequest()
-        let controller = ASAuthorizationController(authorizationRequests: [request])
-        controller.delegate = self
-        controller.presentationContextProvider = self
-        controller.performRequests()
+        self.snsAuthVM.appleLogin(delegate: self, provider: self)
     }
     
     private func setLayout() {
@@ -228,6 +234,7 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
+// MARK: Apple Login ReAuth
 extension SettingVC: ASAuthorizationControllerPresentationContextProviding {
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         return self.view.window!
@@ -272,6 +279,7 @@ extension SettingVC: ASAuthorizationControllerDelegate {
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        // Handle error.
         print("Sign in with Apple errored: \(error)")
     }
 }

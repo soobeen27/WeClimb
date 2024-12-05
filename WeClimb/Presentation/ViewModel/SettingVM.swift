@@ -10,14 +10,17 @@ import RxSwift
 import RxCocoa
 
 protocol SettingViewModel {
-    var sectionData: Driver<[SettingItem]> { get }
-    var error: Observable<String> { get }
     func transform(input: SettingViewModelImpl.Input) -> SettingViewModelImpl.Output
     
+    var sectionData: Driver<[SettingItem]> { get }
+    
+    var error: Observable<String> { get }
+    
     func triggerLogout()
-    var navigateToLoginSubject: PublishSubject<Void> { get }
+    var navigateToLogin: Observable<Void> { get }
+    
     func triggerAccountDeletion()
-    var accountDeletionResultSubject: PublishSubject<Bool> { get }
+    var accountDeletionResult: Observable<Bool> { get }
 }
 
 enum SettingAction {
@@ -47,10 +50,10 @@ final class SettingViewModelImpl: SettingViewModel {
     
     private let navigateToProfileSubject = PublishSubject<Void>()
     private let navigateToBlackListSubject = PublishSubject<Void>()
-    internal let navigateToLoginSubject = PublishSubject<Void>()
+    private let navigateToLoginSubject = PublishSubject<Void>()
     private let showAlertSubject = PublishSubject<String>()
     private let requestReAuthSubject = PublishSubject<Void>()
-    internal let accountDeletionResultSubject = PublishSubject<Bool>()
+    private let accountDeletionResultSubject = PublishSubject<Bool>()
     
     var navigateToProfile: Observable<Void> { return navigateToProfileSubject.asObservable() }
     var navigateToBlackList: Observable<Void> { return navigateToBlackListSubject.asObservable() }
@@ -142,15 +145,21 @@ final class SettingViewModelImpl: SettingViewModel {
         if loginType == .apple {
             self.requestReAuthSubject.onNext(())
         } else {
-            self.deleteUserUseCase.execute { [weak self] success in
-                if success {
-                    self?.accountDeletionResultSubject.onNext(true)
-                    print("회원탈퇴 성공")
-                } else {
-                    self?.accountDeletionResultSubject.onNext(false)
-                    print("회원탈퇴 실패")
-                }
+            deleteUserUseCase.execute { [weak self] success in
+                self?.handleAccountDeletionResult(success)
             }
+        }
+    }
+    
+    private func handleAccountDeletionResult(_ success: Bool) {
+        accountDeletionResultSubject.onNext(success)
+        
+        if success {
+            self.accountDeletionResultSubject.onNext(true)
+            print("회원탈퇴 성공")
+        } else {
+            self.accountDeletionResultSubject.onNext(false)
+            print("회원탈퇴 실패")
         }
     }
 
