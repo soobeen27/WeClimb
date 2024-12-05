@@ -18,7 +18,7 @@ class SettingVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel: SettingViewModel
     private var datas: [SettingItem] = []
-
+    
     private let snsAuthVM = SNSAuthVM()
     
     private let tableView: UITableView = {
@@ -45,7 +45,7 @@ class SettingVC: UIViewController {
         bindViewModel()
         setLayout()
     }
-
+    
     private func bindViewModel() {
         viewModel.sectionData
             .asDriver()
@@ -54,34 +54,11 @@ class SettingVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        viewModel._navigateToLogin
+        viewModel.navigateToLoginSubject
             .subscribe(onNext: { [weak self] in
                 self?.navigateToLogin()
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func startAppleReAuth() {
-        // Apple 로그인 재인증을 처리하는 메서드 호출
-        let request = ASAuthorizationAppleIDProvider().createRequest()
-        let controller = ASAuthorizationController(authorizationRequests: [request])
-        controller.delegate = self
-        controller.presentationContextProvider = self
-        controller.performRequests()
-    }
-    
-    private func setLayout() {
-        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
-        view.addSubview(tableView)
-        
-        tableView.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(8)
-        }
-        
-        tableView.dataSource = self
-        tableView.delegate = self
     }
     
     private func navigateToProfile() {
@@ -105,7 +82,7 @@ class SettingVC: UIViewController {
         [logoutAction, closeAction].forEach { actionSheet.addAction($0) }
         present(actionSheet, animated: true)
     }
-
+    
     private func navigateToLogin() {
         let loginVC = LoginVC()
         let navigationController = UINavigationController(rootViewController: loginVC)
@@ -118,14 +95,64 @@ class SettingVC: UIViewController {
         }
     }
     
-    private func removeAccount() {
-        // 계정 삭제 처리
+    private func showAccountDeletionAlert() {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let deleteAction = UIAlertAction(title: SettingNameSpace.accountRemove, style: .destructive) { [weak self] _ in
+            guard let self else { return }
+            
+            let alert = Alert()
+            alert.showAlert(from: self, title: "계정 삭제",
+                            message: "삭제하시겠습니까?",
+                            includeCancel: true) { [weak self] in
+                guard let self = self else { return }
+                
+                self.viewModel.triggerAccountDeletion()
+                
+                self.viewModel.accountDeletionResultSubject
+                    .subscribe(onNext: { [weak self] result in
+                        guard let self else { return }
+                        if result {
+                            self.navigateToLogin()
+                        } else {
+                            let alert = Alert()
+                            alert.showAlert(from: self, title: "회원 탈퇴 실패", message: "회원 탈퇴를 위해 재로그인 해주세요.")
+                        }
+                    })
+                    .disposed(by: self.disposeBag)
+            }
+        }
+        
+        let closeAction = UIAlertAction(title: "Close", style: .cancel)
+        [deleteAction, closeAction].forEach { actionSheet.addAction($0) }
+        present(actionSheet, animated: true)
+    }
+    
+    private func startAppleReAuth() {
+        snsAuthVM.appleLogin(delegate: self, provider: self)
+        let request = ASAuthorizationAppleIDProvider().createRequest()
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        controller.delegate = self
+        controller.presentationContextProvider = self
+        controller.performRequests()
+    }
+    
+    private func setLayout() {
+        view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
+        view.addSubview(tableView)
+        
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(8)
+        }
+        
+        tableView.dataSource = self
+        tableView.delegate = self
     }
 }
 
 extension SettingVC: UITableViewDelegate, UITableViewDataSource {
-    
-    // UITableViewDataSource
     func numberOfSections(in tableView: UITableView) -> Int {
         return datas.count
     }
@@ -144,7 +171,6 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
 
-    // UITableViewDelegate
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch datas[section].section {
         case .notifications:
@@ -161,17 +187,14 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // 선택된 셀의 title 가져오기
         let selectedTitle = datas[indexPath.section].titles[indexPath.row]
         
-        print("선택된 셀: \(selectedTitle)")  // 선택된 셀 출력
+        print("선택된 셀: \(selectedTitle)")
 
-        // ViewModel에 선택된 셀의 title을 전달하고, Output을 구독
         let input = SettingViewModelImpl.Input(cellSelection: Observable.just(selectedTitle))
         
-        let output = viewModel.transform(input: input)  // transform 호출
+        let output = viewModel.transform(input: input)
 
-        // Output에서 action 구독
         output.action
             .subscribe(onNext: { [weak self] action in
                 switch action {
@@ -182,14 +205,13 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
                 case .logout:
                     self?.showLogoutAlert()
                 case .removeAccount:
-                    self?.removeAccount()
+                    self?.showAccountDeletionAlert()
                 default:
                     break
                 }
             })
             .disposed(by: disposeBag)
 
-        // 에러 처리 구독
         output.error
             .subscribe(onNext: { [weak self] errorMessage in
                 let alert = UIAlertController(title: "Error", message: errorMessage, preferredStyle: .alert)
@@ -198,7 +220,6 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
             })
             .disposed(by: disposeBag)
 
-        // 재인증 요청 구독
         output.requestReAuth
             .subscribe(onNext: { [weak self] in
                 self?.startAppleReAuth()
