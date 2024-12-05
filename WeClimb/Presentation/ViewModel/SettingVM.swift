@@ -21,6 +21,8 @@ protocol SettingViewModel {
     
     func triggerAccountDeletion()
     var accountDeletionResult: Observable<Bool> { get }
+    
+    var requestReAuth: Observable<Void> { get }
 }
 
 enum SettingAction {
@@ -89,7 +91,6 @@ final class SettingViewModelImpl: SettingViewModel {
     struct Output {
         let action: Observable<SettingAction>
         let error: Observable<String>
-        let requestReAuth: Observable<Void>
     }
     
     func transform(input: Input) -> Output {
@@ -126,7 +127,7 @@ final class SettingViewModelImpl: SettingViewModel {
                 return .just(.logout)
             }
         
-        return Output(action: action, error: showAlertSubject.asObservable(), requestReAuth: requestReAuthSubject.asObservable())
+        return Output(action: action, error: showAlertSubject.asObservable())
     }
     
     internal func triggerLogout() {
@@ -156,10 +157,8 @@ final class SettingViewModelImpl: SettingViewModel {
         
         if success {
             self.accountDeletionResultSubject.onNext(true)
-            print("회원탈퇴 성공")
         } else {
             self.accountDeletionResultSubject.onNext(false)
-            print("회원탈퇴 실패")
         }
     }
 
