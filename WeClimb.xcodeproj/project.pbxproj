@@ -11,7 +11,9 @@
 		434227752CF984C9003523EF /* WebPageOpenUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227742CF984C9003523EF /* WebPageOpenUseCase.swift */; };
 		434227772CF98D5D003523EF /* DeleteAccountUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */; };
 		434227792CF99746003523EF /* SettingVMBefore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227782CF99746003523EF /* SettingVMBefore.swift */; };
-		4342277B2CFD7E6D003523EF /* ReAuthUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */; };
+		434227872D01A545003523EF /* LoginTypeDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227862D01A545003523EF /* LoginTypeDataSource.swift */; };
+		434227892D01A658003523EF /* LoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227882D01A658003523EF /* LoginRepository.swift */; };
+		4342278B2D01A683003523EF /* LoginRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4342278A2D01A683003523EF /* LoginRepositoryImpl.swift */; };
 		435A1EB82CE262210076D9A0 /* SelectGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB72CE262210076D9A0 /* SelectGymVC.swift */; };
 		435A1EBA2CE262460076D9A0 /* SelectSettingModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */; };
 		435A1EBC2CE262670076D9A0 /* SelectSettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */; };
@@ -201,7 +203,9 @@
 		434227742CF984C9003523EF /* WebPageOpenUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPageOpenUseCase.swift; sourceTree = "<group>"; };
 		434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountUseCase.swift; sourceTree = "<group>"; };
 		434227782CF99746003523EF /* SettingVMBefore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingVMBefore.swift; sourceTree = "<group>"; };
-		4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReAuthUseCase.swift; sourceTree = "<group>"; };
+		434227862D01A545003523EF /* LoginTypeDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTypeDataSource.swift; sourceTree = "<group>"; };
+		434227882D01A658003523EF /* LoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRepository.swift; sourceTree = "<group>"; };
+		4342278A2D01A683003523EF /* LoginRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRepositoryImpl.swift; sourceTree = "<group>"; };
 		435A1EB72CE262210076D9A0 /* SelectGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGymVC.swift; sourceTree = "<group>"; };
 		435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingModalVC.swift; sourceTree = "<group>"; };
 		435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingCell.swift; sourceTree = "<group>"; };
@@ -406,7 +410,6 @@
 				434227722CF97C9C003523EF /* LogoutUseCase.swift */,
 				434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */,
 				434227742CF984C9003523EF /* WebPageOpenUseCase.swift */,
-				4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */,
 			);
 			path = UseCase;
 			sourceTree = "<group>";
@@ -1259,6 +1262,7 @@
 			isa = PBXGroup;
 			children = (
 				915F0F9A2D01433700CCCB24 /* GoogleLoginRepository.swift */,
+				434227882D01A658003523EF /* LoginRepository.swift */,
 				915F0F9C2D01435400CCCB24 /* KakaoLoginRepository.swift */,
 				915F0F9E2D01438600CCCB24 /* AppleLoginRepository.swift */,
 			);
@@ -1302,6 +1306,7 @@
 				91CE121D2CFFF9E900BCC82E /* AppleLogin */,
 				91CE121E2CFFF9E900BCC82E /* GoogleLoginDataSource.swift */,
 				91CE121F2CFFF9E900BCC82E /* KakaoLoginDataSource.swift */,
+				434227862D01A545003523EF /* LoginTypeDataSource.swift */,
 				91CE12202CFFF9E900BCC82E /* LoginFirebaseDataSource.swift */,
 			);
 			path = Login;
@@ -1313,6 +1318,7 @@
 				91CE12272CFFFA1500BCC82E /* GoogleLoginRepositoryImpl.swift */,
 				915E73042D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift */,
 				915E73062D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift */,
+				4342278A2D01A683003523EF /* LoginRepositoryImpl.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -1610,7 +1616,6 @@
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */,
 				911E1F5B2CF6E97B007B9A52 /* FirestoreHelper.swift in Sources */,
-				4342277B2CFD7E6D003523EF /* ReAuthUseCase.swift in Sources */,
 				43A79AD82C85481300B960A2 /* DetailEditVM.swift in Sources */,
 				6B9402032CF986C900F1DC2D /* UserDeleteDataSource.swift in Sources */,
 				435A1EB82CE262210076D9A0 /* SelectGymVC.swift in Sources */,
@@ -1622,8 +1627,10 @@
 				6BA5EB8B2CFEFD0B00F247FB /* UploadPostRepository.swift in Sources */,
 				91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */,
 				911E1F5D2CF6F63B007B9A52 /* UserReadDataSource.swift in Sources */,
+				434227872D01A545003523EF /* LoginTypeDataSource.swift in Sources */,
 				F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */,
 				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
+				4342278B2D01A683003523EF /* LoginRepositoryImpl.swift in Sources */,
 				6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */,
 				916D64D02C848A540064B766 /* FeedView.swift in Sources */,
 				915F0F9D2D01435400CCCB24 /* KakaoLoginRepository.swift in Sources */,
@@ -1636,6 +1643,7 @@
 				C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */,
 				43A0E72A2CE3888800F15682 /* UploadHeaderView.swift in Sources */,
 				91FF42CC2CC5F37C003D9279 /* SNSAuthVM.swift in Sources */,
+				434227892D01A658003523EF /* LoginRepository.swift in Sources */,
 				91CE12232CFFF9E900BCC82E /* AppleLoginDelegate.swift in Sources */,
 				91A717002CEA0D25007F825C /* LoginNeeded.swift in Sources */,
 				6B7F76992CA4A8E900B05B3F /* BlackListVM.swift in Sources */,
@@ -1857,7 +1865,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.0;
+				CURRENT_PROJECT_VERSION = 1.0.4;
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1875,7 +1883,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.4;
 				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1899,7 +1907,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.0;
+				CURRENT_PROJECT_VERSION = 1.0.4;
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1917,7 +1925,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.4;
 				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
