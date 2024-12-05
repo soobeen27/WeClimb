@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-class AppleLoginRepositoryImpl {
+class AppleLoginRepositoryImpl: AppleLoginRepository {
     let appleLoginDataSource: AppleLoginDataSource
     let loginFirebaseDataSource: LoginFirebaseDataSource
     

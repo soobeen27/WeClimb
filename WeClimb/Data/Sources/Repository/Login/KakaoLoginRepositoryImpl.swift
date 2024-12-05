@@ -9,7 +9,7 @@ import Foundation
 
 import RxSwift
 
-class KakaoLoginRepositoryImpl {
+class KakaoLoginRepositoryImpl: KakaoLoginRepository {
     private let kakaoLoginDataSource: KakaoLoginDataSource
     private let loginFirebaseDataSource: LoginFirebaseDataSource
     

@@ -9,10 +9,6 @@ import Foundation
 
 import RxSwift
 
-protocol GoogleLoginRepository {
-    func googleLogin(presentProvider: @escaping PresenterProvider) -> Single<LoginResult>
-}
-
 class GoogleLoginRepositoryImpl: GoogleLoginRepository {
     private let googleLoginDataSource: GoogleLoginDataSource
     private let loginFirebaseDataSource: LoginFirebaseDataSource

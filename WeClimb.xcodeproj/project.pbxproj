@@ -113,6 +113,9 @@
 		915E73032D003CEF000E6EE6 /* CommentDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB822CFEF38E00F247FB /* CommentDataSource.swift */; };
 		915E73052D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915E73042D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift */; };
 		915E73072D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915E73062D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift */; };
+		915F0F9B2D01433700CCCB24 /* GoogleLoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0F9A2D01433700CCCB24 /* GoogleLoginRepository.swift */; };
+		915F0F9D2D01435400CCCB24 /* KakaoLoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0F9C2D01435400CCCB24 /* KakaoLoginRepository.swift */; };
+		915F0F9F2D01438600CCCB24 /* AppleLoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0F9E2D01438600CCCB24 /* AppleLoginRepository.swift */; };
 		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
 		917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */; };
@@ -135,7 +138,7 @@
 		91CE12242CFFF9E900BCC82E /* GoogleLoginDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CE121E2CFFF9E900BCC82E /* GoogleLoginDataSource.swift */; };
 		91CE12252CFFF9E900BCC82E /* KakaoLoginDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CE121F2CFFF9E900BCC82E /* KakaoLoginDataSource.swift */; };
 		91CE12262CFFF9E900BCC82E /* LoginFirebaseDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CE12202CFFF9E900BCC82E /* LoginFirebaseDataSource.swift */; };
-		91CE12292CFFFA1500BCC82E /* GoogleLoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CE12272CFFFA1500BCC82E /* GoogleLoginRepository.swift */; };
+		91CE12292CFFFA1500BCC82E /* GoogleLoginRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CE12272CFFFA1500BCC82E /* GoogleLoginRepositoryImpl.swift */; };
 		91DC7D242CE0C721004CB66D /* GradeNamespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DC7D232CE0C721004CB66D /* GradeNamespace.swift */; };
 		91E21D112CE20017003269DD /* Hold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E21D102CE20017003269DD /* Hold.swift */; };
 		91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F566CD2CDB566700485F79 /* CommentCellVM.swift */; };
@@ -289,6 +292,9 @@
 		912613282CD8FE1300CD5E74 /* CommentVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = CommentVM.swift; sourceTree = "<group>"; tabWidth = 4; };
 		915E73042D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoLoginRepositoryImpl.swift; sourceTree = "<group>"; };
 		915E73062D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleLoginRepositoryImpl.swift; sourceTree = "<group>"; };
+		915F0F9A2D01433700CCCB24 /* GoogleLoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleLoginRepository.swift; sourceTree = "<group>"; };
+		915F0F9C2D01435400CCCB24 /* KakaoLoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoLoginRepository.swift; sourceTree = "<group>"; };
+		915F0F9E2D01438600CCCB24 /* AppleLoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleLoginRepository.swift; sourceTree = "<group>"; };
 		916D64CF2C848A540064B766 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		916D64D22C848BE00064B766 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
 		917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeClimbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -311,7 +317,7 @@
 		91CE121E2CFFF9E900BCC82E /* GoogleLoginDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoogleLoginDataSource.swift; sourceTree = "<group>"; };
 		91CE121F2CFFF9E900BCC82E /* KakaoLoginDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KakaoLoginDataSource.swift; sourceTree = "<group>"; };
 		91CE12202CFFF9E900BCC82E /* LoginFirebaseDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginFirebaseDataSource.swift; sourceTree = "<group>"; };
-		91CE12272CFFFA1500BCC82E /* GoogleLoginRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoogleLoginRepository.swift; sourceTree = "<group>"; };
+		91CE12272CFFFA1500BCC82E /* GoogleLoginRepositoryImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoogleLoginRepositoryImpl.swift; sourceTree = "<group>"; };
 		91DC7D232CE0C721004CB66D /* GradeNamespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeNamespace.swift; sourceTree = "<group>"; };
 		91E21D102CE20017003269DD /* Hold.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hold.swift; sourceTree = "<group>"; };
 		91F566CD2CDB566700485F79 /* CommentCellVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentCellVM.swift; sourceTree = "<group>"; };
@@ -1128,6 +1134,7 @@
 		6B9402082CFD5C1700F1DC2D /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
+				915F0F992D01430C00CCCB24 /* Login */,
 				6B87F97F2CFEEC58005905EA /* FeedSub */,
 				6B87F97E2CFEEC53005905EA /* Gym */,
 				6B87F97D2CFEEC4E005905EA /* Post */,
@@ -1248,6 +1255,16 @@
 			path = DataSource;
 			sourceTree = "<group>";
 		};
+		915F0F992D01430C00CCCB24 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				915F0F9A2D01433700CCCB24 /* GoogleLoginRepository.swift */,
+				915F0F9C2D01435400CCCB24 /* KakaoLoginRepository.swift */,
+				915F0F9E2D01438600CCCB24 /* AppleLoginRepository.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
 		917DA8952CD4AE13006FF6B9 /* WeClimbTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -1293,7 +1310,7 @@
 		91CE12282CFFFA1500BCC82E /* Login */ = {
 			isa = PBXGroup;
 			children = (
-				91CE12272CFFFA1500BCC82E /* GoogleLoginRepository.swift */,
+				91CE12272CFFFA1500BCC82E /* GoogleLoginRepositoryImpl.swift */,
 				915E73042D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift */,
 				915E73062D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift */,
 			);
@@ -1524,6 +1541,7 @@
 				C49FC70B2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift in Sources */,
 				43A79ADA2C85930A00B960A2 /* ProfileImagePickerVC.swift in Sources */,
 				6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */,
+				915F0F9B2D01433700CCCB24 /* GoogleLoginRepository.swift in Sources */,
 				436AEAEA2C7DCD1100E0D85A /* MyPageCell.swift in Sources */,
 				F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */,
 				918D2A3C2CFD8A9400F54716 /* PostFilterDataSource.swift in Sources */,
@@ -1585,7 +1603,8 @@
 				43A79AD62C853EC100B960A2 /* EditModel.swift in Sources */,
 				915E73032D003CEF000E6EE6 /* CommentDataSource.swift in Sources */,
 				91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */,
-				91CE12292CFFFA1500BCC82E /* GoogleLoginRepository.swift in Sources */,
+				915F0F9F2D01438600CCCB24 /* AppleLoginRepository.swift in Sources */,
+				91CE12292CFFFA1500BCC82E /* GoogleLoginRepositoryImpl.swift in Sources */,
 				91CE12242CFFF9E900BCC82E /* GoogleLoginDataSource.swift in Sources */,
 				436AEAF02C7EE63C00E0D85A /* SearchNameSpace.swift in Sources */,
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
@@ -1607,6 +1626,7 @@
 				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
 				6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */,
 				916D64D02C848A540064B766 /* FeedView.swift in Sources */,
+				915F0F9D2D01435400CCCB24 /* KakaoLoginRepository.swift in Sources */,
 				6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */,
 				919D05762CF9AB49004314AC /* CommonError.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
