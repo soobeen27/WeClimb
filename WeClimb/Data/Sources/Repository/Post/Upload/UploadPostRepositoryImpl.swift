@@ -16,7 +16,7 @@ final class UploadPostRepositoryImpl: UploadPostRepository {
         self.uploadPostDataSource = uploadPostDataSource
     }
     
-    func uploadPost(user: User, gym: String?, caption: String?, datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Completable {
-        return uploadPostDataSource.uploadPost(user: user, gym: gym, caption: caption, datas: datas)
+    func uploadPost(data: PostUploadData) -> Completable {
+        return uploadPostDataSource.uploadPost(data: data)
     }
 }

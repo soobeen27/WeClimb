@@ -10,6 +10,5 @@ import Foundation
 import RxSwift
 
 protocol UploadPostRepository {
-    func uploadPost(user: User, gym: String?, caption: String?,
-                    datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Completable
+    func uploadPost(data: PostUploadData) -> Completable
 }

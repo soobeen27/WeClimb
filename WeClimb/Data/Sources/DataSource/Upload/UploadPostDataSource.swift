@@ -9,92 +9,107 @@ import Foundation
 import RxSwift
 import Firebase
 import FirebaseStorage
+// 업로드용
+struct PostUploadData {
+    let user: User
+    let gym: String?
+    let caption: String?
+    let medias: [MediaUploadData]
+}
+
+struct MediaUploadData {
+    let url: URL
+    let hold: String?
+    let grade: String?
+    let thumbnailURL: URL?
+}
 
 protocol UploadPostDataSource {
-    func uploadPost(user: User, gym: String?, caption: String?,
-                    datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Completable
+    func uploadPost(data: PostUploadData) -> Completable
 }
 
 class UploadPostDataSourceImpl: UploadPostDataSource {
 
     private let db = Firestore.firestore()
-    private let disposebag = DisposeBag()
+    private var disposebag = DisposeBag()
+    private var postUID: String
+    private var postRef: DocumentReference
+    private var batch: WriteBatch
     
-    func uploadPost(user: User, gym: String?, caption: String?,
-                    datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Completable {
+    init() {
+        self.batch = db.batch()
+        self.postUID = UUID().uuidString
+        self.postRef = db.collection("posts").document(postUID)
+    }
+    
+    func uploadPost(data: PostUploadData) -> Completable {
+        batch = db.batch()
+        disposebag = DisposeBag()
+        return mediasUpload(user: data.user, gym: data.gym, datas: data.medias)
+            .flatMapCompletable { [weak self] references in
+                guard let self else { return Completable.error(CommonError.selfNil) }
+                do {
+                    let creationDate = Date()
+                    let authorUID = try FirestoreHelper.userUID()
+                    let post = Post(postUID: self.postUID,
+                                    authorUID: authorUID,
+                                    creationDate: creationDate,
+                                    caption: data.caption,
+                                    like: nil,
+                                    gym: data.gym,
+                                    medias: references,
+                                    thumbnail: data.medias.first?.thumbnailURL?.absoluteString,
+                                    commentCount: nil)
+                    try self.createPost(post: post)
+                    self.userUpdatePost(userUID: authorUID)
+                    self.mediaUpdate(mediaRefs: references)
+                    
+                    return self.commitBatch()
+                } catch {
+                    return Completable.error(error)
+                }
+            }
+    }
+    
+    private func commitBatch() -> Completable {
         return Completable.create { [weak self] completable in
             guard let self else {
                 completable(.error(CommonError.selfNil))
                 return Disposables.create()
             }
-            guard let authorUID = try? FirestoreHelper.userUID() else {
-                completable(.error(UserStateError.nonmeber))
-                return Disposables.create()
-            }
-            let creationDate = Date()
-            mediasUpload(user: user, gym: gym, datas: datas)
-                .subscribe(onSuccess: { [weak self] references, batch in
-                    guard let self else {
-                        completable(.error(UserStateError.nonmeber))
-                        return
-                    }
-                    do {
-                        let postUID = UUID().uuidString
-                        let postRef = self.db.collection("posts").document(postUID)
-                        let post = Post(postUID: postUID,
-                                        authorUID: authorUID,
-                                        creationDate: creationDate,
-                                        caption: caption,
-                                        like: nil,
-                                        gym: gym,
-                                        medias: references,
-                                        thumbnail: datas.first?.thumbnailURL?.absoluteString,
-                                        commentCount: nil)
-                        try self.createPost(batch: batch, post: post, postRef: postRef)
-                        self.userUpdatePost(batch: batch, postRef: postRef, userUID: authorUID)
-                        self.mediaUpdate(batch: batch, postRef: postRef, mediaRefs: references)
-                        batch.commit { error in
-                            if let error {
-                                completable(.error(error))
-                            } else {
-                                completable(.completed)
-                            }
-                        }
-                    } catch {
-                        completable(.error(error))
-                    }
-                }, onFailure: { error in
+            self.batch.commit { error in
+                if let error {
                     completable(.error(error))
-                })
-                .disposed(by: disposebag)
-            
+                } else {
+                    completable(.completed)
+                }
+            }
             return Disposables.create()
         }
     }
     
-    private func createPost(batch: WriteBatch, post: Post, postRef: DocumentReference) throws {
+    private func createPost(post: Post) throws {
         let encodedPost = try Firestore.Encoder().encode(post)
         batch.setData(encodedPost, forDocument: postRef)
     }
     
-    private func userUpdatePost(batch: WriteBatch, postRef: DocumentReference, userUID: String) {
+    private func userUpdatePost(userUID: String) {
         let userRef = db.collection("users").document(userUID)
         batch.updateData(["posts": FieldValue.arrayUnion([postRef])], forDocument: userRef)
     }
     
-    private func mediaUpdate(batch: WriteBatch, postRef: DocumentReference, mediaRefs: [DocumentReference]) {
+    private func mediaUpdate(mediaRefs: [DocumentReference]) {
         mediaRefs.forEach { reference in
             batch.updateData(["postRef" : postRef], forDocument: reference)
         }
     }
     
-    private func mediasUpload(user: User, gym: String?, datas: [(url: URL, hold: String?, grade: String?, thumbnailURL: URL?)]) -> Single<(references: [DocumentReference], batch: WriteBatch )> {
+    private func mediasUpload(user: User, gym: String?, datas: [MediaUploadData]) -> Single<[DocumentReference]> {
         return Single.create { [weak self] single in
             guard let self else {
                 single(.failure(CommonError.selfNil))
                 return Disposables.create()
             }
-            let batch = db.batch()
             let creationDate = Date()
             
             let uploadTasks = datas.enumerated().map { index, data -> Single<(Int, DocumentReference)> in
@@ -119,7 +134,7 @@ class UploadPostDataSourceImpl: UploadPostDataSource {
                             
                             do {
                                 let encodedMedia = try Firestore.Encoder().encode(mediaData)
-                                batch.setData(encodedMedia, forDocument: mediaDocRef)
+                                self.batch.setData(encodedMedia, forDocument: mediaDocRef)
                                 single(.success((index, mediaDocRef)))
                             } catch {
                                 single(.failure(error))
@@ -135,7 +150,7 @@ class UploadPostDataSourceImpl: UploadPostDataSource {
                     results.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
                 }
                 .subscribe(onSuccess: { sortedRefs in
-                    single(.success((sortedRefs, batch)))
+                    single(.success(sortedRefs))
                 }, onFailure: { error in
                     single(.failure(error))
                 })
