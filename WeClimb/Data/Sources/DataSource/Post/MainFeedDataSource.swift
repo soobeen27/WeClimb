@@ -11,11 +11,14 @@ import Firebase
 
 enum FirebaseError: Error {
     case documentNil
+    case nonRequiredInfo
     
     var description: String {
         switch self {
         case .documentNil:
             "도큐멘트가 없음"
+        case .nonRequiredInfo:
+            "필수 정보 없어"
         }
     }
 }
