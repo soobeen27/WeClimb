@@ -34,6 +34,26 @@ final class FirestoreHelper {
         return user.uid
     }
     
+    static func userUID(name: String) -> Single<String> {
+        return Single.create { single in
+            let db = Firestore.firestore()
+            let userRef = db.collection("users").document(name)
+            userRef.getDocument { snapshot, error in
+                if let error {
+                    single(.failure(error))
+                    return
+                }
+                guard let snapshot else {
+                    single(.failure(FirebaseError.documentNil))
+                    return
+                }
+                let uid = snapshot.documentID
+                single(.success(uid))
+            }
+            return Disposables.create()
+        }
+    }
+    
     static func getAllDocuments(from refs: [DocumentReference]) async throws -> [DocumentSnapshot] {
         try await withThrowingTaskGroup(of: DocumentSnapshot.self) { group in
             for ref in refs {
