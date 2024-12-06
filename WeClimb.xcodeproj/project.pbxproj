@@ -11,7 +11,9 @@
 		434227752CF984C9003523EF /* WebPageOpenUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227742CF984C9003523EF /* WebPageOpenUseCase.swift */; };
 		434227772CF98D5D003523EF /* DeleteAccountUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */; };
 		434227792CF99746003523EF /* SettingVMBefore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227782CF99746003523EF /* SettingVMBefore.swift */; };
-		4342277B2CFD7E6D003523EF /* ReAuthUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */; };
+		434227872D01A545003523EF /* LoginTypeDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227862D01A545003523EF /* LoginTypeDataSource.swift */; };
+		434227892D01A658003523EF /* LoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227882D01A658003523EF /* LoginRepository.swift */; };
+		4342278B2D01A683003523EF /* LoginRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4342278A2D01A683003523EF /* LoginRepositoryImpl.swift */; };
 		435A1EB82CE262210076D9A0 /* SelectGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB72CE262210076D9A0 /* SelectGymVC.swift */; };
 		435A1EBA2CE262460076D9A0 /* SelectSettingModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */; };
 		435A1EBC2CE262670076D9A0 /* SelectSettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */; };
@@ -80,7 +82,6 @@
 		6B9CEA602CE61BBC004166DE /* CustomSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9CEA5F2CE61BBC004166DE /* CustomSlider.swift */; };
 		6BA24C942C81A0F00089CECE /* ClimbingDeatilGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */; };
 		6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */; };
-		6BA5EB832CFEF38E00F247FB /* CommentDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB822CFEF38E00F247FB /* CommentDataSource.swift */; };
 		6BA5EB8B2CFEFD0B00F247FB /* UploadPostRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB8A2CFEFD0B00F247FB /* UploadPostRepository.swift */; };
 		6BA5EB8D2CFEFD4100F247FB /* UploadPostRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB8C2CFEFD4100F247FB /* UploadPostRepositoryImpl.swift */; };
 		6BA5EB8F2CFEFDD300F247FB /* LikePostRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB8E2CFEFDD300F247FB /* LikePostRepository.swift */; };
@@ -113,6 +114,12 @@
 		911E1F5F2CF70463007B9A52 /* UserUpdateDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911E1F5E2CF70463007B9A52 /* UserUpdateDataSource.swift */; };
 		911E1F632CF71B4F007B9A52 /* PostDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911E1F622CF71B4F007B9A52 /* PostDataSource.swift */; };
 		912613292CD8FE1300CD5E74 /* CommentVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912613282CD8FE1300CD5E74 /* CommentVM.swift */; };
+		915E73032D003CEF000E6EE6 /* CommentDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB822CFEF38E00F247FB /* CommentDataSource.swift */; };
+		915E73052D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915E73042D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift */; };
+		915E73072D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915E73062D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift */; };
+		915F0F9B2D01433700CCCB24 /* GoogleLoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0F9A2D01433700CCCB24 /* GoogleLoginRepository.swift */; };
+		915F0F9D2D01435400CCCB24 /* KakaoLoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0F9C2D01435400CCCB24 /* KakaoLoginRepository.swift */; };
+		915F0F9F2D01438600CCCB24 /* AppleLoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0F9E2D01438600CCCB24 /* AppleLoginRepository.swift */; };
 		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
 		917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */; };
@@ -129,6 +136,12 @@
 		91AF25632C8D771A002283BD /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25622C8D771A002283BD /* Gym.swift */; };
 		91BFA9332C91962F0044D5AD /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BFA9322C91962F0044D5AD /* Post.swift */; };
 		91C562232CF0E48E00CBE1F3 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 91C562222CF0E48E00CBE1F3 /* FirebaseRemoteConfig */; };
+		91CE12222CFFF9E900BCC82E /* AppleLoginDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CE121B2CFFF9E900BCC82E /* AppleLoginDataSource.swift */; };
+		91CE12232CFFF9E900BCC82E /* AppleLoginDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CE121C2CFFF9E900BCC82E /* AppleLoginDelegate.swift */; };
+		91CE12242CFFF9E900BCC82E /* GoogleLoginDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CE121E2CFFF9E900BCC82E /* GoogleLoginDataSource.swift */; };
+		91CE12252CFFF9E900BCC82E /* KakaoLoginDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CE121F2CFFF9E900BCC82E /* KakaoLoginDataSource.swift */; };
+		91CE12262CFFF9E900BCC82E /* LoginFirebaseDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CE12202CFFF9E900BCC82E /* LoginFirebaseDataSource.swift */; };
+		91CE12292CFFFA1500BCC82E /* GoogleLoginRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CE12272CFFFA1500BCC82E /* GoogleLoginRepositoryImpl.swift */; };
 		91DC7D242CE0C721004CB66D /* GradeNamespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DC7D232CE0C721004CB66D /* GradeNamespace.swift */; };
 		91E21D112CE20017003269DD /* Hold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E21D102CE20017003269DD /* Hold.swift */; };
 		91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F566CD2CDB566700485F79 /* CommentCellVM.swift */; };
@@ -191,7 +204,9 @@
 		434227742CF984C9003523EF /* WebPageOpenUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPageOpenUseCase.swift; sourceTree = "<group>"; };
 		434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountUseCase.swift; sourceTree = "<group>"; };
 		434227782CF99746003523EF /* SettingVMBefore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingVMBefore.swift; sourceTree = "<group>"; };
-		4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReAuthUseCase.swift; sourceTree = "<group>"; };
+		434227862D01A545003523EF /* LoginTypeDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTypeDataSource.swift; sourceTree = "<group>"; };
+		434227882D01A658003523EF /* LoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRepository.swift; sourceTree = "<group>"; };
+		4342278A2D01A683003523EF /* LoginRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRepositoryImpl.swift; sourceTree = "<group>"; };
 		435A1EB72CE262210076D9A0 /* SelectGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGymVC.swift; sourceTree = "<group>"; };
 		435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingModalVC.swift; sourceTree = "<group>"; };
 		435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingCell.swift; sourceTree = "<group>"; };
@@ -259,7 +274,7 @@
 		6B9CEA5F2CE61BBC004166DE /* CustomSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSlider.swift; sourceTree = "<group>"; };
 		6BA24C932C81A0F00089CECE /* ClimbingDeatilGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDeatilGymVC.swift; sourceTree = "<group>"; };
 		6BA24C952C846F1B0089CECE /* ClimbingDetailGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingDetailGymVM.swift; sourceTree = "<group>"; };
-		6BA5EB822CFEF38E00F247FB /* CommentDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CommentDataSource.swift; path = ../../../../../../../../CommentDataSource.swift; sourceTree = "<group>"; };
+		6BA5EB822CFEF38E00F247FB /* CommentDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentDataSource.swift; sourceTree = "<group>"; };
 		6BA5EB8A2CFEFD0B00F247FB /* UploadPostRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPostRepository.swift; sourceTree = "<group>"; };
 		6BA5EB8C2CFEFD4100F247FB /* UploadPostRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPostRepositoryImpl.swift; sourceTree = "<group>"; };
 		6BA5EB8E2CFEFDD300F247FB /* LikePostRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikePostRepository.swift; sourceTree = "<group>"; };
@@ -282,6 +297,11 @@
 		911E1F5E2CF70463007B9A52 /* UserUpdateDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserUpdateDataSource.swift; sourceTree = "<group>"; };
 		911E1F622CF71B4F007B9A52 /* PostDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDataSource.swift; sourceTree = "<group>"; };
 		912613282CD8FE1300CD5E74 /* CommentVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = CommentVM.swift; sourceTree = "<group>"; tabWidth = 4; };
+		915E73042D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoLoginRepositoryImpl.swift; sourceTree = "<group>"; };
+		915E73062D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleLoginRepositoryImpl.swift; sourceTree = "<group>"; };
+		915F0F9A2D01433700CCCB24 /* GoogleLoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleLoginRepository.swift; sourceTree = "<group>"; };
+		915F0F9C2D01435400CCCB24 /* KakaoLoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoLoginRepository.swift; sourceTree = "<group>"; };
+		915F0F9E2D01438600CCCB24 /* AppleLoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleLoginRepository.swift; sourceTree = "<group>"; };
 		916D64CF2C848A540064B766 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		916D64D22C848BE00064B766 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
 		917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeClimbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -298,6 +318,12 @@
 		91AF25602C8C15FC002283BD /* Enumeration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enumeration.swift; sourceTree = "<group>"; };
 		91AF25622C8D771A002283BD /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
 		91BFA9322C91962F0044D5AD /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
+		91CE121B2CFFF9E900BCC82E /* AppleLoginDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppleLoginDataSource.swift; sourceTree = "<group>"; };
+		91CE121C2CFFF9E900BCC82E /* AppleLoginDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppleLoginDelegate.swift; sourceTree = "<group>"; };
+		91CE121E2CFFF9E900BCC82E /* GoogleLoginDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoogleLoginDataSource.swift; sourceTree = "<group>"; };
+		91CE121F2CFFF9E900BCC82E /* KakaoLoginDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KakaoLoginDataSource.swift; sourceTree = "<group>"; };
+		91CE12202CFFF9E900BCC82E /* LoginFirebaseDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginFirebaseDataSource.swift; sourceTree = "<group>"; };
+		91CE12272CFFFA1500BCC82E /* GoogleLoginRepositoryImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoogleLoginRepositoryImpl.swift; sourceTree = "<group>"; };
 		91DC7D232CE0C721004CB66D /* GradeNamespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeNamespace.swift; sourceTree = "<group>"; };
 		91E21D102CE20017003269DD /* Hold.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hold.swift; sourceTree = "<group>"; };
 		91F566CD2CDB566700485F79 /* CommentCellVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentCellVM.swift; sourceTree = "<group>"; };
@@ -386,7 +412,6 @@
 				434227722CF97C9C003523EF /* LogoutUseCase.swift */,
 				434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */,
 				434227742CF984C9003523EF /* WebPageOpenUseCase.swift */,
-				4342277A2CFD7E6D003523EF /* ReAuthUseCase.swift */,
 			);
 			path = UseCase;
 			sourceTree = "<group>";
@@ -1116,6 +1141,7 @@
 		6B9402082CFD5C1700F1DC2D /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
+				915F0F992D01430C00CCCB24 /* Login */,
 				6B87F97F2CFEEC58005905EA /* FeedSub */,
 				6B87F97E2CFEEC53005905EA /* Gym */,
 				6B87F97D2CFEEC4E005905EA /* Post */,
@@ -1127,6 +1153,7 @@
 		6B9402092CFD5C2F00F1DC2D /* Repository */ = {
 			isa = PBXGroup;
 			children = (
+				91CE12282CFFFA1500BCC82E /* Login */,
 				6B87F97A2CFEEBD8005905EA /* FeedSub */,
 				6B87F9792CFEEBD2005905EA /* Gym */,
 				6B87F9782CFEEBCC005905EA /* Post */,
@@ -1247,6 +1274,7 @@
 		911E1F542CF6DCDA007B9A52 /* DataSource */ = {
 			isa = PBXGroup;
 			children = (
+				91CE12212CFFF9E900BCC82E /* Login */,
 				6B87F9762CFEEBAB005905EA /* Upload */,
 				6B87F9752CFEEB97005905EA /* Firebase */,
 				6B87F9742CFEEB8A005905EA /* FeedSub */,
@@ -1255,6 +1283,17 @@
 				6B87F9712CFEEAEC005905EA /* User */,
 			);
 			path = DataSource;
+			sourceTree = "<group>";
+		};
+		915F0F992D01430C00CCCB24 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				915F0F9A2D01433700CCCB24 /* GoogleLoginRepository.swift */,
+				434227882D01A658003523EF /* LoginRepository.swift */,
+				915F0F9C2D01435400CCCB24 /* KakaoLoginRepository.swift */,
+				915F0F9E2D01438600CCCB24 /* AppleLoginRepository.swift */,
+			);
+			path = Login;
 			sourceTree = "<group>";
 		};
 		917DA8952CD4AE13006FF6B9 /* WeClimbTests */ = {
@@ -1277,6 +1316,38 @@
 				6BC91FB22C7F016A00B34083 /* Config.xcconfig */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		91CE121D2CFFF9E900BCC82E /* AppleLogin */ = {
+			isa = PBXGroup;
+			children = (
+				91CE121B2CFFF9E900BCC82E /* AppleLoginDataSource.swift */,
+				91CE121C2CFFF9E900BCC82E /* AppleLoginDelegate.swift */,
+			);
+			path = AppleLogin;
+			sourceTree = "<group>";
+		};
+		91CE12212CFFF9E900BCC82E /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				91CE121D2CFFF9E900BCC82E /* AppleLogin */,
+				91CE121E2CFFF9E900BCC82E /* GoogleLoginDataSource.swift */,
+				91CE121F2CFFF9E900BCC82E /* KakaoLoginDataSource.swift */,
+				434227862D01A545003523EF /* LoginTypeDataSource.swift */,
+				91CE12202CFFF9E900BCC82E /* LoginFirebaseDataSource.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		91CE12282CFFFA1500BCC82E /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				91CE12272CFFFA1500BCC82E /* GoogleLoginRepositoryImpl.swift */,
+				915E73042D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift */,
+				915E73062D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift */,
+				4342278A2D01A683003523EF /* LoginRepositoryImpl.swift */,
+			);
+			path = Login;
 			sourceTree = "<group>";
 		};
 		F4892BDA2C7C237700C5FF16 = {
@@ -1480,11 +1551,13 @@
 				435B7E422C8024AB00EB9816 /* EditPageVC.swift in Sources */,
 				6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */,
 				6B9402232CFD776E00F1DC2D /* GymRepositoryImpl.swift in Sources */,
+				91CE12262CFFF9E900BCC82E /* LoginFirebaseDataSource.swift in Sources */,
 				6B94021F2CFD775E00F1DC2D /* PostRepositoryImpl.swift in Sources */,
 				6BA5EB972CFF007D00F247FB /* MainFeedRepositoryImpl.swift in Sources */,
 				6BA5EB8F2CFEFDD300F247FB /* LikePostRepository.swift in Sources */,
 				6B9CEA5C2CE20188004166DE /* ClimbingFilterVM.swift in Sources */,
 				F4892C2F2C7D9EA700C5FF16 /* UploadNameSpace.swift in Sources */,
+				915E73072D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift in Sources */,
 				C4E29C1D2C898AFB0076BCA6 /* SFMainFeedVC.swift in Sources */,
 				F4892C2B2C7CCDF200C5FF16 /* Identifiers.swift in Sources */,
 				6BA5EBA22D003E8400F247FB /* DataError.swift in Sources */,
@@ -1494,6 +1567,7 @@
 				43A79AE02C85BB7E00B960A2 /* SettingVM.swift in Sources */,
 				6B9033402C89DB1B0012D955 /* PersonalDetailsVC.swift in Sources */,
 				C49FC7092C9F1B0E00CD66D9 /* EditNickNameVC.swift in Sources */,
+				915E73052D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift in Sources */,
 				F4892C162C7C981000C5FF16 /* LoginVC.swift in Sources */,
 				6B7F76972CA4A1C300B05B3F /* BlackListCell.swift in Sources */,
 				43A79AE22C85BD3B00B960A2 /* SettingModel.swift in Sources */,
@@ -1501,6 +1575,7 @@
 				C49FC70B2CA1535C00CD66D9 /* EditPersonalDetailsVC.swift in Sources */,
 				43A79ADA2C85930A00B960A2 /* ProfileImagePickerVC.swift in Sources */,
 				6BA24C962C846F1B0089CECE /* ClimbingDetailGymVM.swift in Sources */,
+				915F0F9B2D01433700CCCB24 /* GoogleLoginRepository.swift in Sources */,
 				436AEAEA2C7DCD1100E0D85A /* MyPageCell.swift in Sources */,
 				F4892C3F2C8013CF00C5FF16 /* UploadOptionView.swift in Sources */,
 				918D2A3C2CFD8A9400F54716 /* PostFilterDataSource.swift in Sources */,
@@ -1516,6 +1591,7 @@
 				C47A0AFA2C8AF1A60068173A /* CommentModalVC.swift in Sources */,
 				43E883532CA27BFE00EF7469 /* Alert.swift in Sources */,
 				43A79AE62C86CEFE00B960A2 /* SettingNameSpace.swift in Sources */,
+				91CE12252CFFF9E900BCC82E /* KakaoLoginDataSource.swift in Sources */,
 				F4892C3E2C7EFD4700C5FF16 /* UploadVC.swift in Sources */,
 				6B9402172CFD760F00F1DC2D /* CommentRepository.swift in Sources */,
 				6B94020D2CFD75B500F1DC2D /* UserUpdateRepository.swift in Sources */,
@@ -1528,7 +1604,6 @@
 				6B94020B2CFD758E00F1DC2D /* UserReadRepository.swift in Sources */,
 				6B9402212CFD776600F1DC2D /* UserBlockRepositoryImpl.swift in Sources */,
 				F4892C1A2C7C984A00C5FF16 /* SearchVC.swift in Sources */,
-				6BA5EB832CFEF38E00F247FB /* CommentDataSource.swift in Sources */,
 				43A79ACA2C81717500B960A2 /* EditPageCell.swift in Sources */,
 				6B9402192CFD772600F1DC2D /* UserReadRepositoryImpl.swift in Sources */,
 				C4D47EF82CC2408B00E451C4 /* LikeVM.swift in Sources */,
@@ -1538,6 +1613,7 @@
 				C4E29C1F2C898DC80076BCA6 /* SFCollectionViewCell.swift in Sources */,
 				436AEAE02C7D69CB00E0D85A /* GymTableViewCell.swift in Sources */,
 				6BA5EB992CFF008300F247FB /* MainFeedRepository.swift in Sources */,
+				91CE12222CFFF9E900BCC82E /* AppleLoginDataSource.swift in Sources */,
 				6B8F38C72C894BC50018C40D /* CreateNickNameVC.swift in Sources */,
 				C4E29C172C806F170076BCA6 /* MainFeedVM.swift in Sources */,
 				6B87F9322CFD9D85005905EA /* ImageDataRepository.swift in Sources */,
@@ -1558,12 +1634,15 @@
 				6BA5EB952CFF006E00F247FB /* PostFilterRepositoryImpl.swift in Sources */,
 				6B87F9452CFED839005905EA /* UIViewController+Extension.swift in Sources */,
 				43A79AD62C853EC100B960A2 /* EditModel.swift in Sources */,
+				915E73032D003CEF000E6EE6 /* CommentDataSource.swift in Sources */,
 				91F566CE2CDB566700485F79 /* CommentCellVM.swift in Sources */,
+				915F0F9F2D01438600CCCB24 /* AppleLoginRepository.swift in Sources */,
+				91CE12292CFFFA1500BCC82E /* GoogleLoginRepositoryImpl.swift in Sources */,
+				91CE12242CFFF9E900BCC82E /* GoogleLoginDataSource.swift in Sources */,
 				436AEAF02C7EE63C00E0D85A /* SearchNameSpace.swift in Sources */,
 				C40397B72C7CB4CC00923777 /* Extension.swift in Sources */,
 				43A79AE42C85C3B800B960A2 /* SettingCell.swift in Sources */,
 				911E1F5B2CF6E97B007B9A52 /* FirestoreHelper.swift in Sources */,
-				4342277B2CFD7E6D003523EF /* ReAuthUseCase.swift in Sources */,
 				43A79AD82C85481300B960A2 /* DetailEditVM.swift in Sources */,
 				6B9402032CF986C900F1DC2D /* UserDeleteDataSource.swift in Sources */,
 				435A1EB82CE262210076D9A0 /* SelectGymVC.swift in Sources */,
@@ -1575,12 +1654,15 @@
 				6BA5EB8B2CFEFD0B00F247FB /* UploadPostRepository.swift in Sources */,
 				91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */,
 				911E1F5D2CF6F63B007B9A52 /* UserReadDataSource.swift in Sources */,
+				434227872D01A545003523EF /* LoginTypeDataSource.swift in Sources */,
 				F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */,
 				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
 				6BA5EB9C2D003CE800F247FB /* DomainError.swift in Sources */,
+				4342278B2D01A683003523EF /* LoginRepositoryImpl.swift in Sources */,
 				6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */,
 				916D64D02C848A540064B766 /* FeedView.swift in Sources */,
 				6BA5EB9F2D003D8500F247FB /* FeaturesError.swift in Sources */,
+				915F0F9D2D01435400CCCB24 /* KakaoLoginRepository.swift in Sources */,
 				6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */,
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
 				6B9402252CFD777800F1DC2D /* CommentRepositoryImpl.swift in Sources */,
@@ -1589,6 +1671,8 @@
 				C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */,
 				43A0E72A2CE3888800F15682 /* UploadHeaderView.swift in Sources */,
 				91FF42CC2CC5F37C003D9279 /* SNSAuthVM.swift in Sources */,
+				434227892D01A658003523EF /* LoginRepository.swift in Sources */,
+				91CE12232CFFF9E900BCC82E /* AppleLoginDelegate.swift in Sources */,
 				91A717002CEA0D25007F825C /* LoginNeeded.swift in Sources */,
 				6B7F76992CA4A8E900B05B3F /* BlackListVM.swift in Sources */,
 				C47A0B012C9115760068173A /* CommentCell.swift in Sources */,
@@ -1809,7 +1893,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.0;
+				CURRENT_PROJECT_VERSION = 1.0.4;
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1827,7 +1911,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.4;
 				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1851,7 +1935,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.0;
+				CURRENT_PROJECT_VERSION = 1.0.4;
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1869,7 +1953,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.4;
 				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";

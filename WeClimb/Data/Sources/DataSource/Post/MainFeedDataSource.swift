@@ -22,20 +22,18 @@ class MainFeedDataSourceImpl: MainFeedDataSource {
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
     func getFeed(user: User?) -> Single<[Post]> {
-        return Single.create { [weak self] single in
+        return Single<Query>.create { [weak self] single in
             guard let self else {
                 single(.failure(CommonError.selfNil))
                 return Disposables.create()
             }
-            var postRef = self.getPostRef(user: user)
-            self.getPost(postRef: postRef)
-                .subscribe(onSuccess: { posts in
-                    single(.success(posts))
-                }, onFailure: { error in
-                    single(.failure(error))
-                })
-                .disposed(by: self.disposeBag)
+            let postRef = self.getPostRef(user: user)
+            single(.success(postRef))
             return Disposables.create()
+        }
+        .flatMap { [weak self] query in
+            guard let self else { return .error(CommonError.selfNil) }
+            return self.getPost(postRef: query)
         }
     }
     
