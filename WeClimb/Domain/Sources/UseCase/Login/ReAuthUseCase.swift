@@ -19,6 +19,12 @@ struct ReAuthUseCaseImpl: ReAuthUseCase {
         self.reAuthRepository = reAuthRepository
     }
 
+    
+    /// 재인증
+    /// - Parameters:
+    ///   - loginType: 로그인타입
+    ///   - presentProvider: 구글 로그인일 시에만
+    /// - Returns: 컴플리터블
     func execute(loginType: LoginType, presentProvider: PresenterProvider?) -> Completable {
         switch loginType {
         case .google:
