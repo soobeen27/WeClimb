@@ -295,17 +295,17 @@ class MyPageVC: UIViewController {
     }
     
     @objc private func rightBarButtonTapped() {
-        let loginTypeDataSource = LoginTypeDataSourceImpl()
-
+        
+        let currentUserDataSource = currentUserDataSourceImpl()
+        let loginTypeRepository = LoginTypeRepositoryImpl(currentUserDataSource: currentUserDataSource)
+        
         let settingViewModel = SettingViewModelImpl(
             logoutUseCase: LogoutUseCaseImpl(),
             deleteUserUseCase: DeleteAccountUseCaseImpl(),
-//            reAuthUseCase: ReAuthUseCaseImpl(),
             webNavigationUseCase: WebPageOpenUseCaseImpl(),
-            loginRepository: LoginRepositoryImpl(loginTypeDataSource: loginTypeDataSource)
+            loginTypeUseCase: LoginTypeUseCaseImpl(loginTypeRepository: loginTypeRepository)
         )
         
-
         let settingsVC = SettingVC(viewModel: settingViewModel)
         navigationController?.pushViewController(settingsVC, animated: true)
     }

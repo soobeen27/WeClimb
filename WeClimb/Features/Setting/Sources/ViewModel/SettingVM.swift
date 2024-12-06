@@ -17,12 +17,8 @@ protocol SettingViewModel {
     var error: Observable<String> { get }
     
     func triggerLogout()
-    var navigateToLogin: Observable<Void> { get }
     
     func triggerAccountDeletion()
-    var accountDeletionResult: Observable<Bool> { get }
-    
-    var requestReAuth: Observable<Void> { get }
 }
 
 enum SettingAction {
@@ -40,7 +36,7 @@ final class SettingViewModelImpl: SettingViewModel {
     private let logoutUseCase: LogoutUseCase
     private let deleteUserUseCase: DeleteAccountUseCase
     private let webNavigationUseCase: WebPageOpenUseCase
-    private let loginRepository: LoginRepository
+    private let loginTypeUseCase: LoginTypeUseCase
     
     private let disposeBag = DisposeBag()
     private let errorRelay = PublishRelay<String>()
@@ -76,27 +72,36 @@ final class SettingViewModelImpl: SettingViewModel {
         logoutUseCase: LogoutUseCase,
         deleteUserUseCase: DeleteAccountUseCase,
         webNavigationUseCase: WebPageOpenUseCase,
-        loginRepository: LoginRepository
+        loginTypeUseCase: LoginTypeUseCase
     ) {
         self.logoutUseCase = logoutUseCase
         self.deleteUserUseCase = deleteUserUseCase
         self.webNavigationUseCase = webNavigationUseCase
-        self.loginRepository = loginRepository
+        self.loginTypeUseCase = loginTypeUseCase
     }
     
     struct Input {
-        let cellSelection: Observable<String>
+        let cellSelection: Observable<IndexPath>
     }
     
     struct Output {
+        let cellData: Observable<[SettingItem]>
+        
         let action: Observable<SettingAction>
         let error: Observable<String>
+        
+        let navigateToLogin: Observable<Void>
+        
+        let requestReAuth: Observable<Void>
+        let accountDeletionResult: Observable<Bool>
     }
     
     func transform(input: Input) -> Output {
         let action = input.cellSelection
-            .flatMap { [weak self] title -> Observable<SettingAction> in
+            .flatMap { [weak self] indexPath -> Observable<SettingAction> in
                 guard let self = self else { return .just(.logout) }
+                
+                let title = self.datas[indexPath.section].titles[indexPath.row]
                 
                 switch title {
                 case SettingNameSpace.termsOfService:
@@ -127,7 +132,7 @@ final class SettingViewModelImpl: SettingViewModel {
                 return .just(.logout)
             }
         
-        return Output(action: action, error: showAlertSubject.asObservable())
+        return Output(cellData: Observable.just(datas), action: action, error: showAlertSubject.asObservable(), navigateToLogin: navigateToLogin, requestReAuth: requestReAuth, accountDeletionResult: accountDeletionResult)
     }
     
     internal func triggerLogout() {
@@ -141,15 +146,21 @@ final class SettingViewModelImpl: SettingViewModel {
     }
     
     internal func triggerAccountDeletion() {
-        let loginType = loginRepository.getLoginType()
-        
-        if loginType == .apple {
-            self.requestReAuthSubject.onNext(())
-        } else {
-            deleteUserUseCase.execute { [weak self] success in
-                self?.handleAccountDeletionResult(success)
-            }
-        }
+        loginTypeUseCase.execute()
+            .subscribe(onNext: { [weak self] loginType in
+                guard let self = self else { return }
+                
+                if loginType == .apple {
+                    self.requestReAuthSubject.onNext(())
+                } else {
+                    self.deleteUserUseCase.execute { success in
+                        self.handleAccountDeletionResult(success)
+                    }
+                }
+            }, onError: { error in
+                print("Error: \(error.localizedDescription)")
+            })
+            .disposed(by: disposeBag)
     }
     
     private func handleAccountDeletionResult(_ success: Bool) {
@@ -166,4 +177,3 @@ final class SettingViewModelImpl: SettingViewModel {
         showAlertSubject.onNext("An error occurred: \(error.localizedDescription)")
     }
 }
-
