@@ -11,6 +11,6 @@ import RxSwift
 import Firebase
 
 protocol UserUpdateRepository {
-    func updateUser<T>(with data: T, for field: UserUpdate, userRef: DocumentReference) -> Completable
-    func uploadProfileImageToStorage(imageURL: URL, userUID: String) -> Single<URL>
+    func updateUser<T>(with data: T, for field: UserUpdate) -> Completable
+    func uploadProfileImageToStorage(imageURL: URL) -> Single<URL>
 }

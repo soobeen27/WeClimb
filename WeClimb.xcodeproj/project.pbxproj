@@ -93,6 +93,7 @@
 		6BA5EB9C2D003CE800F247FB /* DomainError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB9B2D003CE800F247FB /* DomainError.swift */; };
 		6BA5EB9F2D003D8500F247FB /* FeaturesError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB9E2D003D8500F247FB /* FeaturesError.swift */; };
 		6BA5EBA22D003E8400F247FB /* DataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EBA12D003E8400F247FB /* DataError.swift */; };
+		6BA5EBA52D02CDAF00F247FB /* SNSAgreeUsecase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EBA42D02CDAF00F247FB /* SNSAgreeUsecase.swift */; };
 		6BC91F932C7CC81400B34083 /* DifficultyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F922C7CC81400B34083 /* DifficultyTableViewCell.swift */; };
 		6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */; };
 		6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F972C7EEA3F00B34083 /* GoogleSignIn */; };
@@ -286,6 +287,7 @@
 		6BA5EB9B2D003CE800F247FB /* DomainError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainError.swift; sourceTree = "<group>"; };
 		6BA5EB9E2D003D8500F247FB /* FeaturesError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturesError.swift; sourceTree = "<group>"; };
 		6BA5EBA12D003E8400F247FB /* DataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataError.swift; sourceTree = "<group>"; };
+		6BA5EBA42D02CDAF00F247FB /* SNSAgreeUsecase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SNSAgreeUsecase.swift; sourceTree = "<group>"; };
 		6BC91F922C7CC81400B34083 /* DifficultyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyTableViewCell.swift; sourceTree = "<group>"; };
 		6BC91F942C7CCE3A00B34083 /* ClimbingGymVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGymVM.swift; sourceTree = "<group>"; };
 		6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -409,6 +411,7 @@
 		434227702CF979D9003523EF /* UseCase */ = {
 			isa = PBXGroup;
 			children = (
+				6BA5EBA32D02CD3A00F247FB /* User */,
 				434227722CF97C9C003523EF /* LogoutUseCase.swift */,
 				434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */,
 				434227742CF984C9003523EF /* WebPageOpenUseCase.swift */,
@@ -1241,6 +1244,14 @@
 			path = Error;
 			sourceTree = "<group>";
 		};
+		6BA5EBA32D02CD3A00F247FB /* User */ = {
+			isa = PBXGroup;
+			children = (
+				6BA5EBA42D02CDAF00F247FB /* SNSAgreeUsecase.swift */,
+			);
+			path = User;
+			sourceTree = "<group>";
+		};
 		911E1F512CF6DB63007B9A52 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
@@ -1611,6 +1622,7 @@
 				C468976C2CE766F400334F98 /* profileImageFullScreen.swift in Sources */,
 				911E1F5F2CF70463007B9A52 /* UserUpdateDataSource.swift in Sources */,
 				C4E29C1F2C898DC80076BCA6 /* SFCollectionViewCell.swift in Sources */,
+				6BA5EBA52D02CDAF00F247FB /* SNSAgreeUsecase.swift in Sources */,
 				436AEAE02C7D69CB00E0D85A /* GymTableViewCell.swift in Sources */,
 				6BA5EB992CFF008300F247FB /* MainFeedRepository.swift in Sources */,
 				91CE12222CFFF9E900BCC82E /* AppleLoginDataSource.swift in Sources */,

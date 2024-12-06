@@ -8,7 +8,6 @@
 import Foundation
 
 import RxSwift
-import Firebase
 
 final class UserUpdateRepositoryImpl: UserUpdateRepository {
     private let userUpdateDataSource: UserUpdateDataSource
@@ -17,11 +16,11 @@ final class UserUpdateRepositoryImpl: UserUpdateRepository {
         self.userUpdateDataSource = userUpdateDataSource
     }
     
-    func updateUser<T>(with data: T, for field: UserUpdate, userRef: DocumentReference) -> Completable {
-        return userUpdateDataSource.updateUser(with: data, for: field, userRef: userRef)
+    func updateUser<T>(with data: T, for field: UserUpdate) -> Completable {
+        return userUpdateDataSource.updateUser(with: data, for: field)
     }
     
-    func uploadProfileImageToStorage(imageURL: URL, userUID: String) -> Single<URL> {
-        return userUpdateDataSource.uploadProfileImageToStorage(imageURL: imageURL, userUID: userUID)
+    func uploadProfileImageToStorage(imageURL: URL) -> Single<URL> {
+        return userUpdateDataSource.uploadProfileImageToStorage(imageURL: imageURL)
     }
 }
