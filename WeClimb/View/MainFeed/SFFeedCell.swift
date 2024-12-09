@@ -176,7 +176,8 @@ class SFFeedCell: UICollectionViewCell {
             guard let self = self else { return }
             CATransaction.begin()
             CATransaction.setDisableActions(true)
-            if width >= height {
+            if ratio < 1.4 {
+//            if width >= height {
                 self.playerLayer?.videoGravity = .resizeAspect
             } else {
                 self.playerLayer?.videoGravity = .resizeAspectFill
