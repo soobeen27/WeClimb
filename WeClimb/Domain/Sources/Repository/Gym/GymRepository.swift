@@ -10,6 +10,6 @@ import Foundation
 import RxSwift
 
 protocol GymRepository {
-    func allGymName() -> Single<[String]>
-    func gymInfo(from name: String, completion: @escaping (Gym?) -> Void)
+    func gymInfo(gymName: String) -> Single<Gym>
+    func allGymInfo() -> Single<[Gym]>
 }

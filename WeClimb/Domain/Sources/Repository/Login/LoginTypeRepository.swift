@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol LoginRepository {
+protocol LoginTypeRepository {
     func getLoginType() -> LoginType
 }

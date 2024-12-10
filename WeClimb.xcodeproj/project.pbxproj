@@ -11,8 +11,9 @@
 		434227752CF984C9003523EF /* WebPageOpenUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227742CF984C9003523EF /* WebPageOpenUseCase.swift */; };
 		434227772CF98D5D003523EF /* DeleteAccountUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */; };
 		434227792CF99746003523EF /* SettingVMBefore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227782CF99746003523EF /* SettingVMBefore.swift */; };
-		434227872D01A545003523EF /* LoginTypeDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227862D01A545003523EF /* LoginTypeDataSource.swift */; };
-		4342278B2D01A683003523EF /* LoginRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4342278A2D01A683003523EF /* LoginRepositoryImpl.swift */; };
+		434227872D01A545003523EF /* CurrentUserDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227862D01A545003523EF /* CurrentUserDataSource.swift */; };
+		4342278B2D01A683003523EF /* LoginTypeRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4342278A2D01A683003523EF /* LoginTypeRepositoryImpl.swift */; };
+		434227912D02DE9C003523EF /* LoginTypeUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434227902D02DE9C003523EF /* LoginTypeUseCase.swift */; };
 		435A1EB82CE262210076D9A0 /* SelectGymVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB72CE262210076D9A0 /* SelectGymVC.swift */; };
 		435A1EBA2CE262460076D9A0 /* SelectSettingModalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */; };
 		435A1EBC2CE262670076D9A0 /* SelectSettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */; };
@@ -115,6 +116,7 @@
 		911E1F632CF71B4F007B9A52 /* PostDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911E1F622CF71B4F007B9A52 /* PostDataSource.swift */; };
 		912613292CD8FE1300CD5E74 /* CommentVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912613282CD8FE1300CD5E74 /* CommentVM.swift */; };
 		913ED6262D02D7AD00F3ED1E /* ReAuthUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913ED6252D02D7AD00F3ED1E /* ReAuthUseCase.swift */; };
+		913ED6282D02E96D00F3ED1E /* UserSearchDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913ED6272D02E96D00F3ED1E /* UserSearchDataSource.swift */; };
 		915E73032D003CEF000E6EE6 /* CommentDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA5EB822CFEF38E00F247FB /* CommentDataSource.swift */; };
 		915E73052D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915E73042D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift */; };
 		915E73072D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915E73062D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift */; };
@@ -127,7 +129,7 @@
 		915F0FA82D01A00F00CCCB24 /* GoogleLoginUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0FA72D01A00F00CCCB24 /* GoogleLoginUseCase.swift */; };
 		915F0FAA2D01A74400CCCB24 /* AppleLoginUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0FA92D01A74400CCCB24 /* AppleLoginUseCase.swift */; };
 		915F0FAD2D01A79B00CCCB24 /* KakaoLoginUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0FAC2D01A79B00CCCB24 /* KakaoLoginUseCase.swift */; };
-		915F0FAF2D01ADBC00CCCB24 /* LoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0FAE2D01ADBC00CCCB24 /* LoginRepository.swift */; };
+		915F0FAF2D01ADBC00CCCB24 /* LoginTypeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0FAE2D01ADBC00CCCB24 /* LoginTypeRepository.swift */; };
 		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
 		917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */; };
@@ -212,8 +214,9 @@
 		434227742CF984C9003523EF /* WebPageOpenUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPageOpenUseCase.swift; sourceTree = "<group>"; };
 		434227762CF98D5D003523EF /* DeleteAccountUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountUseCase.swift; sourceTree = "<group>"; };
 		434227782CF99746003523EF /* SettingVMBefore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingVMBefore.swift; sourceTree = "<group>"; };
-		434227862D01A545003523EF /* LoginTypeDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTypeDataSource.swift; sourceTree = "<group>"; };
-		4342278A2D01A683003523EF /* LoginRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRepositoryImpl.swift; sourceTree = "<group>"; };
+		434227862D01A545003523EF /* CurrentUserDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentUserDataSource.swift; sourceTree = "<group>"; };
+		4342278A2D01A683003523EF /* LoginTypeRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTypeRepositoryImpl.swift; sourceTree = "<group>"; };
+		434227902D02DE9C003523EF /* LoginTypeUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTypeUseCase.swift; sourceTree = "<group>"; };
 		435A1EB72CE262210076D9A0 /* SelectGymVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGymVC.swift; sourceTree = "<group>"; };
 		435A1EB92CE262460076D9A0 /* SelectSettingModalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingModalVC.swift; sourceTree = "<group>"; };
 		435A1EBB2CE262670076D9A0 /* SelectSettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSettingCell.swift; sourceTree = "<group>"; };
@@ -306,6 +309,7 @@
 		911E1F622CF71B4F007B9A52 /* PostDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDataSource.swift; sourceTree = "<group>"; };
 		912613282CD8FE1300CD5E74 /* CommentVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = CommentVM.swift; sourceTree = "<group>"; tabWidth = 4; };
 		913ED6252D02D7AD00F3ED1E /* ReAuthUseCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReAuthUseCase.swift; sourceTree = "<group>"; };
+		913ED6272D02E96D00F3ED1E /* UserSearchDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSearchDataSource.swift; sourceTree = "<group>"; };
 		915E73042D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoLoginRepositoryImpl.swift; sourceTree = "<group>"; };
 		915E73062D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleLoginRepositoryImpl.swift; sourceTree = "<group>"; };
 		915F0F9A2D01433700CCCB24 /* GoogleLoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleLoginRepository.swift; sourceTree = "<group>"; };
@@ -317,7 +321,7 @@
 		915F0FA72D01A00F00CCCB24 /* GoogleLoginUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleLoginUseCase.swift; sourceTree = "<group>"; };
 		915F0FA92D01A74400CCCB24 /* AppleLoginUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleLoginUseCase.swift; sourceTree = "<group>"; };
 		915F0FAC2D01A79B00CCCB24 /* KakaoLoginUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoLoginUseCase.swift; sourceTree = "<group>"; };
-		915F0FAE2D01ADBC00CCCB24 /* LoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRepository.swift; sourceTree = "<group>"; };
+		915F0FAE2D01ADBC00CCCB24 /* LoginTypeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTypeRepository.swift; sourceTree = "<group>"; };
 		916D64CF2C848A540064B766 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		916D64D22C848BE00064B766 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
 		917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeClimbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -824,6 +828,7 @@
 				911E1F5E2CF70463007B9A52 /* UserUpdateDataSource.swift */,
 				6B9402022CF986C900F1DC2D /* UserDeleteDataSource.swift */,
 				919D056E2CF837E7004314AC /* UserBlockDataSource.swift */,
+				913ED6272D02E96D00F3ED1E /* UserSearchDataSource.swift */,
 			);
 			path = User;
 			sourceTree = "<group>";
@@ -1318,7 +1323,7 @@
 				915F0F9A2D01433700CCCB24 /* GoogleLoginRepository.swift */,
 				915F0F9C2D01435400CCCB24 /* KakaoLoginRepository.swift */,
 				915F0F9E2D01438600CCCB24 /* AppleLoginRepository.swift */,
-				915F0FAE2D01ADBC00CCCB24 /* LoginRepository.swift */,
+				915F0FAE2D01ADBC00CCCB24 /* LoginTypeRepository.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -1338,6 +1343,7 @@
 				915F0FA92D01A74400CCCB24 /* AppleLoginUseCase.swift */,
 				915F0FA72D01A00F00CCCB24 /* GoogleLoginUseCase.swift */,
 				915F0FAC2D01A79B00CCCB24 /* KakaoLoginUseCase.swift */,
+				434227902D02DE9C003523EF /* LoginTypeUseCase.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -1380,7 +1386,7 @@
 				91CE121D2CFFF9E900BCC82E /* AppleLogin */,
 				91CE121E2CFFF9E900BCC82E /* GoogleLoginDataSource.swift */,
 				91CE121F2CFFF9E900BCC82E /* KakaoLoginDataSource.swift */,
-				434227862D01A545003523EF /* LoginTypeDataSource.swift */,
+				434227862D01A545003523EF /* CurrentUserDataSource.swift */,
 				91CE12202CFFF9E900BCC82E /* LoginFirebaseDataSource.swift */,
 			);
 			path = Login;
@@ -1393,7 +1399,7 @@
 				915E73042D0045FA000E6EE6 /* KakaoLoginRepositoryImpl.swift */,
 				915E73062D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift */,
 				915F0FA32D019BCD00CCCB24 /* ReAuthRepositoryImpl.swift */,
-				4342278A2D01A683003523EF /* LoginRepositoryImpl.swift */,
+				4342278A2D01A683003523EF /* LoginTypeRepositoryImpl.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -1607,6 +1613,7 @@
 				6B9CEA5C2CE20188004166DE /* ClimbingFilterVM.swift in Sources */,
 				915F0FAD2D01A79B00CCCB24 /* KakaoLoginUseCase.swift in Sources */,
 				F4892C2F2C7D9EA700C5FF16 /* UploadNameSpace.swift in Sources */,
+				913ED6282D02E96D00F3ED1E /* UserSearchDataSource.swift in Sources */,
 				915E73072D0046F7000E6EE6 /* AppleLoginRepositoryImpl.swift in Sources */,
 				C4E29C1D2C898AFB0076BCA6 /* SFMainFeedVC.swift in Sources */,
 				F4892C2B2C7CCDF200C5FF16 /* Identifiers.swift in Sources */,
@@ -1672,9 +1679,10 @@
 				C4E29C172C806F170076BCA6 /* MainFeedVM.swift in Sources */,
 				6B87F9322CFD9D85005905EA /* ImageDataRepository.swift in Sources */,
 				915F0FA42D019BCD00CCCB24 /* ReAuthRepositoryImpl.swift in Sources */,
+				434227912D02DE9C003523EF /* LoginTypeUseCase.swift in Sources */,
 				C45DC9D52C80519100FC4C1D /* FeedModel.swift in Sources */,
 				6B87F9472CFED86E005905EA /* String+Extension.swift in Sources */,
-				915F0FAF2D01ADBC00CCCB24 /* LoginRepository.swift in Sources */,
+				915F0FAF2D01ADBC00CCCB24 /* LoginTypeRepository.swift in Sources */,
 				916D64D32C848BE00064B766 /* FeedCell.swift in Sources */,
 				434227752CF984C9003523EF /* WebPageOpenUseCase.swift in Sources */,
 				6BC91F952C7CCE3A00B34083 /* ClimbingGymVM.swift in Sources */,
@@ -1711,11 +1719,11 @@
 				6BA5EB8B2CFEFD0B00F247FB /* UploadPostRepository.swift in Sources */,
 				91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */,
 				911E1F5D2CF6F63B007B9A52 /* UserReadDataSource.swift in Sources */,
-				434227872D01A545003523EF /* LoginTypeDataSource.swift in Sources */,
+				434227872D01A545003523EF /* CurrentUserDataSource.swift in Sources */,
 				F4892BE92C7C237700C5FF16 /* SceneDelegate.swift in Sources */,
 				436AEAE22C7D69F000E0D85A /* SearchVM.swift in Sources */,
+				4342278B2D01A683003523EF /* LoginTypeRepositoryImpl.swift in Sources */,
 				6BA5EB9C2D003CE800F247FB /* DomainError.swift in Sources */,
-				4342278B2D01A683003523EF /* LoginRepositoryImpl.swift in Sources */,
 				6B8F38CD2C8989D10018C40D /* CreateNickNameVM.swift in Sources */,
 				916D64D02C848A540064B766 /* FeedView.swift in Sources */,
 				6BA5EB9F2D003D8500F247FB /* FeaturesError.swift in Sources */,
@@ -1949,7 +1957,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.4;
+				CURRENT_PROJECT_VERSION = 1.0.5;
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1967,7 +1975,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1991,7 +1999,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.4;
+				CURRENT_PROJECT_VERSION = 1.0.5;
 				DEVELOPMENT_TEAM = TBHH7W8T8K;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -2009,7 +2017,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				"OTHER_LDFLAGS[arch=*]" = "-objC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";

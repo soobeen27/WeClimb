@@ -797,6 +797,8 @@ extension UploadVC {
         
         self.viewModel.pageChanged = BehaviorRelay<Int>(value: 0)
         
+        self.viewModel.currentPageIndex = 0
+        
         self.viewModel.selectedGrade = BehaviorRelay<String?>(value: nil)
         self.viewModel.selectedHold = BehaviorRelay<Hold?>(value: nil)
         

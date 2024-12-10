@@ -21,11 +21,14 @@ class ReAuthDataSourceImpl: ReAuthDataSource {
                 completable(.error(UserStateError.nonmember))
                 return Disposables.create()
             }
+//            print("유저 정보: \(user.uid)")
             user.reauthenticate(with: credential) { result, error in
                 if let error = error {
+//                    print("에러발생")
                     return completable(.error(error))
                 }
                 completable(.completed)
+//                print("재인증 성공")
             }
             return Disposables.create()
         }
