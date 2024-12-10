@@ -10,71 +10,112 @@ import Firebase
 import RxSwift
 
 protocol GymDataSource {
-    func allGymName() -> Single<[String]>
-    func gymInfo(from name: String, completion: @escaping (Gym?) -> Void)
+    func gymInfo(gymName: String) -> Single<Gym>
+    func allGymInfo() -> Single<[Gym]>
 }
 
 class GymDataSourceImpl: GymDataSource {
     private let db = Firestore.firestore()
     
-    func allGymName() -> Single<[String]> {
+    func gymInfo(gymName: String) -> Single<Gym> {
         return Single.create { [weak self] single in
-            guard let self else { return Disposables.create() }
+            guard let self else {
+                single(.failure(CommonError.selfNil))
+                return Disposables.create()
+            }
+            self.db.collection("climbingGyms").document(gymName)
+                .getDocument { snapShot, error in
+                    if let error {
+                        single(.failure(error))
+                        return
+                    }
+                    guard let snapShot else {
+                        single(.failure(FirebaseError.documentNil))
+                        return
+                    }
+                    do {
+                        let gym = try self.gymDecode(document: snapShot)
+                        single(.success(gym))
+                    } catch {
+                        single(.failure(error))
+                    }
+                }
+            
+            return Disposables.create()
+        }
+    }
+
+    func allGymInfo() -> Single<[Gym]> {
+        return Single.create { [weak self] single in
+            guard let self else {
+                single(.failure(CommonError.selfNil))
+                return Disposables.create()
+            }
             self.db.collection("climbingGyms").getDocuments { snapshot, error in
-                if let error = error {
+                if let error {
                     single(.failure(error))
                     return
                 }
-                guard let documents = snapshot?.documents else {
-                    single(.failure(NetworkError.dataNil))
+                guard let snapshot else {
+                    single(.failure(FirebaseError.documentNil))
                     return
                 }
-                let documentNames = documents.map {
-                    $0.documentID
+                let gyms = snapshot.documents.compactMap { qDocument in
+                    return self.gymDecode(queryDocument: qDocument)
                 }
-                single(.success(documentNames))
+                single(.success(gyms))
             }
             return Disposables.create()
         }
     }
     
-    func gymInfo(from name: String, completion: @escaping (Gym?) -> Void) {
-        db.collection("climbingGyms")
-            .document(name)
-            .getDocument { document, error in
-                if let error = error {
-                    print("암장 정보 가져오기 에러: \(error)")
-                    completion(nil)
-                    return
-                }
-                guard let document = document, document.exists,
-                      let data = document.data()
-                else {
-                    print("정보없음")
-                    completion(nil)
-                    return
-                }
-                guard let address = data["address"] as? String,
-                      let grade = data["grade"] as? String,
-                      let gymName = data["gymName"] as? String,
-                      let sector = data["sector"] as? String,
-                      let profileImage = data["profileImage"] as? String
-                else {
-                    print("필수 정보 없음")
-                    completion(nil)
-                    return
-                }
-                var additionalInfo = data
-                additionalInfo.removeValue(forKey: "address")
-                additionalInfo.removeValue(forKey: "grade")
-                additionalInfo.removeValue(forKey: "gymName")
-                additionalInfo.removeValue(forKey: "sector")
-                additionalInfo.removeValue(forKey: "profileImage")
-                
-                completion(Gym(address: address, grade: grade,
-                               gymName: gymName, sector: sector,
-                               profileImage: profileImage, additionalInfo: additionalInfo))
-            }
+    private func gymDecode(queryDocument: QueryDocumentSnapshot) -> Gym? {
+        let data = queryDocument.data()
+        guard let address = data["address"] as? String,
+              let grade = data["grade"] as? String,
+              let gymName = data["gymName"] as? String,
+              let sector = data["sector"] as? String,
+              let profileImage = data["profileImage"] as? String
+        else {
+            return nil
+        }
+        var additionalInfo = data
+        additionalInfo.removeValue(forKey: "address")
+        additionalInfo.removeValue(forKey: "grade")
+        additionalInfo.removeValue(forKey: "gymName")
+        additionalInfo.removeValue(forKey: "sector")
+        additionalInfo.removeValue(forKey: "profileImage")
+        
+        return Gym(
+            address: address, grade: grade,
+            gymName: gymName, sector: sector,
+            profileImage: profileImage, additionalInfo: additionalInfo
+        )
     }
-
+    
+    private func gymDecode(document: DocumentSnapshot) throws -> Gym {
+        guard let data = document.data() else {
+            throw FirebaseError.documentNil
+        }
+        guard let address = data["address"] as? String,
+              let grade = data["grade"] as? String,
+              let gymName = data["gymName"] as? String,
+              let sector = data["sector"] as? String,
+              let profileImage = data["profileImage"] as? String
+        else {
+            throw FirebaseError.nonRequiredInfo
+        }
+        var additionalInfo = data
+        additionalInfo.removeValue(forKey: "address")
+        additionalInfo.removeValue(forKey: "grade")
+        additionalInfo.removeValue(forKey: "gymName")
+        additionalInfo.removeValue(forKey: "sector")
+        additionalInfo.removeValue(forKey: "profileImage")
+        
+        return Gym(
+            address: address, grade: grade,
+            gymName: gymName, sector: sector,
+            profileImage: profileImage, additionalInfo: additionalInfo
+        )
+    }
 }

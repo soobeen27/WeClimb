@@ -15,14 +15,11 @@ final class GymRepositoryImpl: GymRepository {
     init(gymDataSource: GymDataSource) {
         self.gymDataSource = gymDataSource
     }
-    
-    func allGymName() -> Single<[String]> {
-        return gymDataSource.allGymName()
+    func gymInfo(gymName: String) -> RxSwift.Single<Gym> {
+        return gymDataSource.gymInfo(gymName: gymName)
     }
     
-    func gymInfo(from name: String, completion: @escaping (Gym?) -> Void) {
-        return gymDataSource.gymInfo(from: name) { gym in
-            completion(gym)
-        }
+    func allGymInfo() -> RxSwift.Single<[Gym]> {
+        return gymDataSource.allGymInfo()
     }
 }
