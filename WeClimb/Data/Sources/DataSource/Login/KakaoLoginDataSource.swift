@@ -32,7 +32,7 @@ class KakaoLoginDataSourceImpl: KakaoLoginDataSource {
                         single(.failure(LoginError.invalidIDToken))
                         return
                     }
-                    let credential = OAuthProvider.credential(providerID: .custom("oidc.kakao"), accessToken: idToken)
+                    let credential = OAuthProvider.credential(providerID: .custom("oidc.kakao"), idToken: idToken, rawNonce: "", accessToken: nil)
                     single(.success(credential))
                 })
                 .disposed(by: self.disposeBag)
