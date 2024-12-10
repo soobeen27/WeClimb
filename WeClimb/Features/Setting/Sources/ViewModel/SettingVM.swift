@@ -13,12 +13,10 @@ protocol SettingViewModel {
     func transform(input: SettingViewModelImpl.Input) -> SettingViewModelImpl.Output
     
     var sectionData: Driver<[SettingItem]> { get }
-    
     var error: Observable<String> { get }
     
     func triggerLogout()
-    
-    func triggerAccountDeletion()
+    func triggerAccountDeletion(presentProvider: @escaping PresenterProvider)
 }
 
 enum SettingAction {
@@ -34,9 +32,10 @@ enum SettingAction {
 final class SettingViewModelImpl: SettingViewModel {
     
     private let logoutUseCase: LogoutUseCase
-    private let deleteUserUseCase: DeleteAccountUseCase
+    private let deleteAccountUseCase: DeleteAccountUseCase
     private let webNavigationUseCase: WebPageOpenUseCase
     private let loginTypeUseCase: LoginTypeUseCase
+    private let reAuthUseCase: ReAuthUseCase
     
     private let disposeBag = DisposeBag()
     private let errorRelay = PublishRelay<String>()
@@ -52,6 +51,7 @@ final class SettingViewModelImpl: SettingViewModel {
     private let showAlertSubject = PublishSubject<String>()
     private let requestReAuthSubject = PublishSubject<Void>()
     private let accountDeletionResultSubject = PublishSubject<Bool>()
+    private let requestGoogleLoginSubject = PublishSubject<Void>()
     
     var navigateToProfile: Observable<Void> { return navigateToProfileSubject.asObservable() }
     var navigateToBlackList: Observable<Void> { return navigateToBlackListSubject.asObservable() }
@@ -59,6 +59,7 @@ final class SettingViewModelImpl: SettingViewModel {
     var showAlert: Observable<String> { return showAlertSubject.asObservable() }
     var requestReAuth: Observable<Void> { return requestReAuthSubject.asObservable() }
     var accountDeletionResult: Observable<Bool> { return accountDeletionResultSubject.asObservable() }
+    var requestGoogleLogin: Observable<Void> { return requestGoogleLoginSubject.asObservable() }
     
     var sectionData: Driver<[SettingItem]> {
         return Observable.just(datas).asDriver(onErrorJustReturn: [])
@@ -72,12 +73,14 @@ final class SettingViewModelImpl: SettingViewModel {
         logoutUseCase: LogoutUseCase,
         deleteUserUseCase: DeleteAccountUseCase,
         webNavigationUseCase: WebPageOpenUseCase,
-        loginTypeUseCase: LoginTypeUseCase
+        loginTypeUseCase: LoginTypeUseCase,
+        reAuthUseCase:ReAuthUseCase
     ) {
         self.logoutUseCase = logoutUseCase
-        self.deleteUserUseCase = deleteUserUseCase
+        self.deleteAccountUseCase = deleteUserUseCase
         self.webNavigationUseCase = webNavigationUseCase
         self.loginTypeUseCase = loginTypeUseCase
+        self.reAuthUseCase = reAuthUseCase
     }
     
     struct Input {
@@ -94,6 +97,7 @@ final class SettingViewModelImpl: SettingViewModel {
         
         let requestReAuth: Observable<Void>
         let accountDeletionResult: Observable<Bool>
+        let requestGoogleLogin: Observable<Void>
     }
     
     func transform(input: Input) -> Output {
@@ -132,7 +136,7 @@ final class SettingViewModelImpl: SettingViewModel {
                 return .just(.logout)
             }
         
-        return Output(cellData: Observable.just(datas), action: action, error: showAlertSubject.asObservable(), navigateToLogin: navigateToLogin, requestReAuth: requestReAuth, accountDeletionResult: accountDeletionResult)
+        return Output(cellData: Observable.just(datas), action: action, error: showAlertSubject.asObservable(), navigateToLogin: navigateToLogin, requestReAuth: requestReAuth, accountDeletionResult: accountDeletionResult, requestGoogleLogin: requestGoogleLogin)
     }
     
     internal func triggerLogout() {
@@ -145,26 +149,60 @@ final class SettingViewModelImpl: SettingViewModel {
             .disposed(by: disposeBag)
     }
     
-    internal func triggerAccountDeletion() {
+    internal func triggerAccountDeletion(presentProvider: @escaping PresenterProvider) {
+        print("로그인 타입 가져오는 중...")
+        
         loginTypeUseCase.execute()
-            .subscribe(onNext: { [weak self] loginType in
-                guard let self = self else { return }
-                
-                if loginType == .apple {
-                    self.requestReAuthSubject.onNext(())
-                } else {
-                    self.deleteUserUseCase.execute { success in
-                        self.handleAccountDeletionResult(success)
-                    }
+            .flatMap { [weak self] loginType -> Completable in
+                guard let self = self else { return .error(FuncError.unknown) }
+
+                switch loginType {
+                case .google:
+                    print("Google 로그인 타입 선택됨")
+                    self.requestGoogleLoginSubject.onNext(())
+                    return self.reAuthUseCase.execute(loginType: .google, presentProvider: presentProvider)
+//                        .andThen(self.deleteAccountUseCase.execute())
+                        .catch { error in
+                            print("로그인 재인증 실패: \(error)")  // 에러 객체 자체 출력
+                            return .error(FuncError.unknown)
+                        }
+                case .apple:
+                    print("Apple 로그인 타입 선택됨")
+                    return self.reAuthUseCase.execute(loginType: .apple, presentProvider: nil)
+//                        .andThen(self.deleteAccountUseCase.execute())
+                        .catch { error in
+                            print("로그인 재인증 실패: \(error)")  // 에러 객체 자체 출력
+                            return .error(FuncError.unknown)
+                        }
+                case .kakao:
+                    print("Kakao 로그인 타입 선택됨")
+                    return self.reAuthUseCase.execute(loginType: .kakao, presentProvider: nil)
+//                        .andThen(self.deleteAccountUseCase.execute())
+                        .catch { error in
+                            print("로그인 재인증 실패: \(error)")  // 에러 객체 자체 출력
+                            return .error(FuncError.unknown)
+                        }
+                case .none:
+                    print("로그인 타입이 없음")
+                    return .error(FuncError.unknown)
                 }
-            }, onError: { error in
-                print("Error: \(error.localizedDescription)")
-            })
+            }
+            .subscribe(
+                onError: { [weak self] error in
+                    self?.handleAccountDeletionResult(false)
+                    print("Error 발생: \(error.localizedDescription)")
+                },
+                onCompleted: { [weak self] in
+                    print("계정 삭제 완료")
+                    self?.handleAccountDeletionResult(true)
+                    self?.navigateToLoginSubject.onNext(())
+                }
+            )
             .disposed(by: disposeBag)
     }
     
     private func handleAccountDeletionResult(_ success: Bool) {
-        accountDeletionResultSubject.onNext(success)
+//        accountDeletionResultSubject.onNext(success)
         
         if success {
             self.accountDeletionResultSubject.onNext(true)

@@ -298,16 +298,22 @@ class MyPageVC: UIViewController {
         
         let currentUserDataSource = currentUserDataSourceImpl()
         let loginTypeRepository = LoginTypeRepositoryImpl(currentUserDataSource: currentUserDataSource)
+        let reAuthDataSource = ReAuthDataSourceImpl()
+        let appleLoginDataSource = AppleLoginDataSourceImpl()
+        let googleLoginDataSource = GoogleLoginDataSourceImpl()
+        let kakaoLoginDataSource = KakaoLoginDataSourceImpl()
+        
+        let reAuthRepository = ReAuthRepositoryImpl(reAuthDataSource: reAuthDataSource, appleLoginDataSource: appleLoginDataSource, googleLoginDataSource: googleLoginDataSource, kakaoLoginDataSource: kakaoLoginDataSource)
         
         let settingViewModel = SettingViewModelImpl(
             logoutUseCase: LogoutUseCaseImpl(),
             deleteUserUseCase: DeleteAccountUseCaseImpl(),
             webNavigationUseCase: WebPageOpenUseCaseImpl(),
-            loginTypeUseCase: LoginTypeUseCaseImpl(loginTypeRepository: loginTypeRepository)
+            loginTypeUseCase: LoginTypeUseCaseImpl(loginTypeRepository: loginTypeRepository), reAuthUseCase: ReAuthUseCaseImpl(reAuthRepository: reAuthRepository)
         )
         
-        let settingsVC = SettingVC(viewModel: settingViewModel)
-        navigationController?.pushViewController(settingsVC, animated: true)
+        let settingVC = SettingVC(viewModel: settingViewModel)
+        navigationController?.pushViewController(settingVC, animated: true)
     }
     
     //MARK: - 레이아웃

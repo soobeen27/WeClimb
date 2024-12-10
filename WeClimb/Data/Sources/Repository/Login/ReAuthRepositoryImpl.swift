@@ -41,6 +41,7 @@ class ReAuthRepositoryImpl: ReAuthRepository {
     func reAuthKakao() -> Completable {
         kakaoLoginDataSource.kakaoLogin()
             .flatMapCompletable { [weak self] credential in
+//                print("카카오재인증 진행")
                 guard let self else { return .error(CommonError.selfNil) }
                 return self.reAuthDataSource.reAuthenticate(with: credential)
             }
