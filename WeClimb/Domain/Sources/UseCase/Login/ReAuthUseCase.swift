@@ -35,7 +35,7 @@ struct ReAuthUseCaseImpl: ReAuthUseCase {
         case .kakao:
             return reAuthRepository.reAuthKakao()
         case .none:
-            return .error(FuncError.unknown)
+            return .error(AppError.unknown)
         }
     }
 }

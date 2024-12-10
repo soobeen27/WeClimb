@@ -27,13 +27,10 @@ class PrivacyPolicyVM: PrivacyPolicyVMType {
     }
     
     struct Output {
-        let isAllAgreed: Observable<Bool>
-        let isAppTermsAgreed: Observable<Bool>
-        let isPrivacyTermsAgreed: Observable<Bool>
-        let isSnsConsentGiven: Observable<Bool>
-        let isConfirmEnabled: Observable<Bool>
+        let isAllTermsAgreed: Observable<Bool>
+        let isOptionalTermsAgreed: Observable<Bool>
     }
-    
+
     private let isAllAgreedRelay = BehaviorRelay<Bool>(value: false)
     private let isAppTermsAgreedRelay = BehaviorRelay<Bool>(value: false)
     private let isPrivacyTermsAgreedRelay = BehaviorRelay<Bool>(value: false)
@@ -84,13 +81,12 @@ class PrivacyPolicyVM: PrivacyPolicyVMType {
             .disposed(by: disposeBag)
         
         return Output(
-            isAllAgreed: isAllAgreedRelay.asObservable(),
-            isAppTermsAgreed: Observable.combineLatest(isAppTermsAgreedRelay, isPrivacyTermsAgreedRelay)
+            isAllTermsAgreed: Observable.combineLatest(isAllAgreedRelay, isPrivacyTermsAgreedRelay)
                 .map { $0 && $1 }
                 .distinctUntilChanged(),
-            isPrivacyTermsAgreed: isAppTermsAgreedRelay.asObservable(),
-            isSnsConsentGiven: isPrivacyTermsAgreedRelay.asObservable(),
-            isConfirmEnabled: isSnsConsentGivenRelay.asObservable()
+            isOptionalTermsAgreed: Observable.combineLatest(isAllAgreedRelay, isPrivacyTermsAgreedRelay, isSnsConsentGivenRelay)
+                .map { $0 && $1 && $2 }
+                .distinctUntilChanged()
         )
     }
 

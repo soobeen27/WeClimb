@@ -217,22 +217,6 @@ class PrivacyPolicyVC: UIViewController {
     }
     
     private func bindViewModel() {
-        bindInputs()
-        bindOutputs()
-    }
-    
-    private func bindInputs() {
-        let input = PrivacyPolicyVM.Input(
-            allTermsToggled: allAgreeCheckBox.rx.tap.asObservable(),
-            appTermsToggled: isAppTermsAgreedCheckBox.rx.tap.asObservable(),
-            privacyTermsToggled: isPrivacyTermsAgreedCheckBox.rx.tap.asObservable(),
-            snsConsentToggled: isSnsConsentGivenCheckBox.rx.tap.asObservable()
-        )
-        
-        _ = viewModel.transform(input: input)
-    }
-    
-    private func bindOutputs() {
         let output = viewModel.transform(input: PrivacyPolicyVM.Input(
             allTermsToggled: allAgreeCheckBox.rx.tap.asObservable(),
             appTermsToggled: isAppTermsAgreedCheckBox.rx.tap.asObservable(),
@@ -240,29 +224,15 @@ class PrivacyPolicyVC: UIViewController {
             snsConsentToggled: isSnsConsentGivenCheckBox.rx.tap.asObservable()
         ))
         
-        output.isAllAgreed
+        output.isAllTermsAgreed
             .bind(to: allAgreeCheckBox.rx.isSelected)
             .disposed(by: disposeBag)
         
-        output.isAppTermsAgreed
-            .bind(to: isAppTermsAgreedCheckBox.rx.isSelected)
-            .disposed(by: disposeBag)
-        
-        output.isPrivacyTermsAgreed
-            .bind(to: isPrivacyTermsAgreedCheckBox.rx.isSelected)
-            .disposed(by: disposeBag)
-        
-        output.isSnsConsentGiven
-            .bind(to: isSnsConsentGivenCheckBox.rx.isSelected)
-            .disposed(by: disposeBag)
-        
-        output.isConfirmEnabled
-            .map { $0 ? UIColor.systemBlue : UIColor.lightGray }
-            .bind(to: confirmButton.rx.backgroundColor)
-            .disposed(by: disposeBag)
-        
-        output.isConfirmEnabled
-            .bind(to: confirmButton.rx.isEnabled)
+        output.isOptionalTermsAgreed
+            .subscribe(onNext: { [weak self] isAgreed in
+                self?.confirmButton.isEnabled = isAgreed
+                self?.confirmButton.backgroundColor = isAgreed ? .mainPurple : .lightGray
+            })
             .disposed(by: disposeBag)
     }
 }

@@ -18,7 +18,7 @@ class ReAuthDataSourceImpl: ReAuthDataSource {
     func reAuthenticate(with credential: AuthCredential) -> Completable {
         return Completable.create { completable in
             guard let user = Auth.auth().currentUser else {
-                completable(.error(UserStateError.nonmeber))
+                completable(.error(UserStateError.nonmember))
                 return Disposables.create()
             }
             user.reauthenticate(with: credential) { result, error in
