@@ -7,11 +7,11 @@
 
 import FirebaseAuth
 
-protocol LoginTypeDataSource {
+protocol CurrentUserDataSource {
     var currentUser: FirebaseAuth.User? { get }
 }
 
-final class LoginTypeDataSourceImpl: LoginTypeDataSource {
+final class currentUserDataSourceImpl: CurrentUserDataSource {
     private let auth = Auth.auth()
     
     var currentUser: FirebaseAuth.User? {

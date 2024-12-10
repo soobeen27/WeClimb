@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct LoginRepositoryImpl: LoginRepository {
-    private let loginTypeDataSource: LoginTypeDataSource
+struct LoginTypeRepositoryImpl: LoginTypeRepository {
+    private let loginTypeDataSource: CurrentUserDataSource
     
-    init(loginTypeDataSource: LoginTypeDataSource) {
-        self.loginTypeDataSource = loginTypeDataSource
+    init(currentUserDataSource: CurrentUserDataSource) {
+        self.loginTypeDataSource = currentUserDataSource
     }
     
     func getLoginType() -> LoginType {
