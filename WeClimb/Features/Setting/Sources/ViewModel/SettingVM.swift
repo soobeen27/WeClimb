@@ -150,7 +150,6 @@ final class SettingViewModelImpl: SettingViewModel {
     }
     
     internal func triggerAccountDeletion(presentProvider: @escaping PresenterProvider) {
-        print("로그인 타입 가져오는 중...")
         
         loginTypeUseCase.execute()
             .flatMap { [weak self] loginType -> Completable in
@@ -158,28 +157,25 @@ final class SettingViewModelImpl: SettingViewModel {
 
                 switch loginType {
                 case .google:
-                    print("Google 로그인 타입 선택됨")
                     self.requestGoogleLoginSubject.onNext(())
                     return self.reAuthUseCase.execute(loginType: .google, presentProvider: presentProvider)
-//                        .andThen(self.deleteAccountUseCase.execute())
+                        .andThen(self.deleteAccountUseCase.execute())
                         .catch { error in
-                            print("로그인 재인증 실패: \(error)")  // 에러 객체 자체 출력
+                            print("로그인 재인증 실패: \(error)")
                             return .error(FuncError.unknown)
                         }
                 case .apple:
-                    print("Apple 로그인 타입 선택됨")
                     return self.reAuthUseCase.execute(loginType: .apple, presentProvider: nil)
-//                        .andThen(self.deleteAccountUseCase.execute())
+                        .andThen(self.deleteAccountUseCase.execute())
                         .catch { error in
-                            print("로그인 재인증 실패: \(error)")  // 에러 객체 자체 출력
+                            print("로그인 재인증 실패: \(error)")
                             return .error(FuncError.unknown)
                         }
                 case .kakao:
-                    print("Kakao 로그인 타입 선택됨")
                     return self.reAuthUseCase.execute(loginType: .kakao, presentProvider: nil)
-//                        .andThen(self.deleteAccountUseCase.execute())
+                        .andThen(self.deleteAccountUseCase.execute())
                         .catch { error in
-                            print("로그인 재인증 실패: \(error)")  // 에러 객체 자체 출력
+                            print("로그인 재인증 실패: \(error)")
                             return .error(FuncError.unknown)
                         }
                 case .none:
@@ -193,7 +189,6 @@ final class SettingViewModelImpl: SettingViewModel {
                     print("Error 발생: \(error.localizedDescription)")
                 },
                 onCompleted: { [weak self] in
-                    print("계정 삭제 완료")
                     self?.handleAccountDeletionResult(true)
                     self?.navigateToLoginSubject.onNext(())
                 }
@@ -202,7 +197,6 @@ final class SettingViewModelImpl: SettingViewModel {
     }
     
     private func handleAccountDeletionResult(_ success: Bool) {
-//        accountDeletionResultSubject.onNext(success)
         
         if success {
             self.accountDeletionResultSubject.onNext(true)

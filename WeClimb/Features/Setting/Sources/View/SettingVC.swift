@@ -57,8 +57,6 @@ class SettingVC: UIViewController {
         bindAction(output: output)
         bindError(output: output)
         bindNavigate(output: output)
-//        bindReAuth(output: output)
-//        bindGooglepresentProvider(output: output)
     }
     
     private func bindCellData(output: SettingViewModelImpl.Output) {
@@ -106,27 +104,6 @@ class SettingVC: UIViewController {
             })
             .disposed(by: disposeBag)
     }
-    
-//    private func bindReAuth(output: SettingViewModelImpl.Output) {
-//        output.requestReAuth
-//            .subscribe(onNext: { [weak self] in
-//                self?.startAppleReAuth()
-//            })
-//            .disposed(by: disposeBag)
-//    }
-    
-//    private func bindGooglepresentProvider(output: SettingViewModelImpl.Output) {
-//        output.requestGoogleLogin
-//            .subscribe(onNext: { [weak self] in
-//                guard let self = self else { return }
-//                
-//                let presentProvider: PresenterProvider = { return self }
-//                
-//                self.viewModel.triggerAccountDeletion(presentProvider: presentProvider)
-//            })
-//            .disposed(by: disposeBag)
-//    }
-
     
     private func navigateToProfile() {
         let editPageVC = EditPageVC()
@@ -206,10 +183,6 @@ class SettingVC: UIViewController {
         }
     }
     
-//    private func startAppleReAuth() {
-//        self.snsAuthVM.appleLogin(delegate: self, provider: self)
-//    }
-    
     private func setLayout() {
         view.backgroundColor = UIColor(named: "BackgroundColor") ?? .black
         view.addSubview(tableView)
@@ -259,53 +232,3 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
         return 40
     }
 }
-
-//// MARK: Apple Login ReAuth
-//extension SettingVC: ASAuthorizationControllerPresentationContextProviding {
-//    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-//        return self.view.window!
-//    }
-//}
-//
-//extension SettingVC: ASAuthorizationControllerDelegate {
-//    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-//        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
-//            guard let nonce = snsAuthVM.currentNonce else {
-//                fatalError("Invalid state: A login callback was received, but no login request was sent.")
-//            }
-//            guard let appleIDToken = appleIDCredential.identityToken else {
-//                print("Unable to fetch identity token")
-//                return
-//            }
-//            guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-//                print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
-//                return
-//            }
-//            // Initialize a Firebase credential, including the user's full name.
-//            let credential = OAuthProvider.appleCredential(withIDToken: idTokenString,
-//                                                           rawNonce: nonce,
-//                                                           fullName: appleIDCredential.fullName)
-//            // 파이어베이스 재인증
-//            snsAuthVM.reAuthenticate(with: credential, completion: { error in
-//                if let error = error {
-//                    print("Error - firebase reAuthenticate while deleting Account : \(error)")
-//                    return
-//                }
-//                print("Apple ReAuth Succeed!")
-//                FirebaseManager.shared.userDelete { [weak self] error in
-//                    guard let self else { return }
-//                    if let error = error {
-//                        print("Error - deleting apple account \(error)")
-//                    }
-//                    print("account from apple deleted")
-//                    self.navigateToLogin()
-//                }
-//            })
-//        }
-//    }
-//    
-//    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-//        // Handle error.
-//        print("Sign in with Apple errored: \(error)")
-//    }
-//}
