@@ -127,6 +127,7 @@
 		915F0FAA2D01A74400CCCB24 /* AppleLoginUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0FA92D01A74400CCCB24 /* AppleLoginUseCase.swift */; };
 		915F0FAD2D01A79B00CCCB24 /* KakaoLoginUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0FAC2D01A79B00CCCB24 /* KakaoLoginUseCase.swift */; };
 		915F0FAF2D01ADBC00CCCB24 /* LoginTypeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915F0FAE2D01ADBC00CCCB24 /* LoginTypeRepository.swift */; };
+		916B0DDE2D100F090048D3D1 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 916B0DDD2D100F090048D3D1 /* FirebaseMessaging */; };
 		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
 		917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */; };
@@ -409,6 +410,7 @@
 				F4892BFF2C7C23AC00C5FF16 /* RxCocoa in Frameworks */,
 				91C562232CF0E48E00CBE1F3 /* FirebaseRemoteConfig in Frameworks */,
 				6BC91FB02C7EEB4E00B34083 /* FirebaseStorage in Frameworks */,
+				916B0DDE2D100F090048D3D1 /* FirebaseMessaging in Frameworks */,
 				6BC91FAA2C7EEB4E00B34083 /* FirebaseDatabase in Frameworks */,
 				F4892BFC2C7C239900C5FF16 /* SnapKit in Frameworks */,
 				6BC91FA82C7EEB4E00B34083 /* FirebaseAuth in Frameworks */,
@@ -1465,6 +1467,7 @@
 				43EC6AD62C9171AA004A2E2F /* LightCompressor */,
 				917DA89D2CD4B0A0006FF6B9 /* RxBlocking */,
 				91C562222CF0E48E00CBE1F3 /* FirebaseRemoteConfig */,
+				916B0DDD2D100F090048D3D1 /* FirebaseMessaging */,
 			);
 			productName = WeClimb;
 			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
@@ -1846,6 +1849,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = "";
 			};
 			name = Debug;
 		};
@@ -1903,6 +1907,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = "";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -1940,7 +1945,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb2;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1982,7 +1987,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb2;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -2147,6 +2152,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		916B0DDD2D100F090048D3D1 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 		917DA89D2CD4B0A0006FF6B9 /* RxBlocking */ = {
 			isa = XCSwiftPackageProductDependency;
