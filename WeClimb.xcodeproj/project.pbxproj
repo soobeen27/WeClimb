@@ -40,6 +40,16 @@
 		43E883532CA27BFE00EF7469 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43E883522CA27BFE00EF7469 /* Alert.swift */; };
 		43EC6ACB2C8B5026004A2E2F /* FeedCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */; };
 		43EC6AD72C9171AA004A2E2F /* LightCompressor in Frameworks */ = {isa = PBXBuildFile; productRef = 43EC6AD62C9171AA004A2E2F /* LightCompressor */; };
+		43EE63862D101FF100C2B5A2 /* Pretendard-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 43EE637D2D101FF100C2B5A2 /* Pretendard-Black.otf */; };
+		43EE63872D101FF100C2B5A2 /* Pretendard-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 43EE63842D101FF100C2B5A2 /* Pretendard-SemiBold.otf */; };
+		43EE63882D101FF100C2B5A2 /* Pretendard-ExtraLight.otf in Resources */ = {isa = PBXBuildFile; fileRef = 43EE63802D101FF100C2B5A2 /* Pretendard-ExtraLight.otf */; };
+		43EE63892D101FF100C2B5A2 /* Pretendard-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 43EE63812D101FF100C2B5A2 /* Pretendard-Light.otf */; };
+		43EE638A2D101FF100C2B5A2 /* Pretendard-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 43EE637E2D101FF100C2B5A2 /* Pretendard-Bold.otf */; };
+		43EE638B2D101FF100C2B5A2 /* Pretendard-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 43EE63822D101FF100C2B5A2 /* Pretendard-Medium.otf */; };
+		43EE638C2D101FF100C2B5A2 /* Pretendard-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 43EE63832D101FF100C2B5A2 /* Pretendard-Regular.otf */; };
+		43EE638D2D101FF100C2B5A2 /* Pretendard-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 43EE637F2D101FF100C2B5A2 /* Pretendard-ExtraBold.otf */; };
+		43EE638E2D101FF100C2B5A2 /* Pretendard-Thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 43EE63852D101FF100C2B5A2 /* Pretendard-Thin.otf */; };
+		43EE63902D1023C500C2B5A2 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EE638F2D1023C000C2B5A2 /* UIFont+Extension.swift */; };
 		6B16C0ED2C9AE121004249AF /* UserPageVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B16C0EC2C9AE121004249AF /* UserPageVM.swift */; };
 		6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6B376D2C85807800C9C87A /* GymHeaderView.swift */; };
 		6B7F76952CA47F1D00B05B3F /* BlackListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7F76942CA47F1D00B05B3F /* BlackListVC.swift */; };
@@ -240,6 +250,16 @@
 		43A79AE52C86CEFE00B960A2 /* SettingNameSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNameSpace.swift; sourceTree = "<group>"; };
 		43E883522CA27BFE00EF7469 /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		43EC6ACA2C8B5026004A2E2F /* FeedCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCellModel.swift; sourceTree = "<group>"; };
+		43EE637D2D101FF100C2B5A2 /* Pretendard-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Black.otf"; sourceTree = "<group>"; };
+		43EE637E2D101FF100C2B5A2 /* Pretendard-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Bold.otf"; sourceTree = "<group>"; };
+		43EE637F2D101FF100C2B5A2 /* Pretendard-ExtraBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-ExtraBold.otf"; sourceTree = "<group>"; };
+		43EE63802D101FF100C2B5A2 /* Pretendard-ExtraLight.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-ExtraLight.otf"; sourceTree = "<group>"; };
+		43EE63812D101FF100C2B5A2 /* Pretendard-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Light.otf"; sourceTree = "<group>"; };
+		43EE63822D101FF100C2B5A2 /* Pretendard-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Medium.otf"; sourceTree = "<group>"; };
+		43EE63832D101FF100C2B5A2 /* Pretendard-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Regular.otf"; sourceTree = "<group>"; };
+		43EE63842D101FF100C2B5A2 /* Pretendard-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-SemiBold.otf"; sourceTree = "<group>"; };
+		43EE63852D101FF100C2B5A2 /* Pretendard-Thin.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Thin.otf"; sourceTree = "<group>"; };
+		43EE638F2D1023C000C2B5A2 /* UIFont+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
 		6B16C0EC2C9AE121004249AF /* UserPageVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPageVM.swift; sourceTree = "<group>"; };
 		6B6B376D2C85807800C9C87A /* GymHeaderView.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = GymHeaderView.swift; sourceTree = "<group>"; tabWidth = 4; };
 		6B7F76942CA47F1D00B05B3F /* BlackListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackListVC.swift; sourceTree = "<group>"; };
@@ -438,6 +458,22 @@
 			path = UseCase;
 			sourceTree = "<group>";
 		};
+		43EE637C2D101EB700C2B5A2 /* Font */ = {
+			isa = PBXGroup;
+			children = (
+				43EE637D2D101FF100C2B5A2 /* Pretendard-Black.otf */,
+				43EE637E2D101FF100C2B5A2 /* Pretendard-Bold.otf */,
+				43EE637F2D101FF100C2B5A2 /* Pretendard-ExtraBold.otf */,
+				43EE63802D101FF100C2B5A2 /* Pretendard-ExtraLight.otf */,
+				43EE63812D101FF100C2B5A2 /* Pretendard-Light.otf */,
+				43EE63822D101FF100C2B5A2 /* Pretendard-Medium.otf */,
+				43EE63832D101FF100C2B5A2 /* Pretendard-Regular.otf */,
+				43EE63842D101FF100C2B5A2 /* Pretendard-SemiBold.otf */,
+				43EE63852D101FF100C2B5A2 /* Pretendard-Thin.otf */,
+			);
+			path = Font;
+			sourceTree = "<group>";
+		};
 		6B87F93D2CFED0B0005905EA /* Core */ = {
 			isa = PBXGroup;
 			children = (
@@ -465,6 +501,7 @@
 		6B87F93F2CFED726005905EA /* Extension */ = {
 			isa = PBXGroup;
 			children = (
+				43EE638F2D1023C000C2B5A2 /* UIFont+Extension.swift */,
 				C40397B62C7CB4CC00923777 /* Extension.swift */,
 				6B87F9442CFED839005905EA /* UIViewController+Extension.swift */,
 				6B87F9402CFED7B6005905EA /* UIColor+Extension.swift */,
@@ -503,6 +540,7 @@
 		6B87F9502CFEE01A005905EA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				43EE637C2D101EB700C2B5A2 /* Font */,
 				6B87F9512CFEE03B005905EA /* NameSpace */,
 				F4892BEF2C7C237900C5FF16 /* Assets.xcassets */,
 				91AF25602C8C15FC002283BD /* Enumeration.swift */,
@@ -1539,6 +1577,15 @@
 			files = (
 				F4892BF02C7C237900C5FF16 /* Assets.xcassets in Resources */,
 				F4892BF32C7C237900C5FF16 /* Base in Resources */,
+				43EE63862D101FF100C2B5A2 /* Pretendard-Black.otf in Resources */,
+				43EE63872D101FF100C2B5A2 /* Pretendard-SemiBold.otf in Resources */,
+				43EE63882D101FF100C2B5A2 /* Pretendard-ExtraLight.otf in Resources */,
+				43EE63892D101FF100C2B5A2 /* Pretendard-Light.otf in Resources */,
+				43EE638A2D101FF100C2B5A2 /* Pretendard-Bold.otf in Resources */,
+				43EE638B2D101FF100C2B5A2 /* Pretendard-Medium.otf in Resources */,
+				43EE638C2D101FF100C2B5A2 /* Pretendard-Regular.otf in Resources */,
+				43EE638D2D101FF100C2B5A2 /* Pretendard-ExtraBold.otf in Resources */,
+				43EE638E2D101FF100C2B5A2 /* Pretendard-Thin.otf in Resources */,
 				F4892C012C7C23CE00C5FF16 /* CommitConvention.md in Resources */,
 				F4892C222C7C9DC700C5FF16 /* CodingConvention.md in Resources */,
 				F4892C032C7C23D400C5FF16 /* CodeConvention.md in Resources */,
@@ -1700,6 +1747,7 @@
 				436AEAF62C7EEF0A00E0D85A /* UserPageNameSpace.swift in Sources */,
 				6B9402252CFD777800F1DC2D /* CommentRepositoryImpl.swift in Sources */,
 				6B87F9302CFD9405005905EA /* ImageDataSource.swift in Sources */,
+				43EE63902D1023C500C2B5A2 /* UIFont+Extension.swift in Sources */,
 				F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */,
 				C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */,
 				43A0E72A2CE3888800F15682 /* UploadHeaderView.swift in Sources */,
