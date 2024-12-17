@@ -24,6 +24,7 @@ enum AppError: Error {
 enum FirebaseError: Error {
     case documentNil
     case firestoreFailure(String)
+    case nonRequiredInfo
     
     var description: String {
         switch self {
@@ -31,6 +32,8 @@ enum FirebaseError: Error {
             return "도큐멘트를 찾을 수 없습니다."
         case .firestoreFailure(let message):
             return "Firestore 작업 실패: \(message)"
+        case .nonRequiredInfo:
+            return "비필수 정보"
         }
     }
 }
@@ -54,11 +57,14 @@ enum UserStateError: Error {
 
 enum FuncError: Error {
     case wrongArgument
+    case unknown
     
     var description: String {
         switch self {
         case .wrongArgument:
             return "잘못된 인자가 전달되었습니다."
+        case .unknown:
+            return "알 수 없는 에러가 발생했습니다."
         }
     }
 }
