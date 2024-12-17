@@ -7,97 +7,71 @@
 
 import Foundation
 
+import FirebaseAuth
 import RxCocoa
 import RxSwift
 
-protocol PrivacyPolicyVMType {
-    func transform(input: PrivacyPolicyVM.Input) -> PrivacyPolicyVM.Output
-}
-
-class PrivacyPolicyVM: PrivacyPolicyVMType {
+class PrivacyPolicyVM {
+    // Output: View로 내보낼 데이터
+    // 약관동의
+    let isAllAgreed = BehaviorRelay<Bool>(value: false)
+    let isTerms1Agreed = BehaviorRelay<Bool>(value: false)
+    let isTerms2Agreed = BehaviorRelay<Bool>(value: false)
+    let isTerms3Agreed = BehaviorRelay<Bool>(value: false)
     
-    private let snsAgreeUseCase: SNSAgreeUsecase
+    // 선택항목
+    let isTerms4Agreed = BehaviorRelay<Bool>(value: false)
+    
     private let disposeBag = DisposeBag()
     
-    struct Input {
-        let allTermsToggled: Observable<Void>
-        let appTermsToggled: Observable<Void>
-        let privacyTermsToggled: Observable<Void>
-        let snsConsentToggled: Observable<Void>
-    }
-    
-    struct Output {
-        let isAllTermsAgreed: Observable<Bool>
-        let isOptionalTermsAgreed: Observable<Bool>
-    }
-
-    private let isAllAgreedRelay = BehaviorRelay<Bool>(value: false)
-    private let isAppTermsAgreedRelay = BehaviorRelay<Bool>(value: false)
-    private let isPrivacyTermsAgreedRelay = BehaviorRelay<Bool>(value: false)
-    private let isSnsConsentGivenRelay = BehaviorRelay<Bool>(value: false)
-    
-    init(snsAgreeUseCase: SNSAgreeUsecase) {
-        self.snsAgreeUseCase = snsAgreeUseCase
-        allAgreeStateCheck()
-    }
-    
-    private func allAgreeStateCheck() {
-        Observable.combineLatest(isAppTermsAgreedRelay, isPrivacyTermsAgreedRelay, isSnsConsentGivenRelay)
-            .map { $0 && $1 && $2 }
-            .bind(to: isAllAgreedRelay)
+    init() {
+        // 모든 개별 약관 동의 상태를 조합하여 전체 동의 여부를 계산
+        Observable.combineLatest(isTerms1Agreed, isTerms2Agreed/*, isTerms3Agreed*/) { $0 && $1/* && $2 */}
+            .bind(to: isAllAgreed)
             .disposed(by: disposeBag)
     }
     
-    private func toggle(_ relay: BehaviorRelay<Bool>) {
-        relay.accept(!relay.value)
+    // Input: View에서 호출되는 액션
+    func toggleTerms1() {
+        isTerms1Agreed.accept(!isTerms1Agreed.value)
     }
     
-    func transform(input: Input) -> Output {
-        input.allTermsToggled
-            .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
-                let newState = !self.isAllAgreedRelay.value
-                self.isAppTermsAgreedRelay.accept(newState)
-                self.isPrivacyTermsAgreedRelay.accept(newState)
-                self.isSnsConsentGivenRelay.accept(newState)
-                self.updateTermsInFirebase()
-            })
-            .disposed(by: disposeBag)
+    func toggleTerms2() {
+        isTerms2Agreed.accept(!isTerms2Agreed.value)
+    }
+    
+    //    func toggleTerms3() {
+    //        isTerms3Agreed.accept(!isTerms3Agreed.value)
+    //    }
+    
+    // 선택 항목
+    func toggleTerms4() {
+        isTerms4Agreed.accept(!isTerms4Agreed.value)
         
-        input.appTermsToggled
-            .subscribe(onNext: { [weak self] in self?.toggle(self!.isAppTermsAgreedRelay) })
-            .disposed(by: disposeBag)
-        
-        input.privacyTermsToggled
-            .subscribe(onNext: { [weak self] in self?.toggle(self!.isPrivacyTermsAgreedRelay) })
-            .disposed(by: disposeBag)
-        
-        input.snsConsentToggled
-            .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
-                self.toggle(self.isSnsConsentGivenRelay)
-                self.updateTermsInFirebase()
-            })
-            .disposed(by: disposeBag)
-        
-        return Output(
-            isAllTermsAgreed: Observable.combineLatest(isAllAgreedRelay, isPrivacyTermsAgreedRelay)
-                .map { $0 && $1 }
-                .distinctUntilChanged(),
-            isOptionalTermsAgreed: Observable.combineLatest(isAllAgreedRelay, isPrivacyTermsAgreedRelay, isSnsConsentGivenRelay)
-                .map { $0 && $1 && $2 }
-                .distinctUntilChanged()
-        )
+        updateTermsInFirebase()
     }
-
-    private func updateTermsInFirebase() {
-        snsAgreeUseCase
-            .excute(data: isSnsConsentGivenRelay.value, for: .snsConsent)
-            .subscribe(onCompleted: {
+    
+    func toggleAllTerms() {
+        let newState = !isAllAgreed.value
+        isTerms1Agreed.accept(newState)
+        isTerms2Agreed.accept(newState)
+        //        isTerms3Agreed.accept(newState)
+        isTerms4Agreed.accept(newState)
+        
+        updateTermsInFirebase()
+    }
+    
+    func updateTermsInFirebase() {
+        guard let userUID = Auth.auth().currentUser?.uid else { return }
+        
+        // Firebase에 SNS 동의 상태를 업데이트
+        FirebaseManager.shared.updateSNSConsent(for: userUID, consent: isTerms4Agreed.value) { result in
+            switch result {
+            case .success:
                 print("SNS 수신 동의 상태가 성공적으로 업데이트되었습니다.")
-            }, onError: { error in
+            case .failure(let error):
                 print("SNS 수신 동의 상태 업데이트 실패: \(error.localizedDescription)")
-            })
-            .disposed(by: disposeBag)
+            }
+        }
     }
 }

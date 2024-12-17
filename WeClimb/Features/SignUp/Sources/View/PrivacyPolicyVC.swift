@@ -13,20 +13,9 @@ import RxSwift
 class PrivacyPolicyVC: UIViewController {
     
     private let disposeBag = DisposeBag()
-    private let viewModel: PrivacyPolicyVMType
+    private let viewModel = PrivacyPolicyVM()
     
-    init(viewModel: PrivacyPolicyVMType) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-        setLayout()
-        bindViewModel()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private let logoImage: UIImageView = {
+    private let logoView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "LogoText")?.withRenderingMode(.alwaysTemplate))
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = UIColor.mainPurple
@@ -56,7 +45,7 @@ class PrivacyPolicyVC: UIViewController {
         return button
     }()
     
-    private let isAppTermsAgreedCheckBox: UIButton = {
+    private let termsCheckBox1: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "checkmark.circle"), for: .selected)
         button.setImage(UIImage(systemName: "circle"), for: .normal)
@@ -68,7 +57,7 @@ class PrivacyPolicyVC: UIViewController {
         return button
     }()
     
-    private let isPrivacyTermsAgreedCheckBox: UIButton = {
+    private let termsCheckBox2: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "checkmark.circle"), for: .selected)
         button.setImage(UIImage(systemName: "circle"), for: .normal)
@@ -80,7 +69,20 @@ class PrivacyPolicyVC: UIViewController {
         return button
     }()
     
-    private let isSnsConsentGivenCheckBox: UIButton = {
+    // 추후 추가
+//    private let termsCheckBox3: UIButton = {
+//        let button = UIButton()
+//        button.setImage(UIImage(systemName: "checkmark.circle"), for: .selected)
+//        button.setImage(UIImage(systemName: "circle"), for: .normal)
+//        button.setTitle(" (필수) WeClimb 위치정보 이용동의 및 위치기반서비스 이용약관", for: .normal)
+//        button.setTitleColor(.systemGray, for: .normal)
+//        button.contentHorizontalAlignment = .left
+//        button.titleLabel?.font = .systemFont(ofSize: 13)
+//        button.titleLabel?.numberOfLines = 2
+//        return button
+//    }()
+    
+    private let termsCheckBox4: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "checkmark.circle"), for: .selected)
         button.setImage(UIImage(systemName: "circle"), for: .normal)
@@ -108,32 +110,34 @@ class PrivacyPolicyVC: UIViewController {
         textView.isSelectable = true
         textView.isUserInteractionEnabled = true
         textView.dataDetectorTypes = [.link] // 링크 감지
-        
+
         // 링크 텍스트 설정
         let text = "이용약관  및  개인정보 처리방침"
         let attributedString = NSMutableAttributedString(string: text)
-        
+
         // 링크 범위 설정
         let termsRange = (text as NSString).range(of: "이용약관")
         let andRange = (text as NSString).range(of: "및")
         let privacyPolicyRange = (text as NSString).range(of: "개인정보 처리방침")
-        
+
         attributedString.addAttribute(.link, value: "https://www.notion.so/iosclimber/104292bf48c947b2b3b7a8cacdf1d130", range: termsRange)
         attributedString.addAttribute(.foregroundColor, value: UIColor.lightGray, range: andRange)
         attributedString.addAttribute(.link, value: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928", range: privacyPolicyRange)
-        
+
         textView.attributedText = attributedString
         textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.systemGray,
                                        NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue]
         
         textView.textAlignment = .right
-        
+
         return textView
     }()
     
     // MARK: - 라이프 사이클
     override func viewDidLoad() {
         super.viewDidLoad()
+        setLayout()
+        bindViewModel()
         termsTextView.delegate = self
     }
     
@@ -153,25 +157,26 @@ class PrivacyPolicyVC: UIViewController {
         self.overrideUserInterfaceStyle = .light
         
         [
-            logoImage,
+            logoView,
             titleLabel,
             allAgreeCheckBox,
-            isAppTermsAgreedCheckBox,
-            isPrivacyTermsAgreedCheckBox,
-            isSnsConsentGivenCheckBox,
+            termsCheckBox1,
+            termsCheckBox2,
+//            termsCheckBox3,
+            termsCheckBox4,
             termsTextView,
             confirmButton
         ].forEach { view.addSubview($0) }
         
-        logoImage.snp.makeConstraints {
+        logoView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
             $0.leading.equalToSuperview().offset(16)
             $0.width.equalTo(120)
             $0.height.equalTo(40)
         }
-        
+    
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(logoImage.snp.bottom).offset(8)
+            $0.top.equalTo(logoView.snp.bottom).offset(8)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
         }
@@ -183,26 +188,32 @@ class PrivacyPolicyVC: UIViewController {
             $0.height.equalTo(50)
         }
         
-        isAppTermsAgreedCheckBox.snp.makeConstraints {
+        termsCheckBox1.snp.makeConstraints {
             $0.top.equalTo(allAgreeCheckBox.snp.bottom).offset(20)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
         }
         
-        isPrivacyTermsAgreedCheckBox.snp.makeConstraints {
-            $0.top.equalTo(isAppTermsAgreedCheckBox.snp.bottom).offset(20)
+        termsCheckBox2.snp.makeConstraints {
+            $0.top.equalTo(termsCheckBox1.snp.bottom).offset(20)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
         }
         
-        isSnsConsentGivenCheckBox.snp.makeConstraints {
-            $0.top.equalTo(isPrivacyTermsAgreedCheckBox.snp.bottom).offset(20)
+//        termsCheckBox3.snp.makeConstraints {
+//            $0.top.equalTo(termsCheckBox2.snp.bottom).offset(20)
+//            $0.leading.equalToSuperview().offset(16)
+//            $0.trailing.equalToSuperview().offset(-16)
+//        }
+        
+        termsCheckBox4.snp.makeConstraints {
+            $0.top.equalTo(termsCheckBox2.snp.bottom).offset(20)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
         }
         
         termsTextView.snp.makeConstraints {
-            $0.top.equalTo(isSnsConsentGivenCheckBox.snp.bottom).offset(35)
+            $0.top.equalTo(termsCheckBox4.snp.bottom).offset(35)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.height.equalTo(30)
@@ -217,21 +228,110 @@ class PrivacyPolicyVC: UIViewController {
     }
     
     private func bindViewModel() {
-        let output = viewModel.transform(input: PrivacyPolicyVM.Input(
-            allTermsToggled: allAgreeCheckBox.rx.tap.asObservable(),
-            appTermsToggled: isAppTermsAgreedCheckBox.rx.tap.asObservable(),
-            privacyTermsToggled: isPrivacyTermsAgreedCheckBox.rx.tap.asObservable(),
-            snsConsentToggled: isSnsConsentGivenCheckBox.rx.tap.asObservable()
-        ))
-        
-        output.isAllTermsAgreed
+        // ViewModel과 View를 바인딩
+        viewModel.isAllAgreed
             .bind(to: allAgreeCheckBox.rx.isSelected)
             .disposed(by: disposeBag)
         
-        output.isOptionalTermsAgreed
-            .subscribe(onNext: { [weak self] isAgreed in
-                self?.confirmButton.isEnabled = isAgreed
-                self?.confirmButton.backgroundColor = isAgreed ? .mainPurple : .lightGray
+        viewModel.isTerms1Agreed
+            .bind(to: termsCheckBox1.rx.isSelected)
+            .disposed(by: disposeBag)
+        
+        viewModel.isTerms2Agreed
+            .bind(to: termsCheckBox2.rx.isSelected)
+            .disposed(by: disposeBag)
+        
+//        viewModel.isTerms3Agreed
+//            .bind(to: termsCheckBox3.rx.isSelected)
+//            .disposed(by: disposeBag)
+        
+        viewModel.isTerms4Agreed
+            .bind(to: termsCheckBox4.rx.isSelected) // 선택 항목 처리
+            .disposed(by: disposeBag)
+        
+        // 필수 약관 모두 동의 색상과 테두리 업데이트
+        viewModel.isAllAgreed
+            .map { $0 ? UIColor.mainPurple : .systemGray3 }
+            .subscribe(onNext: { [weak self] color in
+                self?.allAgreeCheckBox.setTitleColor(color, for: .normal)
+                self?.allAgreeCheckBox.layer.borderColor = color.cgColor
+            })
+            .disposed(by: disposeBag)
+        
+        // 필수 항목 체크박스 색상 업데이트
+        viewModel.isTerms1Agreed
+            .map { $0 ? UIColor.systemBlue : .systemGray3 }
+            .subscribe(onNext: { [weak self] color in
+                self?.termsCheckBox1.setTitleColor(color, for: .normal)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.isTerms2Agreed
+            .map { $0 ? UIColor.systemBlue : .systemGray3 }
+            .subscribe(onNext: { [weak self] color in
+                self?.termsCheckBox2.setTitleColor(color, for: .normal)
+            })
+            .disposed(by: disposeBag)
+        
+//        viewModel.isTerms3Agreed
+//            .map { $0 ? UIColor.systemBlue : .systemGray3 }
+//            .subscribe(onNext: { [weak self] color in
+//                self?.termsCheckBox3.setTitleColor(color, for: .normal)
+//            })
+//            .disposed(by: disposeBag)
+        
+        viewModel.isTerms4Agreed
+            .map { $0 ? UIColor.systemBlue : .systemGray3 } // 선택 항목 처리
+            .subscribe(onNext: { [weak self] color in
+                self?.termsCheckBox4.setTitleColor(color, for: .normal)
+            })
+            .disposed(by: disposeBag)
+        
+        // 전부 동의되었을 때 버튼 색상
+        viewModel.isAllAgreed
+            .map { $0 ? UIColor.mainPurple : .lightGray }
+            .bind(to: confirmButton.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        viewModel.isAllAgreed
+            .bind(to: confirmButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        // 버튼 액션 처리
+        allAgreeCheckBox.rx.tap
+            .subscribe(onNext: { [weak self] in
+                self?.viewModel.toggleAllTerms()
+            })
+            .disposed(by: disposeBag)
+        
+        termsCheckBox1.rx.tap
+            .subscribe(onNext: { [weak self] in
+                self?.viewModel.toggleTerms1()
+            })
+            .disposed(by: disposeBag)
+        
+        termsCheckBox2.rx.tap
+            .subscribe(onNext: { [weak self] in
+                self?.viewModel.toggleTerms2()
+            })
+            .disposed(by: disposeBag)
+        
+//        termsCheckBox3.rx.tap
+//            .subscribe(onNext: { [weak self] in
+//                self?.viewModel.toggleTerms3()
+//            })
+//            .disposed(by: disposeBag)
+        
+        termsCheckBox4.rx.tap // 선택 항목에 대한 액션 처리
+            .subscribe(onNext: { [weak self] in
+                self?.viewModel.toggleTerms4()
+            })
+            .disposed(by: disposeBag)
+        
+        confirmButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                let personalDetailsVC = CreateNickNameVC()
+                self?.navigationController?.pushViewController(personalDetailsVC, animated: true)
             })
             .disposed(by: disposeBag)
     }
