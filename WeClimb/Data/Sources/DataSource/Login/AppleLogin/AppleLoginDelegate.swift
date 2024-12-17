@@ -22,9 +22,7 @@ final class AppleLoginDelegate: NSObject, ASAuthorizationControllerDelegate, ASA
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
            let identityToken = appleIDCredential.identityToken,
-           let tokenString = String(data: identityToken, encoding: .utf8),
-           let rawNonce = appleIDCredential.authorizationCode.flatMap({ String(data: $0, encoding: .utf8) }),
-           sha256(rawNonce) == nonce {
+           let tokenString = String(data: identityToken, encoding: .utf8) {
             let credential = OAuthProvider.credential(providerID: .apple, idToken: tokenString, rawNonce: nonce)
             completion(.success(credential))
         } else {

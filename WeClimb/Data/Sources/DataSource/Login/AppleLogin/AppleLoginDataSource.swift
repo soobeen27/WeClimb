@@ -20,6 +20,7 @@ protocol AppleLoginDataSource {
 class AppleLoginDataSourceImpl: AppleLoginDataSource {
     
     var currentNonce: String?
+    private var appleLoginDelegate: AppleLoginDelegate?
     
     func appleLogin() -> Single<AuthCredential> {
         return Single.create { [weak self] single in
@@ -37,15 +38,18 @@ class AppleLoginDataSourceImpl: AppleLoginDataSource {
             
             let controller = ASAuthorizationController(authorizationRequests: [request])
             
-            let delegate = AppleLoginDelegate(nonce: nonce) { result in
-                switch result {
-                case .success(let credential):
-                    single(.success(credential))
-                case .failure(let error):
-                    single(.failure(error))
+            let delegate = AppleLoginDelegate(nonce: nonce) { [weak self] result in
+                self?.appleLoginDelegate = nil
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let credential):
+                        single(.success(credential))
+                    case .failure(let error):
+                        single(.failure(error))
+                    }
                 }
             }
-            
+            self.appleLoginDelegate = delegate
             controller.delegate = delegate
             controller.presentationContextProvider = delegate
             controller.performRequests()
