@@ -104,6 +104,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       // Print message ID.
       print(userInfo)
     }
+    
+    func application(_ application: UIApplication,
+                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        Messaging.messaging().apnsToken = deviceToken
+        print("APNs 토큰 등록됨: \(deviceToken.map { String(format: "%02.2hhx", $0) }.joined())")
+    }
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("APNs 등록 실패: \(error.localizedDescription)")
+    }
+
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
@@ -143,7 +154,10 @@ extension AppDelegate: MessagingDelegate {
     )
     // TODO: If necessary send token to application server.
     // Note: This callback is fired at each app startup and whenever a new token is generated.
+      guard let fcmToken else { return }
+      
+      guard let uid = Auth.auth().currentUser?.uid else { return }
+      Firestore.firestore().collection("users").document(uid).setData(["fcmToken": fcmToken], merge: true)
   }
-
   // [END refresh_token]
 }
