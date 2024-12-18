@@ -72,6 +72,72 @@ extension String {
             return (self, "Other", UIColor.clear)
         }
     }
+
+//extension String {
+//    var colorInfo: (text: String, englishText: String, image: UIImage?) {
+//        switch self {
+//        case "빨", "Red":
+//            return ("빨강", "Red", UIImage(systemName: "colorRed"))
+//        case "주", "Orange":
+//            return ("주황", "Orange", UIImage(systemName: "colorOrange"))
+//        case "노", "Yellow":
+//            return ("노랑", "Yellow", UIImage(systemName: "colorYellow"))
+//        case "연", "LightGreen":
+//            return ("연두", "LightGreen", UIImage(systemName: "colorLightGreen"))
+//        case "초", "Green":
+//            return ("초록", "Green", UIImage(systemName: "colorGreen"))
+//        case "하", "SkyBlue":
+//            return ("하늘", "SkyBlue", UIImage(systemName: "colorBlue"))
+//        case "파", "Blue":
+//            return ("파랑", "Blue", UIImage(systemName: "colorBlue"))
+//        case "남", "Navy":
+//            return ("남색", "Navy", UIImage(systemName: "colorNavy"))
+//        case "보", "Purple":
+//            return ("보라", "Purple", UIImage(systemName: "colorPurple"))
+//        case "검", "Black":
+//            return ("검정", "Black", UIImage(systemName: "colorBlack"))
+//        case "흰", "White":
+//            return ("흰색", "White", UIImage(systemName: "colorWhite"))
+//        case "민", "Mint":
+//            return ("민트", "Mint", UIImage(systemName: "colorMint"))
+//        case "회", "Gray":
+//            return ("회색", "Gray", UIImage(systemName: "colorGray"))
+//        case "핑", "Pink":
+//            return ("핑크", "Pink", UIImage(systemName: "colorPink"))
+//        case "갈", "Brown":
+//            return ("갈색", "Brown", UIImage(systemName: "colorBrown"))
+//        case "노검", "DarkYellow":
+//            return ("노랑", "DarkYellow", UIImage(systemName: "colorDarkYellow"))
+//        case "초검", "DarkGreen":
+//            return ("초록", "DarkGreen", UIImage(systemName: "colorDarkGreen"))
+//        case "파검", "DarkBlue":
+//            return ("파랑", "DarkBlue", UIImage(systemName: "colorDarkBlue"))
+//        case "검빨", "DarkRed":
+//            return ("검정빨강", "DarkRed", UIImage(systemName: "colorDarkRed"))
+//        case "B1":
+//            return ("B1", "B1", UIImage(systemName: "gradeB1"))
+//        case "B2":
+//            return ("B2", "B2", UIImage(systemName: "gradeB2"))
+//        case "B3":
+//            return ("B3", "B3", UIImage(systemName: "gradeB3"))
+//        case "B4":
+//            return ("B4", "B4", UIImage(systemName: "gradeB4"))
+//        case "B5":
+//            return ("B5", "B5", UIImage(systemName: "gradeB5"))
+//        case "B6":
+//            return ("B6", "B6", UIImage(systemName: "gradeB6"))
+//        case "B7":
+//            return ("B7", "B7",  UIImage(systemName: "gradeB7"))
+//        case "B8":
+//            return ("B8", "B8", UIImage(systemName: "gradeB8"))
+//        case "B9":
+//            return ("B9", "B9", UIImage(systemName: "gradeB9"))
+//        case "별":
+//            return ("Star", "Star", nil)
+//        default:
+//            return (self, "Other", nil)
+//        }
+//    }
     
     var getGradeArray: [String] {
         return self.components(separatedBy: ", ")
