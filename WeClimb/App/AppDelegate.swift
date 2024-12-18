@@ -125,19 +125,28 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
 
         let userInfo = notification.request.content.userInfo
-        print("포그라운드 알림 수신: \(userInfo)")
+        handleNotification(userInfo: userInfo)
 
         completionHandler([.badge, .sound, .banner])
     }
-
+    // 앱이 백그라운드, 또는 종료 상태에서 알림 클릭했을 때
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-
+        
         let userInfo = response.notification.request.content.userInfo
-        print("사용자 응답 수신: \(userInfo)")
+        handleNotification(userInfo: userInfo)
 
         completionHandler()
+    }
+    
+    func handleNotification(userInfo: [AnyHashable : Any]) {
+        if let postUID = userInfo["postUID"] as? String {
+            print("포스트: \(postUID)")
+            if let commentUID = userInfo["commentUID"] as? String {
+                print("코멘트임 : \(commentUID)")
+            }
+        }
     }
 }
 
