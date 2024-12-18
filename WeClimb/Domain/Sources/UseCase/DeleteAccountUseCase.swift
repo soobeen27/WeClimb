@@ -18,7 +18,6 @@ public struct DeleteAccountUseCaseImpl: DeleteAccountUseCase {
             
             FirebaseManager.shared.userDelete { error in
                 if let error = error {
-                    print("사용자 삭제에 실패: \(error.localizedDescription)")
                     completable(.error(error))
                 } else {
                     completable(.completed)
