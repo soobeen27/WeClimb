@@ -9,7 +9,7 @@ import UIKit
 
 import SnapKit
 
-class TwoImageButton: UIButton {
+class CustomButton: UIButton {
     
     var leftImage: UIImage? {
         didSet {
@@ -43,13 +43,9 @@ class TwoImageButton: UIButton {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setButton()
-        setLayout()
     }
     
     private func setButton() {
-        
-        // 버튼 스타일
         titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         layer.cornerRadius = 10
         clipsToBounds = true

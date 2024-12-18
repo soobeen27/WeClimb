@@ -50,7 +50,8 @@
 		43EE638D2D101FF100C2B5A2 /* Pretendard-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 43EE637F2D101FF100C2B5A2 /* Pretendard-ExtraBold.otf */; };
 		43EE638E2D101FF100C2B5A2 /* Pretendard-Thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 43EE63852D101FF100C2B5A2 /* Pretendard-Thin.otf */; };
 		43EE63902D1023C500C2B5A2 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EE638F2D1023C000C2B5A2 /* UIFont+Extension.swift */; };
-		43EE63D92D1296DA00C2B5A2 /* TwoImageButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EE63D82D1296C400C2B5A2 /* TwoImageButton.swift */; };
+		43EE63D92D1296DA00C2B5A2 /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EE63D82D1296C400C2B5A2 /* CustomButton.swift */; };
+		43EE63F72D12D0B800C2B5A2 /* CustomImageButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EE63F62D12D0A100C2B5A2 /* CustomImageButton.swift */; };
 		6B16C0ED2C9AE121004249AF /* UserPageVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B16C0EC2C9AE121004249AF /* UserPageVM.swift */; };
 		6B6B376E2C85807800C9C87A /* GymHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6B376D2C85807800C9C87A /* GymHeaderView.swift */; };
 		6B7F76952CA47F1D00B05B3F /* BlackListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7F76942CA47F1D00B05B3F /* BlackListVC.swift */; };
@@ -261,7 +262,8 @@
 		43EE63842D101FF100C2B5A2 /* Pretendard-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-SemiBold.otf"; sourceTree = "<group>"; };
 		43EE63852D101FF100C2B5A2 /* Pretendard-Thin.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Thin.otf"; sourceTree = "<group>"; };
 		43EE638F2D1023C000C2B5A2 /* UIFont+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
-		43EE63D82D1296C400C2B5A2 /* TwoImageButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoImageButton.swift; sourceTree = "<group>"; };
+		43EE63D82D1296C400C2B5A2 /* CustomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
+		43EE63F62D12D0A100C2B5A2 /* CustomImageButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomImageButton.swift; sourceTree = "<group>"; };
 		6B16C0EC2C9AE121004249AF /* UserPageVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPageVM.swift; sourceTree = "<group>"; };
 		6B6B376D2C85807800C9C87A /* GymHeaderView.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = GymHeaderView.swift; sourceTree = "<group>"; tabWidth = 4; };
 		6B7F76942CA47F1D00B05B3F /* BlackListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackListVC.swift; sourceTree = "<group>"; };
@@ -476,12 +478,13 @@
 			path = Font;
 			sourceTree = "<group>";
 		};
-		43EE63D72D1296B100C2B5A2 /* CustomButton */ = {
+		43EE63D72D1296B100C2B5A2 /* CustomButtons */ = {
 			isa = PBXGroup;
 			children = (
-				43EE63D82D1296C400C2B5A2 /* TwoImageButton.swift */,
+				43EE63D82D1296C400C2B5A2 /* CustomButton.swift */,
+				43EE63F62D12D0A100C2B5A2 /* CustomImageButton.swift */,
 			);
-			path = CustomButton;
+			path = CustomButtons;
 			sourceTree = "<group>";
 		};
 		6B87F93D2CFED0B0005905EA /* Core */ = {
@@ -535,7 +538,7 @@
 			isa = PBXGroup;
 			children = (
 				6B9CEA5F2CE61BBC004166DE /* CustomSlider.swift */,
-				43EE63D72D1296B100C2B5A2 /* CustomButton */,
+				43EE63D72D1296B100C2B5A2 /* CustomButtons */,
 				43E883522CA27BFE00EF7469 /* Alert.swift */,
 			);
 			path = Components;
@@ -1628,6 +1631,7 @@
 				C440789E2CA319B200B747A6 /* GuestVC.swift in Sources */,
 				6B8467BE2C86129B006B062D /* ClimbingGymNameSpace.swift in Sources */,
 				F4892C1E2C7C98A100C5FF16 /* MyPageVC.swift in Sources */,
+				43EE63F72D12D0B800C2B5A2 /* CustomImageButton.swift in Sources */,
 				434227772CF98D5D003523EF /* DeleteAccountUseCase.swift in Sources */,
 				6B8F38B92C888F6B0018C40D /* PrivacyPolicyVC.swift in Sources */,
 				435B7E422C8024AB00EB9816 /* EditPageVC.swift in Sources */,
@@ -1700,7 +1704,7 @@
 				911E1F5F2CF70463007B9A52 /* UserUpdateDataSource.swift in Sources */,
 				C4E29C1F2C898DC80076BCA6 /* SFCollectionViewCell.swift in Sources */,
 				436AEAE02C7D69CB00E0D85A /* GymTableViewCell.swift in Sources */,
-				43EE63D92D1296DA00C2B5A2 /* TwoImageButton.swift in Sources */,
+				43EE63D92D1296DA00C2B5A2 /* CustomButton.swift in Sources */,
 				6BA5EB992CFF008300F247FB /* MainFeedRepository.swift in Sources */,
 				91CE12222CFFF9E900BCC82E /* AppleLoginDataSource.swift in Sources */,
 				6B8F38C72C894BC50018C40D /* CreateNickNameVC.swift in Sources */,
