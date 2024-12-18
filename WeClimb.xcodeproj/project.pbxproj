@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		43EC6AD72C9171AA004A2E2F /* LightCompressor in Frameworks */ = {isa = PBXBuildFile; productRef = 43EC6AD62C9171AA004A2E2F /* LightCompressor */; };
 		6B7EEBC62D1293D8008017A5 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 6B7EEBC52D1293D8008017A5 /* Swinject */; };
+		6B7EEBFF2D12CD79008017A5 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 6B7EEBFE2D12CD79008017A5 /* FirebaseMessaging */; };
 		6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F972C7EEA3F00B34083 /* GoogleSignIn */; };
 		6BC91F9A2C7EEA5A00B34083 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F992C7EEA5A00B34083 /* GoogleSignInSwift */; };
 		6BC91F9D2C7EEACF00B34083 /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91F9C2C7EEACF00B34083 /* KakaoSDK */; };
@@ -101,6 +102,7 @@
 				6BC91F9A2C7EEA5A00B34083 /* GoogleSignInSwift in Frameworks */,
 				F4892C062C7C23FA00C5FF16 /* Kingfisher in Frameworks */,
 				6BC91F982C7EEA3F00B34083 /* GoogleSignIn in Frameworks */,
+				6B7EEBFF2D12CD79008017A5 /* FirebaseMessaging in Frameworks */,
 				F4892BFF2C7C23AC00C5FF16 /* RxCocoa in Frameworks */,
 				91C562232CF0E48E00CBE1F3 /* FirebaseRemoteConfig in Frameworks */,
 				6B7EEBC62D1293D8008017A5 /* Swinject in Frameworks */,
@@ -118,6 +120,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6B7EEBFD2D12CD79008017A5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F4892BDA2C7C237700C5FF16 = {
 			isa = PBXGroup;
 			children = (
@@ -130,6 +139,7 @@
 				6B7EE3782D11737A008017A5 /* WeClimbTests */,
 				6B7EE71F2D126ED9008017A5 /* WeClimb.app */,
 				6B7EE7202D126ED9008017A5 /* WeClimbTests.xctest */,
+				6B7EEBFD2D12CD79008017A5 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -194,6 +204,7 @@
 				917DA89D2CD4B0A0006FF6B9 /* RxBlocking */,
 				91C562222CF0E48E00CBE1F3 /* FirebaseRemoteConfig */,
 				6B7EEBC52D1293D8008017A5 /* Swinject */,
+				6B7EEBFE2D12CD79008017A5 /* FirebaseMessaging */,
 			);
 			productName = WeClimb;
 			productReference = 6B7EE71F2D126ED9008017A5 /* WeClimb.app */;
@@ -658,6 +669,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6B7EEBC42D1293D8008017A5 /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
+		};
+		6B7EEBFE2D12CD79008017A5 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 		6BC91F972C7EEA3F00B34083 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;

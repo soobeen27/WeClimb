@@ -21,30 +21,33 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         
-        if Auth.auth().currentUser != nil {
-            FirebaseManager.shared.currentUserInfo { result in
-                switch result {
-                case .success(let user):
-                    if let userName = user.userName, !userName.isEmpty {
-                        window.rootViewController = TabBarController()
-                    } else {
-                        window.rootViewController = UINavigationController(rootViewController: LoginVC())
-                    }
-                case .failure(let error):
-                    print("유저 정보를 가져오는 데 실패했습니다: \(error)")
-                    window.rootViewController = UINavigationController(rootViewController: LoginVC())
-                }
-                window.makeKeyAndVisible()
-                self.window = window
-                self.checkAppVersion()
-            }
-        } else {
-            // 사용자가 로그인되어 있지 않으면 LoginVC로 이동
-            window.rootViewController = UINavigationController(rootViewController: LoginVC())
-            window.makeKeyAndVisible()
-            self.window = window
-            self.checkAppVersion()
-        }
+//        // 의존성 초기화
+//        let appDIContainer = AppDIContainer.shared
+        
+//        if Auth.auth().currentUser != nil {
+//            FirebaseManager.shared.currentUserInfo { result in
+//                switch result {
+//                case .success(let user):
+//                    if let userName = user.userName, !userName.isEmpty {
+//                        window.rootViewController = TabBarController()
+//                    } else {
+//                        window.rootViewController = UINavigationController(rootViewController: LoginVC())
+//                    }
+//                case .failure(let error):
+//                    print("유저 정보를 가져오는 데 실패했습니다: \(error)")
+//                    window.rootViewController = UINavigationController(rootViewController: LoginVC())
+//                }
+//                window.makeKeyAndVisible()
+//                self.window = window
+//                self.checkAppVersion()
+//            }
+//        } else {
+//            // 사용자가 로그인되어 있지 않으면 LoginVC로 이동
+//            window.rootViewController = UINavigationController(rootViewController: LoginVC())
+//            window.makeKeyAndVisible()
+//            self.window = window
+//            self.checkAppVersion()
+//        }
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
