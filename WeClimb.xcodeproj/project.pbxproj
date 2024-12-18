@@ -43,9 +43,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = WeClimbTests.xctest; path = /Users/Yoondaesung/Desktop/WeClimb/lastClean/WeClimbApp/build/Debug/WeClimb.app/Contents/PlugIns/WeClimbTests.xctest; sourceTree = "<absolute>"; };
+		6B7EE71F2D126ED9008017A5 /* WeClimb.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeClimb.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B7EE7202D126ED9008017A5 /* WeClimbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeClimbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		917DA89F2CD4B340006FF6B9 /* WeClimb.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = WeClimb.xctestplan; sourceTree = "<group>"; };
-		F4892BE32C7C237700C5FF16 /* WeClimb.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = WeClimb.app; path = "/Users/Yoondaesung/Desktop/WeClimb/lastClean/WeClimbApp/build/Debug-iphoneos/WeClimb.app"; sourceTree = "<absolute>"; };
 		F4892C002C7C23CE00C5FF16 /* CommitConvention.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CommitConvention.md; sourceTree = "<group>"; };
 		F4892C022C7C23D400C5FF16 /* CodeConvention.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CodeConvention.md; sourceTree = "<group>"; };
 		F4892C072C7C249300C5FF16 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
@@ -126,6 +126,8 @@
 				F4892C002C7C23CE00C5FF16 /* CommitConvention.md */,
 				6B7EE47C2D1173A6008017A5 /* WeClimb */,
 				6B7EE3782D11737A008017A5 /* WeClimbTests */,
+				6B7EE71F2D126ED9008017A5 /* WeClimb.app */,
+				6B7EE7202D126ED9008017A5 /* WeClimbTests.xctest */,
 			);
 			sourceTree = "<group>";
 		};
@@ -150,7 +152,7 @@
 			);
 			name = WeClimbTests;
 			productName = WeClimbTests;
-			productReference = 917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */;
+			productReference = 6B7EE7202D126ED9008017A5 /* WeClimbTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		F4892BE22C7C237700C5FF16 /* WeClimb */ = {
@@ -191,7 +193,7 @@
 				91C562222CF0E48E00CBE1F3 /* FirebaseRemoteConfig */,
 			);
 			productName = WeClimb;
-			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
+			productReference = 6B7EE71F2D126ED9008017A5 /* WeClimb.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
