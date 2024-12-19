@@ -21,6 +21,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         
+        window.rootViewController = UINavigationController(rootViewController: PrivacyPolicyVC())
+        window.makeKeyAndVisible()
+        
+        self.window = window
 //        // 의존성 초기화
 //        let appDIContainer = AppDIContainer.shared
         
