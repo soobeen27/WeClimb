@@ -7,40 +7,157 @@
 
 import UIKit
 
+enum CustomFontStyle {
+    case title1Bold
+    case title1Medium
+    case title1Regular
+    
+    case title2Bold
+    case title2Medium
+    case title2Regular
+    
+    case heading1Bold
+    case heading1Medium
+    case heading1Regular
+    
+    case heading2Bold
+    case heading2Medium
+    case heading2Regular
+    
+    case body1Bold
+    case body1Medium
+    case body1Regular
+    
+    case body2Bold
+    case body2Medium
+    case body2Regular
+    
+    case label1Bold
+    case label1Medium
+    case label1Regular
+    
+    case label2Bold
+    case label2Medium
+    case label2Regular
+    
+    case caption1Bold
+    case caption1Medium
+    case caption1Regular
+    
+    case caption2Bold
+    case caption2Medium
+    case caption2Regular
+}
 
 extension UIFont {
-    /// 폰트 extension
-    /// - Parameters:
-    ///   - fontSize: 원하는 폰트 사이즈
-    ///   - weight: 원하는 폰트 두께
-    /// - Returns: 해당 사이즈와 두께에 맞는 폰트 반환
-    static func pretendard(size fontSize: CGFloat, weight: UIFont.Weight) -> UIFont {
+    
+    static func customFont(style: CustomFontStyle) -> UIFont {
         let familyName = "Pretendard"
-
         var weightString: String
-        switch weight {
-        case .black:
-            weightString = "Black"
-        case .heavy:
-            weightString = "ExtraBold"
-        case .bold:
-            weightString = "Blod"
-        case .medium:
+        var fontSize: CGFloat
+        
+        switch style {
+        case .title1Bold:
+            weightString = "Bold"
+            fontSize = 28
+        case .title1Medium:
             weightString = "Medium"
-        case .regular:
+            fontSize = 28
+        case .title1Regular:
             weightString = "Regular"
-        case .semibold:
+            fontSize = 28
+            
+        case .title2Bold:
             weightString = "SemiBold"
-        case .light:
-            weightString = "Light"
-        case .ultraLight:
-            weightString = "ExtraLight"
-        case .thin:
-            weightString = "Thin"
-        default:
+            fontSize = 24
+        case .title2Medium:
+            weightString = "Medium"
+            fontSize = 24
+        case .title2Regular:
             weightString = "Regular"
+            fontSize = 24
+            
+        case .heading1Bold:
+            weightString = "SemiBold"
+            fontSize = 20
+        case .heading1Medium:
+            weightString = "Medium"
+            fontSize = 20
+        case .heading1Regular:
+            weightString = "Regular"
+            fontSize = 20
+            
+        case .heading2Bold:
+            weightString = "SemiBold"
+            fontSize = 18
+        case .heading2Medium:
+            weightString = "Medium"
+            fontSize = 18
+        case .heading2Regular:
+            weightString = "Regular"
+            fontSize = 18
+            
+        case .body1Bold:
+            weightString = "SemiBold"
+            fontSize = 16
+        case .body1Medium:
+            weightString = "Medium"
+            fontSize = 16
+        case .body1Regular:
+            weightString = "Regular"
+            fontSize = 16
+            
+        case .body2Bold:
+            weightString = "SemiBold"
+            fontSize = 14
+        case .body2Medium:
+            weightString = "Medium"
+            fontSize = 14
+        case .body2Regular:
+            weightString = "Regular"
+            fontSize = 14
+            
+        case .label1Bold:
+            weightString = "SemiBold"
+            fontSize = 16
+        case .label1Medium:
+            weightString = "Medium"
+            fontSize = 16
+        case .label1Regular:
+            weightString = "Regular"
+            fontSize = 16
+            
+        case .label2Bold:
+            weightString = "SemiBold"
+            fontSize = 14
+        case .label2Medium:
+            weightString = "Medium"
+            fontSize = 14
+        case .label2Regular:
+            weightString = "Regular"
+            fontSize = 14
+            
+        case .caption1Bold:
+            weightString = "SemiBold"
+            fontSize = 12
+        case .caption1Medium:
+            weightString = "Medium"
+            fontSize = 12
+        case .caption1Regular:
+            weightString = "Regular"
+            fontSize = 12
+            
+        case .caption2Bold:
+            weightString = "SemiBold"
+            fontSize = 10
+        case .caption2Medium:
+            weightString = "Medium"
+            fontSize = 10
+        case .caption2Regular:
+            weightString = "Regular"
+            fontSize = 10
         }
-
-        return UIFont(name: "\(familyName)-\(weightString)", size: fontSize) ?? .systemFont(ofSize: fontSize, weight: weight)
+        
+        return UIFont(name: "\(familyName)-\(weightString)", size: fontSize) ?? .systemFont(ofSize: fontSize)
     }
 }
