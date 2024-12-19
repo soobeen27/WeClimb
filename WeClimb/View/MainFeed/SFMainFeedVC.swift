@@ -100,6 +100,32 @@ class SFMainFeedVC: UIViewController{
         }
     }
     
+    func performActionWhenTapSelectedAgain() {
+//        collectionView.setContentOffset(CGPoint(x: .zero, y: -101),animated: true)
+        
+        
+        let scrolltoTopAnimation = UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut) { [weak self] in
+            self?.collectionView.setContentOffset(CGPoint(x: .zero, y: -90),animated: false)
+            self?.activityIndicator.startAnimating()
+        }
+        
+        scrolltoTopAnimation.addCompletion { [weak self] _ in
+            self?.mainFeedVM.fetchInitialFeed() { [weak self] in
+                guard let self else { return }
+                DispatchQueue.main.async {
+                    self.collectionView.setContentOffset(.zero, animated: true)
+                    self.activityIndicator.stopAnimating()
+                    if self.feedType == .mainFeed {
+                        self.isRefresh = false
+                    }
+                    self.innerCollectionViewPlayers(playOrPause: true)
+                }
+            }
+        }
+        scrolltoTopAnimation.startAnimation()
+
+    }
+    
     //MARK: - 네비게이션바, 탭바 세팅
     private func setNavigationBar() {
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
@@ -536,9 +562,10 @@ extension SFMainFeedVC: UICollectionViewDelegateFlowLayout {
         if collectionView.contentOffset.y < -100 {
             activityIndicator.startAnimating()
             if feedType == .mainFeed {
-                mainFeedVM.fetchInitialFeed()
-                self.innerCollectionViewPlayers(playOrPause: true)
-                isRefresh = true
+                mainFeedVM.fetchInitialFeed() { [weak self] in
+                    self?.innerCollectionViewPlayers(playOrPause: true)
+                    self?.isRefresh = true
+                }
             }
             self.stopAllVideos()
         }

@@ -12,10 +12,12 @@ class TabBarController: UITabBarController {
     
     private let viewModel = MyPageVM()
     private var isLoggedIn: Bool = Auth.auth().currentUser != nil
+    private var lastSelectedIndex: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setView()
+        self.delegate = self
     }
     
     private func setView() {
@@ -67,6 +69,20 @@ class TabBarController: UITabBarController {
             self.tabBarController?.tabBar.tintColor = .white
         } else {
             self.tabBarController?.tabBar.tintColor = UIColor.label
+        }
+    }
+}
+
+extension TabBarController: UITabBarControllerDelegate {
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        if let selectedIndex = tabBarController.viewControllers?.firstIndex(of: viewController) {
+            if selectedIndex == lastSelectedIndex {
+                if let navController = viewController as? UINavigationController,
+                   let topVC = navController.topViewController as? SFMainFeedVC {
+                    topVC.performActionWhenTapSelectedAgain()
+                }
+            }
+            lastSelectedIndex = selectedIndex
         }
     }
 }

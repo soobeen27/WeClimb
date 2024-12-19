@@ -78,6 +78,7 @@
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
 		917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */; };
 		917DA89E2CD4B0A0006FF6B9 /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 917DA89D2CD4B0A0006FF6B9 /* RxBlocking */; };
+		9195AD042D12971B00B905E0 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 9195AD032D12971B00B905E0 /* FirebaseMessaging */; };
 		91995F202CA4A24100BCC004 /* SFFeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91995F1F2CA4A24000BCC004 /* SFFeedCell.swift */; };
 		91A717002CEA0D25007F825C /* LoginNeeded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A716FF2CEA0D25007F825C /* LoginNeeded.swift */; };
 		91AF25612C8C15FC002283BD /* Enumeration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AF25602C8C15FC002283BD /* Enumeration.swift */; };
@@ -283,6 +284,7 @@
 				F4892BFF2C7C23AC00C5FF16 /* RxCocoa in Frameworks */,
 				91C562232CF0E48E00CBE1F3 /* FirebaseRemoteConfig in Frameworks */,
 				6BC91FB02C7EEB4E00B34083 /* FirebaseStorage in Frameworks */,
+				9195AD042D12971B00B905E0 /* FirebaseMessaging in Frameworks */,
 				6BC91FAA2C7EEB4E00B34083 /* FirebaseDatabase in Frameworks */,
 				F4892BFC2C7C239900C5FF16 /* SnapKit in Frameworks */,
 				6BC91FA82C7EEB4E00B34083 /* FirebaseAuth in Frameworks */,
@@ -612,6 +614,7 @@
 				43EC6AD62C9171AA004A2E2F /* LightCompressor */,
 				917DA89D2CD4B0A0006FF6B9 /* RxBlocking */,
 				91C562222CF0E48E00CBE1F3 /* FirebaseRemoteConfig */,
+				9195AD032D12971B00B905E0 /* FirebaseMessaging */,
 			);
 			productName = WeClimb;
 			productReference = F4892BE32C7C237700C5FF16 /* WeClimb.app */;
@@ -1024,7 +1027,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb2;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1066,7 +1069,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosclimber.WeClimb;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WeClimb2;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1236,6 +1239,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F4892BFD2C7C23AC00C5FF16 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxBlocking;
+		};
+		9195AD032D12971B00B905E0 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BC91FA42C7EEB4D00B34083 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 		91C562222CF0E48E00CBE1F3 /* FirebaseRemoteConfig */ = {
 			isa = XCSwiftPackageProductDependency;

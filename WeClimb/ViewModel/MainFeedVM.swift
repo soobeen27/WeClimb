@@ -48,7 +48,7 @@ class MainFeedVM {
     }
     
     func mainFeed() {
-        fetchInitialFeed()
+        fetchInitialFeed() {}
         isLastCell
             .subscribe(onNext: { [weak self] shouldLoad in
                 guard let self else { return }
@@ -65,10 +65,13 @@ class MainFeedVM {
     }
     
     // 피드 데이터 초기 로드
-    func fetchInitialFeed() {
+    func fetchInitialFeed(completion: @escaping () -> Void) {
         FirebaseManager.shared.feedFirst { [weak self] fetchedPosts in
             guard let self, let fetchedPosts = fetchedPosts else { return }
             self.posts.accept(fetchedPosts)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                completion()
+            }
         }
     }
     
