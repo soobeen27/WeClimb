@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
-        <capability name="Named colors" minToolsVersion="9.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -17,28 +16,15 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LogoImage" translatesAutoresizingMaskIntoConstraints="NO" id="yIJ-rS-MoD">
-                                <rect key="frame" x="135" y="329.66666666666669" width="123" height="120"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="120" id="GgH-Fh-7dE"/>
-                                    <constraint firstAttribute="width" constant="123" id="UHF-Pt-EF3"/>
-                                </constraints>
-                            </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LogoText" translatesAutoresizingMaskIntoConstraints="NO" id="ePv-cy-wnm">
-                                <rect key="frame" x="113" y="453.66666666666669" width="167" height="62.000000000000057"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="62" id="Rkm-hW-t1Z"/>
-                                </constraints>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="storyboardLogo" translatesAutoresizingMaskIntoConstraints="NO" id="Yqj-Bl-Igf">
+                                <rect key="frame" x="84" y="346" width="225" height="60"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="exa-lS-8NF"/>
-                        <color key="backgroundColor" name="BackgroundColor"/>
+                        <color key="backgroundColor" red="0.58823531870000001" green="0.34117650989999998" blue="0.88235294819999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
-                            <constraint firstItem="ePv-cy-wnm" firstAttribute="centerY" secondItem="yIJ-rS-MoD" secondAttribute="bottom" constant="35" id="GGG-T3-vfK"/>
-                            <constraint firstItem="yIJ-rS-MoD" firstAttribute="centerX" secondItem="ePv-cy-wnm" secondAttribute="centerX" id="IPo-m8-h6v"/>
-                            <constraint firstItem="exa-lS-8NF" firstAttribute="centerY" secondItem="ePv-cy-wnm" secondAttribute="top" constant="-15" id="TMk-uq-Zpw"/>
-                            <constraint firstItem="yIJ-rS-MoD" firstAttribute="centerX" secondItem="UFg-eg-5s8" secondAttribute="centerX" id="paM-F5-wR2"/>
-                            <constraint firstItem="ePv-cy-wnm" firstAttribute="leading" secondItem="exa-lS-8NF" secondAttribute="leading" constant="113" id="ygd-aT-vUc"/>
+                            <constraint firstItem="Yqj-Bl-Igf" firstAttribute="centerX" secondItem="UFg-eg-5s8" secondAttribute="centerX" id="hQG-wd-ve6"/>
+                            <constraint firstItem="Yqj-Bl-Igf" firstAttribute="top" secondItem="exa-lS-8NF" secondAttribute="top" constant="287" id="kI3-wt-dQ1"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -48,10 +34,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="LogoImage" width="266.66665649414062" height="266.66665649414062"/>
-        <image name="LogoText" width="796.33331298828125" height="147.33332824707031"/>
-        <namedColor name="BackgroundColor">
-            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
+        <image name="storyboardLogo" width="225" height="60"/>
     </resources>
 </document>
