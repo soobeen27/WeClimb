@@ -7,13 +7,8 @@
 
 import UIKit
 
-protocol Coordinator {
-    
-}
-
-final class AppCoordinator: Coordinator {
+final class AppCoordinator: BaseCoordinator {
     public var navigationController: UINavigationController
-    public var childCoordinates: [Coordinator] = []
     public let appDIcontainer: AppDIContainer
     
     init(navigationController: UINavigationController, appDIcontainer: AppDIContainer) {
@@ -21,7 +16,39 @@ final class AppCoordinator: Coordinator {
         self.appDIcontainer = appDIcontainer
     }
     
-    func start() {
+    override func start() {
         
     }
+
+//    func start() {
+//        if Auth.auth().currentUser != nil {
+//            FirebaseManager.shared.currentUserInfo { result in
+//                switch result {
+//                case .success(let user):
+//                    if let userName = user.userName, !userName.isEmpty {
+//                        let tabBarController = UITabBarController()
+//                        let tabBarCoordinator = TabBarCoordinator(tabBarController: tabBarController)
+//                        
+//                        tabBarCoordinator.start()
+//                        self.childCoordinators.append(tabBarCoordinator)
+//                        
+//                        self.window.rootViewController = tabBarController
+//                    } else {
+//                        self.showLogin()
+//                    }
+//                case .failure:
+//                    self.showLogin()
+//                }
+//                self.window.makeKeyAndVisible()
+//            }
+//        } else {
+//            showLogin()
+//            self.window.makeKeyAndVisible()
+//        }
+//    }
+//    
+//    private func showLogin() {
+//        let navigationController = UINavigationController(rootViewController: LoginVC())
+//        window.rootViewController = navigationController
+//    }
 }

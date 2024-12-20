@@ -13,13 +13,13 @@ class LoginVC: UIViewController {
     
     private let logoImage: UIImageView = {
         let image = UIImageView()
-        image.image = UIImage(named: Login.loginLogo)
+        image.image = UIImage.customImage(style: .loginLogo)
         return image
     }()
     
     private let kakaoLoginButton: UIButton = {
         let button = UIButton(type: .system)
-        if let buttonImage = UIImage(named: Login.kakaoLoginButton) {
+        if let buttonImage = UIImage.customImage(style: .kakaoLogin) {
             button.setBackgroundImage(buttonImage, for: .normal)
         }
         return button
@@ -27,7 +27,7 @@ class LoginVC: UIViewController {
     
     private let appleLoginButton: UIButton = {
         let button = UIButton(type: .system)
-        if let buttonImage = UIImage(named: Login.appleLoginButton) {
+        if let buttonImage = UIImage.customImage(style: .appleLogin) {
             button.setBackgroundImage(buttonImage, for: .normal)
         }
         return button
@@ -35,7 +35,7 @@ class LoginVC: UIViewController {
     
     private let googleLoginButton: UIButton = {
         let button = UIButton(type: .system)
-        if let buttonImage = UIImage(named: Login.googleLoginButton) {
+        if let buttonImage = UIImage.customImage(style: .googleLogin) {
             button.setBackgroundImage(buttonImage, for: .normal)
         }
         return button
@@ -43,7 +43,7 @@ class LoginVC: UIViewController {
     
     private let guestLoginButton: UIButton = {
         let button = UIButton()
-        button.setTitle(Login.nonMemberButton, for: .normal)
+        button.setTitle(LoginNS.nonMemberButton, for: .normal)
         button.setTitleColor(.darkGray, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 13)
         return button

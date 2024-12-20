@@ -1,27 +1,13 @@
 //
-//  OnboardingNameSpace.swift
+//  PrivacyPolicy.swift
 //  WeClimb
 //
 //  Created by 윤대성 on 12/19/24.
 //
 
-import UIKit
+import Foundation
 
-
-enum Login {
-
-    static let loginLogo = "loginLogo"
-    
-    static let kakaoLoginButton = "kakaoLoginButton"
-    static let googleLoginButton = "googleLoginButton"
-    static let appleLoginButton = "appleLoginButton"
-    
-    static let nonMemberButton = "비회원으로 둘러보기"
-}
-
-enum PrivacyPolicy {
-    
-    static let logoImage = "logoImage"
+enum PrivacyPolicyNS {
     static let titleLabel = "이용 약관에\n동의해 주세요"
     static let pageControll = "1/3"
     
