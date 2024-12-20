@@ -73,6 +73,8 @@
 		6BC91FB02C7EEB4E00B34083 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC91FAF2C7EEB4E00B34083 /* FirebaseStorage */; };
 		6BC91FB32C7F016A00B34083 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6BC91FB12C7F016A00B34083 /* GoogleService-Info.plist */; };
 		6BCF42DA2C942C22000EF20B /* UserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCF42D92C942C22000EF20B /* UserTableViewCell.swift */; };
+		9112DB382D140DE8008D7FB6 /* NotificationSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9112DB372D140DE0008D7FB6 /* NotificationSettingVC.swift */; };
+		912138AB2D1516F400D55729 /* NotificationSettingTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912138AA2D1516F400D55729 /* NotificationSettingTableCell.swift */; };
 		912613292CD8FE1300CD5E74 /* CommentVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912613282CD8FE1300CD5E74 /* CommentVM.swift */; };
 		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
@@ -201,6 +203,8 @@
 		6BC91FB22C7F016A00B34083 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		6BC91FB52C7F16D800B34083 /* WeClimb.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeClimb.entitlements; sourceTree = "<group>"; };
 		6BCF42D92C942C22000EF20B /* UserTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTableViewCell.swift; sourceTree = "<group>"; };
+		9112DB372D140DE0008D7FB6 /* NotificationSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingVC.swift; sourceTree = "<group>"; };
+		912138AA2D1516F400D55729 /* NotificationSettingTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingTableCell.swift; sourceTree = "<group>"; };
 		912613282CD8FE1300CD5E74 /* CommentVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = CommentVM.swift; sourceTree = "<group>"; tabWidth = 4; };
 		916D64CF2C848A540064B766 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		916D64D22C848BE00064B766 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
@@ -401,6 +405,8 @@
 		C4EC63502CBE18FE00ED49B4 /* Setting */ = {
 			isa = PBXGroup;
 			children = (
+				9112DB372D140DE0008D7FB6 /* NotificationSettingVC.swift */,
+				912138AA2D1516F400D55729 /* NotificationSettingTableCell.swift */,
 				43A79ADB2C85AA7400B960A2 /* SettingVC.swift */,
 				43A79AE32C85C3B800B960A2 /* SettingCell.swift */,
 				435B7E412C8024AB00EB9816 /* EditPageVC.swift */,
@@ -718,6 +724,7 @@
 				F4892C2F2C7D9EA700C5FF16 /* UploadNameSpace.swift in Sources */,
 				C4E29C1D2C898AFB0076BCA6 /* SFMainFeedVC.swift in Sources */,
 				F4892C2B2C7CCDF200C5FF16 /* Identifiers.swift in Sources */,
+				912138AB2D1516F400D55729 /* NotificationSettingTableCell.swift in Sources */,
 				6B16C0ED2C9AE121004249AF /* UserPageVM.swift in Sources */,
 				436AEAF82C7F0EEE00E0D85A /* SearchModel.swift in Sources */,
 				43A79ACC2C819CB200B960A2 /* EditPageVM.swift in Sources */,
@@ -727,6 +734,7 @@
 				6B9033402C89DB1B0012D955 /* PersonalDetailsVC.swift in Sources */,
 				C49FC7092C9F1B0E00CD66D9 /* EditNickNameVC.swift in Sources */,
 				F4892C162C7C981000C5FF16 /* LoginVC.swift in Sources */,
+				9112DB382D140DE8008D7FB6 /* NotificationSettingVC.swift in Sources */,
 				6B7F76972CA4A1C300B05B3F /* BlackListCell.swift in Sources */,
 				43A79AE22C85BD3B00B960A2 /* SettingModel.swift in Sources */,
 				F4892C102C7C27D800C5FF16 /* ExampleModel.swift in Sources */,

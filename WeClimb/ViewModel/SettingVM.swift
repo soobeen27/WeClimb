@@ -25,17 +25,6 @@ class SettingVM {
         }
     }
     
-    // MARK: - 파이어베이스 회원탈퇴 YJ
-    //근데 이거 왜 필요함?
-//    func deleteUser() -> Observable<Void> {
-//        return Observable.create { observer in
-//            FirebaseManager.shared.userDelete()
-//            observer.onNext(())
-//            observer.onCompleted()
-//            return Disposables.create()
-//        }
-//    }
-    
     func checkLoginType() -> LoginType {
         guard let user = Auth.auth().currentUser else { return .none }
         

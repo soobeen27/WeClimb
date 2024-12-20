@@ -19,9 +19,8 @@ class SettingVC: UIViewController {
     private let snsAuthVM = SNSAuthVM()
     
     private var datas: [SettingItem] = [
-        //        SettingItem(section: .notifications, titles: [SettingNameSpace.notifications]),
         SettingItem(section: .policy, titles: [SettingNameSpace.termsOfService, SettingNameSpace.privacyPolic, SettingNameSpace.inquiry]),
-        SettingItem(section: .account, titles: [SettingNameSpace.editProfile, SettingNameSpace.blackList, SettingNameSpace.logout, SettingNameSpace.accountRemove]),
+        SettingItem(section: .account, titles: [SettingNameSpace.editProfile, SettingNameSpace.notifications, SettingNameSpace.blackList, SettingNameSpace.logout, SettingNameSpace.accountRemove]),
     ]
     
     private let tableView: UITableView = {
@@ -81,6 +80,8 @@ class SettingVC: UIViewController {
                     self.setLogout()
                 case SettingNameSpace.accountRemove:
                     self.setDeleteUser()
+                case SettingNameSpace.notifications:
+                    self.pushNotificationSettingVC()
                 default:
                     break
                 }
@@ -93,6 +94,10 @@ class SettingVC: UIViewController {
         guard let url = URL(string: urlString) else { return }
         let safariVC = SFSafariViewController(url: url)
         present(safariVC, animated: true, completion: nil)
+    }
+    private func pushNotificationSettingVC() {
+        let notificationSettingVC = NotificationSettingVC()
+        navigationController?.pushViewController(notificationSettingVC, animated: true)
     }
     
     
@@ -230,7 +235,7 @@ extension SettingVC: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SettingCell.className, for: indexPath) as? SettingCell else {
             fatalError("SettingCell을 가져올 수 없음.")
         }
-        
+        cell.selectionStyle = .none
         let item = datas[indexPath.section].titles[indexPath.row]
         cell.configure(with: item)
         return cell
