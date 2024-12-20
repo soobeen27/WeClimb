@@ -11,6 +11,7 @@ import SnapKit
 import RxSwift
 
 class EditNickNameVC: UIViewController, UITextFieldDelegate {
+    var coordinator: EditNickNameCoordinator?
 }
 //    private let disposeBag = DisposeBag()
 //    private let viewModel = CreateNickNameVM()

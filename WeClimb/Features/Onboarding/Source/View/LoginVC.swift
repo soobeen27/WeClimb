@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 
 class LoginVC: UIViewController {
+    var coordinator: LoginCoordinator?
     
     private let logoImage: UIImageView = {
         let image = UIImageView()

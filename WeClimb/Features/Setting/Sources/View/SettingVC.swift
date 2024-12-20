@@ -14,6 +14,7 @@ import AuthenticationServices
 import FirebaseAuth
 
 class SettingVC: UIViewController {
+    var coordinator: SettingCoordinator?
 }
 //    private let disposeBag = DisposeBag()
 //    private let viewModel: SettingViewModel

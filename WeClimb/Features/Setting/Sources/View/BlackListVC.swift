@@ -12,7 +12,7 @@ import RxSwift
 import SnapKit
 
 class BlackListVC: UIViewController {
-    
+    var coordinator: BlackListCoordinator?
 //    private let disposeBag = DisposeBag()
 //    private let viewModel = BlackListVM()
 //    

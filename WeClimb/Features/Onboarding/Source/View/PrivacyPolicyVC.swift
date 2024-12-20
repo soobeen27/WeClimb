@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 
 class PrivacyPolicyVC: UIViewController {
+    var coordinator: PrivacyPolicyCoordinator?
     
     private let logoImage: UIImageView = {
         let image = UIImageView()
