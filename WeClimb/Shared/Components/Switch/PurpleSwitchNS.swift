@@ -7,7 +7,7 @@
 
 import UIKit
 
-private enum PurpleSwitchNS {
+enum PurpleSwitchNS {
     static let activeColor = UIColor(red: 160/255, green: 83/255, blue: 233/255, alpha: 1)
     static let disabledColor = UIColor(red: 223/255, green: 224/255, blue: 226/255, alpha: 1)
 }

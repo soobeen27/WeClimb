@@ -15,11 +15,11 @@ enum RectangleButtonSize {
     var fontType: UIFont {
         switch self {
         case .large:
-            return UIFont.systemFont(ofSize: 16, weight: .semibold)
+            return .customFont(style: .label1SemiBold)
         case .medium:
-            return UIFont.systemFont(ofSize: 14, weight: .medium)
+            return .customFont(style: .label2Medium)
         case .small:
-            return UIFont.systemFont(ofSize: 12, weight: .light)
+            return .customFont(style: .caption1Medium)
         }
     }
     
