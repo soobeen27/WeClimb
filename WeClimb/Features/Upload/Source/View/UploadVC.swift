@@ -12,6 +12,10 @@ class UploadVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        setLayout()
+    }
+    
+    private func setLayout() {
+        view.backgroundColor = UIColor.yellow
     }
 }

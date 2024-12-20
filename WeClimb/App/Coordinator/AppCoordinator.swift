@@ -9,16 +9,26 @@ import UIKit
 
 final class AppCoordinator: BaseCoordinator {
     public var navigationController: UINavigationController
-    public let appDIcontainer: AppDIContainer
+    private let window: UIWindow
     
-    init(navigationController: UINavigationController, appDIcontainer: AppDIContainer) {
-        self.navigationController = navigationController
-        self.appDIcontainer = appDIcontainer
+    init(window: UIWindow) {
+        self.window = window
+        self.navigationController = UINavigationController()
     }
     
     override func start() {
+        // TabBarCoordinator 생성 및 실행
+        let tabBarController = UITabBarController()
+        let tabBarCoordinator = TabBarCoordinator(tabBarController: tabBarController)
         
+        addDependency(tabBarCoordinator)
+        tabBarCoordinator.start()
+        
+        // UIWindow의 rootViewController로 설정
+        window.rootViewController = tabBarController
+        window.makeKeyAndVisible()
     }
+}
 
 //    func start() {
 //        if Auth.auth().currentUser != nil {
@@ -28,10 +38,10 @@ final class AppCoordinator: BaseCoordinator {
 //                    if let userName = user.userName, !userName.isEmpty {
 //                        let tabBarController = UITabBarController()
 //                        let tabBarCoordinator = TabBarCoordinator(tabBarController: tabBarController)
-//                        
+//
 //                        tabBarCoordinator.start()
 //                        self.childCoordinators.append(tabBarCoordinator)
-//                        
+//
 //                        self.window.rootViewController = tabBarController
 //                    } else {
 //                        self.showLogin()
@@ -46,9 +56,8 @@ final class AppCoordinator: BaseCoordinator {
 //            self.window.makeKeyAndVisible()
 //        }
 //    }
-//    
+//
 //    private func showLogin() {
 //        let navigationController = UINavigationController(rootViewController: LoginVC())
 //        window.rootViewController = navigationController
 //    }
-}

@@ -27,8 +27,8 @@ extension UIImage {
         case feed
         case feedFill
         
-        case serach
-        case serachFill
+        case search
+        case searchFill
         
         case upload
         case uploadFill
@@ -60,9 +60,9 @@ extension UIImage {
             imageName = "homeIcon"
         case .feedFill:
             imageName = "homeIcon.fill"
-        case .serach:
+        case .search:
             imageName = "searchIcon"
-        case .serachFill:
+        case .searchFill:
             imageName = "searchIcon.fill"
         case .upload:
             imageName = "uploadIcon"

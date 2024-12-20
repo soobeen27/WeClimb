@@ -15,16 +15,20 @@ import FirebaseRemoteConfig
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
-    
+    var appCoordinator: AppCoordinator?
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         
-        window.rootViewController = UINavigationController(rootViewController: LoginVC())
-        window.makeKeyAndVisible()
+        let tabBarVC = TabBarVC()
+        let tabBarCoordinator = TabBarCoordinator(tabBarController: tabBarVC)
+        tabBarCoordinator.start()
+        window.rootViewController = tabBarVC
         
         self.window = window
+        window.makeKeyAndVisible()
+        
 //        // 의존성 초기화
 //        let appDIContainer = AppDIContainer.shared
         

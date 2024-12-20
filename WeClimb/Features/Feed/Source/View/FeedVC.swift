@@ -12,5 +12,10 @@ class FeedVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setLayout()
+    }
+    
+    private func setLayout() {
+        view.backgroundColor = UIColor.red
     }
 }

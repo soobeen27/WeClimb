@@ -19,11 +19,11 @@ final class TabBarCoordinator: BaseCoordinator {
     }
     
     private func setUpTabBar() {
-        let feedCoordinator = FeedCoordinator(navigationController: UINavigationController())
-        let searchCoordinator = SearchCoordinator(navigationController: UINavigationController())
-        let uploadCoordinator = UploadCoordinator(navigationController: UINavigationController())
-        let notificationCoordinator = NotificationCoordinator(navigationController: UINavigationController())
-        let userPageCoordinator = UserPageCoordinator(navigationController: UINavigationController())
+        let feedCoordinator = createFeedCoordinator()
+        let searchCoordinator = createSearchCoordinator()
+        let uploadCoordinator = createUploadCoordinator()
+        let notificationCoordinator = createNotificationCoordinator()
+        let userPageCoordinator = createUserPageCoordinator()
         
         addDependency(feedCoordinator)
         addDependency(searchCoordinator)
@@ -63,8 +63,8 @@ final class TabBarCoordinator: BaseCoordinator {
         let coordinator = SearchCoordinator(navigationController: navigationController)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
-            image: UIImage.customImage(style: .serach),
-            selectedImage: UIImage.customImage(style: .serachFill)
+            image: UIImage.customImage(style: .search),
+            selectedImage: UIImage.customImage(style: .searchFill)
         )
         return coordinator
     }
