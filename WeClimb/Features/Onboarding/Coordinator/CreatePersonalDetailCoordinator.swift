@@ -15,8 +15,8 @@ final class CreatePersonalDetailCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        let pushNotificationVC = PushNotificationVC()
-        pushNotificationVC.coordinator = self
-        navigationController.pushViewController(pushNotificationVC, animated: true)
+        let createPersonalDetailVC = CreatePersonalDetailVC()
+        createPersonalDetailVC.coordinator = self
+        navigationController.pushViewController(createPersonalDetailVC, animated: true)
     }
 }
