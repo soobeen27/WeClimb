@@ -27,3 +27,9 @@ extension UIColor {
     static let mainPurple = UIColor(hex: "#512BBB")
     
 }
+
+extension UIColor {
+    static let customlightGray = UIColor(red: 235/255, green: 235/255, blue: 236/255, alpha: 1)
+    static let customMediumGray = UIColor(red: 244/255, green: 245/255, blue: 245/255, alpha: 1)
+    static let customGray = UIColor(red: 191/255, green: 192/255, blue: 196/255, alpha: 1)
+}
