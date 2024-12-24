@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RxSwift
 import KakaoSDKCommon
 import KakaoSDKAuth
 import KakaoSDKUser
@@ -15,18 +16,21 @@ import FirebaseRemoteConfig
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
-    
+    let disposeBag = DisposeBag()
+    var alarmManager: AlarmManager?
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
+        alarmManager = AlarmManagerImpl()
         
         if Auth.auth().currentUser != nil {
+            let tabBarController = TabBarController()
             FirebaseManager.shared.currentUserInfo { result in
                 switch result {
                 case .success(let user):
                     if let userName = user.userName, !userName.isEmpty {
-                        window.rootViewController = TabBarController()
+                        window.rootViewController = tabBarController
                     } else {
                         window.rootViewController = UINavigationController(rootViewController: LoginVC())
                     }
@@ -37,6 +41,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 window.makeKeyAndVisible()
                 self.window = window
                 self.checkAppVersion()
+
+                // 알림 처리 위치 이동
+                if let notificationResponse = connectionOptions.notificationResponse {
+                    let userInfo = notificationResponse.notification.request.content.userInfo
+                    if let postUID = userInfo["postUID"] as? String {
+                        print("포스트: \(postUID)")
+//                        self.moveToMyPage(postUID: postUID)
+                        if let commentUID = userInfo["commentUID"] as? String {
+                            self.alarmManager?.moveToMyPage(postUID: postUID, commentUID: commentUID)
+                        } else {
+                            self.alarmManager?.moveToMyPage(postUID: postUID, commentUID: nil)
+                        }
+                    }
+                }
             }
         } else {
             // 사용자가 로그인되어 있지 않으면 LoginVC로 이동
@@ -46,6 +64,41 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             self.checkAppVersion()
         }
     }
+    
+    func moveToMyPage(postUID: String) {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let tabBarController = windowScene.windows.first?.rootViewController as? UITabBarController else {
+            print("탭바 닐")
+            return
+        }
+        
+        tabBarController.selectedIndex = 3
+        
+        let mainFeedVM = MainFeedVM()
+        mainFeedVM.fetchMyPosts()
+        
+        mainFeedVM.posts.asDriver()
+            .drive(onNext: { [weak self] posts in
+                guard let self = self else { return }
+                
+                let postUIDs = posts.map { $0.postUID }
+                
+                guard let index = postUIDs.firstIndex(of: postUID) else {
+                    print("내 포스트에 없음")
+                    return
+                }
+                
+                let mainFeedVC = SFMainFeedVC(viewModel: mainFeedVM, startingIndex: index, feedType: .myPage)
+                
+                if let navigationController = tabBarController.selectedViewController as? UINavigationController {
+                    navigationController.pushViewController(mainFeedVC, animated: true)
+                } else {
+                    print("네비컨트롤러 아님")
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         if let url = URLContexts.first?.url {

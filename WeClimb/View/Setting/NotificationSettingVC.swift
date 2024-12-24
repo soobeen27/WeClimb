@@ -112,7 +112,6 @@ class NotificationSettingVC: UIViewController {
                     self.data.accept(newData)
             }
         }
-        
     }
     
     private func getUserUID() {

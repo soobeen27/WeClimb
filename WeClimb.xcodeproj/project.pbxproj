@@ -76,6 +76,7 @@
 		9112DB382D140DE8008D7FB6 /* NotificationSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9112DB372D140DE0008D7FB6 /* NotificationSettingVC.swift */; };
 		912138AB2D1516F400D55729 /* NotificationSettingTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912138AA2D1516F400D55729 /* NotificationSettingTableCell.swift */; };
 		912613292CD8FE1300CD5E74 /* CommentVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912613282CD8FE1300CD5E74 /* CommentVM.swift */; };
+		9151015A2D1A67A600C06A28 /* AlarmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915101592D1A679A00C06A28 /* AlarmManager.swift */; };
 		916D64D02C848A540064B766 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64CF2C848A540064B766 /* FeedView.swift */; };
 		916D64D32C848BE00064B766 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D64D22C848BE00064B766 /* FeedCell.swift */; };
 		917DA8972CD4AE13006FF6B9 /* WeClimbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917DA8962CD4AE13006FF6B9 /* WeClimbTests.swift */; };
@@ -206,6 +207,7 @@
 		9112DB372D140DE0008D7FB6 /* NotificationSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingVC.swift; sourceTree = "<group>"; };
 		912138AA2D1516F400D55729 /* NotificationSettingTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingTableCell.swift; sourceTree = "<group>"; };
 		912613282CD8FE1300CD5E74 /* CommentVM.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = CommentVM.swift; sourceTree = "<group>"; tabWidth = 4; };
+		915101592D1A679A00C06A28 /* AlarmManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmManager.swift; sourceTree = "<group>"; };
 		916D64CF2C848A540064B766 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		916D64D22C848BE00064B766 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
 		917DA8942CD4AE13006FF6B9 /* WeClimbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeClimbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -526,6 +528,7 @@
 		F4892C0C2C7C27A800C5FF16 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				915101592D1A679A00C06A28 /* AlarmManager.swift */,
 				F4892C0D2C7C27BE00C5FF16 /* ExampleCommon.swift */,
 				F4892C2A2C7CCDF200C5FF16 /* Identifiers.swift */,
 				C47A0AFE2C9038990068173A /* FeedNameSpace.swift */,
@@ -795,6 +798,7 @@
 				F4892C242C7CBC8700C5FF16 /* UploadVM.swift in Sources */,
 				C49FC70D2CA265B300CD66D9 /* PersonalDetailsVM.swift in Sources */,
 				43A0E72A2CE3888800F15682 /* UploadHeaderView.swift in Sources */,
+				9151015A2D1A67A600C06A28 /* AlarmManager.swift in Sources */,
 				91FF42CC2CC5F37C003D9279 /* SNSAuthVM.swift in Sources */,
 				91A717002CEA0D25007F825C /* LoginNeeded.swift in Sources */,
 				6B7F76992CA4A8E900B05B3F /* BlackListVM.swift in Sources */,
@@ -1013,7 +1017,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1.0.5;
-				DEVELOPMENT_TEAM = TBHH7W8T8K;
+				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeClimb/Info.plist;
@@ -1055,7 +1059,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1.0.5;
-				DEVELOPMENT_TEAM = TBHH7W8T8K;
+				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3R26TKQ96R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeClimb/Info.plist;

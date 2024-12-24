@@ -7,6 +7,7 @@
 
 import AVFoundation
 import UIKit
+import RxSwift
 
 import FirebaseAuth
 import FirebaseCore
@@ -22,10 +23,13 @@ import UserNotifications
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
+    let disposeBag = DisposeBag()
+    var alarmManager: AlarmManager?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        // 파이어베이스 설정
+        alarmManager = AlarmManagerImpl()
+        // 파이어베이스 설
         FirebaseApp.configure()
         // Override point for customization after application launch.
         // 파이어스토어 디비
@@ -125,7 +129,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
 
         let userInfo = notification.request.content.userInfo
-        handleNotification(userInfo: userInfo)
+//        handleNotification(userInfo: userInfo)ㅇㅇ
 
         completionHandler([.badge, .sound, .banner])
     }
@@ -141,11 +145,42 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
     
     func handleNotification(userInfo: [AnyHashable : Any]) {
+        
         if let postUID = userInfo["postUID"] as? String {
             print("포스트: \(postUID)")
+//            moveToMyPage(postUID: postUID)
             if let commentUID = userInfo["commentUID"] as? String {
                 print("코멘트임 : \(commentUID)")
+                alarmManager?.moveToMyPage(postUID: postUID, commentUID: commentUID)
+            } else {
+                alarmManager?.moveToMyPage(postUID: postUID, commentUID: nil)
             }
+        }
+    }
+    func moveToMyPage(postUID: String) {
+        if let tabBarController = (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.first?.rootViewController as? UITabBarController {
+            tabBarController.selectedIndex = 3
+            
+            let mainFeedVM = MainFeedVM()
+            mainFeedVM.fetchMyPosts()
+            mainFeedVM.posts.asDriver()
+                .skip(1)
+                .drive() { [weak self] posts in
+                    guard let self else { return }
+                    let postUIDs = posts.map {
+                        return $0.postUID
+                    }
+                    print("포스트 유아이디s\(postUIDs)")
+                    print("포스트 유아이디\(postUID)")
+                    guard let index = postUIDs.firstIndex(of: postUID) else { return }
+                    print("index: \(index)")
+                    let mainFeedVC = SFMainFeedVC(viewModel: mainFeedVM, startingIndex: index, feedType: .myPage)
+                    if let navigationController = tabBarController.selectedViewController as? UINavigationController {
+                        navigationController.pushViewController(mainFeedVC, animated: true)
+                    } else {
+                        print("Error - 뷰컨 닐임")
+                    }
+                }.disposed(by: disposeBag)
         }
     }
 }
