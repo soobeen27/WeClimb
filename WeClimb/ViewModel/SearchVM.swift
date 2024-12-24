@@ -44,8 +44,9 @@ class SearchViewModel {
                 .toArray() // 배열로 변환
                 .subscribe(onSuccess: { gyms in
                     let validGyms = gyms.compactMap { $0 } // nil 값 필터링
-                    self?.data.accept(validGyms) // 테이블 뷰에 전달할 데이터
-                    self?.filteredData.accept(validGyms) // 필터링 되지 않은 초기 데이터
+                    let sortedGyms = self?.customSort(items: validGyms) ?? validGyms
+                    self?.data.accept(sortedGyms) // 테이블 뷰에 전달할 데이터
+                    self?.filteredData.accept(sortedGyms) // 필터링 되지 않은 초기 데이터
                 })
                 .disposed(by: self?.disposeBag ?? DisposeBag())
         }
@@ -130,4 +131,41 @@ class SearchViewModel {
             })
             .disposed(by: disposeBag)
     }
+
+    func customSort(items: [Gym]) -> [Gym] {
+        return items.sorted { (lhs: Gym, rhs: Gym) in
+            let lhsPriority = getSortPriority(for: lhs.gymName)
+            let rhsPriority = getSortPriority(for: rhs.gymName)
+            
+            // 우선순위 비교
+            if lhsPriority != rhsPriority {
+                return lhsPriority < rhsPriority
+            }
+            
+            // 같은 우선순위라면 문자열 자체 비교
+            return lhs.gymName < rhs.gymName
+        }
+    }
+
+    func getSortPriority(for string: String) -> Int {
+        // 한글: 우선순위 1
+        if string.range(of: "^[가-힣]", options: .regularExpression) != nil {
+            return 1
+        }
+        
+        // 영어: 우선순위 2
+        if string.range(of: "^[A-Za-z]", options: .regularExpression) != nil {
+            return 2
+        }
+        
+        // 숫자: 우선순위 3
+        if string.range(of: "^[0-9]", options: .regularExpression) != nil {
+            return 3
+        }
+        
+        // 기타: 우선순위 4
+        return 4
+    }
+
+
 }
