@@ -71,7 +71,7 @@ class SettingVC: UIViewController {
                 case SettingNameSpace.privacyPolic:
                     self.openWeb(urlString: "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928")
                 case SettingNameSpace.inquiry:
-                    self.openWeb(urlString: "https://forms.gle/UUaJmFeLAyuFXFFS9")
+                    self.openWeb(urlString: "https://smore.im/form/SJzhMCAciD")
                 case SettingNameSpace.editProfile:
                     self.setEditProfile()
                 case SettingNameSpace.blackList:
