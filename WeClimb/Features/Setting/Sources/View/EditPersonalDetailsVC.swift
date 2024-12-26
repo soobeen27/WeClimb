@@ -12,7 +12,7 @@ import RxCocoa
 import RxSwift
 
 class EditPersonalDetailsVC: UIViewController {
-    var coordinator: EditPageCoordinator?
+    var coordinator: EditPersonalDetailsCoordinator?
 }
 //
 //    private let disposeBag = DisposeBag()
