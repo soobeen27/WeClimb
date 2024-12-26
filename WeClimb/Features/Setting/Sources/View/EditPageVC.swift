@@ -13,6 +13,7 @@ import RxSwift
 import SnapKit
 
 class EditPageVC: UIViewController {
+    var coordinator: EditPageCoordinator?
 }
 //    private let editPageViewModel = EditPageVM()
 //    private let createNickNameVM = CreateNickNameVM()

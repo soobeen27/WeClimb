@@ -25,5 +25,5 @@ extension UIColor {
     }
     
     static let mainPurple = UIColor(hex: "#512BBB")
-    
+    static let customlightGray = UIColor(hex: "#DFE0E2")
 }
