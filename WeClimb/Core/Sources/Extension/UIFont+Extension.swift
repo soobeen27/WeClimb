@@ -12,39 +12,39 @@ enum CustomFontStyle {
     case title1Medium
     case title1Regular
     
-    case title2Bold
+    case title2SemiBold
     case title2Medium
     case title2Regular
     
-    case heading1Bold
+    case heading1SemiBold
     case heading1Medium
     case heading1Regular
     
-    case heading2Bold
+    case heading2SemiBold
     case heading2Medium
     case heading2Regular
     
-    case body1Bold
+    case body1SemiBold
     case body1Medium
     case body1Regular
     
-    case body2Bold
+    case body2SemiBold
     case body2Medium
     case body2Regular
     
-    case label1Bold
+    case label1SemiBold
     case label1Medium
     case label1Regular
     
-    case label2Bold
+    case label2SemiBold
     case label2Medium
     case label2Regular
     
-    case caption1Bold
+    case caption1SemiBold
     case caption1Medium
     case caption1Regular
     
-    case caption2Bold
+    case caption2SemiBold
     case caption2Medium
     case caption2Regular
 }
@@ -67,7 +67,7 @@ extension UIFont {
             weightString = "Regular"
             fontSize = 28
             
-        case .title2Bold:
+        case .title2SemiBold:
             weightString = "SemiBold"
             fontSize = 24
         case .title2Medium:
@@ -77,7 +77,7 @@ extension UIFont {
             weightString = "Regular"
             fontSize = 24
             
-        case .heading1Bold:
+        case .heading1SemiBold:
             weightString = "SemiBold"
             fontSize = 20
         case .heading1Medium:
@@ -87,7 +87,7 @@ extension UIFont {
             weightString = "Regular"
             fontSize = 20
             
-        case .heading2Bold:
+        case .heading2SemiBold:
             weightString = "SemiBold"
             fontSize = 18
         case .heading2Medium:
@@ -97,7 +97,7 @@ extension UIFont {
             weightString = "Regular"
             fontSize = 18
             
-        case .body1Bold:
+        case .body1SemiBold:
             weightString = "SemiBold"
             fontSize = 16
         case .body1Medium:
@@ -107,7 +107,7 @@ extension UIFont {
             weightString = "Regular"
             fontSize = 16
             
-        case .body2Bold:
+        case .body2SemiBold:
             weightString = "SemiBold"
             fontSize = 14
         case .body2Medium:
@@ -117,7 +117,7 @@ extension UIFont {
             weightString = "Regular"
             fontSize = 14
             
-        case .label1Bold:
+        case .label1SemiBold:
             weightString = "SemiBold"
             fontSize = 16
         case .label1Medium:
@@ -127,7 +127,7 @@ extension UIFont {
             weightString = "Regular"
             fontSize = 16
             
-        case .label2Bold:
+        case .label2SemiBold:
             weightString = "SemiBold"
             fontSize = 14
         case .label2Medium:
@@ -137,7 +137,7 @@ extension UIFont {
             weightString = "Regular"
             fontSize = 14
             
-        case .caption1Bold:
+        case .caption1SemiBold:
             weightString = "SemiBold"
             fontSize = 12
         case .caption1Medium:
@@ -147,7 +147,7 @@ extension UIFont {
             weightString = "Regular"
             fontSize = 12
             
-        case .caption2Bold:
+        case .caption2SemiBold:
             weightString = "SemiBold"
             fontSize = 10
         case .caption2Medium:
