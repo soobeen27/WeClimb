@@ -48,6 +48,10 @@ extension UIImage {
         
         // MARK: - PrivacyPolicy 페이지
         case logoImage
+        
+        //MARK: - ChoicedTagsCollectionView
+        case close
+        case check
     }
 }
 
@@ -86,8 +90,77 @@ extension UIImage {
             imageName = "appleLoginButton"
         case .logoImage:
             imageName = "logoImage"
+        case .close:
+            imageName = "closeIcon"
+        case .check:
+            imageName = "checkIcon"
         }
         return UIImage(named: imageName)
     }
 }
 
+enum ColorType {
+    case black
+    case blue
+    case brown
+    case darkBlue
+    case darkGreen
+    case darkRed
+    case darkYellow
+    case gray
+    case green
+    case lightGreen
+    case mint
+    case navy
+    case orange
+    case pink
+    case purple
+    case red
+    case white
+    case yellow
+}
+
+// UIImage Extension
+extension UIImage {
+    static func colors(style: ColorType) -> UIImage {
+        switch style {
+        case .black:
+            UIImage.colorBlack
+        case .blue:
+            UIImage.colorBlue
+        case .brown:
+            UIImage.colorBrown
+        case .darkBlue:
+            UIImage.colorDarkBlue
+        case .darkGreen:
+            UIImage.colorDarkGreen
+        case .darkRed:
+            UIImage.colorDarkRed
+        case .darkYellow:
+            UIImage.colorDarkYellow
+        case .gray:
+            UIImage.colorGray
+        case .green:
+            UIImage.colorGreen
+        case .lightGreen:
+            UIImage.colorLightGreen
+        case .mint:
+            UIImage.colorMint
+        case .navy:
+            UIImage.colorNavy
+        case .orange:
+            UIImage.colorOrange
+        case .pink:
+            UIImage.colorPink
+        case .purple:
+            UIImage.colorPurple
+        case .red:
+            UIImage.colorRed
+        case .white:
+            UIImage.colorWhite
+        case .yellow:
+            UIImage.colorYellow
+        }
+        
+    }
+}

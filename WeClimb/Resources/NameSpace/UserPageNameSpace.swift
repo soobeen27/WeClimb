@@ -16,30 +16,3 @@ enum UserPageNameSpace {
     static let none = "미정"
 
 }
-
-
-enum SomeViewConstants {
-    enum Color {
-        static let black = UIColor.black
-    }
-    
-    enum Font {
-        static let regular = UIFont.systemFont(ofSize: 14)
-    }
-    
-    enum Image {
-        static let close = UIImage(systemName: "xmark")
-    }
-    
-    enum Size {
-        static let padding: CGFloat = 16
-    }
-    
-    enum Spacing {
-        static let padding: CGFloat = 16
-    }
-    
-    enum Text {
-        static let none = "미정"
-    }
-}
