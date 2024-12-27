@@ -6,9 +6,17 @@
 //
 
 import UIKit
+import RxCocoa
+import RxSwift
 
 class UploadMediaVC: UIViewController {
     var coordinator: UploadMediaCoordinator?
+    
+    let button : RectangleIconButton = {
+        let button = RectangleIconButton()
+        button.layer.cornerRadius = 10
+       return button
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
