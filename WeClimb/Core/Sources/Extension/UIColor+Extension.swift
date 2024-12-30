@@ -9,7 +9,7 @@ import UIKit
 
 //MARK: - 메인 포인트 컬러(보라)
 extension UIColor {
-    convenience init(hex: String) {
+    convenience init(hex: String, alpha: CGFloat = 1.0) {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
         
@@ -21,7 +21,7 @@ extension UIColor {
         let green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
         let blue = CGFloat(rgb & 0x0000FF) / 255.0
         
-        self.init(red: red, green: green, blue: blue, alpha: 1.0)
+        self.init(red: red, green: green, blue: blue, alpha: alpha)
     }
     
     static let mainPurple = UIColor(hex: "#512BBB")
@@ -39,4 +39,14 @@ extension UIColor {
     static let alertbackgroundGray = UIColor(red: 26/255, green: 26/255, blue: 26/255, alpha: 0.12)
     static let alertlightGray = UIColor(red: 127/255, green: 129/255, blue: 138/255, alpha: 0.16)
     static let alertTitleGray = UIColor(red: 88/255, green: 89/255, blue: 96/255, alpha: 1)
+}
+
+extension UIColor {
+    static let labelStrong = UIColor(hex: "#27282B")
+    static let labelAlternative = UIColor(hex: "#AAABB1")
+    static let lineSolidLight = UIColor(hex: "#F4F5F5")
+    static let fillSolidLightWhite = UIColor(hex: "#FFF")
+    static let labelWhite = UIColor(hex: "#FFF")
+    static let labelNeutral = UIColor(hex: "#7F818A")
+    static let fillSolidLightNormal = UIColor(hex: "#F4F5F5")
 }
