@@ -10,7 +10,15 @@ import UIKit
 import SnapKit
 import RxSwift
 
+enum ScreenMode {
+    case dark
+    case light
+}
+
 class TagCollectionCell: UICollectionViewCell {
+    
+    private var screenMode: ScreenMode?
+    
     private let tagImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -42,12 +50,17 @@ class TagCollectionCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func configure(screenMode: ScreenMode) {
+        self.screenMode = screenMode
+    }
+    
     private func setLayout() {
         [
             tagImageView,
             titleLabel,
             cancelButton
-        ].forEach {
+        ]
+            .forEach {
             self.contentView.addSubview($0)
         }
         
