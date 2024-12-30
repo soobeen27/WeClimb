@@ -31,12 +31,16 @@ extension UIColor {
 extension UIColor {
     
     //MARK: - 세그먼트 커스텀 컬러
-    static let segmentlightGray = UIColor(red: 235/255, green: 235/255, blue: 236/255, alpha: 1)
-    static let segmentMediumGray = UIColor(red: 244/255, green: 245/255, blue: 245/255, alpha: 1)
-    static let segmentGray = UIColor(red: 191/255, green: 192/255, blue: 196/255, alpha: 1)
+    static let lineSolidLight = UIColor(red: 235/255, green: 235/255, blue: 236/255, alpha: 1)
+    static let fillSoildLightNormal = UIColor(red: 244/255, green: 245/255, blue: 245/255, alpha: 1)
+    static let fillSoildLightHeavy = UIColor(red: 191/255, green: 192/255, blue: 196/255, alpha: 1)
     
     //MARK: - 알럿 커스텀 컬러
-    static let alertbackgroundGray = UIColor(red: 26/255, green: 26/255, blue: 26/255, alpha: 0.12)
-    static let alertlightGray = UIColor(red: 127/255, green: 129/255, blue: 138/255, alpha: 0.16)
-    static let alertTitleGray = UIColor(red: 88/255, green: 89/255, blue: 96/255, alpha: 1)
+    static let fillSoildDarkNormal = UIColor(red: 39/255, green: 40/255, blue: 43/255, alpha: 1)
+    static let labelStrong = UIColor(red: 39/255, green: 40/255, blue: 43/255, alpha: 1)
+    static let lineOpacityStrong = UIColor(red: 127/255, green: 129/255, blue: 138/255, alpha: 0.24)
+    static let lineOpacityHeavy = UIColor(red: 127/255, green: 129/255, blue: 138/255, alpha: 0.4)
+    static let labelNormal = UIColor(red: 88/255, green: 89/255, blue: 96/255, alpha: 1)
+    static let labelAssistive = UIColor(red: 191/255, green: 192/255, blue: 196/255, alpha: 1)
+    static let MaterialNormal = UIColor(red: 26/255, green: 26/255, blue: 26/255, alpha: 0.12)
 }
