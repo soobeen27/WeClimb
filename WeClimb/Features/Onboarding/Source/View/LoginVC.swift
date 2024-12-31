@@ -16,52 +16,45 @@ class LoginVC: UIViewController {
     
     private let logoImage: UIImageView = {
         let image = UIImageView()
-        image.image = UIImage.customImage(style: .loginLogo)
+        image.image = OnboardingConst.Login.Image.weclimbLogo
         return image
     }()
     
     private let kakaoLoginButton: UIButton = {
         let button = UIButton(type: .system)
-        if let buttonImage = UIImage.customImage(style: .kakaoLogin) {
-            button.setBackgroundImage(buttonImage, for: .normal)
-        }
+        button.setBackgroundImage(OnboardingConst.Login.Image.kakaoLoginButton, for: .normal)
         return button
     }()
     
     private let appleLoginButton: UIButton = {
         let button = UIButton(type: .system)
-        if let buttonImage = UIImage.customImage(style: .appleLogin) {
-            button.setBackgroundImage(buttonImage, for: .normal)
-        }
+        button.setBackgroundImage(OnboardingConst.Login.Image.appleLoginButton, for: .normal)
         return button
     }()
     
     private let googleLoginButton: UIButton = {
         let button = UIButton(type: .system)
-        if let buttonImage = UIImage.customImage(style: .googleLogin) {
-            button.setBackgroundImage(buttonImage, for: .normal)
-        }
+        button.setBackgroundImage(OnboardingConst.Login.Image.googleLoginButton, for: .normal)
         return button
     }()
     
     private let guestLoginButton: UIButton = {
         let button = UIButton()
-        button.setTitle(LoginNS.nonMemberButton, for: .normal)
-        button.setTitleColor(.darkGray, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 13)
+        button.setTitle(OnboardingConst.Login.Text.nonMemberButton, for: .normal)
+        button.setTitleColor(OnboardingConst.Login.Color.guestLoginFontColor, for: .normal)
+        button.titleLabel?.font = OnboardingConst.Login.Font.guestLogin
         return button
     }()
     
     private let buttonStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 15
+        stackView.spacing = OnboardingConst.Login.Spacing.vertical
         return stackView
     }()
     
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
         setLayout()
     }
@@ -82,31 +75,28 @@ class LoginVC: UIViewController {
         ].forEach { buttonStackView.addArrangedSubview($0) }
         
         logoImage.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 135, height: 169))
+            $0.size.equalTo(OnboardingConst.Login.Size.weclimbLogo)
             $0.centerX.equalToSuperview()
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(48)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(OnboardingConst.Login.Spacing.logoTopMargin)
         }
         
         buttonStackView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalToSuperview().multipliedBy(0.85)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.bottom.equalToSuperview().multipliedBy(OnboardingConst.Login.Spacing.BottomOffset)
+            $0.leading.equalToSuperview().offset(OnboardingConst.Login.Spacing.padding)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.Login.Spacing.padding)
         }
         
         kakaoLoginButton.snp.makeConstraints {
-            $0.height.equalTo(48)
-            $0.width.equalTo(343)
+            $0.height.width.equalTo(OnboardingConst.Login.Size.loginButton)
         }
         
         googleLoginButton.snp.makeConstraints {
-            $0.height.equalTo(48)
-            $0.width.equalTo(343)
+            $0.height.width.equalTo(OnboardingConst.Login.Size.loginButton)
         }
         
         appleLoginButton.snp.makeConstraints {
-            $0.height.equalTo(48)
-            $0.width.equalTo(343)
+            $0.height.width.equalTo(OnboardingConst.Login.Size.loginButton)
         }
     }
 }

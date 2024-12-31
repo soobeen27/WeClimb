@@ -52,8 +52,8 @@ final class TabBarCoordinator: BaseCoordinator {
         let coordinator = FeedCoordinator(navigationController: navigationController)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
-            image: UIImage.customImage(style: .feed),
-            selectedImage: UIImage.customImage(style: .feedFill)
+            image: UIImage.homeIcon,
+            selectedImage: UIImage.homeIconFill
         )
         return coordinator
     }
@@ -63,8 +63,8 @@ final class TabBarCoordinator: BaseCoordinator {
         let coordinator = SearchCoordinator(navigationController: navigationController)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
-            image: UIImage.customImage(style: .search),
-            selectedImage: UIImage.customImage(style: .searchFill)
+            image: UIImage.searchIcon,
+            selectedImage: UIImage.searchIconFill
         )
         return coordinator
     }
@@ -74,8 +74,8 @@ final class TabBarCoordinator: BaseCoordinator {
         let coordinator = UploadCoordinator(navigationController: navigationController)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
-            image: UIImage.customImage(style: .upload),
-            selectedImage: UIImage.customImage(style: .uploadFill)
+            image: UIImage.uploadIcon,
+            selectedImage: UIImage.uploadIconFill
         )
         return coordinator
     }
@@ -85,8 +85,8 @@ final class TabBarCoordinator: BaseCoordinator {
         let coordinator = NotificationCoordinator(navigationController: navigationController)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
-            image: UIImage.customImage(style: .notification),
-            selectedImage: UIImage.customImage(style: .notificationFill)
+            image: UIImage.notificationIcon,
+            selectedImage: UIImage.notificationIconFill
         )
         return coordinator
     }
@@ -96,8 +96,8 @@ final class TabBarCoordinator: BaseCoordinator {
         let coordinator = UserPageCoordinator(navigationController: navigationController)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
-            image: UIImage.customImage(style: .userPage),
-            selectedImage: UIImage.customImage(style: .userPageFill)
+            image: UIImage.avatarIcon,
+            selectedImage: UIImage.avatarIconFill
         )
         return coordinator
     }

@@ -56,23 +56,23 @@ class CustomSegmentedControl: UIView {
     private func setupSegmentControl() {
         addSubview(segmentControl)
         
-        segmentControl.selectedSegmentIndex = CustomSegmentConstants.Size.firstSegmentItem
+        segmentControl.selectedSegmentIndex = CustomSegmentConst.Size.firstSegmentItem
         segmentControl.selectedSegmentTintColor = .clear
         
         segmentControl.setTitleTextAttributes([
-            .font: CustomSegmentConstants.Font.normalFont,
-            .foregroundColor: CustomSegmentConstants.Color.normalFontColor
+            .font: CustomSegmentConst.Font.normalFont,
+            .foregroundColor: CustomSegmentConst.Color.normalFontColor
         ], for: .normal)
 
         segmentControl.setTitleTextAttributes([
-            .font: CustomSegmentConstants.Font.selectedFont,
-            .foregroundColor: CustomSegmentConstants.Color.selectedFontColor
+            .font: CustomSegmentConst.Font.selectedFont,
+            .foregroundColor: CustomSegmentConst.Color.selectedFontColor
         ], for: .selected)
         
         segmentControl.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.equalToSuperview()
-            $0.height.equalTo(CustomSegmentConstants.Size.segmentControlHeight)
+            $0.height.equalTo(CustomSegmentConst.Size.segmentControlHeight)
         }
     }
     
@@ -84,32 +84,32 @@ class CustomSegmentedControl: UIView {
     
     private func setupIndicatorView() {
         addSubview(indicatorView)
-        indicatorView.backgroundColor = CustomSegmentConstants.Color.indicatorColor
+        indicatorView.backgroundColor = CustomSegmentConst.Color.indicatorColor
         
-        let initialWidth = CustomSegmentConstants.Helper.titleWidth(
-            for: segmentControl.titleForSegment(at: CustomSegmentConstants.Size.firstSegmentItem),
-            font: CustomSegmentConstants.Font.normalFont
+        let initialWidth = CustomSegmentConst.Helper.titleWidth(
+            for: segmentControl.titleForSegment(at: CustomSegmentConst.Size.firstSegmentItem),
+            font: CustomSegmentConst.Font.normalFont
         )
         
         indicatorView.snp.makeConstraints {
-            $0.bottom.equalTo(segmentControl.snp.bottom).offset(CustomSegmentConstants.Spacing.indicatorBottomOffset)
-            $0.height.equalTo(CustomSegmentConstants.Size.indicatorHeight)
+            $0.bottom.equalTo(segmentControl.snp.bottom).offset(CustomSegmentConst.Spacing.indicatorBottomOffset)
+            $0.height.equalTo(CustomSegmentConst.Size.indicatorHeight)
             indicatorWidthConstraint = $0.width.equalTo(initialWidth).constraint
             indicatorCenterXConstraint = $0.centerX.equalTo(segmentControl.snp.leading)
-                .offset(CustomSegmentConstants.Helper.centerX(for: segmentWidth(), at: CustomSegmentConstants.Size.firstSegmentItem))
+                .offset(CustomSegmentConst.Helper.centerX(for: segmentWidth(), at: CustomSegmentConst.Size.firstSegmentItem))
                 .constraint
         }
     }
 
     
     private func initializeIndicatorLayout() {
-        let initialWidth = CustomSegmentConstants.Helper.titleWidth(
-            for: segmentControl.titleForSegment(at: CustomSegmentConstants.Size.firstSegmentItem),
-            font: CustomSegmentConstants.Font.normalFont
+        let initialWidth = CustomSegmentConst.Helper.titleWidth(
+            for: segmentControl.titleForSegment(at: CustomSegmentConst.Size.firstSegmentItem),
+            font: CustomSegmentConst.Font.normalFont
         )
-        let initialCenterX = CustomSegmentConstants.Helper.centerX(
+        let initialCenterX = CustomSegmentConst.Helper.centerX(
             for: segmentWidth(),
-            at: CustomSegmentConstants.Size.firstSegmentItem
+            at: CustomSegmentConst.Size.firstSegmentItem
         )
         
         indicatorWidthConstraint.update(offset: initialWidth)
@@ -125,11 +125,11 @@ class CustomSegmentedControl: UIView {
                 guard let self = self,
                       let selectedTitle = self.segmentControl.titleForSegment(at: selectedIndex) else { return }
                 
-                let titleWidth = CustomSegmentConstants.Helper.titleWidth(
+                let titleWidth = CustomSegmentConst.Helper.titleWidth(
                     for: selectedTitle,
-                    font: CustomSegmentConstants.Font.normalFont
+                    font: CustomSegmentConst.Font.normalFont
                 )
-                let newCenterX = CustomSegmentConstants.Helper.centerX(
+                let newCenterX = CustomSegmentConst.Helper.centerX(
                     for: self.segmentWidth(),
                     at: selectedIndex
                 )

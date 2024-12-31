@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum CustomSegmentConstants {
+enum CustomSegmentConst {
     enum Color {
         static let indicatorColor: UIColor = UIColor.fillSolidDarkBlack
         static let normalFontColor: UIColor = UIColor.labelNeutral

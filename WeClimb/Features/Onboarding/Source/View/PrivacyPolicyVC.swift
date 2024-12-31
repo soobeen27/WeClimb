@@ -14,7 +14,7 @@ class PrivacyPolicyVC: UIViewController {
     
     private let logoImage: UIImageView = {
         let image = UIImageView()
-        image.image = UIImage.customImage(style: .logoImage)
+        image.image = UIImage.logo
         return image
     }()
     
