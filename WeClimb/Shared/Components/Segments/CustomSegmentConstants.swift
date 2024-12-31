@@ -15,8 +15,8 @@ enum CustomSegmentConstants {
     }
     
     enum Font {
-        static let normalFont: UIFont = UIFont.customFont(style: CustomFontStyle.body1SemiBold)
-        static let selectedFont: UIFont = UIFont.customFont(style: CustomFontStyle.body1Regular)
+        static let normalFont: UIFont = UIFont.customFont(style: CustomFontStyle.body1Regular)
+        static let selectedFont: UIFont = UIFont.customFont(style: CustomFontStyle.body1SemiBold)
     }
     
     enum Size {

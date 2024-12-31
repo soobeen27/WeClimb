@@ -71,7 +71,7 @@ class CustomSegmentedControl: UIView {
         
         segmentControl.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.leading.equalToSuperview().inset(20)
+            $0.leading.equalToSuperview()
             $0.height.equalTo(CustomSegmentConstants.Size.segmentControlHeight)
         }
     }
