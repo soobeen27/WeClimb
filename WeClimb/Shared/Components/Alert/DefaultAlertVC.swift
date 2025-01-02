@@ -39,7 +39,6 @@ public class DefaultAlertVC: UIViewController {
         }
     }
     
-    // 버튼 텍스트 색상
     public var cancelButtonTitleColor: UIColor? {
         didSet {
             cancelButton.setTitleColor(cancelButtonTitleColor, for: .normal)
@@ -55,7 +54,6 @@ public class DefaultAlertVC: UIViewController {
     public var customAction: (() -> Void)?
     
     private var alertType: AlertType
-//    private var interfaceStyle: InterfaceStyle
     
     private var cancelButtonTitle: String?
     private var customButtonTitle: String?
@@ -81,7 +79,7 @@ public class DefaultAlertVC: UIViewController {
         button.titleLabel?.font = .customFont(style: .label2Medium)
         button.setTitleColor(.labelStrong, for: .normal)
         button.setTitle("취소", for: .normal)
-        button.backgroundColor = .white // 기본값은 흰색
+        button.backgroundColor = .white
         return button
     }()
     
@@ -89,7 +87,7 @@ public class DefaultAlertVC: UIViewController {
         let button = UIButton()
         button.layer.cornerRadius = DefaultAlertVCNS.CornerRadius.buttons
         button.titleLabel?.font = .customFont(style: .label2Medium)
-        button.backgroundColor = .red // 기본값은 빨간색
+        button.backgroundColor = .red
         button.setTitleColor(.white, for: .normal)
         button.setTitle("확인", for: .normal)
         return button
@@ -99,7 +97,7 @@ public class DefaultAlertVC: UIViewController {
         let label = UILabel()
         label.text = "Title"
         label.font = .customFont(style: .label1SemiBold)
-        label.textColor = .black // 기본값은 검은색
+        label.textColor = .labelStrong
         return label
     }()
     
@@ -109,7 +107,7 @@ public class DefaultAlertVC: UIViewController {
         label.font = .customFont(style: .body2Regular)
         label.textAlignment = .left
         label.numberOfLines = DefaultAlertVCNS.NumberOfLines.description
-        label.textColor = .labelNormal // 기본값은 회색
+        label.textColor = .labelNormal
         return label
     }()
     
