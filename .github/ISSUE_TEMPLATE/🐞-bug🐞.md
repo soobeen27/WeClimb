@@ -1,8 +1,8 @@
 ---
-name: "⚡️Simple⚡️"
-about: 간단한 수정
+name: "\U0001F41E Bug\U0001F41E"
+about: 버그수정
 title: ''
-labels: "⚡️Simple"
+labels: "\U0001F436 bug"
 assignees: ''
 
 ---

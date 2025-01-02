@@ -1,8 +1,8 @@
 ---
-name: "⚡️Simple⚡️"
-about: 간단한 수정
+name: "✨Featuer✨"
+about: 기능추가
 title: ''
-labels: "⚡️Simple"
+labels: "\U0001F58A️ Feat"
 assignees: ''
 
 ---
