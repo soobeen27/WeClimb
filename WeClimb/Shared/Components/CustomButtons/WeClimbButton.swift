@@ -77,7 +77,7 @@ class WeClimbButton: UIButton {
             return CGSize(width: totalWidth, height: buttonSize.height)
             
         case .rightIconRound:
-            return CGSize(width: RoundRightIconButtonNS.width, height: RoundRightIconButtonNS.height)
+            return CGSize(width: ButtonsConst.RightIconRound.Size.width, height:  ButtonsConst.RightIconRound.Size.height)
         }
     }
     
@@ -98,7 +98,7 @@ class WeClimbButton: UIButton {
             backgroundColor = .black
             
         case .rightIconRound:
-            layer.cornerRadius = RoundRightIconButtonNS.cornerRadius
+            layer.cornerRadius = ButtonsConst.RightIconRound.cornerRadius
             clipsToBounds = true
             titleLabel?.font = UIFont.customFont(style: .caption1Medium)
             setTitleColor(.white, for: .normal)
@@ -137,14 +137,14 @@ class WeClimbButton: UIButton {
             
         case .rightIconRound:
             rightIconView.snp.makeConstraints {
-                $0.trailing.equalToSuperview().offset(-RoundRightIconButtonNS.trailing)
+                $0.trailing.equalToSuperview().offset(-ButtonsConst.RightIconRound.Spacing.rightPadding)
                 $0.centerY.equalToSuperview()
-                $0.width.height.equalTo(RoundRightIconButtonNS.imageSize)
+                $0.width.height.equalTo(ButtonsConst.RightIconRound.Size.imageSize)
             }
             
             titleLabel.snp.makeConstraints {
-                $0.trailing.equalTo(rightIconView.snp.leading).offset(-RoundRightIconButtonNS.inteval)
-                $0.leading.equalToSuperview().offset(RoundRightIconButtonNS.leading)
+                $0.trailing.equalTo(rightIconView.snp.leading).offset(-ButtonsConst.RightIconRound.Spacing.spacing)
+                $0.leading.equalToSuperview().offset(ButtonsConst.RightIconRound.Spacing.leftPadding)
             }
         }
     }
