@@ -27,6 +27,11 @@ final class AppCoordinator: BaseCoordinator {
         // UIWindow의 rootViewController로 설정
         window.rootViewController = tabBarController
         window.makeKeyAndVisible()
+        
+    }
+    
+    override func childDidFinish(_ coordinator: Coordinator) {
+        removeDependency(coordinator) // 자식 Coordinator 제거
     }
 }
 

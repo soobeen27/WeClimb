@@ -21,13 +21,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         
-        let tabBarVC = TabBarVC()
-        let tabBarCoordinator = TabBarCoordinator(tabBarController: tabBarVC)
-        tabBarCoordinator.start()
-        window.rootViewController = tabBarVC
+//        let tabBarVC = TabBarVC()
+//        let tabBarCoordinator = TabBarCoordinator(tabBarController: tabBarVC)
+//        tabBarCoordinator.start()
+//        window.rootViewController = tabBarVC
+//        
+//        self.window = window
+//        window.makeKeyAndVisible()
+        
+//        guard let windowScene = (scene as? UIWindowScene) else { return }
+//        window.rootViewController = UINavigationController(rootViewController: LoginVC(viewModel: viewModel))
+//        window.makeKeyAndVisible()
         
         self.window = window
-        window.makeKeyAndVisible()
         
 //        // 의존성 초기화
 //        let appDIContainer = AppDIContainer.shared

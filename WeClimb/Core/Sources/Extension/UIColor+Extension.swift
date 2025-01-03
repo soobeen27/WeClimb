@@ -53,4 +53,6 @@ extension UIColor {
     
     // DS
     static let fillSolidDarkBlack = UIColor(hex: "#141415")
+    static let labelNormal = UIColor(hex: "#585960")
+    static let fillSolidLightLight = UIColor(hex: "#FAFAFA")
 }

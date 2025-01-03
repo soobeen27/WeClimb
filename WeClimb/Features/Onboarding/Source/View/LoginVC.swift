@@ -13,6 +13,18 @@ import SnapKit
 
 class LoginVC: UIViewController {
     var coordinator: LoginCoordinator?
+    private let viewModel: LoginVM
+    private let disposeBag = DisposeBag()
+    
+    init(coordinator: LoginCoordinator? = nil, viewModel: LoginVM) {
+        self.coordinator = coordinator
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private let logoImage: UIImageView = {
         let image = UIImageView()
@@ -98,5 +110,36 @@ class LoginVC: UIViewController {
         appleLoginButton.snp.makeConstraints {
             $0.height.width.equalTo(OnboardingConst.Login.Size.loginButton)
         }
+    }
+    
+    private func loginBind() {
+        let input = LoginVM.Input(
+            loginType: Observable.merge(
+                googleLoginButton.rx.tap.map { LoginType.google },
+                kakaoLoginButton.rx.tap.map { LoginType.kakao },
+                appleLoginButton.rx.tap.map { LoginType.apple }
+            ),
+            loginButtonTapped: Observable.merge(
+                googleLoginButton.rx.tap.asObservable(),
+                kakaoLoginButton.rx.tap.asObservable(),
+                appleLoginButton.rx.tap.asObservable()
+            )
+        )
+        let output = viewModel.transform(input: input)
+        
+        output.loginResult
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success:
+                    //코디네이터 네비게이션
+                    print(result)
+                case .failure(let error):
+                    //에러처리
+                    print("에러")
+                }
+            })
+            .disposed(by: disposeBag)
     }
 }
