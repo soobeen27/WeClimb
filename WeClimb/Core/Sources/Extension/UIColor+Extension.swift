@@ -49,4 +49,10 @@ extension UIColor {
     static let labelWhite = UIColor(hex: "#FFF")
     static let labelNeutral = UIColor(hex: "#7F818A")
     static let fillSolidLightNormal = UIColor(hex: "#F4F5F5")
+    
+    
+    // DS
+    static let fillSolidDarkBlack = UIColor(hex: "#141415")
+    static let labelNormal = UIColor(hex: "#585960")
+    static let fillSolidLightLight = UIColor(hex: "#FAFAFA")
 }
