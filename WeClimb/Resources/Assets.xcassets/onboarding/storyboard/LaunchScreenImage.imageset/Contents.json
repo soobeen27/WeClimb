@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "storyboardLogo.svg",
+      "filename" : "LaunchScreenImage@x1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "storyboardLogo 1.svg",
+      "filename" : "LaunchScreenImage@x2.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "storyboardLogo 2.svg",
+      "filename" : "LaunchScreenImage@x3.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

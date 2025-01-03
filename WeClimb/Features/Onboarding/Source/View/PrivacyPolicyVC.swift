@@ -13,26 +13,25 @@ class PrivacyPolicyVC: UIViewController {
     var coordinator: PrivacyPolicyCoordinator?
     
     private let logoImage: UIImageView = {
-        let image = UIImageView()
-        image.image = UIImage.customImage(style: .logoImage)
+        var image = UIImageView()
+        image.image = OnboardingConst.PrivacyPolicy.Image.weclimbLogo
         return image
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = PrivacyPolicyNS.titleLabel
-        label.font = UIFont.customFont(style: CustomFontStyle.title1Bold)
-        label.numberOfLines = 2
-        label.textColor = UIColor.black
+        label.text = OnboardingConst.PrivacyPolicy.Text.titleLabel
+        label.font = OnboardingConst.PrivacyPolicy.Font.titleFont
+        label.numberOfLines = OnboardingConst.PrivacyPolicy.Text.titleNumberofLine
+        label.textColor = OnboardingConst.PrivacyPolicy.Color.titleTextColor
         return label
     }()
     
     private let pageController: UILabel = {
         let label = UILabel()
-        label.text = PrivacyPolicyNS.pageControll
-        label.textColor = UIColor.gray
-        label.font = UIFont.customFont(style: CustomFontStyle.caption1Regular)
-        label.layer.backgroundColor = UIColor.customlightGray.cgColor
+        label.text = OnboardingConst.PrivacyPolicy.Text.pageControl
+        label.textColor = OnboardingConst.PrivacyPolicy.Color.pageControlTextColor
+        label.font = OnboardingConst.PrivacyPolicy.Font.pageControlFont
         label.layer.cornerRadius = 16
         label.contentMode = .center
         return label
@@ -40,52 +39,52 @@ class PrivacyPolicyVC: UIViewController {
     
     private let allAgreeCheckBox: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: PrivacyPolicyNS.clickCheckBox), for: .selected)
-        button.setImage(UIImage(named: PrivacyPolicyNS.clearCheckBox), for: .normal)
-        button.setTitle(PrivacyPolicyNS.isAllAgree, for: .normal)
+        button.setImage(OnboardingConst.PrivacyPolicy.Image.clickCheckBox, for: .selected)
+        button.setImage(OnboardingConst.PrivacyPolicy.Image.clearCheckBox, for: .normal)
+        button.setTitle(OnboardingConst.PrivacyPolicy.Text.isAllAgree, for: .normal)
         button.contentHorizontalAlignment = .left
-        button.titleLabel?.font = UIFont.customFont(style: CustomFontStyle.label1Medium)
-        button.setTitleColor(.black, for: .normal)
+        button.titleLabel?.font = OnboardingConst.PrivacyPolicy.Font.titleCheckBoxFont
+        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.CheckBoxFontColor, for: .normal)
         return button
     }()
     
     private let isAppTermsAgreedCheckBox: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: PrivacyPolicyNS.clickCheckBox), for: .selected)
-        button.setImage(UIImage(named: PrivacyPolicyNS.clearCheckBox), for: .normal)
-        button.setTitle(PrivacyPolicyNS.isAppTermsAgreed, for: .normal)
+        button.setImage(OnboardingConst.PrivacyPolicy.Image.clickCheckBox, for: .selected)
+        button.setImage(OnboardingConst.PrivacyPolicy.Image.clearCheckBox, for: .normal)
+        button.setTitle(OnboardingConst.PrivacyPolicy.Text.isAppTermsAgreed, for: .normal)
         button.contentHorizontalAlignment = .left
-        button.setTitleColor(.systemGray, for: .normal)
-        button.titleLabel?.font = UIFont.customFont(style: CustomFontStyle.label2Medium)
+        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.CheckBoxFontColor, for: .normal)
+        button.titleLabel?.font = OnboardingConst.PrivacyPolicy.Font.valueCheckBoxFont
         return button
     }()
     
     private let isPrivacyTermsAgreedCheckBox: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: PrivacyPolicyNS.clickCheckBox), for: .selected)
-        button.setImage(UIImage(named: PrivacyPolicyNS.clearCheckBox), for: .normal)
-        button.setTitle(PrivacyPolicyNS.isPrivacyTermsAgreed, for: .normal)
+        button.setImage(OnboardingConst.PrivacyPolicy.Image.clickCheckBox, for: .selected)
+        button.setImage(OnboardingConst.PrivacyPolicy.Image.clearCheckBox, for: .normal)
+        button.setTitle(OnboardingConst.PrivacyPolicy.Text.isPrivacyTermsAgreed, for: .normal)
         button.contentHorizontalAlignment = .left
-        button.setTitleColor(.systemGray, for: .normal)
-        button.titleLabel?.font = UIFont.customFont(style: CustomFontStyle.label2Medium)
+        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.CheckBoxFontColor, for: .normal)
+        button.titleLabel?.font = OnboardingConst.PrivacyPolicy.Font.valueCheckBoxFont
         return button
     }()
     
     private let isSnsConsentGivenCheckBox: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: PrivacyPolicyNS.clickCheckBox), for: .selected)
-        button.setImage(UIImage(named: PrivacyPolicyNS.clearCheckBox), for: .normal)
-        button.setTitle(PrivacyPolicyNS.isSNSConsenctGivenCheck, for: .normal)
+        button.setImage(OnboardingConst.PrivacyPolicy.Image.clickCheckBox, for: .selected)
+        button.setImage(OnboardingConst.PrivacyPolicy.Image.clearCheckBox, for: .normal)
+        button.setTitle(OnboardingConst.PrivacyPolicy.Text.isSNSConsenctGivenCheck, for: .normal)
         button.contentHorizontalAlignment = .left
-        button.setTitleColor(.systemGray, for: .normal)
-        button.titleLabel?.font = UIFont.customFont(style: CustomFontStyle.label2Medium)
+        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.CheckBoxFontColor, for: .normal)
+        button.titleLabel?.font = OnboardingConst.PrivacyPolicy.Font.valueCheckBoxFont
         return button
     }()
     
     private let checkBoxView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.customlightGray
-        view.layer.cornerRadius = 8
+        view.backgroundColor = OnboardingConst.PrivacyPolicy.Color.containerBoxColor
+        view.layer.cornerRadius = OnboardingConst.PrivacyPolicy.Style.containerCornerRadius
         return view
     }()
     

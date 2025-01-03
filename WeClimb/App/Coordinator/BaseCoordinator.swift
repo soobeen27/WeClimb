@@ -34,6 +34,11 @@ class BaseCoordinator: Coordinator {
         }
     }
     
+    /// 자식코디네이터 제거
+    public func childDidFinish(_ coordinator: Coordinator) {
+        removeDependency(coordinator)
+    }
+    
     // MARK: - Coordinator
     func start() {
         

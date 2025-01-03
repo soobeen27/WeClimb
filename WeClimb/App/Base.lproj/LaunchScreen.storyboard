@@ -16,15 +16,15 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="storyboardLogo" translatesAutoresizingMaskIntoConstraints="NO" id="Yqj-Bl-Igf">
-                                <rect key="frame" x="84" y="346" width="225" height="60"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchScreenImage" translatesAutoresizingMaskIntoConstraints="NO" id="Kre-ZP-K55">
+                                <rect key="frame" x="84" y="347" width="225" height="60"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="exa-lS-8NF"/>
                         <color key="backgroundColor" red="0.58823531870000001" green="0.34117650989999998" blue="0.88235294819999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
-                            <constraint firstItem="Yqj-Bl-Igf" firstAttribute="centerX" secondItem="UFg-eg-5s8" secondAttribute="centerX" id="hQG-wd-ve6"/>
-                            <constraint firstItem="Yqj-Bl-Igf" firstAttribute="top" secondItem="exa-lS-8NF" secondAttribute="top" constant="287" id="kI3-wt-dQ1"/>
+                            <constraint firstItem="Kre-ZP-K55" firstAttribute="top" secondItem="exa-lS-8NF" secondAttribute="top" constant="288" id="3nG-En-oPA"/>
+                            <constraint firstItem="Kre-ZP-K55" firstAttribute="centerX" secondItem="UFg-eg-5s8" secondAttribute="centerX" id="wSi-mf-nyx"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -34,6 +34,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="storyboardLogo" width="225" height="60"/>
+        <image name="LaunchScreenImage" width="225" height="60"/>
     </resources>
 </document>

@@ -17,7 +17,7 @@ final class AppDIContainer {
             FeedAssembly(),
             GymProfileAssembly(),
             NotificationAssembly(),
-            OnboardingAssembly(),
+            LoginAssembly(),
             SearchAssembly(),
             SettingAssembly(),
             UploadAssembly(),
