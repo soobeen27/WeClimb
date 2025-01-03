@@ -9,13 +9,15 @@ import UIKit
 
 final class LoginCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
+    private let builder: OnboardingBuilder
     
-    init(navigationController: UINavigationController) {
+    init(navigationController: UINavigationController, builder: OnboardingBuilder) {
         self.navigationController = navigationController
+        self.builder = builder
     }
     
     override func start() {
-        let loginVC = LoginVC()
+        let loginVC = builder.buildLogin()
         loginVC.coordinator = self
         navigationController.pushViewController(loginVC, animated: true)
     }

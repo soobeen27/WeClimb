@@ -8,26 +8,27 @@
 import UIKit
 
 final class AppCoordinator: BaseCoordinator {
-    public var navigationController: UINavigationController
     private let window: UIWindow
+    private let navigationController: UINavigationController
+    private let loginBuilder: OnboardingBuilder
     
-    init(window: UIWindow) {
+    init(window: UIWindow, navigationController: UINavigationController, onboardingBuilder: OnboardingBuilder) {
         self.window = window
-        self.navigationController = UINavigationController()
+        self.navigationController = navigationController
+        self.loginBuilder = onboardingBuilder
     }
     
     override func start() {
-        // TabBarCoordinator 생성 및 실행
-        let tabBarController = UITabBarController()
-        let tabBarCoordinator = TabBarCoordinator(tabBarController: tabBarController)
+        let loginCoordinator = LoginCoordinator(
+            navigationController: navigationController,
+            builder: loginBuilder
+        )
         
-        addDependency(tabBarCoordinator)
-        tabBarCoordinator.start()
+        addDependency(loginCoordinator)
+        loginCoordinator.start()
         
-        // UIWindow의 rootViewController로 설정
-        window.rootViewController = tabBarController
+        window.rootViewController = navigationController
         window.makeKeyAndVisible()
-        
     }
     
     override func childDidFinish(_ coordinator: Coordinator) {

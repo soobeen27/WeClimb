@@ -10,7 +10,7 @@ import Foundation
 protocol OnboardingBuilder {
 //    func buildCreateNickname() -> CreateNicknameVC
 //    func buildCreatePersonalDetail() -> CreatePersonalDetailVC
-//    func buildLogin() -> LoginVC
+    func buildLogin() -> LoginVC
 //    func buildPrivacyPolicy() -> PrivacyPolicyVC
 //    func buildRegisterResult() -> RegisterResultVC
 }
@@ -20,6 +20,11 @@ final class OnboardingBuilderImpl: OnboardingBuilder {
     
     init(container: AppDIContainer = .shard) {
         self.container = container
+    }
+    
+    func buildLogin() -> LoginVC {
+        let viewModel: LoginVM = container.resolve(LoginVM.self)
+        return LoginVC(viewModel: viewModel)
     }
     
 //    func buildCreateNickname() -> CreateNicknameVC {
