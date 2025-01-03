@@ -7,11 +7,11 @@
 
 import Foundation
 
-enum DefaultAlertVCNS {
+enum DefaultAlertConst {
   
     enum Text {
-        static let cancelButton = "취소"
-        static let customButton = "확인"
+        static let cancel = "취소"
+        static let custom = "확인"
         static let title = "취소"
         static let description = "확인"
     }
@@ -42,13 +42,8 @@ enum DefaultAlertVCNS {
         static let buttons: CGFloat = 8
     }
     
-    enum NumberOfLines {
-        static let description: Int = 2
-    }
-    
-    enum borderWidth {
-          static let button: CGFloat = 1
-      }
+    static let numberOfLinesDescription: Int = 10
+    static let borderWidthButton: CGFloat = 10
     
     enum Animation {
         static let fadeInDuration: TimeInterval = 0.3

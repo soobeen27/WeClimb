@@ -68,36 +68,36 @@ public class DefaultAlertVC: UIViewController {
     
     private let alertView : UIView = {
         let alertView = UIView()
-        alertView.layer.cornerRadius = DefaultAlertVCNS.CornerRadius.alertView
+        alertView.layer.cornerRadius = DefaultAlertConst.CornerRadius.alertView
         alertView.layer.masksToBounds = true
         return alertView
     }()
     
     private var cancelButton : UIButton = {
         let button = UIButton()
-        button.layer.borderWidth = DefaultAlertVCNS.borderWidth.button
+        button.layer.borderWidth = DefaultAlertConst.borderWidthButton
         button.layer.borderColor = UIColor.lineOpacityStrong.cgColor
-        button.layer.cornerRadius = DefaultAlertVCNS.CornerRadius.buttons
+        button.layer.cornerRadius = DefaultAlertConst.CornerRadius.buttons
         button.titleLabel?.font = .customFont(style: .label2Medium)
         button.setTitleColor(.labelStrong, for: .normal)
-        button.setTitle("취소", for: .normal)
+        button.setTitle(DefaultAlertConst.Text.cancel, for: .normal)
         button.backgroundColor = .white
         return button
     }()
     
     private var customButton : UIButton = {
         let button = UIButton()
-        button.layer.cornerRadius = DefaultAlertVCNS.CornerRadius.buttons
+        button.layer.cornerRadius = DefaultAlertConst.CornerRadius.buttons
         button.titleLabel?.font = .customFont(style: .label2Medium)
         button.backgroundColor = .red
         button.setTitleColor(.white, for: .normal)
-        button.setTitle("확인", for: .normal)
+        button.setTitle(DefaultAlertConst.Text.custom, for: .normal)
         return button
     }()
     
     private var titleLabel : UILabel = {
         let label = UILabel()
-        label.text = "Title"
+        label.text = DefaultAlertConst.Text.title
         label.font = .customFont(style: .label1SemiBold)
         label.textColor = .labelStrong
         return label
@@ -105,10 +105,10 @@ public class DefaultAlertVC: UIViewController {
     
     private var descriptionLabel : UILabel = {
         let label = UILabel()
-        label.text = "Description"
+        label.text = DefaultAlertConst.Text.description
         label.font = .customFont(style: .body2Regular)
         label.textAlignment = .left
-        label.numberOfLines = DefaultAlertVCNS.NumberOfLines.description
+        label.numberOfLines = DefaultAlertConst.numberOfLinesDescription
         label.textColor = .labelNormal
         return label
     }()
@@ -165,8 +165,8 @@ public class DefaultAlertVC: UIViewController {
         self.descriptionLabel.text = description
         
         let titleParagraphStyle = NSMutableParagraphStyle()
-        titleParagraphStyle.minimumLineHeight = DefaultAlertVCNS.Size.titleHeight
-        titleParagraphStyle.maximumLineHeight = DefaultAlertVCNS.Size.titleHeight
+        titleParagraphStyle.minimumLineHeight = DefaultAlertConst.Size.titleHeight
+        titleParagraphStyle.maximumLineHeight = DefaultAlertConst.Size.titleHeight
         
         let attributedTitle = NSAttributedString(
             string: title,
@@ -178,8 +178,8 @@ public class DefaultAlertVC: UIViewController {
         self.titleLabel.attributedText = attributedTitle
         
         let descriptionParagraphStyle = NSMutableParagraphStyle()
-        descriptionParagraphStyle.minimumLineHeight = DefaultAlertVCNS.Size.descriptionHeight
-        descriptionParagraphStyle.maximumLineHeight = DefaultAlertVCNS.Size.descriptionHeight
+        descriptionParagraphStyle.minimumLineHeight = DefaultAlertConst.Size.descriptionHeight
+        descriptionParagraphStyle.maximumLineHeight = DefaultAlertConst.Size.descriptionHeight
         
         let attributedDescription = NSAttributedString(
             string: description,
@@ -226,20 +226,20 @@ extension DefaultAlertVC {
         
         alertView.snp.makeConstraints {
             $0.center.equalToSuperview()
-            $0.leading.trailing.equalToSuperview().inset(DefaultAlertVCNS.Spacing.alertViewHorizontalInset)
-            $0.width.equalTo(DefaultAlertVCNS.Size.alertViewWidth)
+            $0.leading.trailing.equalToSuperview().inset(DefaultAlertConst.Spacing.alertViewHorizontalInset)
+            $0.width.equalTo(DefaultAlertConst.Size.alertViewWidth)
         }
         
         titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(DefaultAlertVCNS.Spacing.titleTopInset)
-            $0.leading.trailing.equalToSuperview().inset(DefaultAlertVCNS.Spacing.titleHorizontalInset)
+            $0.top.equalToSuperview().offset(DefaultAlertConst.Spacing.titleTopInset)
+            $0.leading.trailing.equalToSuperview().inset(DefaultAlertConst.Spacing.titleHorizontalInset)
         }
         
         if type != .title {
             alertView.addSubview(descriptionLabel)
             descriptionLabel.snp.makeConstraints {
-                $0.leading.trailing.equalToSuperview().inset(DefaultAlertVCNS.Spacing.descriptionHorizontalInset)
-                $0.top.equalTo(titleLabel.snp.bottom).offset(DefaultAlertVCNS.Spacing.descriptionTopOffset)
+                $0.leading.trailing.equalToSuperview().inset(DefaultAlertConst.Spacing.descriptionHorizontalInset)
+                $0.top.equalTo(titleLabel.snp.bottom).offset(DefaultAlertConst.Spacing.descriptionTopOffset)
             }
         }
         
@@ -248,43 +248,43 @@ extension DefaultAlertVC {
             alertView.addSubview(cancelButton)
             
             cancelButton.snp.makeConstraints {
-                $0.top.equalTo(titleLabel.snp.bottom).offset(DefaultAlertVCNS.Spacing.buttonTopOffset)
-                $0.leading.bottom.equalToSuperview().inset(DefaultAlertVCNS.Spacing.buttonHorizontalInset)
+                $0.top.equalTo(titleLabel.snp.bottom).offset(DefaultAlertConst.Spacing.buttonTopOffset)
+                $0.leading.bottom.equalToSuperview().inset(DefaultAlertConst.Spacing.buttonHorizontalInset)
                 $0.width.equalTo(customButton.snp.width)
                 $0.height.equalTo(customButton.snp.height)
             }
             
             customButton.snp.makeConstraints {
-                $0.width.equalTo(DefaultAlertVCNS.Size.customButtonWidth)
-                $0.height.equalTo(DefaultAlertVCNS.Size.customButtonHeight)
+                $0.width.equalTo(DefaultAlertConst.Size.customButtonWidth)
+                $0.height.equalTo(DefaultAlertConst.Size.customButtonHeight)
                 $0.top.equalTo(cancelButton.snp.top)
-                $0.trailing.bottom.equalToSuperview().inset(DefaultAlertVCNS.Spacing.buttonHorizontalInset)
-                $0.leading.equalTo(cancelButton.snp.trailing).offset(DefaultAlertVCNS.Spacing.buttons)
+                $0.trailing.bottom.equalToSuperview().inset(DefaultAlertConst.Spacing.buttonHorizontalInset)
+                $0.leading.equalTo(cancelButton.snp.trailing).offset(DefaultAlertConst.Spacing.buttons)
             }
             
         case .titleDescription:
             alertView.addSubview(cancelButton)
             
             cancelButton.snp.makeConstraints {
-                $0.top.equalTo(descriptionLabel.snp.bottom).offset(DefaultAlertVCNS.Spacing.buttonTopOffset)
-                $0.leading.bottom.equalToSuperview().inset(DefaultAlertVCNS.Spacing.buttonHorizontalInset)
+                $0.top.equalTo(descriptionLabel.snp.bottom).offset(DefaultAlertConst.Spacing.buttonTopOffset)
+                $0.leading.bottom.equalToSuperview().inset(DefaultAlertConst.Spacing.buttonHorizontalInset)
                 $0.width.equalTo(customButton.snp.width)
                 $0.height.equalTo(customButton.snp.height)
             }
             
             customButton.snp.makeConstraints {
-                $0.width.equalTo(DefaultAlertVCNS.Size.customButtonWidth)
-                $0.height.equalTo(DefaultAlertVCNS.Size.customButtonHeight)
+                $0.width.equalTo(DefaultAlertConst.Size.customButtonWidth)
+                $0.height.equalTo(DefaultAlertConst.Size.customButtonHeight)
                 $0.top.equalTo(cancelButton.snp.top)
-                $0.trailing.bottom.equalToSuperview().inset(DefaultAlertVCNS.Spacing.buttonHorizontalInset)
-                $0.leading.equalTo(cancelButton.snp.trailing).offset(DefaultAlertVCNS.Spacing.buttons)
+                $0.trailing.bottom.equalToSuperview().inset(DefaultAlertConst.Spacing.buttonHorizontalInset)
+                $0.leading.equalTo(cancelButton.snp.trailing).offset(DefaultAlertConst.Spacing.buttons)
             }
         case .confirmation:
             customButton.snp.makeConstraints {
-                $0.top.equalTo(descriptionLabel.snp.bottom).offset(DefaultAlertVCNS.Spacing.buttonTopOffset)
-                $0.leading.trailing.bottom.equalToSuperview().inset(DefaultAlertVCNS.Spacing.buttonHorizontalInset)
-                $0.width.equalTo(DefaultAlertVCNS.Size.confirmationButtonWidth)
-                $0.height.equalTo(DefaultAlertVCNS.Size.confirmationButtonHeight)
+                $0.top.equalTo(descriptionLabel.snp.bottom).offset(DefaultAlertConst.Spacing.buttonTopOffset)
+                $0.leading.trailing.bottom.equalToSuperview().inset(DefaultAlertConst.Spacing.buttonHorizontalInset)
+                $0.width.equalTo(DefaultAlertConst.Size.confirmationButtonWidth)
+                $0.height.equalTo(DefaultAlertConst.Size.confirmationButtonHeight)
             }
         }
     }
@@ -292,19 +292,19 @@ extension DefaultAlertVC {
 
 extension DefaultAlertVC {
     public func showAlert() {
-        self.view.alpha = DefaultAlertVCNS.Animation.alphaHidden
-        self.alertView.transform = CGAffineTransform(scaleX: DefaultAlertVCNS.Animation.zoomInScale, y: DefaultAlertVCNS.Animation.zoomInScale)
+        self.view.alpha = DefaultAlertConst.Animation.alphaHidden
+        self.alertView.transform = CGAffineTransform(scaleX: DefaultAlertConst.Animation.zoomInScale, y: DefaultAlertConst.Animation.zoomInScale)
         
-        UIView.animate(withDuration: DefaultAlertVCNS.Animation.fadeInDuration, animations: {
-            self.view.alpha = DefaultAlertVCNS.Animation.alphaVisible
+        UIView.animate(withDuration: DefaultAlertConst.Animation.fadeInDuration, animations: {
+            self.view.alpha = DefaultAlertConst.Animation.alphaVisible
             self.alertView.transform = CGAffineTransform.identity
         })
     }
     
     public func dismissAlert() {
-        UIView.animate(withDuration: DefaultAlertVCNS.Animation.fadeOutDuration, animations: {
-            self.view.alpha = DefaultAlertVCNS.Animation.alphaHidden
-            self.alertView.transform = CGAffineTransform(scaleX: DefaultAlertVCNS.Animation.zoomOutScale, y: DefaultAlertVCNS.Animation.zoomOutScale)
+        UIView.animate(withDuration: DefaultAlertConst.Animation.fadeOutDuration, animations: {
+            self.view.alpha = DefaultAlertConst.Animation.alphaHidden
+            self.alertView.transform = CGAffineTransform(scaleX: DefaultAlertConst.Animation.zoomOutScale, y: DefaultAlertConst.Animation.zoomOutScale)
         }, completion: { _ in
             self.dismiss(animated: false, completion: nil)
         })

@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum ButtonsConst {
+enum WeClimbButtonConst {
     enum DefaultRectangle {
         static let cornerRadius: CGFloat = 10
         
@@ -90,6 +90,13 @@ enum ButtonsConst {
         
         var spacing: CGFloat {
             return 6
+        }
+        
+        enum Layout {
+            static let defaultWidth: CGFloat = 0
+            static let iconCount: CGFloat = 2
+            static let spacingCount: CGFloat = 2
+            static let paddingCount: CGFloat = 2
         }
     }
     

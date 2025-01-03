@@ -22,7 +22,7 @@ class WeClimbButton: UIButton {
         }
     }
     
-    var buttonSize: ButtonsConst.IconRectangleSize = .medium {
+    var buttonSize: WeClimbButtonConst.IconRectangleSize = .medium {
         didSet {
             setButtonStyle(buttonStyle)
             setNeedsLayout()
@@ -55,7 +55,7 @@ class WeClimbButton: UIButton {
         return imageView
     }()
     
-    init(style: ButtonStyle, size: ButtonsConst.IconRectangleSize = .medium) {
+    init(style: ButtonStyle, size: WeClimbButtonConst.IconRectangleSize = .medium) {
         self.buttonStyle = style
         self.buttonSize = size
         super.init(frame: .zero)
@@ -70,21 +70,21 @@ class WeClimbButton: UIButton {
     override var intrinsicContentSize: CGSize {
         switch buttonStyle {
         case .defaultRectangle:
-            return CGSize(width: 343, height: 48)
+            return CGSize(width: WeClimbButtonConst.DefaultRectangle.Size.width, height: WeClimbButtonConst.DefaultRectangle.Size.height)
         case .iconRectangle:
-            let textWidth = titleLabel?.intrinsicContentSize.width ?? 0
-            let totalWidth = buttonSize.icon * 2 + textWidth + buttonSize.spacing * 2 + buttonSize.padding * 2
+            let textWidth = titleLabel?.intrinsicContentSize.width ?? WeClimbButtonConst.IconRectangleSize.Layout.defaultWidth
+            let totalWidth = buttonSize.icon * WeClimbButtonConst.IconRectangleSize.Layout.iconCount + textWidth + buttonSize.spacing * WeClimbButtonConst.IconRectangleSize.Layout.spacingCount + buttonSize.padding * WeClimbButtonConst.IconRectangleSize.Layout.paddingCount
             return CGSize(width: totalWidth, height: buttonSize.height)
             
         case .rightIconRound:
-            return CGSize(width: ButtonsConst.RightIconRound.Size.width, height:  ButtonsConst.RightIconRound.Size.height)
+            return CGSize(width: WeClimbButtonConst.RightIconRound.Size.width, height:  WeClimbButtonConst.RightIconRound.Size.height)
         }
     }
     
     private func setButtonStyle(_ style: ButtonStyle) {
         switch style {
         case .defaultRectangle:
-            layer.cornerRadius = 10
+            layer.cornerRadius = WeClimbButtonConst.DefaultRectangle.cornerRadius
             clipsToBounds = true
             titleLabel?.font = UIFont.customFont(style: .label1SemiBold)
             setTitleColor(.white, for: .normal)
@@ -98,7 +98,7 @@ class WeClimbButton: UIButton {
             backgroundColor = .black
             
         case .rightIconRound:
-            layer.cornerRadius = ButtonsConst.RightIconRound.cornerRadius
+            layer.cornerRadius = WeClimbButtonConst.RightIconRound.cornerRadius
             clipsToBounds = true
             titleLabel?.font = UIFont.customFont(style: .caption1Medium)
             setTitleColor(.white, for: .normal)
@@ -137,14 +137,14 @@ class WeClimbButton: UIButton {
             
         case .rightIconRound:
             rightIconView.snp.makeConstraints {
-                $0.trailing.equalToSuperview().offset(-ButtonsConst.RightIconRound.Spacing.rightPadding)
+                $0.trailing.equalToSuperview().offset(-WeClimbButtonConst.RightIconRound.Spacing.rightPadding)
                 $0.centerY.equalToSuperview()
-                $0.width.height.equalTo(ButtonsConst.RightIconRound.Size.imageSize)
+                $0.width.height.equalTo(WeClimbButtonConst.RightIconRound.Size.imageSize)
             }
             
             titleLabel.snp.makeConstraints {
-                $0.trailing.equalTo(rightIconView.snp.leading).offset(-ButtonsConst.RightIconRound.Spacing.spacing)
-                $0.leading.equalToSuperview().offset(ButtonsConst.RightIconRound.Spacing.leftPadding)
+                $0.trailing.equalTo(rightIconView.snp.leading).offset(-WeClimbButtonConst.RightIconRound.Spacing.spacing)
+                $0.leading.equalToSuperview().offset(WeClimbButtonConst.RightIconRound.Spacing.leftPadding)
             }
         }
     }
