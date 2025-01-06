@@ -13,7 +13,7 @@ protocol AppleLoginUseCase {
     func execute() -> Single<LoginResult>
 }
 
-struct AppleLoginUseCaseImpl {
+struct AppleLoginUseCaseImpl: AppleLoginUseCase {
     private let appleLoginRepository: AppleLoginRepository
     
     init(appleLoginRepository: AppleLoginRepository) {

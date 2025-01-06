@@ -16,9 +16,9 @@ protocol LoginProtocol {
 
 class LoginVM: LoginProtocol {
     private let disposeBag = DisposeBag()
-    private let usecase: ReAuthUseCase
+    public let usecase: LoginUsecase
     
-    init(usecase: ReAuthUseCase) {
+    init(usecase: LoginUsecase) {
         self.usecase = usecase
     }
     
@@ -43,10 +43,20 @@ class LoginVM: LoginProtocol {
                 
                 isLoadingSubject.onNext(true)
                 
-                return self.usecase.execute(loginType: loginType, presentProvider: nil)
-                    .andThen(Observable.just(Result<Void, Error>.success(())))
-                    .catch { .just(Result.failure($0))}
-                    .do(onDispose: { isLoadingSubject.onNext(false)})
+                /// Google은 presentProvider가 필요하지만, 현재 상황에서 VM은 presentProvider를 알 수 없으므로
+                /// Apple, Kakao만 처리하고 Google은 별도로 LoginVC에서 처리 하고있음
+                switch loginType {
+                case .apple, .kakao:
+                    return self.usecase.execute(loginType: loginType, presentProvider: nil)
+                        .map { _ in Result<Void, Error>.success(()) }
+                        .asObservable()
+                        .catch { .just(Result.failure($0))}
+                        .do(onDispose: { isLoadingSubject.onNext(false)})
+                case .google:
+                    return Observable.empty()
+                default :
+                    return .error(AppError.unknown)
+                }
             }
             .subscribe(onNext: { result in
                 loginResultSubject.onNext(result)
