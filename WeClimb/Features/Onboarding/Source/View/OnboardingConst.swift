@@ -39,6 +39,9 @@ enum OnboardingConst {
         
         enum Text {
             static let nonMemberButton = "비회원으로 둘러보기"
+            static let successLoginText = "정상적으로 로그인 되었어요!"
+            static let failureLoginText = "로그인에 실패 했어요:"
+            static let noVC = "VC가 nil이예요!"
         }
     }
     

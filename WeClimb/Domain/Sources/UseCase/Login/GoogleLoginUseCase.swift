@@ -13,7 +13,7 @@ protocol GoogleLoginUseCase {
     func execute(presentProvider: @escaping PresenterProvider) -> Single<LoginResult>
 }
 
-struct GoogleUseCaseImpl {
+struct GoogleUseCaseImpl: GoogleLoginUseCase {
     private let googleLoginRepository: GoogleLoginRepository
     
     init(googleLoginRepository: GoogleLoginRepository) {

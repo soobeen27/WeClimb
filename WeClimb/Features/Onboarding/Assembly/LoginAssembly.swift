@@ -9,9 +9,7 @@ import Swinject
 
 final class LoginAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(ReAuthDataSource.self) { _ in
-            ReAuthDataSourceImpl()
-        }
+        
         container.register(AppleLoginDataSource.self) { _ in
             AppleLoginDataSourceImpl()
         }
@@ -21,24 +19,60 @@ final class LoginAssembly: Assembly {
         container.register(KakaoLoginDataSource.self) { _ in
             KakaoLoginDataSourceImpl()
         }
+        container.register(LoginFirebaseDataSource.self) { _ in
+            LoginFirebaseDataSourceImpl()
+        }
         
-        container.register(ReAuthRepository.self) { resolver in
-            ReAuthRepositoryImpl(
-                reAuthDataSource: resolver.resolve(ReAuthDataSource.self)!,
+        container.register(AppleLoginRepository.self) { resolver in
+            AppleLoginRepositoryImpl(
                 appleLoginDataSource: resolver.resolve(AppleLoginDataSource.self)!,
-                googleLoginDataSource: resolver.resolve(GoogleLoginDataSource.self)!,
-                kakaoLoginDataSource: resolver.resolve(KakaoLoginDataSource.self)!
+                loginFirebaseDataSource: resolver.resolve(LoginFirebaseDataSource.self)!
             )
         }
-        container.register(ReAuthUseCase.self) { resolver in
-            ReAuthUseCaseImpl(
-                reAuthRepository: resolver.resolve(ReAuthRepository.self)!
+        
+        container.register(GoogleLoginRepository.self) { resolver in
+            GoogleLoginRepositoryImpl(
+                googleLoginDataSource: resolver.resolve(GoogleLoginDataSource.self)!,
+                loginFirebaseDataSource: resolver.resolve(LoginFirebaseDataSource.self)!
+            )
+        }
+        
+        container.register(KakaoLoginRepository.self) { resolver in
+            KakaoLoginRepositoryImpl(
+                kakaoLoginDataSource: resolver.resolve(KakaoLoginDataSource.self)!,
+                loginFirebaseDataSource: resolver.resolve(LoginFirebaseDataSource.self)!
+            )
+        }
+        
+        container.register(AppleLoginUseCase.self) { resolver in
+            AppleLoginUseCaseImpl(
+                appleLoginRepository: resolver.resolve(AppleLoginRepository.self)!
+            )
+        }
+        
+        container.register(GoogleLoginUseCase.self) { resolver in
+            GoogleUseCaseImpl(
+                googleLoginRepository: resolver.resolve(GoogleLoginRepository.self)!
+            )
+        }
+        
+        container.register(KakaoLoginUseCase.self) { resolver in
+            KakaoLoginUseCaseImpl(
+                kakaoLoginRepository: resolver.resolve(KakaoLoginRepository.self)!
+            )
+        }
+        
+        container.register(LoginUsecase.self) { resolver in
+            LoginUsecaseImpl(
+                appleLoginUseCase: resolver.resolve(AppleLoginUseCase.self)!,
+                googleLoginUseCase: resolver.resolve(GoogleLoginUseCase.self)!,
+                kakaoLoginUseCase: resolver.resolve(KakaoLoginUseCase.self)!
             )
         }
         
         container.register(LoginVM.self) { resolver in
             LoginVM(
-                usecase: resolver.resolve(ReAuthUseCase.self)!
+                usecase: resolver.resolve(LoginUsecase.self)!
             )
         }
     }

@@ -69,6 +69,7 @@ class LoginVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
+        loginBind()
     }
     
     private func setLayout() {
@@ -125,20 +126,43 @@ class LoginVC: UIViewController {
                 appleLoginButton.rx.tap.asObservable()
             )
         )
-        let output = viewModel.transform(input: input)
-        
-        output.loginResult
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success:
-                    //코디네이터 네비게이션
-                    print(result)
-                case .failure(let error):
-                    //에러처리
-                    print("에러")
+               let output = viewModel.transform(input: input)
+
+        input.loginType
+            .subscribe(onNext: { [weak self] loginType in
+                guard let self else { return }
+                
+                switch loginType {
+                case .google:
+                    self.handleGoogleLogin()
+                default:
+                    output.loginResult
+                        .observe(on: MainScheduler.instance)
+                        .subscribe(onNext: { result in
+                            switch result {
+                            case .success:
+                                print(OnboardingConst.Login.Text.successLoginText)
+                            case .failure(let error):
+                                print(OnboardingConst.Login.Text.failureLoginText, "\(AppError.unknown)")
+                            }
+                        })
+                        .disposed(by: self.disposeBag)
                 }
+            })
+            .disposed(by: disposeBag)
+            }
+                       
+    private func handleGoogleLogin() {
+        let presenterProvider: PresenterProvider = { [weak self] in
+            guard let self = self else { fatalError(OnboardingConst.Login.Text.noVC) }
+            return self
+        }
+        
+        viewModel.usecase.execute(loginType: .google, presentProvider: presenterProvider)
+            .subscribe(onSuccess: { _ in
+                print(OnboardingConst.Login.Text.successLoginText)
+            }, onFailure: { error in
+                print(OnboardingConst.Login.Text.failureLoginText, "\(AppError.unknown)")
             })
             .disposed(by: disposeBag)
     }
