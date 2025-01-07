@@ -59,10 +59,10 @@ class TableCollectionSegment: UIControl {
     private func setSegment() {
         self.layer.cornerRadius = TableCollectionSegmentNS.cornerRadius
         self.layer.masksToBounds = true
-        self.backgroundColor = UIColor.segmentlightGray
+        self.backgroundColor = UIColor.lineSolidLight
 
         self.layer.borderWidth = TableCollectionSegmentNS.borderWidth
-        self.layer.borderColor = UIColor.segmentlightGray.cgColor
+        self.layer.borderColor = UIColor.lineSolidLight.cgColor
 
         selectedIndex = TableCollectionSegmentNS.startIndex
     }
@@ -94,9 +94,9 @@ class TableCollectionSegment: UIControl {
 
             if button.isSelected {
                 button.setImage(button.image(for: .normal)?.withTintColor(.black, renderingMode: .alwaysOriginal), for: .normal)
-                button.backgroundColor = UIColor.segmentMediumGray
+                button.backgroundColor = UIColor.fillSoildLightNormal
             } else {
-                button.setImage(button.image(for: .normal)?.withTintColor(UIColor.segmentGray, renderingMode: .alwaysOriginal), for: .normal)
+                button.setImage(button.image(for: .normal)?.withTintColor(UIColor.fillSoildLightHeavy, renderingMode: .alwaysOriginal), for: .normal)
                 button.backgroundColor = .white
             }
         }
