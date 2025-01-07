@@ -8,18 +8,18 @@
 import Foundation
 
 protocol FeedBuilder {
-//    func buildFeed() -> FeedVC
+    func buildFeed() -> FeedVC
 }
 
 final class FeedBuilderImpl: FeedBuilder {
     private let container: AppDIContainer
     
-    init(container: AppDIContainer = .shard) {
+    init(container: AppDIContainer = .shared) {
         self.container = container
     }
     
-//    func buildFeed() -> FeedVC {
-//        let viewModel: FeedVM = container.resolve(FeedVM.self)
-//        return FeedVC(viewModel: viewModel)
-//    }
+    func buildFeed() -> FeedVC {
+        let viewModel: FeedVM = container.resolve(FeedVM.self)
+        return FeedVC(viewModel: viewModel)
+    }
 }

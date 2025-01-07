@@ -13,10 +13,10 @@ protocol UserPageBuilder {
 //    func buildUserPage() -> UserPageVC
 }
 
-final class UserPageBuilderImpl: UploadBuilder {
+final class UserPageBuilderImpl: UserPageBuilder {
     private let container: AppDIContainer
     
-    init(container: AppDIContainer = .shard) {
+    init(container: AppDIContainer = .shared) {
         self.container = container
     }
     

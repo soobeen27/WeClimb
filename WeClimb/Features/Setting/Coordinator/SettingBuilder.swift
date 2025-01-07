@@ -15,7 +15,7 @@ protocol SettingBuilder {
 final class SettingBuilderImpl: SettingBuilder {
     private let container: AppDIContainer
     
-    init(container: AppDIContainer = .shard) {
+    init(container: AppDIContainer = .shared) {
         self.container = container
     }
     

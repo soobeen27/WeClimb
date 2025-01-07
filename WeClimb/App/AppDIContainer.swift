@@ -9,10 +9,13 @@
 import Swinject
 
 final class AppDIContainer {
-    static let shard = AppDIContainer()
+    static let shared = AppDIContainer()
     private let assembler: Assembler
+    let container: Container
     
     private init() {
+        container = Container()
+        
         assembler = Assembler([
             FeedAssembly(),
             GymProfileAssembly(),
@@ -22,7 +25,8 @@ final class AppDIContainer {
             SettingAssembly(),
             UploadAssembly(),
             UserPageAssembly(),
-        ])
+            TabBarAssembly(),
+        ], container: container)
     }
     
     func resolve<T>(_ type: T.Type) -> T {

@@ -10,26 +10,41 @@ import UIKit
 final class AppCoordinator: BaseCoordinator {
     private let window: UIWindow
     private let navigationController: UINavigationController
-    private let loginBuilder: OnboardingBuilder
+    private let tabBarCoordinator: TabBarCoordinator
     
-    init(window: UIWindow, navigationController: UINavigationController, onboardingBuilder: OnboardingBuilder) {
+    init(window: UIWindow,
+         navigationController: UINavigationController,
+         tabBarCoordinator: TabBarCoordinator) {
         self.window = window
         self.navigationController = navigationController
-        self.loginBuilder = onboardingBuilder
+        self.tabBarCoordinator = tabBarCoordinator
     }
     
     override func start() {
-        let loginCoordinator = LoginCoordinator(
-            navigationController: navigationController,
-            builder: loginBuilder
-        )
+        showMainFlow()
+    }
+    
+    private func showMainFlow() {
+        addDependency(tabBarCoordinator)
+        tabBarCoordinator.start()
         
-        addDependency(loginCoordinator)
-        loginCoordinator.start()
-        
-        window.rootViewController = navigationController
+        window.rootViewController = tabBarCoordinator.tabBarController
         window.makeKeyAndVisible()
     }
+    
+//    private func showLoginFlow() {
+//        let loginCoordinator = LoginCoordinator(
+//            navigationController: navigationController,
+//            builder: loginBuilder
+//        )
+//        
+//        addDependency(loginCoordinator)
+//        loginCoordinator.start()
+//        
+//        window.rootViewController = navigationController
+//        window.makeKeyAndVisible()
+//    }
+    
     
     override func childDidFinish(_ coordinator: Coordinator) {
         removeDependency(coordinator) // 자식 Coordinator 제거
