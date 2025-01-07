@@ -31,7 +31,7 @@ class PrivacyPolicyVC: UIViewController {
         let label = UILabel()
         label.text = OnboardingConst.PrivacyPolicy.Text.pageControl
         label.textColor = OnboardingConst.PrivacyPolicy.Color.pageControlTextColor
-        label.font = OnboardingConst.PrivacyPolicy.Font.pageControlFont
+        label.font = OnboardingConst.PrivacyPolicy.Font.valueFont
         label.layer.cornerRadius = 16
         label.contentMode = .center
         return label
@@ -81,46 +81,57 @@ class PrivacyPolicyVC: UIViewController {
         return button
     }()
     
-    private let checkBoxView: UIView = {
+    private let checkBoxBackGroundView: UIView = {
         let view = UIView()
         view.backgroundColor = OnboardingConst.PrivacyPolicy.Color.containerBoxColor
         view.layer.cornerRadius = OnboardingConst.PrivacyPolicy.Style.containerCornerRadius
         return view
     }()
     
+    private let AppTermsAgreedLinkButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.titleLabel?.font = OnboardingConst.PrivacyPolicy.Font.valueFont
+        
+        let buttonTitle = OnboardingConst.PrivacyPolicy.Text.AppTermAgreedButtonText
+        let attributedString = NSMutableAttributedString(string: buttonTitle)
+        
+        attributedString.addAttributes([
+            .foregroundColor: UIColor.systemGray,
+            .underlineStyle: NSUnderlineStyle.single.rawValue
+        ], range: NSRange(location: 0, length: buttonTitle.count))
+        
+        button.setAttributedTitle(attributedString, for: .normal)
+//        button.addTarget(self, action: #selector(appTermsButtonTapped), for: .touchUpInside)
+        
+        return button
+    }()
+
+    private let PrivacyTermsAgreedLinkButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.titleLabel?.font = OnboardingConst.PrivacyPolicy.Font.valueFont
+        
+        let buttonTitle = OnboardingConst.PrivacyPolicy.Text.PrivacyTermsAgreedLinkButton
+        let attributedString = NSMutableAttributedString(string: buttonTitle)
+        
+        attributedString.addAttributes([
+            .foregroundColor: UIColor.systemGray,
+            .underlineStyle: NSUnderlineStyle.single.rawValue
+        ], range: NSRange(location: 0, length: buttonTitle.count))
+        
+        button.setAttributedTitle(attributedString, for: .normal)
+//        button.addTarget(self, action: #selector(privacyPolicyButtonTapped), for: .touchUpInside)
+        
+        return button
+    }()
+    
     private let confirmButton: UIButton = {
         let button = UIButton()
-        button.setTitle(PrivacyPolicyNS.nextPage, for: .normal)
+        button.setTitle(OnboardingConst.PrivacyPolicy.Text.nextPage, for: .normal)
         button.backgroundColor = UIColor.lightGray
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 8
         button.isEnabled = false
         return button
-    }()
-    
-    private let termsTextView: UITextView = {
-        let textView = UITextView()
-        textView.isEditable = false
-        textView.isSelectable = true
-        textView.isUserInteractionEnabled = true
-        textView.dataDetectorTypes = [.link]
-        
-        let text = PrivacyPolicyNS.termsText
-        let attributedString = NSMutableAttributedString(string: text)
-        
-        let termsRange = (text as NSString).range(of: PrivacyPolicyNS.termsRange)
-        let privacyPolicyRange = (text as NSString).range(of: PrivacyPolicyNS.privacyPolicyRange)
-        
-        attributedString.addAttribute(.link, value: PrivacyPolicyNS.termslink, range: termsRange)
-        attributedString.addAttribute(.link, value: PrivacyPolicyNS.privacyPolicylink, range: privacyPolicyRange)
-        
-        textView.attributedText = attributedString
-        textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.systemGray,
-                                       NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue]
-        
-        textView.textAlignment = .left
-        
-        return textView
     }()
     
     override func viewDidLoad() {
@@ -136,19 +147,21 @@ class PrivacyPolicyVC: UIViewController {
             titleLabel,
             pageController,
             allAgreeCheckBox,
-            checkBoxView,
+            checkBoxBackGroundView,
+            AppTermsAgreedLinkButton,
+            PrivacyTermsAgreedLinkButton,
             confirmButton,
-            termsTextView,
+//            termsTextView,
         ].forEach { view.addSubview($0) }
         
         [
             isAppTermsAgreedCheckBox,
             isPrivacyTermsAgreedCheckBox,
             isSnsConsentGivenCheckBox,
-        ].forEach { checkBoxView.addSubview($0) }
+        ].forEach { checkBoxBackGroundView.addSubview($0) }
         
         pageController.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.top.equalToSuperview()
             $0.trailing.equalToSuperview().offset(-16)
             $0.height.equalTo(26)
             $0.width.equalTo(41)
@@ -173,7 +186,7 @@ class PrivacyPolicyVC: UIViewController {
             $0.trailing.equalToSuperview().offset(-16)
         }
         
-        checkBoxView.snp.makeConstraints {
+        checkBoxBackGroundView.snp.makeConstraints {
             $0.top.equalTo(allAgreeCheckBox.snp.bottom).offset(8)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
@@ -182,27 +195,41 @@ class PrivacyPolicyVC: UIViewController {
         }
         
         isAppTermsAgreedCheckBox.snp.makeConstraints {
-            $0.top.equalTo(allAgreeCheckBox.snp.top).offset(16)
+            $0.top.equalToSuperview().offset(16)
             $0.height.equalTo(21)
             $0.leading.equalToSuperview().offset(16)
         }
         
         isPrivacyTermsAgreedCheckBox.snp.makeConstraints {
-            $0.top.equalTo(isAppTermsAgreedCheckBox.snp.top).offset(16)
+            $0.top.equalTo(isAppTermsAgreedCheckBox.snp.bottom).offset(16)
             $0.height.equalTo(21)
-            $0.leading.equalToSuperview().offset(16)
+            $0.leading.equalToSuperview().offset(32)
         }
         
         isSnsConsentGivenCheckBox.snp.makeConstraints {
-            $0.top.equalTo(isPrivacyTermsAgreedCheckBox.snp.top).offset(16)
+            $0.top.equalTo(isPrivacyTermsAgreedCheckBox.snp.bottom).offset(16)
             $0.height.equalTo(21)
             $0.leading.equalToSuperview().offset(16)
         }
         
-        termsTextView.snp.makeConstraints {
-            $0.top.equalTo(allAgreeCheckBox.snp.bottom).offset(16)
+        AppTermsAgreedLinkButton.snp.makeConstraints {
+            $0.top.equalTo(checkBoxBackGroundView.snp.bottom).offset(16)
             $0.leading.equalToSuperview().offset(16)
+            $0.height.equalTo(16)
+            $0.width.equalTo(42)
         }
+        PrivacyTermsAgreedLinkButton.snp.makeConstraints {
+            $0.top.equalTo(AppTermsAgreedLinkButton .snp.bottom).offset(8)
+            $0.leading.equalToSuperview().offset(16)
+            $0.height.equalTo(16)
+            $0.width.equalTo(83)
+        }
+//        termsTextView.snp.makeConstraints {
+//            $0.top.equalTo(checkBoxBackGroundView.snp.bottom).offset(16)
+//            $0.leading.equalToSuperview().offset(16)
+//            $0.height.equalTo(40)
+//            $0.width.equalTo(100)
+//        }
         
         confirmButton.snp.makeConstraints {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)

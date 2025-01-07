@@ -54,19 +54,18 @@ enum OnboardingConst {
         }
         
         enum Text {
-            static let titleLabel = "이용 약관에\n동의해 주세요"
+            static let titleLabel = "이용 약관에\n동의해주세요"
             static let pageControl = "1/3"
             static let isAllAgree = "모두 동의"
             static let nextPage = "다음"
             static let titleNumberofLine = 2
             
-            static let isAppTermsAgreed = " (필수) WeClimb 이용약관"
-            static let isPrivacyTermsAgreed = " (필수) WeClimb 개인정보 수집 및 이용에 대한 동의"
-            static let isSNSConsenctGivenCheck = " (선택) SNS 광고성 정보 수신동의"
+            static let isAppTermsAgreed = "WeClimb 이용약관(필수)"
+            static let isPrivacyTermsAgreed = "개인정보 수집 및 이용에 대한 동의(필수)"
+            static let isSNSConsenctGivenCheck = "SNS 광고성 정보 수신동의(선택)"
             
-            static let termsText = "이용약관\n개인정보 처리방침"
-            static let termsRange = "이용약관"
-            static let privacyPolicyRange = "개인정보 처리방침"
+            static let AppTermAgreedButtonText = "이용약관"
+            static let PrivacyTermsAgreedLinkButton = "개인정보보호방침"
         }
         
         enum Size {
@@ -75,7 +74,7 @@ enum OnboardingConst {
         
         enum Font {
             static let titleFont = UIFont.customFont(style: CustomFontStyle.title1Bold)
-            static let pageControlFont = UIFont.customFont(style: CustomFontStyle.caption1Regular)
+            static let valueFont = UIFont.customFont(style: CustomFontStyle.caption1Regular)
             static let titleCheckBoxFont = UIFont.customFont(style: CustomFontStyle.label1Medium)
             static let valueCheckBoxFont = UIFont.customFont(style: CustomFontStyle.label2Medium)
         }
@@ -98,6 +97,35 @@ enum OnboardingConst {
         enum Style {
             static let pageControlCornerRadius = 10000
             static let containerCornerRadius: CGFloat = 14
+        }
+    }
+    
+    enum CreateNickname {
+        enum Color {
+            static let titleTextColor: UIColor = UIColor.labelStrong
+            static let subtitleTextColor: UIColor = UIColor.labelNeutral
+            static let pageControlTextColor: UIColor = UIColor.fillSolidLightNormal
+            static let backgroundColor: UIColor = UIColor.white
+        }
+        
+        enum Text {
+            static let titleLabel = "닉네임을\n설정해주세요"
+            static let pageControl = "2/3"
+            static let titleNumberofLine = 2
+            
+            static let nickNameTitle = "닉네임"
+            static let nickNameSub = "필수"
+            
+            static let nicknamePlaceholder = "닉네임을 입력해주세요"
+            static let charCountLabel = "0/12"
+        }
+        
+        enum Font {
+            static let titleFont = UIFont.customFont(style: CustomFontStyle.title1Bold)
+            static let valueFont = UIFont.customFont(style: CustomFontStyle.caption1Regular)
+            
+            static let nickNameTitle = UIFont.customFont(style: CustomFontStyle.label2Medium)
+            static let placeholderFont = UIFont.customFont(style: CustomFontStyle.body2Medium)
         }
     }
 }
