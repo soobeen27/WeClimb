@@ -42,7 +42,7 @@ class MainFeedDataSourceImpl: MainFeedDataSource {
     private func getPostRef(user: User? = nil) -> Query {
         var postsRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
-            .limit(to: 50)
+            .limit(to: 5)
         
         if let user {
             postsRef = checkBlackList(quary: postsRef, user: user)
