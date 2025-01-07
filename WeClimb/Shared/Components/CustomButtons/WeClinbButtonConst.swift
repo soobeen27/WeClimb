@@ -8,6 +8,13 @@
 import UIKit
 
 enum WeClimbButtonConst {
+    
+    enum Color {
+        static let defaultBackgroundColor: UIColor = .black
+        static let defaultTintColor: UIColor = .white
+        static let defaultTitleColor: UIColor = .white
+    }
+    
     enum DefaultRectangle {
         static let cornerRadius: CGFloat = 10
         

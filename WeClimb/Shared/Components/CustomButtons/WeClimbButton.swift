@@ -44,14 +44,14 @@ class WeClimbButton: UIButton {
     private lazy var leftIconView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.tintColor = .white
+        imageView.tintColor = WeClimbButtonConst.Color.defaultBackgroundColor
         return imageView
     }()
     
     private lazy var rightIconView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.tintColor = .white
+        imageView.tintColor = WeClimbButtonConst.Color.defaultTintColor
         return imageView
     }()
     
@@ -87,30 +87,30 @@ class WeClimbButton: UIButton {
             layer.cornerRadius = WeClimbButtonConst.DefaultRectangle.cornerRadius
             clipsToBounds = true
             titleLabel?.font = UIFont.customFont(style: .label1SemiBold)
-            setTitleColor(.white, for: .normal)
-            backgroundColor = .black
+            setTitleColor(WeClimbButtonConst.Color.defaultTitleColor, for: .normal)
+            backgroundColor = WeClimbButtonConst.Color.defaultBackgroundColor
             
         case .iconRectangle:
             layer.cornerRadius = buttonSize.cornerRadius
             clipsToBounds = true
             titleLabel?.font = buttonSize.fontType
-            setTitleColor(.white, for: .normal)
-            backgroundColor = .black
+            setTitleColor(WeClimbButtonConst.Color.defaultTitleColor, for: .normal)
+            backgroundColor = WeClimbButtonConst.Color.defaultBackgroundColor
             
         case .rightIconRound:
             layer.cornerRadius = WeClimbButtonConst.RightIconRound.cornerRadius
             clipsToBounds = true
             titleLabel?.font = UIFont.customFont(style: .caption1Medium)
-            setTitleColor(.white, for: .normal)
-            backgroundColor = .black
+            setTitleColor(WeClimbButtonConst.Color.defaultTitleColor, for: .normal)
+            backgroundColor = WeClimbButtonConst.Color.defaultBackgroundColor
         }
     }
     
     private func setLayout() {
-        addSubview(leftIconView)
-        addSubview(rightIconView)
-        
         guard let titleLabel else { return }
+        
+        [leftIconView, rightIconView]
+            .forEach{ addSubview($0) }
         
         switch buttonStyle {
         case .defaultRectangle:
