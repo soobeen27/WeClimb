@@ -163,4 +163,23 @@ enum OnboardingConst {
             
         }
     }
+    
+    enum RegisterResult {
+        enum Text {
+            static let titleLabel = "가입이\n완료되었어요!"
+            static let titleNumberofLine = 2
+            
+            static let GreetingComment = "위클에 오신 것을 진심으로 환영합니다!"
+        }
+        
+        enum Font {
+            static let titleFont = UIFont.customFont(style: CustomFontStyle.title1Bold)
+            static let valueFont = UIFont.customFont(style: CustomFontStyle.label2Medium)
+        }
+        
+        enum Color {
+            static let titleTextColor: UIColor = UIColor.labelStrong
+            static let GreetingCommentColor: UIColor = UIColor.labelNormal
+        }
+    }
 }
