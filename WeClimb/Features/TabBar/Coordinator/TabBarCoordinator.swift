@@ -10,8 +10,24 @@ import UIKit
 final class TabBarCoordinator: BaseCoordinator {
     var tabBarController: UITabBarController
     
-    init(tabBarController: UITabBarController) {
+    private let feedBuilder: FeedBuilder
+    private let searchBuilder: SearchBuilder
+    private let uploadBuilder: UploadBuilder
+    private let notificationBuilder: NotificationBuilder
+    private let userPageBuilder: UserPageBuilder
+    
+    init(tabBarController: UITabBarController,
+         feedBuilder: FeedBuilder,
+         searchBuilder: SearchBuilder,
+         uploadBuilder: UploadBuilder,
+         notificationBuilder: NotificationBuilder,
+         userPageBuilder: UserPageBuilder) {
         self.tabBarController = tabBarController
+        self.feedBuilder = feedBuilder
+        self.searchBuilder = searchBuilder
+        self.uploadBuilder = uploadBuilder
+        self.notificationBuilder = notificationBuilder
+        self.userPageBuilder = userPageBuilder
     }
     
     override func start() {
@@ -49,7 +65,7 @@ final class TabBarCoordinator: BaseCoordinator {
     // MARK: - Coordinator Factory Methods
     private func createFeedCoordinator() -> FeedCoordinator {
         let navigationController = UINavigationController()
-        let coordinator = FeedCoordinator(navigationController: navigationController, builder: <#any FeedBuilder#>)
+        let coordinator = FeedCoordinator(navigationController: navigationController, builder: feedBuilder)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage.homeIcon,
