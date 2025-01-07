@@ -14,7 +14,7 @@ protocol FeedBuilder {
 final class FeedBuilderImpl: FeedBuilder {
     private let container: AppDIContainer
     
-    init(container: AppDIContainer = .shard) {
+    init(container: AppDIContainer = .shared) {
         self.container = container
     }
     

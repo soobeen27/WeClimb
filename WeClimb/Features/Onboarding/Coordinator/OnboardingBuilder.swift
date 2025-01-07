@@ -18,7 +18,7 @@ protocol OnboardingBuilder {
 final class OnboardingBuilderImpl: OnboardingBuilder {
     private let container: AppDIContainer
     
-    init(container: AppDIContainer = .shard) {
+    init(container: AppDIContainer = .shared) {
         self.container = container
     }
     

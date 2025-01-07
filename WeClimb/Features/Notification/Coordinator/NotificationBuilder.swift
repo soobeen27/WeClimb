@@ -14,7 +14,7 @@ protocol NotificationBuilder {
 final class NotificationBuilderImpl: NotificationBuilder {
     private let container: AppDIContainer
     
-    init(container: AppDIContainer = .shard) {
+    init(container: AppDIContainer = .shared) {
         self.container = container
     }
     
