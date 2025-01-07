@@ -39,6 +39,9 @@ extension UIColor {
     static let alertbackgroundGray = UIColor(red: 26/255, green: 26/255, blue: 26/255, alpha: 0.12)
     static let alertlightGray = UIColor(red: 127/255, green: 129/255, blue: 138/255, alpha: 0.16)
     static let alertTitleGray = UIColor(red: 88/255, green: 89/255, blue: 96/255, alpha: 1)
+    
+    //MARK: - 텍스트필드 커스텀 컬러
+    static let textFieldBorderGray = UIColor(red: 127/255, green: 129/255, blue: 138/255, alpha: 0.16)
 }
 
 extension UIColor {
@@ -55,4 +58,5 @@ extension UIColor {
     static let fillSolidDarkBlack = UIColor(hex: "#141415")
     static let labelNormal = UIColor(hex: "#585960")
     static let fillSolidLightLight = UIColor(hex: "#FAFAFA")
+    static let labelAssistive = UIColor(hex: "#BFC0C4")
 }

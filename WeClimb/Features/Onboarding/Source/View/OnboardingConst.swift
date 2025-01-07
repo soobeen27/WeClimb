@@ -105,7 +105,10 @@ enum OnboardingConst {
             static let titleTextColor: UIColor = UIColor.labelStrong
             static let subtitleTextColor: UIColor = UIColor.labelNeutral
             static let pageControlTextColor: UIColor = UIColor.fillSolidLightNormal
+            static let nickNameFieldColor: UIColor = UIColor.labelAssistive
+            static let nickNameLabelColor: UIColor = UIColor.black
             static let backgroundColor: UIColor = UIColor.white
+            static let boarderGray: UIColor = UIColor.textFieldBorderGray
         }
         
         enum Text {

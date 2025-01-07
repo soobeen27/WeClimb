@@ -63,9 +63,22 @@ class CreateNicknameVC: UIViewController {
     private let nickNameTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = OnboardingConst.CreateNickname.Text.nicknamePlaceholder
+        
         textField.borderStyle = .roundedRect
         textField.font = OnboardingConst.CreateNickname.Font.placeholderFont
+        textField.textColor = OnboardingConst.CreateNickname.Color.nickNameLabelColor
+        
         textField.backgroundColor = OnboardingConst.CreateNickname.Color.backgroundColor
+        textField.layer.cornerRadius = 8
+        textField.layer.borderWidth = 1
+        textField.layer.borderColor = OnboardingConst.CreateNickname.Color.boarderGray.cgColor
+        
+        textField.attributedPlaceholder = NSAttributedString(
+            string: OnboardingConst.CreateNickname.Text.nicknamePlaceholder,
+            attributes: [
+                .foregroundColor: OnboardingConst.CreateNickname.Color.nickNameFieldColor
+            ]
+        )
         return textField
     }()
     
@@ -151,7 +164,14 @@ class CreateNicknameVC: UIViewController {
             $0.top.equalTo(nickNameTitleStackView.snp.bottom).offset(8)
             $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
-            $0.width.equalTo(46)
+            $0.height.equalTo(46)
+        }
+        
+        characterCountLabel.snp.makeConstraints {
+            $0.top.equalTo(nickNameTextField.snp.bottom).offset(4)
+            $0.trailing.equalToSuperview().offset(-16)
+            $0.width.equalTo(30)
+            $0.height.equalTo(16)
         }
         
         confirmButton.snp.makeConstraints {
