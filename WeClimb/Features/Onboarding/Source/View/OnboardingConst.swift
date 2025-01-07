@@ -8,6 +8,9 @@
 import UIKit
 
 enum OnboardingConst {
+    
+    static let weclimbLogo: UIImage = UIImage.logo
+    
     enum Login {
         enum Color {
             static let guestLoginFontColor: UIColor = UIColor.labelNeutral
@@ -84,7 +87,6 @@ enum OnboardingConst {
         }
         
         enum Image {
-            static let weclimbLogo: UIImage = UIImage.logo
             static let clickCheckBox: UIImage = UIImage.privacyPolicyCheck
             static let clearCheckBox: UIImage = UIImage.privacyPolicyNonCheck
         }
@@ -129,6 +131,36 @@ enum OnboardingConst {
             
             static let nickNameTitle = UIFont.customFont(style: CustomFontStyle.label2Medium)
             static let placeholderFont = UIFont.customFont(style: CustomFontStyle.body2Medium)
+        }
+    }
+    
+    enum PersonalDetail {
+        enum Text {
+            static let titleLabel = "신체 정보를\n입력해주세요"
+            static let titleNumberofLine = 2
+            static let pageControl = "3/3"
+            
+            static let heightTitleText = "신장"
+            static let armrichTitleText = "암리치"
+            
+            static let requiredText = "필수"
+            static let selectionLabel = "선택"
+        }
+        
+        enum Font {
+            static let titleFont = UIFont.customFont(style: CustomFontStyle.title1Bold)
+            static let valueFont = UIFont.customFont(style: CustomFontStyle.caption1Regular)
+            static let textFiledTitleLabelFont = UIFont.customFont(style: CustomFontStyle.label2Medium)
+        }
+        
+        enum Color {
+            static let titleTextColor: UIColor = UIColor.labelStrong
+            static let pageControlTextColor: UIColor = UIColor.fillSolidLightNormal
+            static let subtitleTextColor: UIColor = UIColor.labelNeutral
+        }
+        
+        enum Image {
+            
         }
     }
 }

@@ -14,7 +14,7 @@ class CreateNicknameVC: UIViewController {
     
     private let logoImage: UIImageView = {
         var image = UIImageView()
-        image.image = OnboardingConst.PrivacyPolicy.Image.weclimbLogo
+        image.image = OnboardingConst.weclimbLogo
         return image
     }()
     
