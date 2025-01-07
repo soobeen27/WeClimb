@@ -49,7 +49,7 @@ final class TabBarCoordinator: BaseCoordinator {
     // MARK: - Coordinator Factory Methods
     private func createFeedCoordinator() -> FeedCoordinator {
         let navigationController = UINavigationController()
-        let coordinator = FeedCoordinator(navigationController: navigationController)
+        let coordinator = FeedCoordinator(navigationController: navigationController, builder: <#any FeedBuilder#>)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage.homeIcon,
