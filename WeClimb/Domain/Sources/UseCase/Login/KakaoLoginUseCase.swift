@@ -8,11 +8,11 @@ import Foundation
 
 import RxSwift
 
-protocol KakaLoginUseCase {
+protocol KakaoLoginUseCase {
     func execute() -> Single<LoginResult>
 }
 
-struct KakaoLoginUseCaseImpl {
+struct KakaoLoginUseCaseImpl: KakaoLoginUseCase {
     private let kakaoLoginRepository: KakaoLoginRepository
     
     init(kakaoLoginRepository: KakaoLoginRepository) {
