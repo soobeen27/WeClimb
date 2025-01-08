@@ -125,6 +125,8 @@ class CustomSegmentedControl: UIView {
                 guard let self = self,
                       let selectedTitle = self.segmentControl.titleForSegment(at: selectedIndex) else { return }
                 
+                self.onSegmentChanged?(selectedIndex)
+                
                 let titleWidth = CustomSegmentConst.Helper.titleWidth(
                     for: selectedTitle,
                     font: CustomSegmentConst.Font.normalFont
