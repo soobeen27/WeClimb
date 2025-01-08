@@ -54,12 +54,14 @@ enum OnboardingConst {
             static let pageControlTextColor: UIColor = UIColor.fillSolidLightNormal
             static let CheckBoxFontColor: UIColor = UIColor.labelNormal
             static let containerBoxColor: UIColor = UIColor.fillSolidLightLight
+            static let confirmActivationColor: UIColor = UIColor.labelAlternative
+            static let confirmDeactivationColor: UIColor = UIColor.fillSolidDarkBlack
         }
         
         enum Text {
             static let titleLabel = "이용 약관에\n동의해주세요"
             static let pageControl = "1/3"
-            static let isAllAgree = "모두 동의"
+            static let isAllAgree = "전체 동의"
             static let nextPage = "다음"
             static let titleNumberofLine = 2
             

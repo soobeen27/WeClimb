@@ -10,11 +10,11 @@ import UIKit
 import RxCocoa
 import RxSwift
 
-protocol LoginProtocol {
-    func transform(input: LoginVM.Input) -> LoginVM.Output
+protocol LoginVM {
+    func transform(input: LoginImpl.Input) -> LoginImpl.Output
 }
 
-class LoginVM: LoginProtocol {
+class LoginImpl: LoginVM {
     private let disposeBag = DisposeBag()
     public let usecase: LoginUsecase
     
