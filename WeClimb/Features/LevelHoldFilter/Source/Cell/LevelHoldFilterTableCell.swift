@@ -10,7 +10,6 @@ import UIKit
 import SnapKit
 
 class LevelHoldFilterTableCell: UITableViewCell {
-    var coordinator: UploadCoordinator?
     
     private let iconImage: UIImageView = {
         let imageView = UIImageView()
@@ -21,24 +20,34 @@ class LevelHoldFilterTableCell: UITableViewCell {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = UIColor(red: 127/255, green: 129/255, blue: 138/255, alpha: 1)
-        label.font = UIFont.customFont(style: .label2Regular)
+        label.font = LevelHoldFilterCellConst.cellTitleFont
         return label
     }()
     
     private let leftImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView
     }()
     
-    private let separatorLine: UIView = {
+    private let rightSeparatorLine: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.lightGray
-        view.backgroundColor = UIColor(red: 127/255, green: 129/255, blue: 138/255, alpha: 0.16)
+        view.backgroundColor = LevelHoldFilterCellConst.Color.rightSeparatorLineColor
         return view
     }()
+    
+    func updateCellStyle(for theme: LevelHoldFilterVC.FilterViewTheme, isChecked: Bool) {
+        switch theme {
+        case .light:
+            contentView.backgroundColor = LevelHoldFilterCellConst.Color.lightCellBackgroundColor
+            titleLabel.textColor = isChecked ? LevelHoldFilterCellConst.Color.lightIsCheckedCellTitleColor : LevelHoldFilterCellConst.Color.lightNormalCellTitleColor
+        case .dark:
+            contentView.backgroundColor = LevelHoldFilterCellConst.Color.darkCellBackgroundColor
+            titleLabel.textColor = isChecked ? LevelHoldFilterCellConst.Color.darkIsCheckedCellTitleColor : LevelHoldFilterCellConst.Color.darkNormalCellTitleColor
+        }
+
+    }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -52,56 +61,56 @@ class LevelHoldFilterTableCell: UITableViewCell {
     }
     
     private func setLayout() {
-        [iconImage, titleLabel, leftImage, separatorLine].forEach { contentView.addSubview($0) }
+        [iconImage, titleLabel, leftImage, rightSeparatorLine].forEach { contentView.addSubview($0) }
         
         iconImage.snp.makeConstraints {
-            $0.leading.equalTo(contentView).inset(16)
+            $0.leading.equalTo(contentView).inset(LevelHoldFilterCellConst.padding.defaultPadding)
             $0.centerY.equalTo(contentView)
-            $0.width.height.equalTo(16)
+            $0.width.height.equalTo(LevelHoldFilterCellConst.padding.defaultPadding)
         }
         
         titleLabel.snp.makeConstraints {
-            $0.leading.equalTo(iconImage.snp.trailing).offset(8)
+            $0.leading.equalTo(iconImage.snp.trailing).offset(LevelHoldFilterCellConst.padding.titleLeading)
             $0.centerY.equalTo(contentView)
-            $0.trailing.lessThanOrEqualTo(leftImage.snp.leading).offset(-8)
         }
         
         leftImage.snp.makeConstraints {
-            $0.trailing.equalTo(contentView).inset(16)
+            $0.trailing.equalTo(contentView).inset(LevelHoldFilterCellConst.padding.defaultPadding)
             $0.centerY.equalToSuperview()
         }
         
-        separatorLine.snp.makeConstraints {
-            $0.trailing.equalTo(contentView).inset(16)
+        rightSeparatorLine.snp.makeConstraints {
+            $0.trailing.equalTo(contentView).inset(LevelHoldFilterCellConst.padding.defaultPadding)
             $0.centerY.equalToSuperview()
-            $0.width.equalTo(43)
-            $0.height.equalTo(1)
+            $0.width.equalTo(LevelHoldFilterCellConst.Size.rightSeparatorLineWidth)
+            $0.height.equalTo(LevelHoldFilterCellConst.Size.rightSeparatorLineHeight)
         }
     }
     
-    func configure(with text: String, imageName: String, isChecked: Bool, isFirstCell: Bool, isLastCell: Bool) {
-        titleLabel.text = text
-        iconImage.image = UIImage(named: imageName)
+    func configure(with config: LevelHoldFilterCellConfig, theme: LevelHoldFilterVC.FilterViewTheme) {
+        titleLabel.text = config.text
+        iconImage.image = UIImage(named: config.imageName)
         
-        if isChecked {
+        if config.isChecked {
             titleLabel.font = UIFont.customFont(style: .label2SemiBold)
-            titleLabel.textColor = .black
-            iconImage.image = UIImage(named: imageName + "Check")
+            iconImage.image = UIImage(named: config.imageName + LevelHoldFilterCellConst.Text.checkSuffix)
         } else {
-            iconImage.image = UIImage(named: imageName)
-            titleLabel.textColor = UIColor(red: 127/255, green: 129/255, blue: 138/255, alpha: 1)
+            iconImage.image = UIImage(named: config.imageName)
             titleLabel.font = UIFont.customFont(style: .label2Regular)
         }
         
-        if isFirstCell {
-            separatorLine.isHidden = true
-            leftImage.image = UIImage(named: "harderIcon")
-        } else if isLastCell {
-            separatorLine.isHidden = true
-            leftImage.image = UIImage(named: "easierIcon")
+        if config.isFirstCell {
+            rightSeparatorLine.isHidden = true
+            leftImage.image = LevelHoldFilterCellConst.Icon.firstCellHarderIcon
+        } else if config.isLastCell {
+            rightSeparatorLine.isHidden = true
+            leftImage.image = LevelHoldFilterCellConst.Icon.lastCellEasierIcon
         } else {
-            separatorLine.isHidden = false
+            rightSeparatorLine.isHidden = false
             leftImage.image = nil
         }
+        
+        updateCellStyle(for: theme, isChecked: config.isChecked)
+        
     }
 }

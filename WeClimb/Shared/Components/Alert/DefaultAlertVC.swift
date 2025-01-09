@@ -76,7 +76,7 @@ public class DefaultAlertVC: UIViewController {
     private var cancelButton : UIButton = {
         let button = UIButton()
         button.layer.borderWidth = DefaultAlertConst.borderWidthButton
-        button.layer.borderColor = UIColor.lineOpacityStrong.cgColor
+        button.layer.borderColor = UIColor.lineOpacityHeavy.cgColor
         button.layer.cornerRadius = DefaultAlertConst.CornerRadius.buttons
         button.titleLabel?.font = .customFont(style: .label2Medium)
         button.setTitleColor(.labelStrong, for: .normal)
