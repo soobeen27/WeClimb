@@ -12,8 +12,8 @@ import RxSwift
 final class MainFeedRepositoryImpl: MainFeedRepository {
     private let mainFeedDataSource: MainFeedDataSource
     
-    init(mainFeedDataSourceL: MainFeedDataSource) {
-        self.mainFeedDataSource = mainFeedDataSourceL
+    init(mainFeedDataSource: MainFeedDataSource) {
+        self.mainFeedDataSource = mainFeedDataSource
     }
     
     func getFeed(user: User?) -> Single<[Post]> {

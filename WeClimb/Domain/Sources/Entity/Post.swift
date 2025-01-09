@@ -35,7 +35,6 @@ struct Post: Codable {
     let medias: [DocumentReference]?
     let thumbnail: String?
     let commentCount: Int?
-//    let medias: [Media]?
 }
 
 // 댓글

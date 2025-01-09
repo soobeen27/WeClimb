@@ -7,11 +7,11 @@
 
 import RxSwift
 
-protocol LoginUsecase {
+protocol LoginUseCase {
     func execute(loginType: LoginType, presentProvider: PresenterProvider?) -> Single<LoginResult>
 }
 
-struct LoginUsecaseImpl: LoginUsecase {
+struct LoginUseCaseImpl: LoginUseCase {
     private let appleLoginUseCase: AppleLoginUseCase
     private let googleLoginUseCase: GoogleLoginUseCase
     private let kakaoLoginUseCase: KakaoLoginUseCase
