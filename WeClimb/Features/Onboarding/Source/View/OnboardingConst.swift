@@ -52,7 +52,7 @@ enum OnboardingConst {
         enum Color {
             static let titleTextColor: UIColor = UIColor.labelStrong
             static let pageControlTextColor: UIColor = UIColor.fillSolidLightNormal
-            static let CheckBoxFontColor: UIColor = UIColor.labelNormal
+            static let checkBoxFontColor: UIColor = UIColor.labelNormal
             static let containerBoxColor: UIColor = UIColor.fillSolidLightLight
             static let confirmActivationColor: UIColor = UIColor.labelAlternative
             static let confirmDeactivationColor: UIColor = UIColor.fillSolidDarkBlack
@@ -73,10 +73,6 @@ enum OnboardingConst {
             static let PrivacyTermsAgreedLinkButton = "개인정보보호방침"
         }
         
-        enum Size {
-            
-        }
-        
         enum Font {
             static let titleFont = UIFont.customFont(style: CustomFontStyle.title1Bold)
             static let valueFont = UIFont.customFont(style: CustomFontStyle.caption1Regular)
@@ -84,8 +80,42 @@ enum OnboardingConst {
             static let valueCheckBoxFont = UIFont.customFont(style: CustomFontStyle.label2Medium)
         }
         
+        enum CornerRadius {
+            static let pageControl: CGFloat = 16
+            static let confirmButton: CGFloat = 8
+        }
+        
+        enum Size {
+            static let logoSize: CGSize = CGSize(width: 60, height: 60)
+            static let pageControllerSize: CGSize = CGSize(width: 41, height: 26)
+            static let checkBoxBackGroundSize: CGSize = CGSize(width: 343, height: 127)
+            static let AppTermsLinkButtonSize: CGSize = CGSize(width: 42, height: 16)
+            static let PrivacyTermsLinkButtonSize: CGSize = CGSize(width: 83, height: 16)
+            static let checkBoxHeight: CGFloat = 21
+            static let allAgreeCheckBoxHeight: CGFloat = 48
+            static let confirmButtonHeight: CGFloat = 50
+            static let labelstartLocation = 0
+        }
+        
+        enum Style {
+            static let containerCornerRadius: CGFloat = 8
+            static let confirmButtonCornerRadius: CGFloat = 8
+            static let pageControlCornerRadius = 10000
+        }
+        
         enum Spacing {
-//            static let 
+            static let pageControllerTopOffset: CGFloat = 0
+            static let logoTopOffset: CGFloat = 30
+            static let titleLabelTopOffset: CGFloat = 16
+            static let allAgreeCheckBoxTopOffset: CGFloat = 40
+            static let checkBoxBackgroundViewTopOffset: CGFloat = 0
+            static let checkBoxVerticalSpacing: CGFloat = 16
+            static let linkButtonTopOffset: CGFloat = 16
+            static let linkButtonVerticalSpacing: CGFloat = 8
+            static let privacyPolicyLabelLeadingOffset: CGFloat = 32
+            static let confirmButtonBottomOffset: CGFloat = 20
+            static let horizontalPadding: CGFloat = 16
+            static let checkBoxBackgroundViewHeight: CGFloat = 127
         }
         
         enum Image {
@@ -96,11 +126,6 @@ enum OnboardingConst {
         enum link {
             static let termslink = "https://www.notion.so/iosclimber/104292bf48c947b2b3b7a8cacdf1d130"
             static let privacyPolicylink = "https://www.notion.so/iosclimber/146cdb8937944e18a0e055c892c52928"
-        }
-        
-        enum Style {
-            static let pageControlCornerRadius = 10000
-            static let containerCornerRadius: CGFloat = 14
         }
     }
     
@@ -113,6 +138,9 @@ enum OnboardingConst {
             static let nickNameLabelColor: UIColor = UIColor.black
             static let backgroundColor: UIColor = UIColor.white
             static let boarderGray: UIColor = UIColor.textFieldBorderGray
+            static let errorTextColor: UIColor = UIColor.statusNegative
+            static let confirmActivationColor: UIColor = UIColor.labelAlternative
+            static let confirmDeactivationColor: UIColor = UIColor.fillSolidDarkBlack
         }
         
         enum Text {
@@ -125,6 +153,11 @@ enum OnboardingConst {
             
             static let nicknamePlaceholder = "닉네임을 입력해주세요"
             static let charCountLabel = "0/12"
+            static let errorMessageDuplicate = "이미 사용중인 닉네임입니다."
+            static let errorMessage = "알 수 없는 오류가 발생하셨습니다."
+            
+            static let regex = "^[가-힣a-zA-Z0-9]{2,12}$"
+            static let nextPage = "다음"
         }
         
         enum Font {
@@ -133,6 +166,53 @@ enum OnboardingConst {
             
             static let nickNameTitle = UIFont.customFont(style: CustomFontStyle.label2Medium)
             static let placeholderFont = UIFont.customFont(style: CustomFontStyle.body2Medium)
+        }
+        
+        enum Icon {
+            static let chevronRight = UIImage(systemName: "chevron.right")
+            static let xCircle = UIImage(systemName: "x.circle")
+            static let exclamationMark = UIImage(systemName: "exclamationmark.circle")
+        }
+        
+        enum CornerRadius {
+            static let pageControl: CGFloat = 16
+            static let textField: CGFloat = 8
+            static let button: CGFloat = 8
+            static let confirmButton: CGFloat = 8
+        }
+        
+        enum Spacing {
+            static let stackViewSpacing: CGFloat = 3
+            static let textFieldTopOffset: CGFloat = 8
+            static let labelTopOffset: CGFloat = 4
+            static let confirmButtonBottomOffset: CGFloat = 20
+            static let viewHorizontalMargin: CGFloat = 16
+            static let logoTopMargin: CGFloat = 30
+            static let nicknameTextFieldTop: CGFloat = 32
+        }
+        
+        enum Size {
+            static let logoSize: CGSize = CGSize(width: 60, height: 60)
+            static let pageControlSize: CGSize = CGSize(width: 41, height: 26)
+            static let iconSize: CGSize = CGSize(width: 16, height: 16)
+            static let nickNameTilteStackViewSize: CGSize = CGSize(width: 62, height: 21)
+            static let nickNameTitleLabelSize: CGSize = CGSize(width: 37, height: 21)
+            static let nickNameSubTitleLabelSize: CGSize = CGSize(width: 21, height: 16)
+            static let characterCountLabelSize: CGSize = CGSize(width: 30, height: 16)
+            
+            static let textFieldHeight: CGFloat = 46
+            static let errorMessageHeight: CGFloat = 21
+            static let characterCountLabelWidth: CGFloat = 30
+            static let characterCountLabelHeight: CGFloat = 16
+            static let confirmButtonHeight: CGFloat = 50
+            static let borderWidth: CGFloat = 1
+            static let minCharacterCount: Int = 2
+            static let maxCharacterCount: Int = 12
+        }
+        
+        enum Status {
+            static let boolValue: Int = 0
+            static let trueValue: Int = 1
         }
     }
     

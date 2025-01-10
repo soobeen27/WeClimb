@@ -10,10 +10,7 @@ import RxSwift
 import Firebase
 import FirebaseStorage
 
-
-
 protocol UserReadDataSource {
-//    func userInfo(name: String?, uid: String?) throws -> Single<User>
     func userInfoFromUID(uid: String) -> Single<User>
     func userInfoFromName(name: String) -> Single<User>
 }

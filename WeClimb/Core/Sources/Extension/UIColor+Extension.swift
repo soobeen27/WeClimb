@@ -66,4 +66,5 @@ extension UIColor {
     static let labelNormal = UIColor(hex: "#585960")
     static let fillSolidLightLight = UIColor(hex: "#FAFAFA")
     static let labelAssistive = UIColor(hex: "#BFC0C4")
+    static let statusNegative = UIColor(hex: "FB283E")
 }

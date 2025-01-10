@@ -60,7 +60,7 @@ class PrivacyPolicyVC: UIViewController {
         label.text = OnboardingConst.PrivacyPolicy.Text.pageControl
         label.textColor = OnboardingConst.PrivacyPolicy.Color.pageControlTextColor
         label.font = OnboardingConst.PrivacyPolicy.Font.valueFont
-        label.layer.cornerRadius = 16
+        label.layer.cornerRadius = OnboardingConst.PrivacyPolicy.CornerRadius.pageControl
         label.contentMode = .center
         return label
     }()
@@ -72,7 +72,7 @@ class PrivacyPolicyVC: UIViewController {
         button.setTitle(OnboardingConst.PrivacyPolicy.Text.isAllAgree, for: .normal)
         button.contentHorizontalAlignment = .left
         button.titleLabel?.font = OnboardingConst.PrivacyPolicy.Font.titleCheckBoxFont
-        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.CheckBoxFontColor, for: .normal)
+        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.checkBoxFontColor, for: .normal)
         return button
     }()
     
@@ -82,7 +82,7 @@ class PrivacyPolicyVC: UIViewController {
         button.setImage(OnboardingConst.PrivacyPolicy.Image.clearCheckBox, for: .normal)
         button.setTitle(OnboardingConst.PrivacyPolicy.Text.isAppTermsAgreed, for: .normal)
         button.contentHorizontalAlignment = .left
-        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.CheckBoxFontColor, for: .normal)
+        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.checkBoxFontColor, for: .normal)
         button.titleLabel?.font = OnboardingConst.PrivacyPolicy.Font.valueCheckBoxFont
         return button
     }()
@@ -93,7 +93,7 @@ class PrivacyPolicyVC: UIViewController {
         button.setImage(OnboardingConst.PrivacyPolicy.Image.clearCheckBox, for: .normal)
         button.setTitle(OnboardingConst.PrivacyPolicy.Text.isPrivacyTermsAgreed, for: .normal)
         button.contentHorizontalAlignment = .left
-        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.CheckBoxFontColor, for: .normal)
+        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.checkBoxFontColor, for: .normal)
         button.titleLabel?.font = OnboardingConst.PrivacyPolicy.Font.valueCheckBoxFont
         return button
     }()
@@ -104,7 +104,7 @@ class PrivacyPolicyVC: UIViewController {
         button.setImage(OnboardingConst.PrivacyPolicy.Image.clearCheckBox, for: .normal)
         button.setTitle(OnboardingConst.PrivacyPolicy.Text.isSNSConsenctGivenCheck, for: .normal)
         button.contentHorizontalAlignment = .left
-        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.CheckBoxFontColor, for: .normal)
+        button.setTitleColor(OnboardingConst.PrivacyPolicy.Color.checkBoxFontColor, for: .normal)
         button.titleLabel?.font = OnboardingConst.PrivacyPolicy.Font.valueCheckBoxFont
         return button
     }()
@@ -126,7 +126,7 @@ class PrivacyPolicyVC: UIViewController {
         attributedString.addAttributes([
             .foregroundColor: UIColor.systemGray,
             .underlineStyle: NSUnderlineStyle.single.rawValue
-        ], range: NSRange(location: 0, length: buttonTitle.count))
+        ], range: NSRange(location: OnboardingConst.PrivacyPolicy.Size.labelstartLocation, length: buttonTitle.count))
         
         button.setAttributedTitle(attributedString, for: .normal)
         
@@ -143,7 +143,7 @@ class PrivacyPolicyVC: UIViewController {
         attributedString.addAttributes([
             .foregroundColor: UIColor.systemGray,
             .underlineStyle: NSUnderlineStyle.single.rawValue
-        ], range: NSRange(location: 0, length: buttonTitle.count))
+        ], range: NSRange(location: OnboardingConst.PrivacyPolicy.Size.labelstartLocation, length: buttonTitle.count))
         
         button.setAttributedTitle(attributedString, for: .normal)
         
@@ -155,7 +155,7 @@ class PrivacyPolicyVC: UIViewController {
         button.setTitle(OnboardingConst.PrivacyPolicy.Text.nextPage, for: .normal)
         button.backgroundColor = OnboardingConst.PrivacyPolicy.Color.confirmActivationColor
         button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 8
+        button.layer.cornerRadius = OnboardingConst.PrivacyPolicy.CornerRadius.confirmButton
         button.isEnabled = false
         return button
     }()
@@ -190,77 +190,72 @@ class PrivacyPolicyVC: UIViewController {
         
         pageController.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.height.equalTo(26)
-            $0.width.equalTo(41)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.height.width.equalTo(OnboardingConst.PrivacyPolicy.Size.pageControllerSize)
         }
         
         logoImage.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(30)
-            $0.leading.equalToSuperview().offset(16)
-            $0.width.equalTo(60)
-            $0.height.equalTo(60)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(OnboardingConst.PrivacyPolicy.Spacing.logoTopOffset)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.height.width.equalTo(OnboardingConst.PrivacyPolicy.Size.logoSize)
         }
         
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(logoImage.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalTo(logoImage.snp.bottom).offset(OnboardingConst.PrivacyPolicy.Spacing.titleLabelTopOffset)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
         }
         
         allAgreeCheckBox.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(40)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.height.equalTo(48)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(OnboardingConst.PrivacyPolicy.Spacing.allAgreeCheckBoxTopOffset)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.height.width.equalTo(OnboardingConst.PrivacyPolicy.Size.allAgreeCheckBoxHeight)
         }
         
         checkBoxBackGroundView.snp.makeConstraints {
             $0.top.equalTo(allAgreeCheckBox.snp.bottom)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.height.equalTo(127)
-            $0.width.equalTo(343)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.height.width.equalTo(OnboardingConst.PrivacyPolicy.Size.checkBoxBackGroundSize)
         }
         
         isAppTermsAgreedCheckBox.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(16)
-            $0.height.equalTo(21)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.titleLabelTopOffset)
+            $0.height.equalTo(OnboardingConst.PrivacyPolicy.Size.checkBoxHeight)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
         }
         
         isPrivacyTermsAgreedCheckBox.snp.makeConstraints {
-            $0.top.equalTo(isAppTermsAgreedCheckBox.snp.bottom).offset(16)
-            $0.height.equalTo(21)
-            $0.leading.equalToSuperview().offset(32)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalTo(isAppTermsAgreedCheckBox.snp.bottom).offset(OnboardingConst.PrivacyPolicy.Spacing.titleLabelTopOffset)
+            $0.height.equalTo(OnboardingConst.PrivacyPolicy.Size.checkBoxHeight)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.privacyPolicyLabelLeadingOffset)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
         }
         
         isSnsConsentGivenCheckBox.snp.makeConstraints {
-            $0.top.equalTo(isPrivacyTermsAgreedCheckBox.snp.bottom).offset(16)
-            $0.height.equalTo(21)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalTo(isPrivacyTermsAgreedCheckBox.snp.bottom).offset(OnboardingConst.PrivacyPolicy.Spacing.titleLabelTopOffset)
+            $0.height.equalTo(OnboardingConst.PrivacyPolicy.Size.checkBoxHeight)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
         }
         
         AppTermsAgreedLinkButton.snp.makeConstraints {
-            $0.top.equalTo(checkBoxBackGroundView.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(16)
-            $0.height.equalTo(16)
-            $0.width.equalTo(42)
+            $0.top.equalTo(checkBoxBackGroundView.snp.bottom).offset(OnboardingConst.PrivacyPolicy.Spacing.titleLabelTopOffset)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.width.height.equalTo(OnboardingConst.PrivacyPolicy.Size.AppTermsLinkButtonSize)
         }
         PrivacyTermsAgreedLinkButton.snp.makeConstraints {
-            $0.top.equalTo(AppTermsAgreedLinkButton .snp.bottom).offset(8)
-            $0.leading.equalToSuperview().offset(16)
-            $0.height.equalTo(16)
-            $0.width.equalTo(83)
+            $0.top.equalTo(AppTermsAgreedLinkButton .snp.bottom).offset(OnboardingConst.PrivacyPolicy.Spacing.linkButtonVerticalSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.width.height.equalTo(OnboardingConst.PrivacyPolicy.Size.PrivacyTermsLinkButtonSize)
         }
         
         confirmButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-OnboardingConst.PrivacyPolicy.Spacing.confirmButtonBottomOffset)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
         }
     }
     
@@ -276,19 +271,16 @@ class PrivacyPolicyVC: UIViewController {
         
         output.allTermsAgreed
             .drive(onNext: { isAllAgreed in
-                let imageName = isAllAgreed ? "PrivacyPolicy_Check" : "PrivacyPolicy_NonCheck"
-                self.allAgreeCheckBox.setImage(UIImage(named: imageName), for: .normal)
-                self.allAgreeCheckBox.setImage(UIImage(named: "checked"), for: .selected)
-
+                let imageName = isAllAgreed ? OnboardingConst.PrivacyPolicy.Image.clickCheckBox : OnboardingConst.PrivacyPolicy.Image.clearCheckBox
+                self.allAgreeCheckBox.setImage(imageName, for: .normal)
             })
             .disposed(by: disposeBag)
         
         output.requiredTermsAgreed
             .drive(onNext: { states in
                 for (index, state) in states.enumerated() {
-                    let imageName = state ? "PrivacyPolicy_Check" : "PrivacyPolicy_NonCheck"
-                    self.requiredCheckBoxes[index].setImage(UIImage(named: imageName), for: .normal)
-                    self.requiredCheckBoxes[index].setImage(UIImage(named: "checked"), for: .selected)
+                    let imageName = state ? OnboardingConst.PrivacyPolicy.Image.clickCheckBox : OnboardingConst.PrivacyPolicy.Image.clearCheckBox
+                    self.requiredCheckBoxes[index].setImage(imageName, for: .normal)
                 }
             })
             .disposed(by: disposeBag)
@@ -296,9 +288,8 @@ class PrivacyPolicyVC: UIViewController {
         output.optionalTermsAgreed
             .drive(onNext: { states in
                 for (index, state) in states.enumerated() {
-                    let imageName = state ? "PrivacyPolicy_Check" : "PrivacyPolicy_NonCheck"
-                    self.optionalCheckBoxes[index].setImage(UIImage(named: imageName), for: .normal)
-                    self.optionalCheckBoxes[index].setImage(UIImage(named: "checked"), for: .selected)
+                    let imageName = state ? OnboardingConst.PrivacyPolicy.Image.clickCheckBox : OnboardingConst.PrivacyPolicy.Image.clearCheckBox
+                    self.optionalCheckBoxes[index].setImage(imageName, for: .normal)
                 }
             })
             .disposed(by: disposeBag)
