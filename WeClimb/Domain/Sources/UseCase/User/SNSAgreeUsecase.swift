@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 
 protocol SNSAgreeUsecase {
-    func excute<T>(data: T, for field: UserUpdate) -> Completable
+    func execute<T>(data: T, for field: UserUpdate) -> Completable
 }
 
 public struct SNSAgreeUsecaseImpl: SNSAgreeUsecase {
@@ -20,7 +20,7 @@ public struct SNSAgreeUsecaseImpl: SNSAgreeUsecase {
         self.userUpdateRepository = userUpdateRepository
     }
     
-    func excute<T>(data: T, for field: UserUpdate) -> Completable {
+    func execute<T>(data: T, for field: UserUpdate) -> Completable {
         return userUpdateRepository.updateUser(with: data, for: field)
     }
 }
