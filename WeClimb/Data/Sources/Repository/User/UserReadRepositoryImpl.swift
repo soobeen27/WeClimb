@@ -23,4 +23,8 @@ final class UserReadRepositoryImpl: UserReadRepository {
     func getUserInfoFromName(byName name: String) -> Single<User> {
         return userReadDataSource.userInfoFromName(name: name)
     }
+    
+    func getMyUserInfo() -> Single<User?> {
+        return userReadDataSource.myInfo()
+    }
 }

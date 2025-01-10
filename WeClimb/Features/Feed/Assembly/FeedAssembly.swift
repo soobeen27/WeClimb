@@ -9,18 +9,9 @@ import Swinject
 
 final class FeedAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(MainFeedDataSource.self) { _ in
-            MainFeedDataSourceImpl()
-        }
-        container.register(MainFeedRepository.self) { resolver in
-            MainFeedRepositoryImpl(
-                mainFeedDataSourceL: resolver.resolve(MainFeedDataSource.self)!
-            )
-        }
-        container.register(MainFeedUseCase.self) { resolver in
-            MainFeedUseCaseImpl(
-                mainFeedRepository: resolver.resolve(MainFeedRepository.self)!
-            )
+        container.register(FeedVM.self) { resolver in
+            FeedVMImpl(mainFeedUseCase: resolver.resolve(MainFeedUseCase.self)!,
+                       myUserInfo: resolver.resolve(MyUserInfoUseCase.self)!)
         }
     }
 }

@@ -62,17 +62,17 @@ final class LoginAssembly: Assembly {
             )
         }
         
-        container.register(LoginUsecase.self) { resolver in
-            LoginUsecaseImpl(
+        container.register(LoginUseCase.self) { resolver in
+            LoginUseCaseImpl(
                 appleLoginUseCase: resolver.resolve(AppleLoginUseCase.self)!,
                 googleLoginUseCase: resolver.resolve(GoogleLoginUseCase.self)!,
                 kakaoLoginUseCase: resolver.resolve(KakaoLoginUseCase.self)!
             )
         }
         
-        container.register(LoginImpl.self) { resolver in
-            LoginImpl(
-                usecase: resolver.resolve(LoginUsecase.self)!
+        container.register(LoginVM.self) { resolver in
+            LoginVM(
+                usecase: resolver.resolve(LoginUseCase.self)!
             )
         }
     }

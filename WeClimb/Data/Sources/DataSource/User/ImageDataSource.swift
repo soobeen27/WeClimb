@@ -15,7 +15,7 @@ protocol ImageDataSource {
     func loadImage(from imageURL: String?, imageView: UIImageView)
 }
 
-final class ImageDataSourceImpl {
+final class ImageDataSourceImpl: ImageDataSource {
     private let storage = Storage.storage()
     private let urlCache = NSCache<NSString, NSURL>()
     private let imageCache = NSCache<NSString, UIImage>()

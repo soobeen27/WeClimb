@@ -40,7 +40,8 @@ final class TabBarAssembly: Assembly {
         
         container.register(FeedVM.self) { resolver in
             let mainFeedUseCase = resolver.resolve(MainFeedUseCase.self)!
-            return FeedVMImpl(mainFeedUseCase: mainFeedUseCase)
+            let myUserInfoUseCase = resolver.resolve(MyUserInfoUseCase.self)!
+            return FeedVMImpl(mainFeedUseCase: mainFeedUseCase, myUserInfo: myUserInfoUseCase)
         }
     }
 }

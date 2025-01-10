@@ -12,4 +12,5 @@ import RxSwift
 protocol UserReadRepository {
     func getUserInfoFromUID(byUID uid: String) -> Single<User>
     func getUserInfoFromName(byName name: String) -> Single<User>
+    func getMyUserInfo() -> Single<User?>
 }

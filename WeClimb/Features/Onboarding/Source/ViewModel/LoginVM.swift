@@ -16,9 +16,9 @@ protocol LoginVM {
 
 class LoginImpl: LoginVM {
     private let disposeBag = DisposeBag()
-    public let usecase: LoginUsecase
+    public let usecase: LoginUseCase
     
-    init(usecase: LoginUsecase) {
+    init(usecase: LoginUseCase) {
         self.usecase = usecase
     }
     
