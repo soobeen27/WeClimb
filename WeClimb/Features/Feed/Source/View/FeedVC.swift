@@ -11,16 +11,14 @@ import RxSwift
 import RxCocoa
 import SnapKit
 
-struct PostItem: Hashable {
-    let uid: String
-}
-
 class FeedVC: UIViewController {
     enum Section {
         case feed
     }
-    let FeedVM: FeedVM
+    let feedVM: FeedVM
     var coordinator: FeedCoordinator?
+    
+    let disposeBag = DisposeBag()
     
     private lazy var dataSource: UICollectionViewDiffableDataSource<Section, PostItem> = {
         let dataSource = UICollectionViewDiffableDataSource<Section, PostItem>(collectionView: postCollectionView) { collectionView, indexPath, item in
@@ -47,7 +45,7 @@ class FeedVC: UIViewController {
     }()
     
     init(viewModel: FeedVM) {
-        self.FeedVM = viewModel
+        self.feedVM = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -58,6 +56,12 @@ class FeedVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
+        feedVM.postItemRelay.subscribe(onNext: { item in
+            item.forEach { postitem in
+                print("fetch post test: \(postitem.postUID)")
+            }
+        })
+        .disposed(by: disposeBag)
     }
     
     private func setLayout() {

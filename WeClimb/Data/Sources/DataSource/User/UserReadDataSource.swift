@@ -16,6 +16,7 @@ protocol UserReadDataSource {
 //    func userInfo(name: String?, uid: String?) throws -> Single<User>
     func userInfoFromUID(uid: String) -> Single<User>
     func userInfoFromName(name: String) -> Single<User>
+    func myInfo() -> Single<User?>
 }
 
 final class UserReadDataSourceImpl: UserReadDataSource {
@@ -56,6 +57,27 @@ final class UserReadDataSourceImpl: UserReadDataSource {
                         single(.failure(error))
                     }
                 }
+            }
+            return Disposables.create()
+        }
+    }
+    
+    func myInfo() -> Single<User?> {
+        return Single.create { [weak self] single in
+            guard let self else { return Disposables.create() }
+            do {
+                let userUID = try FirestoreHelper.userUID()
+                let userRef = self.db.collection("users").document(userUID)
+                userRef.getDocument(as: User.self) { result in
+                    switch result {
+                    case .success(let user):
+                        single(.success(user))
+                    case .failure(let error):
+                        single(.failure(error))
+                    }
+                }
+            } catch {
+                single(.success(nil))
             }
             return Disposables.create()
         }
