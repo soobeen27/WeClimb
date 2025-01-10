@@ -166,4 +166,28 @@ extension String {
         ]
         return colorMap[self] ?? self
     }
+    
+    func imageTextChange() -> String {
+        let colorMap: [String: String] = [
+            "빨": "colorRed",
+            "주": "colorOrange",
+            "노": "colorYellow",
+            "연": "colorLightGreen",
+            "초": "colorGreen",
+            "하": "colorMint",
+            "파": "colorBlue",
+            "남": "colorNavy",
+            "보": "colorPurple",
+            "검": "colorBlack",
+            "흰": "colorWhite",
+            "민": "colorMint",
+            "회": "colorGray",
+            "핑": "colorPink",
+            "갈": "colorGray",
+            "노검": "colorDarkYellow",
+            "초검": "colorDarkGreen",
+            "파검": "colorDarkBlue",
+        ]
+        return colorMap[self] ?? self
+    }
 }

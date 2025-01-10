@@ -33,6 +33,24 @@ class CustomSegmentedControl: UIView {
     private var indicatorWidthConstraint: Constraint!
     private var indicatorCenterXConstraint: Constraint!
     
+    var normalFontColor: UIColor = CustomSegmentConst.Color.normalFontColor {
+        didSet {
+            updateSegmentTextColors()
+        }
+    }
+    
+    var selectedFontColor: UIColor = CustomSegmentConst.Color.selectedFontColor {
+        didSet {
+            updateSegmentTextColors()
+        }
+    }
+    
+    var indicatorColor: UIColor = CustomSegmentConst.Color.indicatorColor {
+        didSet {
+            indicatorView.backgroundColor = indicatorColor
+        }
+    }
+    
     var selectedSegmentIndex: Int {
         return segmentControl.selectedSegmentIndex
     }
@@ -74,6 +92,20 @@ class CustomSegmentedControl: UIView {
             $0.leading.equalToSuperview()
             $0.height.equalTo(CustomSegmentConst.Size.segmentControlHeight)
         }
+        
+        updateSegmentTextColors()
+    }
+    
+    private func updateSegmentTextColors() {
+        segmentControl.setTitleTextAttributes([
+            .font: CustomSegmentConst.Font.normalFont,
+            .foregroundColor: normalFontColor
+        ], for: .normal)
+
+        segmentControl.setTitleTextAttributes([
+            .font: CustomSegmentConst.Font.selectedFont,
+            .foregroundColor: selectedFontColor
+        ], for: .selected)
     }
     
     private func segmentControllerBackgroundColor() {
@@ -84,7 +116,8 @@ class CustomSegmentedControl: UIView {
     
     private func setupIndicatorView() {
         addSubview(indicatorView)
-        indicatorView.backgroundColor = CustomSegmentConst.Color.indicatorColor
+//        indicatorView.backgroundColor = CustomSegmentConst.Color.indicatorColor
+        indicatorView.backgroundColor = indicatorColor
         
         let initialWidth = CustomSegmentConst.Helper.titleWidth(
             for: segmentControl.titleForSegment(at: CustomSegmentConst.Size.firstSegmentItem),
@@ -124,6 +157,8 @@ class CustomSegmentedControl: UIView {
             .subscribe(onNext: { [weak self] selectedIndex in
                 guard let self = self,
                       let selectedTitle = self.segmentControl.titleForSegment(at: selectedIndex) else { return }
+                
+                self.onSegmentChanged?(selectedIndex)
                 
                 let titleWidth = CustomSegmentConst.Helper.titleWidth(
                     for: selectedTitle,

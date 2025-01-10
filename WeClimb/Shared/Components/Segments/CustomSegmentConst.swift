@@ -22,7 +22,7 @@ enum CustomSegmentConst {
     enum Size {
         static let firstSegmentItem = 0
         static let segmentControlHeight: CGFloat = 44
-        static let indicatorHeight: CGFloat = 2
+        static let indicatorHeight: CGFloat = 3
     }
     
     enum Spacing {
