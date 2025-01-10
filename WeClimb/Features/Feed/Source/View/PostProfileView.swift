@@ -20,6 +20,11 @@ class PostProfileView: UIView {
         return imageView
     }()
     
-    
+    private let nameLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.customFont(style: .label2SemiBold)
+        label.textColor = UIColor.labelWhite
+        return label
+    }()
     
 }
