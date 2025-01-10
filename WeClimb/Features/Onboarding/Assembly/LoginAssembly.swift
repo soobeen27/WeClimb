@@ -70,10 +70,10 @@ final class LoginAssembly: Assembly {
             )
         }
         
-        container.register(LoginVM.self) { resolver in
-            LoginVM(
-                usecase: resolver.resolve(LoginUseCase.self)!
-            )
-        }
+//        container.register(LoginVM.self) { resolver in
+//            LoginVM(
+//                usecase: resolver.resolve(LoginUseCase.self)!
+//            )
+//        }
     }
 }

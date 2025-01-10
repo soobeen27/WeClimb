@@ -15,8 +15,8 @@ final class CreateNickNameCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        let createNicknameVC = CreateNicknameVC()
-        createNicknameVC.coordinator = self
-        navigationController.pushViewController(createNicknameVC, animated: true)
+//        let createNicknameVC = CreateNicknameVC()
+//        createNicknameVC.coordinator = self
+//        navigationController.pushViewController(createNicknameVC, animated: true)
     }
 }

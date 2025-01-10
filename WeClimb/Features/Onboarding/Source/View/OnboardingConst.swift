@@ -137,7 +137,7 @@ enum OnboardingConst {
             static let nickNameFieldColor: UIColor = UIColor.labelAssistive
             static let nickNameLabelColor: UIColor = UIColor.labelNormal
             static let backgroundColor: UIColor = UIColor.white
-            static let boarderGray: UIColor = UIColor.textFieldBorderGray
+            static let boarderGray: UIColor = UIColor.lineOpacityNormal
             static let errorTextColor: UIColor = UIColor.statusNegative
             static let confirmActivationColor: UIColor = UIColor.labelAlternative
             static let confirmDeactivationColor: UIColor = UIColor.fillSolidDarkBlack
@@ -266,7 +266,7 @@ enum OnboardingConst {
             static let subtitleTextColor: UIColor = UIColor.labelNeutral
             static let textFieldLabelColor: UIColor = UIColor.labelNormal
             static let backgroundColor: UIColor = UIColor.white
-            static let boarderGray: UIColor = UIColor.textFieldBorderGray
+            static let boarderGray: UIColor = UIColor.lineOpacityNormal
             static let placeholderTextFieldColor: UIColor = UIColor.labelAssistive
             static let confirmActivationColor: UIColor = UIColor.labelAlternative
         }
