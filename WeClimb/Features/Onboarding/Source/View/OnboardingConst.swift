@@ -135,7 +135,7 @@ enum OnboardingConst {
             static let subtitleTextColor: UIColor = UIColor.labelNeutral
             static let pageControlTextColor: UIColor = UIColor.fillSolidLightNormal
             static let nickNameFieldColor: UIColor = UIColor.labelAssistive
-            static let nickNameLabelColor: UIColor = UIColor.black
+            static let nickNameLabelColor: UIColor = UIColor.labelNormal
             static let backgroundColor: UIColor = UIColor.white
             static let boarderGray: UIColor = UIColor.textFieldBorderGray
             static let errorTextColor: UIColor = UIColor.statusNegative
@@ -221,24 +221,69 @@ enum OnboardingConst {
             static let titleLabel = "신체 정보를\n입력해주세요"
             static let titleNumberofLine = 2
             static let pageControl = "3/3"
+            static let nextPage = "다음"
             
             static let heightTitleText = "신장"
             static let armrichTitleText = "암리치"
             
             static let requiredText = "필수"
             static let selectionLabel = "선택"
+            
+            static let heightTitle = "신장"
+            static let armrichTitle = "암리치"
+            
+            static let heightPlaceholder = "신장을 입력해주세요"
+            static let armrichPlaceholder = "리치를 입력해주세요"
+            
+        }
+        
+        enum CornerRadius {
+            static let pageControl: CGFloat = 16
+            static let textFieldCornerRadius: CGFloat = 8
+            static let confirmButton: CGFloat = 8
+        }
+        
+        enum Spacing {
+            static let viewHorizontalMargin: CGFloat = 16
+            static let stackViewSpacing: CGFloat = 3
+            static let logoTopSpacing: CGFloat = 30
+            static let titleTopSpacing: CGFloat = 16
+            static let textFieldTopSpacing: CGFloat = 8
+            static let titleStackViewTopSpacing: CGFloat = 32
+            static let confirmButtonBottomSpacing: CGFloat = 20
         }
         
         enum Font {
             static let titleFont = UIFont.customFont(style: CustomFontStyle.title1Bold)
             static let valueFont = UIFont.customFont(style: CustomFontStyle.caption1Regular)
             static let textFiledTitleLabelFont = UIFont.customFont(style: CustomFontStyle.label2Medium)
+            static let placeholderFont = UIFont.customFont(style: CustomFontStyle.body2Medium)
         }
         
         enum Color {
             static let titleTextColor: UIColor = UIColor.labelStrong
             static let pageControlTextColor: UIColor = UIColor.fillSolidLightNormal
             static let subtitleTextColor: UIColor = UIColor.labelNeutral
+            static let textFieldLabelColor: UIColor = UIColor.labelNormal
+            static let backgroundColor: UIColor = UIColor.white
+            static let boarderGray: UIColor = UIColor.textFieldBorderGray
+            static let placeholderTextFieldColor: UIColor = UIColor.labelAssistive
+            static let confirmActivationColor: UIColor = UIColor.labelAlternative
+        }
+        
+        enum Size {
+            static let textFieldBorderWidth: CGFloat = 1
+            static let logoSize: CGSize = CGSize(width: 60, height: 60)
+            static let pageControlSize: CGSize = CGSize(width: 41, height: 26)
+            static let heightTitleStackViewSize: CGSize = CGSize(width: 50, height: 21)
+            static let heightTitleLabelSize: CGSize = CGSize(width: 25, height: 21)
+            static let requiredLabelSize: CGSize = CGSize(width: 21, height: 16)
+            static let armrichTitleStackViewSize: CGSize = CGSize(width: 62, height: 21)
+            static let armrichTitleLabelSize: CGSize = CGSize(width: 37, height: 21)
+            static let selectionLabelSize: CGSize = CGSize(width: 21, height: 16)
+            
+            static let heightTextFieldHeight: CGFloat = 46
+            static let armrichTextFieldHeight: CGFloat = 46
         }
         
         enum Image {

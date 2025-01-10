@@ -32,7 +32,7 @@ class CreatePersonalDetailVC: UIViewController {
         label.text = OnboardingConst.PersonalDetail.Text.pageControl
         label.textColor = OnboardingConst.PersonalDetail.Color.pageControlTextColor
         label.font = OnboardingConst.PersonalDetail.Font.valueFont
-        label.layer.cornerRadius = 16
+        label.layer.cornerRadius = OnboardingConst.PersonalDetail.CornerRadius.pageControl
         label.contentMode = .center
         return label
     }()
@@ -71,35 +71,35 @@ class CreatePersonalDetailVC: UIViewController {
     
     private let heightTitleStackView: UIStackView = {
         let stackView = UIStackView()
-        stackView.spacing = 3
+        stackView.spacing = OnboardingConst.PersonalDetail.Spacing.stackViewSpacing
         stackView.axis = .horizontal
         return stackView
     }()
     
     private let armrichTitleStackView: UIStackView = {
         let stackView = UIStackView()
-        stackView.spacing = 3
+        stackView.spacing = OnboardingConst.PersonalDetail.Spacing.stackViewSpacing
         stackView.axis = .horizontal
         return stackView
     }()
     
     private let heightTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = OnboardingConst.CreateNickname.Text.nicknamePlaceholder
+        textField.placeholder = OnboardingConst.PersonalDetail.Text.heightPlaceholder
         
         textField.borderStyle = .roundedRect
-        textField.font = OnboardingConst.CreateNickname.Font.placeholderFont
-        textField.textColor = OnboardingConst.CreateNickname.Color.nickNameLabelColor
+        textField.font = OnboardingConst.PersonalDetail.Font.placeholderFont
+        textField.textColor = OnboardingConst.PersonalDetail.Color.textFieldLabelColor
         
-        textField.backgroundColor = OnboardingConst.CreateNickname.Color.backgroundColor
-        textField.layer.cornerRadius = 8
-        textField.layer.borderWidth = 1
-        textField.layer.borderColor = OnboardingConst.CreateNickname.Color.boarderGray.cgColor
+        textField.backgroundColor = OnboardingConst.PersonalDetail.Color.backgroundColor
+        textField.layer.cornerRadius = OnboardingConst.PersonalDetail.CornerRadius.textFieldCornerRadius
+        textField.layer.borderWidth = OnboardingConst.PersonalDetail.Size.textFieldBorderWidth
+        textField.layer.borderColor = OnboardingConst.PersonalDetail.Color.boarderGray.cgColor
         
         textField.attributedPlaceholder = NSAttributedString(
-            string: OnboardingConst.CreateNickname.Text.nicknamePlaceholder,
+            string: OnboardingConst.PersonalDetail.Text.heightPlaceholder,
             attributes: [
-                .foregroundColor: OnboardingConst.CreateNickname.Color.nickNameFieldColor
+                .foregroundColor: OnboardingConst.PersonalDetail.Color.placeholderTextFieldColor
             ]
         )
         return textField
@@ -107,32 +107,32 @@ class CreatePersonalDetailVC: UIViewController {
     
     private let armrichTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = OnboardingConst.CreateNickname.Text.nicknamePlaceholder
+        textField.placeholder = OnboardingConst.PersonalDetail.Text.armrichPlaceholder
         
         textField.borderStyle = .roundedRect
-        textField.font = OnboardingConst.CreateNickname.Font.placeholderFont
-        textField.textColor = OnboardingConst.CreateNickname.Color.nickNameLabelColor
+        textField.font = OnboardingConst.PersonalDetail.Font.placeholderFont
+        textField.textColor = OnboardingConst.PersonalDetail.Color.textFieldLabelColor
         
-        textField.backgroundColor = OnboardingConst.CreateNickname.Color.backgroundColor
-        textField.layer.cornerRadius = 8
-        textField.layer.borderWidth = 1
-        textField.layer.borderColor = OnboardingConst.CreateNickname.Color.boarderGray.cgColor
+        textField.backgroundColor = OnboardingConst.PersonalDetail.Color.backgroundColor
+        textField.layer.cornerRadius = OnboardingConst.PersonalDetail.CornerRadius.textFieldCornerRadius
+        textField.layer.borderWidth = OnboardingConst.PersonalDetail.Size.textFieldBorderWidth
+        textField.layer.borderColor = OnboardingConst.PersonalDetail.Color.boarderGray.cgColor
         
         textField.attributedPlaceholder = NSAttributedString(
-            string: OnboardingConst.CreateNickname.Text.nicknamePlaceholder,
+            string: OnboardingConst.PersonalDetail.Text.armrichPlaceholder,
             attributes: [
-                .foregroundColor: OnboardingConst.CreateNickname.Color.nickNameFieldColor
+                .foregroundColor: OnboardingConst.PersonalDetail.Color.placeholderTextFieldColor
             ]
         )
         return textField
     }()
     
-    private let confirmButton: UIButton = {
-        let button = UIButton()
-        button.setTitle(OnboardingConst.PrivacyPolicy.Text.nextPage, for: .normal)
-        button.backgroundColor = UIColor.lightGray
+    private let confirmButton: WeClimbButton = {
+        let button = WeClimbButton(style: .defaultRectangle)
+        button.setTitle(OnboardingConst.PersonalDetail.Text.nextPage, for: .normal)
+        button.backgroundColor = OnboardingConst.PersonalDetail.Color.confirmActivationColor
         button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 8
+        button.layer.cornerRadius = OnboardingConst.PersonalDetail.CornerRadius.confirmButton
         button.isEnabled = false
         return button
     }()
@@ -167,77 +167,68 @@ class CreatePersonalDetailVC: UIViewController {
         
         pageController.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.height.equalTo(26)
-            $0.width.equalTo(41)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
+            $0.height.width.equalTo(OnboardingConst.PersonalDetail.Size.pageControlSize)
         }
         
         logoImage.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(30)
-            $0.leading.equalToSuperview().offset(16)
-            $0.width.equalTo(60)
-            $0.height.equalTo(60)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(OnboardingConst.PersonalDetail.Spacing.logoTopSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
+            $0.height.width.equalTo(OnboardingConst.PersonalDetail.Size.logoSize)
         }
         
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(logoImage.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalTo(logoImage.snp.bottom).offset(OnboardingConst.PersonalDetail.Spacing.titleTopSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
         }
         
         heightTitleStackView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(32)
-            $0.leading.equalToSuperview().offset(16)
-            $0.width.equalTo(50)
-            $0.height.equalTo(21)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(OnboardingConst.PersonalDetail.Spacing.titleStackViewTopSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
+            $0.width.height.equalTo(OnboardingConst.PersonalDetail.Size.heightTitleStackViewSize)
         }
         
         heightTitleLabel.snp.makeConstraints {
-            $0.width.equalTo(25)
-            $0.height.equalTo(21)
+            $0.width.height.equalTo(OnboardingConst.PersonalDetail.Size.heightTitleLabelSize)
         }
         
         requiredLabel.snp.makeConstraints {
-            $0.width.equalTo(21)
-            $0.height.equalTo(16)
+            $0.width.height.equalTo(OnboardingConst.PersonalDetail.Size.requiredLabelSize)
         }
         
         heightTextField.snp.makeConstraints {
-            $0.top.equalTo(heightTitleStackView.snp.bottom).offset(8)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.height.equalTo(46)
+            $0.top.equalTo(heightTitleStackView.snp.bottom).offset(OnboardingConst.PersonalDetail.Spacing.textFieldTopSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
+            $0.height.equalTo(OnboardingConst.PersonalDetail.Size.heightTextFieldHeight)
         }
         
         armrichTitleStackView.snp.makeConstraints {
-            $0.top.equalTo(heightTextField.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(16)
-            $0.width.equalTo(62)
-            $0.height.equalTo(21)
+            $0.top.equalTo(heightTextField.snp.bottom).offset(OnboardingConst.PersonalDetail.Spacing.titleTopSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
+            $0.width.height.equalTo(OnboardingConst.PersonalDetail.Size.armrichTitleStackViewSize)
         }
         
         armrichTitleLabel.snp.makeConstraints {
-            $0.width.equalTo(37)
-            $0.height.equalTo(21)
+            $0.width.height.equalTo(OnboardingConst.PersonalDetail.Size.armrichTitleLabelSize)
         }
         
         selectionLabel.snp.makeConstraints {
-            $0.width.equalTo(21)
-            $0.height.equalTo(16)
+            $0.width.height.equalTo(OnboardingConst.PersonalDetail.Size.selectionLabelSize)
         }
         
         armrichTextField.snp.makeConstraints {
-            $0.top.equalTo(armrichTitleStackView.snp.bottom).offset(8)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.height.equalTo(46)
+            $0.top.equalTo(armrichTitleStackView.snp.bottom).offset(OnboardingConst.PersonalDetail.Spacing.textFieldTopSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
+            $0.height.equalTo(OnboardingConst.PersonalDetail.Size.armrichTextFieldHeight)
         }
         
         confirmButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.height.equalTo(50)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-OnboardingConst.PersonalDetail.Spacing.confirmButtonBottomSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
         }
     }
 }
