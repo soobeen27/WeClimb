@@ -19,7 +19,7 @@ class FeedVC: UIViewController {
     var coordinator: FeedCoordinator?
     
     let disposeBag = DisposeBag()
-    
+
     private lazy var dataSource: UICollectionViewDiffableDataSource<Section, PostItem> = {
         let dataSource = UICollectionViewDiffableDataSource<Section, PostItem>(collectionView: postCollectionView) { collectionView, indexPath, item in
            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionCell.className, for: indexPath) as? PostCollectionCell
@@ -47,6 +47,7 @@ class FeedVC: UIViewController {
     init(viewModel: FeedVM) {
         self.feedVM = viewModel
         super.init(nibName: nil, bundle: nil)
+        setLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -65,6 +66,17 @@ class FeedVC: UIViewController {
     }
     
     private func setLayout() {
-        view.backgroundColor = UIColor.red
+        view.backgroundColor = UIColor.black
+        
+        view.addSubview(tagTest)
+        view.addSubview(tagTest2)
+        
+        tagTest.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        tagTest2.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(tagTest.snp.bottom).offset(10)
+        }
     }
 }

@@ -6,7 +6,7 @@
 //
 import UIKit
 
-enum FeedConts {
+enum FeedConsts {
     enum CollectionView {
         static let lineSpacing: CGFloat = 0
         static let backgroundColor: UIColor = .clear
@@ -17,6 +17,9 @@ enum FeedConts {
             static let profileImageCornerRadius = profileImageSize / 2
             static let tagCornerRadius: CGFloat = 8
             static let tagHeight: CGFloat = 26
+            static let tagHPadding: CGFloat = 9
+            static let tagImage: CGSize = CGSize(width: 12, height: 12)
+            static let tagSpacing: CGFloat = 4
         }
         enum Font {
             static let name: UIFont = UIFont.customFont(style: .label2SemiBold)

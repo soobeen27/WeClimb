@@ -16,7 +16,7 @@ class PostProfileView: UIView {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = FeedConts.Profile.Size.profileImageCornerRadius
+        imageView.layer.cornerRadius = FeedConsts.Profile.Size.profileImageCornerRadius
         return imageView
     }()
     
