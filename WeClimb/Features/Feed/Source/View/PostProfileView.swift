@@ -163,7 +163,7 @@ class PostProfileView: UIView {
     @objc private func captionSCVTapped() {
         captionSCV.isScrollEnabled.toggle()
         let newHeight: CGFloat = captionSCV.isScrollEnabled ? FeedConsts.Profile.Size.captionLongHeight : FeedConsts.Profile.Size.captionShortHeight
-        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseIn]) { [weak self] in
+        UIView.animate(withDuration: 0.3) { [weak self] in
             guard let self else { return }
             self.captionLabel.numberOfLines = self.captionSCV.isScrollEnabled ? 0 : 2
             self.captionSCV.snp.updateConstraints {
@@ -188,13 +188,13 @@ class PostProfileView: UIView {
     }
     
     private func toggleStackView() {
-        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseIn]) { [weak self] in
-            guard let self else { return }
-            for (index, view) in self.profileStackView.arrangedSubviews.enumerated() {
-                if index != 0 {
-                    view.isHidden = self.hideButton.isSelected
-                }
+        for (index, view) in self.profileStackView.arrangedSubviews.enumerated() {
+            if index != 0 {
+                view.isHidden = self.hideButton.isSelected
             }
+        }
+        UIView.animate(withDuration: 0.3) { [weak self] in
+            guard let self else { return }
             self.profileStackView.layer.layoutIfNeeded()
         }
     }
