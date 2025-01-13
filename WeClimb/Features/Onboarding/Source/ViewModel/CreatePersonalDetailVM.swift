@@ -23,8 +23,8 @@ class CreatePersonalDetailImpl: CreatePersonalDetailVM {
     }
     
     struct Input {
-        let height: Observable<String>
-        let armReach: Observable<String?>
+        let height: Observable<Int>
+        let armReach: Observable<Int?>
         let confirmButtonTap: Observable<Void>
     }
     
@@ -36,19 +36,19 @@ class CreatePersonalDetailImpl: CreatePersonalDetailVM {
     
     func transform(input: Input) -> Output {
         let isHeightValid = input.height
-            .map { !$0.isEmpty && Int($0) != nil }
+            .map { $0 > 0 }
             .share(replay: 1, scope: .whileConnected)
         
         let isFormValid = isHeightValid
         
         let updateResult = input.confirmButtonTap
             .withLatestFrom(Observable.combineLatest(input.height, input.armReach))
-            .flatMapLatest { [weak self] (height: String, armReach: String?) -> Completable in
+            .flatMapLatest { [weak self] (height: Int, armReach: Int?) -> Completable in
                 guard let self else { return Completable.error(AppError.unknown) }
                 
                 let heightUpdate = self.updateUseCase.execute(height: height)
                 
-                if let armReach = armReach, !armReach.isEmpty {
+                if let armReach = armReach {
                     let armReachUpdate = self.updateUseCase.execute(armReach: armReach)
                     return Completable.zip(heightUpdate, armReachUpdate)
                 }
@@ -56,7 +56,7 @@ class CreatePersonalDetailImpl: CreatePersonalDetailVM {
                 return heightUpdate
             }
             .asCompletable()
-            
+        
         return Output(
             isHeightValid: isHeightValid,
             isFormValid: isFormValid,

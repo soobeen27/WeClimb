@@ -8,26 +8,12 @@
 import UIKit
 
 final class TabBarCoordinator: BaseCoordinator {
-    var tabBarController: UITabBarController
+    private let tabBarController: UITabBarController
+    private let builder: TabBarBuilder
     
-    private let feedBuilder: FeedBuilder
-    private let searchBuilder: SearchBuilder
-    private let uploadBuilder: UploadBuilder
-    private let notificationBuilder: NotificationBuilder
-    private let userPageBuilder: UserPageBuilder
-    
-    init(tabBarController: UITabBarController,
-         feedBuilder: FeedBuilder,
-         searchBuilder: SearchBuilder,
-         uploadBuilder: UploadBuilder,
-         notificationBuilder: NotificationBuilder,
-         userPageBuilder: UserPageBuilder) {
+    init(tabBarController: UITabBarController, builder: TabBarBuilder) {
         self.tabBarController = tabBarController
-        self.feedBuilder = feedBuilder
-        self.searchBuilder = searchBuilder
-        self.uploadBuilder = uploadBuilder
-        self.notificationBuilder = notificationBuilder
-        self.userPageBuilder = userPageBuilder
+        self.builder = builder
     }
     
     override func start() {
@@ -35,11 +21,11 @@ final class TabBarCoordinator: BaseCoordinator {
     }
     
     private func setUpTabBar() {
-        let feedCoordinator = createFeedCoordinator()
-        let searchCoordinator = createSearchCoordinator()
-        let uploadCoordinator = createUploadCoordinator()
-        let notificationCoordinator = createNotificationCoordinator()
-        let userPageCoordinator = createUserPageCoordinator()
+        let feedCoordinator = builder.buildFeedCoordinator()
+        let searchCoordinator = builder.buildSearchCoordinator()
+        let uploadCoordinator = builder.buildUploadCoordinator()
+        let notificationCoordinator = builder.buildNotificationCoordinator()
+        let userPageCoordinator = builder.buildUserPageCoordinator()
         
         addDependency(feedCoordinator)
         addDependency(searchCoordinator)
@@ -60,61 +46,5 @@ final class TabBarCoordinator: BaseCoordinator {
             notificationCoordinator.navigationController,
             userPageCoordinator.navigationController
         ]
-    }
-    
-    // MARK: - Coordinator Factory Methods
-    private func createFeedCoordinator() -> FeedCoordinator {
-        let navigationController = UINavigationController()
-        let coordinator = FeedCoordinator(navigationController: navigationController, builder: feedBuilder)
-        navigationController.tabBarItem = UITabBarItem(
-            title: nil,
-            image: UIImage.homeIcon,
-            selectedImage: UIImage.homeIconFill
-        )
-        return coordinator
-    }
-    
-    private func createSearchCoordinator() -> SearchCoordinator {
-        let navigationController = UINavigationController()
-        let coordinator = SearchCoordinator(navigationController: navigationController)
-        navigationController.tabBarItem = UITabBarItem(
-            title: nil,
-            image: UIImage.searchIcon,
-            selectedImage: UIImage.searchIconFill
-        )
-        return coordinator
-    }
-    
-    private func createUploadCoordinator() -> UploadCoordinator {
-        let navigationController = UINavigationController()
-        let coordinator = UploadCoordinator(navigationController: navigationController)
-        navigationController.tabBarItem = UITabBarItem(
-            title: nil,
-            image: UIImage.uploadIcon,
-            selectedImage: UIImage.uploadIconFill
-        )
-        return coordinator
-    }
-    
-    private func createNotificationCoordinator() -> NotificationCoordinator {
-        let navigationController = UINavigationController()
-        let coordinator = NotificationCoordinator(navigationController: navigationController)
-        navigationController.tabBarItem = UITabBarItem(
-            title: nil,
-            image: UIImage.notificationIcon,
-            selectedImage: UIImage.notificationIconFill
-        )
-        return coordinator
-    }
-    
-    private func createUserPageCoordinator() -> UserPageCoordinator {
-        let navigationController = UINavigationController()
-        let coordinator = UserPageCoordinator(navigationController: navigationController)
-        navigationController.tabBarItem = UITabBarItem(
-            title: nil,
-            image: UIImage.avatarIcon,
-            selectedImage: UIImage.avatarIconFill
-        )
-        return coordinator
     }
 }

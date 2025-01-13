@@ -7,78 +7,76 @@
 
 import UIKit
 
+import RxSwift
+import FirebaseAuth
+
 final class AppCoordinator: BaseCoordinator {
     private let window: UIWindow
     private let navigationController: UINavigationController
-    private let tabBarCoordinator: TabBarCoordinator
+    private let appDIContainer: AppDIContainer
+    private let disposeBag = DisposeBag()
     
-    init(window: UIWindow,
-         navigationController: UINavigationController,
-         tabBarCoordinator: TabBarCoordinator) {
+    init(window: UIWindow, navigationController: UINavigationController, appDIContainer: AppDIContainer) {
         self.window = window
         self.navigationController = navigationController
-        self.tabBarCoordinator = tabBarCoordinator
+        self.appDIContainer = appDIContainer
     }
     
     override func start() {
-        showMainFlow()
-    }
-    
-    private func showMainFlow() {
-        addDependency(tabBarCoordinator)
-        tabBarCoordinator.start()
+        let userReadDataSource = appDIContainer.resolve(UserReadDataSource.self)
         
-        window.rootViewController = tabBarCoordinator.tabBarController
-        window.makeKeyAndVisible()
+        if Auth.auth().currentUser != nil {
+            userReadDataSource.myInfo()
+                .observe(on: MainScheduler.instance)
+                .subscribe(onSuccess: { [weak self] user in
+                    guard let self else { return }
+                    if let userName = user?.userName, !userName.isEmpty {
+                        self.showMainTabBar()
+                    } else {
+                        self.showLogin()
+                    }
+                    self.window.makeKeyAndVisible()
+                }, onFailure: { [weak self] _ in
+                    guard let self else { return }
+                    self.showLogin()
+                    self.window.makeKeyAndVisible()
+                })
+                .disposed(by: disposeBag)
+        } else {
+            showLogin()
+            window.makeKeyAndVisible()
+        }
     }
-    
-//    private func showLoginFlow() {
-//        let loginCoordinator = LoginCoordinator(
-//            navigationController: navigationController,
-//            builder: loginBuilder
-//        )
-//        
-//        addDependency(loginCoordinator)
-//        loginCoordinator.start()
-//        
-//        window.rootViewController = navigationController
-//        window.makeKeyAndVisible()
-//    }
-    
     
     override func childDidFinish(_ coordinator: Coordinator) {
         removeDependency(coordinator) // 자식 Coordinator 제거
     }
+    
+    private func showMainTabBar() {
+        let tabBarBuilder = appDIContainer.resolve(TabBarBuilder.self)
+        
+        let tabBarController = UITabBarController()
+        let tabBarCoordinator = TabBarCoordinator(tabBarController: tabBarController, builder: tabBarBuilder)
+        
+        tabBarCoordinator.start()
+        addDependency(tabBarCoordinator)
+        childCoordinators.append(tabBarCoordinator)
+        
+        window.rootViewController = navigationController
+    }
+    
+    private func showLogin() {
+        let loginBuilder = appDIContainer.resolve(OnboardingBuilder.self)
+        
+        let loginVC = loginBuilder.buildLogin()
+        let navigationController = UINavigationController(rootViewController: loginVC)
+        
+        let loginCoordinator = LoginCoordinator(navigationController: navigationController, builder: loginBuilder)
+        
+        loginCoordinator.start()
+        addDependency(loginCoordinator)
+        childCoordinators.append(loginCoordinator)
+        
+        window.rootViewController = navigationController
+    }
 }
-
-//    func start() {
-//        if Auth.auth().currentUser != nil {
-//            FirebaseManager.shared.currentUserInfo { result in
-//                switch result {
-//                case .success(let user):
-//                    if let userName = user.userName, !userName.isEmpty {
-//                        let tabBarController = UITabBarController()
-//                        let tabBarCoordinator = TabBarCoordinator(tabBarController: tabBarController)
-//
-//                        tabBarCoordinator.start()
-//                        self.childCoordinators.append(tabBarCoordinator)
-//
-//                        self.window.rootViewController = tabBarController
-//                    } else {
-//                        self.showLogin()
-//                    }
-//                case .failure:
-//                    self.showLogin()
-//                }
-//                self.window.makeKeyAndVisible()
-//            }
-//        } else {
-//            showLogin()
-//            self.window.makeKeyAndVisible()
-//        }
-//    }
-//
-//    private func showLogin() {
-//        let navigationController = UINavigationController(rootViewController: LoginVC())
-//        window.rootViewController = navigationController
-//    }

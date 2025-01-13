@@ -254,9 +254,12 @@ class CreatePersonalDetailVC: UIViewController {
     
     private func viewModelBind() {
         let input = CreatePersonalDetailImpl.Input(
-            height: heightTextField.rx.text.orEmpty.asObservable(),
-            armReach: armReachTextField.rx.text.asObservable(),
-            confirmButtonTap: confirmButton.rx.tap.asObservable()
+            height: heightTextField.rx.text.orEmpty
+                    .map { Int($0) ?? 0 }
+                    .asObservable(),
+                armReach: armReachTextField.rx.text
+                    .map { Int($0 ?? "") },
+                confirmButtonTap: confirmButton.rx.tap.asObservable()
         )
         
         let output = viewModel.transform(input: input)

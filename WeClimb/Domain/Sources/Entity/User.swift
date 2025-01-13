@@ -15,7 +15,7 @@ struct User: Codable {
     let lastModified: Date
     let userRole: String
     let armReach: Int?
-    let height: Int?
+    let height: Int
     let posts: [DocumentReference]?
     let comments: [DocumentReference]?
     let followers: [String]?

@@ -10,8 +10,8 @@ import Foundation
 import RxSwift
 
 protocol PersonalDetailUseCase {
-    func execute(height: String) -> Completable
-    func execute(armReach: String) -> Completable
+    func execute(height: Int) -> Completable
+    func execute(armReach: Int) -> Completable
 }
 
 final class PersonalDetailUseCaseImpl: PersonalDetailUseCase {
@@ -21,11 +21,11 @@ final class PersonalDetailUseCaseImpl: PersonalDetailUseCase {
         self.userUpdateRepository = userUpdateRepository
     }
     
-    func execute(height: String) -> Completable {
+    func execute(height: Int) -> Completable {
         return userUpdateRepository.updateUser(with: height, for: .height)
     }
     
-    func execute(armReach: String) -> Completable {
+    func execute(armReach: Int) -> Completable {
         return userUpdateRepository.updateUser(with: armReach, for: .armReach)
     }
 }

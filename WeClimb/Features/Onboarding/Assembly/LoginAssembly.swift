@@ -23,6 +23,10 @@ final class LoginAssembly: Assembly {
             LoginFirebaseDataSourceImpl()
         }
         
+        container.register(OnboardingBuilder.self) { resolver in
+            OnboardingBuilderImpl()
+        }
+        
         container.register(AppleLoginRepository.self) { resolver in
             AppleLoginRepositoryImpl(
                 appleLoginDataSource: resolver.resolve(AppleLoginDataSource.self)!,
@@ -70,10 +74,8 @@ final class LoginAssembly: Assembly {
             )
         }
         
-//        container.register(LoginVM.self) { resolver in
-//            LoginVM(
-//                usecase: resolver.resolve(LoginUseCase.self)!
-//            )
-//        }
+        container.register(LoginVM.self) { resolver in
+            LoginImpl(usecase: resolver.resolve(LoginUseCase.self)!)
+        }
     }
 }

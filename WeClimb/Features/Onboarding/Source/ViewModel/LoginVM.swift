@@ -25,6 +25,7 @@ class LoginImpl: LoginVM {
     struct Input {
         let loginType: Observable<LoginType>
         let loginButtonTapped: Observable<Void>
+        let presentProvider: PresenterProvider
     }
     
     struct Output {
@@ -38,25 +39,21 @@ class LoginImpl: LoginVM {
         
         input.loginButtonTapped
             .withLatestFrom(input.loginType)
-            .flatMapLatest { [weak self] loginType -> Observable<Result<Void,Error>> in
+            .flatMapLatest { [weak self] loginType -> Observable<Result<Void, Error>> in
                 guard let self else { return .empty() }
                 
                 isLoadingSubject.onNext(true)
                 
-                /// Google은 presentProvider가 필요하지만, 현재 상황에서 VM은 presentProvider를 알 수 없으므로
-                /// Apple, Kakao만 처리하고 Google은 별도로 LoginVC에서 처리 하고있음
-                switch loginType {
-                case .apple, .kakao:
-                    return self.usecase.execute(loginType: loginType, presentProvider: nil)
-                        .map { _ in Result<Void, Error>.success(()) }
-                        .asObservable()
-                        .catch { .just(Result.failure($0))}
-                        .do(onDispose: { isLoadingSubject.onNext(false)})
-                case .google:
-                    return Observable.empty()
-                default :
-                    return .error(AppError.unknown)
-                }
+                let presentProvider = loginType == .google ? input.presentProvider : nil
+                
+                return self.usecase.execute(
+                    loginType: loginType,
+                    presentProvider: presentProvider
+                )
+                .map { _ in Result<Void, Error>.success(()) }
+                .asObservable()
+                .catch { .just(Result.failure($0)) }
+                .do(onDispose: { isLoadingSubject.onNext(false) })
             }
             .subscribe(onNext: { result in
                 loginResultSubject.onNext(result)
@@ -68,4 +65,5 @@ class LoginImpl: LoginVM {
             isLoading: isLoadingSubject.asObservable()
         )
     }
+
 }

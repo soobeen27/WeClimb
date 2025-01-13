@@ -77,7 +77,7 @@ class LoginFirebaseDataSourceImpl: LoginFirebaseDataSource {
                 try ref.setData(from: User(userName: nil, profileImage: nil,
                                            registerationDate: Date(), lastModified: Date(),
                                            userRole: "user", armReach: nil,
-                                           height: nil, posts: nil,
+                                           height: 0, posts: nil,
                                            comments: nil, followers: nil,
                                            following: nil, snsConsent: false,
                                            blackList: nil)) 

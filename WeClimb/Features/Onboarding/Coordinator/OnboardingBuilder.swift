@@ -23,8 +23,8 @@ final class OnboardingBuilderImpl: OnboardingBuilder {
     }
     
     func buildLogin() -> LoginVC {
-        let viewModel: LoginImpl = container.resolve(LoginImpl.self)
-        return LoginVC(viewModel: viewModel)
+        let viewModel: LoginVM = container.resolve(LoginVM.self)
+            return LoginVC(viewModel: viewModel)
     }
     
 //    func buildCreateNickname() -> CreateNicknameVC {
