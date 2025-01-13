@@ -8,7 +8,6 @@
 import UIKit
 
 import SnapKit
-
 import RxSwift
 import RxCocoa
 
@@ -50,9 +49,9 @@ class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
 
         let searchIcon = UIImageView(image: UIImage(named: "searchIcon"))
         searchIcon.contentMode = .scaleAspectFit
-        let iconWrapper = UIView(frame: CGRect(x: 0, y: 0, width: 24 + 12 + 8, height: 24))
+        let iconWrapper = UIView(frame: CGRect(x: 0, y: 0, width: 20 + 12 + 8, height: 20))
         iconWrapper.addSubview(searchIcon)
-        searchIcon.frame.origin = CGPoint(x: 12, y: 1)
+        searchIcon.frame.origin = CGPoint(x: 12, y: 0)
 
         textField.leftView = iconWrapper
         textField.leftViewMode = .always
@@ -108,6 +107,8 @@ class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        
+        navigationController?.setNavigationBarHidden(true, animated: false)
 
         setLayout()
         bindTableView()
@@ -115,6 +116,7 @@ class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
         items.accept(dummyItems)
         searchTextField.delegate = self
 
+        bindSearchTextField()
     }
 
     private func setLayout() {
@@ -122,7 +124,7 @@ class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
             .forEach { view.addSubview($0)}
 
         searchTextField.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.top.equalTo(view.safeAreaLayoutGuide).inset(16)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(46)
         }
@@ -162,6 +164,23 @@ class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
                 return cell
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func bindSearchTextField() {
+           searchTextField.rx.text.orEmpty
+               .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+               .distinctUntilChanged()
+               .subscribe(onNext: { [weak self] query in
+                   self?.filterItems(with: query)
+               })
+               .disposed(by: disposeBag)
+       }
+    
+    private func filterItems(with query: String) {
+        let filteredItems = dummyItems.filter { item in
+            item.name.lowercased().contains(query.lowercased())
+        }
+        items.accept(filteredItems)
     }
 
     func textFieldDidBeginEditing(_ textField: UITextField) {
