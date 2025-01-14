@@ -33,17 +33,17 @@ final class AppCoordinator: BaseCoordinator {
                     if let userName = user?.userName, !userName.isEmpty {
                         self.showMainTabBar()
                     } else {
-                        self.showLogin()
+                        self.showOnboardingFlow()
                     }
                     self.window.makeKeyAndVisible()
                 }, onFailure: { [weak self] _ in
                     guard let self else { return }
-                    self.showLogin()
+                    self.showOnboardingFlow()
                     self.window.makeKeyAndVisible()
                 })
                 .disposed(by: disposeBag)
         } else {
-            showLogin()
+            showOnboardingFlow()
             window.makeKeyAndVisible()
         }
     }
@@ -60,23 +60,32 @@ final class AppCoordinator: BaseCoordinator {
         
         tabBarCoordinator.start()
         addDependency(tabBarCoordinator)
-        childCoordinators.append(tabBarCoordinator)
         
         window.rootViewController = navigationController
     }
     
-    private func showLogin() {
-        let loginBuilder = appDIContainer.resolve(OnboardingBuilder.self)
+    private func showOnboardingFlow() {
+        let onboardingCoordinator = OnboardingCoordinator(
+            navigationController: navigationController,
+            builder: appDIContainer.resolve(OnboardingBuilder.self)
+        )
         
-        let loginVC = loginBuilder.buildLogin()
-        let navigationController = UINavigationController(rootViewController: loginVC)
-        
-        let loginCoordinator = LoginCoordinator(navigationController: navigationController, builder: loginBuilder)
-        
-        loginCoordinator.start()
-        addDependency(loginCoordinator)
-        childCoordinators.append(loginCoordinator)
+        addDependency(onboardingCoordinator)
+        onboardingCoordinator.start()
         
         window.rootViewController = navigationController
     }
+//    private func showLogin() {
+//        let loginBuilder = appDIContainer.resolve(OnboardingBuilder.self)
+//        
+//        let loginVC = loginBuilder.buildLogin()
+//        let navigationController = UINavigationController(rootViewController: loginVC)
+//        
+//        let loginCoordinator = LoginCoordinator(navigationController: navigationController, builder: loginBuilder)
+//        
+//        loginCoordinator.start()
+//        addDependency(loginCoordinator)
+//        
+//        window.rootViewController = navigationController
+//    }
 }

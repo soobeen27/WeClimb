@@ -30,6 +30,8 @@ class PrivacyPolicyVC: UIViewController {
         isSnsConsentGivenCheckBox
     ]
     
+    var onTermsAgreed: (() -> Void)?
+    
     init(coordinator: PrivacyPolicyCoordinator? = nil, viewModel: PrivacyPolicyVM) {
         self.coordinator = coordinator
         self.viewModel = viewModel
@@ -256,6 +258,7 @@ class PrivacyPolicyVC: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-OnboardingConst.PrivacyPolicy.Spacing.confirmButtonBottomOffset)
             $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
             $0.trailing.equalToSuperview().offset(-OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.height.equalTo(48)
         }
     }
     
@@ -296,6 +299,7 @@ class PrivacyPolicyVC: UIViewController {
         
         output.isConfirmButtonEnabled
             .drive(onNext: { [weak self] isEnabled in
+                print("Confirm Button Enabled: \(isEnabled)")
                 self?.confirmButton.isEnabled = isEnabled
                 self?.confirmButton.backgroundColor = isEnabled ? OnboardingConst.PrivacyPolicy.Color.confirmDeactivationColor : OnboardingConst.PrivacyPolicy.Color.confirmActivationColor
             })
@@ -322,8 +326,12 @@ class PrivacyPolicyVC: UIViewController {
         }
         
         confirmButton.rx.tap
-            .bind(to: confirmButtonTapRelay)
-            .disposed(by: disposeBag)
+                .subscribe(onNext: { [weak self] in
+                    print("나간다")
+                    self?.onTermsAgreed?()
+                })
+                .disposed(by: disposeBag)
+
     }
     
     private func linkButtonTapBind() {

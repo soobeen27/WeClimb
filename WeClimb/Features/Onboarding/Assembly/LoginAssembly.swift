@@ -77,5 +77,16 @@ final class LoginAssembly: Assembly {
         container.register(LoginVM.self) { resolver in
             LoginImpl(usecase: resolver.resolve(LoginUseCase.self)!)
         }
+        
+        container.register(PrivacyPolicyVM.self) { resolver in
+            PrivacyPolicyImpl(usecase: resolver.resolve(SNSAgreeUsecase.self)!)
+        }
+        
+        container.register(CreateNicknameVM.self) { resolver in
+            CreateNicknameImpl(
+                checkDuplicationUseCase: resolver.resolve(NicknameDuplicationCheckUseCase.self)!,
+                registerNicknameUseCase: resolver.resolve(NicknameRegisterUseCase.self)!
+            )
+        }
     }
 }

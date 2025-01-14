@@ -17,6 +17,8 @@ class CreateNicknameVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel: CreateNicknameVM
     
+    var onCreateNickname: (() -> Void)?
+    
     init(coordinator: CreateNickNameCoordinator? = nil, viewModel: CreateNicknameVM) {
         self.coordinator = coordinator
         self.viewModel = viewModel
@@ -208,8 +210,8 @@ class CreateNicknameVC: UIViewController {
         
         errorMessageLabel.snp.makeConstraints {
             $0.top.equalTo(nickNameTextField.snp.bottom).offset(OnboardingConst.CreateNickname.Spacing.labelTopOffset)
-            $0.leading.equalTo(nickNameTextField)
-            $0.height.width.equalTo(OnboardingConst.CreateNickname.Size.errorMessageHeight)
+            $0.leading.trailing.equalTo(nickNameTextField)
+            $0.height.equalTo(OnboardingConst.CreateNickname.Size.errorMessageHeight)
         }
         
         rightIconImageView.snp.makeConstraints {
@@ -270,7 +272,7 @@ class CreateNicknameVC: UIViewController {
         output.updateResult
             .drive(onNext: { (success: Bool) in
                 if success {
-//                    self?.coordinator?.moveToNextScreen()  성공 시 다음 화면으로 이동
+                    self.onCreateNickname?()
                     print("성공햇서오")
                 } else {
                     print("실패햇서오")

@@ -16,6 +16,8 @@ class LoginVC: UIViewController {
     private let viewModel: LoginVM
     private let disposeBag = DisposeBag()
     
+    var loginButtonSelected: ((LoginStatus) -> Void)?
+    
     init(coordinator: LoginCoordinator? = nil, viewModel: LoginVM) {
         self.coordinator = coordinator
         self.viewModel = viewModel
@@ -132,7 +134,6 @@ class LoginVC: UIViewController {
         
         let output = viewModel.transform(input: input)
         
-        // Google 로그인은 별도 처리
         googleLoginButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 self?.handleGoogleLogin()
@@ -145,6 +146,7 @@ class LoginVC: UIViewController {
                 switch result {
                 case .success:
                     print(OnboardingConst.Login.Text.successLoginText)
+                    self.loginButtonSelected?(.privacyPolicy)
                 case .failure(let error):
                     print(OnboardingConst.Login.Text.failureLoginText, error.localizedDescription)
                 }
@@ -166,27 +168,10 @@ class LoginVC: UIViewController {
         loginImpl.usecase.execute(loginType: .google, presentProvider: presenterProvider)
             .subscribe(onSuccess: { _ in
                 print(OnboardingConst.Login.Text.successLoginText)
-                //                self.coordinator?.navigateToMain() // 성공 시 메인 화면으로 이동
+                self.loginButtonSelected?(.privacyPolicy)
             }, onFailure: { error in
                 print(OnboardingConst.Login.Text.failureLoginText, "\(error.localizedDescription)")
             })
             .disposed(by: disposeBag)
     }
 }
-
-
-//    private func handleGoogleLogin() {
-//        let presenterProvider: PresenterProvider = { [weak self] in
-//            guard let self = self else { fatalError(OnboardingConst.Login.Text.noVC) }
-//            return self
-//        }
-//
-//        viewModel.usecase.execute(loginType: .google, presentProvider: presenterProvider)
-//            .subscribe(onSuccess: { _ in
-//                print(OnboardingConst.Login.Text.successLoginText)
-//            }, onFailure: { error in
-//                print(OnboardingConst.Login.Text.failureLoginText, "\(AppError.unknown)")
-//            })
-//            .disposed(by: disposeBag)
-//    }
-

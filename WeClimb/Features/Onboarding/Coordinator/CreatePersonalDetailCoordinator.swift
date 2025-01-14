@@ -9,33 +9,22 @@ import UIKit
 
 final class CreatePersonalDetailCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
+    private let builder: OnboardingBuilder
     
-    init(navigationController: UINavigationController) {
+    var onFinish: (() -> Void)?
+    
+    init(navigationController: UINavigationController, builder: OnboardingBuilder) {
         self.navigationController = navigationController
+        self.builder = builder
     }
     
     override func start() {
-        // 1. DataSource 생성
-        let userUpdateDataSource = UserUpdateDataSourceImpl()
-        let userReadDataSource = UserReadDataSourceImpl()
-        
-        // 2. Repository 생성
-        let userUpdateRepository = UserUpdateRepositoryImpl(userUpdateDataSource: userUpdateDataSource)
-        
-        // 3. UseCase 생성
-        let personalDetailUseCase = PersonalDetailUseCaseImpl(userUpdateRepository: userUpdateRepository)
-        
-        // 4. ViewModel 생성
-        let createPersonalDetailVM = CreatePersonalDetailImpl(
-            
-            updateUseCase: personalDetailUseCase
-        )
-        
-        // 5. ViewController 생성
-        let createPersonalDetailVC = CreatePersonalDetailVC(viewModel: createPersonalDetailVM)
-        
-//        let createPersonalDetailVC = CreatePersonalDetailVC()
+        let createPersonalDetailVC = builder.buildCreatePersonalDetail()
         createPersonalDetailVC.coordinator = self
         navigationController.pushViewController(createPersonalDetailVC, animated: true)
+    }
+    
+    func finishLogin() {
+        onFinish?()
     }
 }
