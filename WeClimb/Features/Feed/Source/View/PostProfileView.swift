@@ -11,48 +11,27 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+struct PostProfileModel {
+    let profileImage: UIImage?
+    let name: String?
+    let gymName: String?
+    let heightArmReach: String?
+    let level: UIImage?
+    let hold: UIImage?
+    let caption: String?
+}
+
 class PostProfileView: UIView {
-    let disposeBag = DisposeBag()
-    var profileImage: UIImage? {
-        didSet {
-            profileImageView.image = profileImage
-        }
-    }
-    var name: String? {
-        didSet {
-            nameLabel.text = name
-        }
-    }
+    private var disposeBag = DisposeBag()
     
-    var gymName: String? {
+    private var profileModel: PostProfileModel? {
         didSet {
-            gymTag.text = gymName
+            setData()
+            dataCheck()
+            bindHideButton()
         }
     }
-    var heightArmReach: String? {
-        didSet {
-            heightArmReachLabel.text = heightArmReach
-        }
-    }
-    
-    var level: UIImage? {
-        didSet {
-            levelTag.rightImage = level
-        }
-    }
-    
-    var hold: UIImage? {
-        didSet {
-            holdTag.rightImage = hold
-        }
-    }
-    
-    var caption: String? {
-        didSet {
-            captionLabel.text = caption
-        }
-    }
-    
+
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -150,10 +129,37 @@ class PostProfileView: UIView {
         return stv
     }()
     
+    private lazy var gradientLayer: CAGradientLayer = {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = self.bounds
+        gradientLayer.colors = [
+            UIColor(hex: "1A1A1A", alpha: 0.0),
+            UIColor(hex: "1A1A1A", alpha: 0.8)
+        ]
+        gradientLayer.locations = [0, 1]
+        
+        return gradientLayer
+    }()
+    
     init() {
         super.init(frame: .zero)
         setLayout()
-        bindHideButton()
+    }
+    
+    func resetToDefaultState() {
+        profileImageView.image = nil
+        nameLabel.text = nil
+        heightArmReachLabel.text = nil
+        hideButton.isSelected = false
+        gymTag.text = nil
+        levelTag.text = nil
+        holdTag.text = nil
+        captionLabel.text = nil
+        disposeBag = DisposeBag()
+    }
+    
+    func configure(with data: PostProfileModel) {
+        profileModel = data
     }
     
     required init?(coder: NSCoder) {
@@ -161,6 +167,23 @@ class PostProfileView: UIView {
     }
     
     @objc private func captionSCVTapped() {
+        if captionLabel.calculateNumberOfLines() > 2 {
+            showFullCaption()
+        }
+    }
+    
+    private func setData() {
+        guard let profileModel else { return }
+        profileImageView.image = profileModel.profileImage
+        nameLabel.text = profileModel.name
+        gymTag.text = profileModel.gymName
+        heightArmReachLabel.text = profileModel.heightArmReach
+        levelTag.rightImage = profileModel.level
+        holdTag.rightImage = profileModel.hold
+        captionLabel.text = profileModel.caption
+    }
+    
+    private func showFullCaption() {
         captionSCV.isScrollEnabled.toggle()
         let newHeight: CGFloat = captionSCV.isScrollEnabled ? FeedConsts.Profile.Size.captionLongHeight : FeedConsts.Profile.Size.captionShortHeight
         UIView.animate(withDuration: 0.3) { [weak self] in
@@ -188,14 +211,25 @@ class PostProfileView: UIView {
     }
     
     private func toggleStackView() {
-        for (index, view) in self.profileStackView.arrangedSubviews.enumerated() {
+        profileStackView.arrangedSubviews.enumerated().forEach { index, view in
             if index != 0 {
                 view.isHidden = self.hideButton.isSelected
             }
         }
+        dataCheck()
         UIView.animate(withDuration: 0.3) { [weak self] in
             guard let self else { return }
             self.profileStackView.layer.layoutIfNeeded()
+        }
+    }
+    
+    private func dataCheck() {
+        if profileModel?.caption?.isEmpty ?? true {
+            profileStackView.arrangedSubviews[2].isHidden = true
+            profileStackView.layer.layoutIfNeeded()
+        } else {
+            profileStackView.arrangedSubviews[2].isHidden = hideButton.isSelected
+            profileStackView.layer.layoutIfNeeded()
         }
     }
     
@@ -212,7 +246,6 @@ class PostProfileView: UIView {
         profileStackView.snp.makeConstraints {
             $0.edges.equalToSuperview().inset(FeedConsts.Profile.Size.padding)
         }
-
     }
     
     private func setUserInfoViewLayout() {

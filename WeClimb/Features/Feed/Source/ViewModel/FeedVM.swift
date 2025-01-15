@@ -12,7 +12,7 @@ import RxSwift
 import RxCocoa
 
 protocol FeedVM {
-    var postItemRelay: BehaviorRelay<[PostItem]> {get}
+    func transform(input: FeedVMImpl.Input) -> FeedVMImpl.Output
 }
 
 struct PostItem: Hashable {
@@ -39,12 +39,17 @@ struct PostItem: Hashable {
     }
 }
 
+enum FetchPostType {
+    case initial
+    case more
+}
+
 class FeedVMImpl: FeedVM {
-    let disposeBag = DisposeBag()
-    let mainFeedUseCase: MainFeedUseCase
-    let myUserInfo: MyUserInfoUseCase
+    private let disposeBag = DisposeBag()
+    private let mainFeedUseCase: MainFeedUseCase
+    private let myUserInfo: MyUserInfoUseCase
     
-    let postItemRelay = BehaviorRelay<[PostItem]>.init(value: [])
+    private let postItemRelay: BehaviorRelay<[PostItem]> = .init(value: [])
     
     init(mainFeedUseCase: MainFeedUseCase, myUserInfo: MyUserInfoUseCase) {
         self.mainFeedUseCase = mainFeedUseCase
@@ -52,12 +57,25 @@ class FeedVMImpl: FeedVM {
         fetchPost(type: .initial)
     }
     
-    enum FetchPostType {
-        case initial
-        case more
+    struct Input {
+        let fetchType: BehaviorRelay<FetchPostType>
     }
     
-    func fetchPost(type: FetchPostType) {
+    struct Output {
+        let postItems: BehaviorRelay<[PostItem]>
+    }
+    
+    func transform(input: Input) -> Output {
+        input.fetchType
+            .subscribe { [weak self] in
+                self?.fetchPost(type: $0)
+            }
+            .disposed(by: disposeBag)
+        
+        return Output(postItems: postItemRelay)
+    }
+    
+    private func fetchPost(type: FetchPostType) {
         myUserInfo.execute()
             .flatMap { [weak self] user -> Single<[Post]> in
                 guard let self else { return Single.error(UserError.noID) }
@@ -66,7 +84,7 @@ class FeedVMImpl: FeedVM {
             .subscribe(onSuccess: { [weak self] posts in
                 guard let self else { return }
                 let postItems = posts.map {
-                    self.postToPostItem(post: $0)
+                    return self.postToPostItem(post: $0)
                 }
                 switch type {
                 case .initial:
