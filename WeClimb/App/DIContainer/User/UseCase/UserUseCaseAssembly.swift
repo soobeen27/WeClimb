@@ -21,5 +21,8 @@ final class UserUseCaseAssembly: Assembly {
         container.register(NicknameRegisterUseCase.self) { resolver in
             NicknameRegisterUseCaseImpl(userUpdateRepository: resolver.resolve(UserUpdateRepository.self)!)
         }
+        container.register(PersonalDetailUseCase.self) { resolver in
+            PersonalDetailUseCaseImpl(userUpdateRepository: resolver.resolve(UserUpdateRepository.self)!)
+        }
     }
 }

@@ -31,7 +31,6 @@ final class TabBarAssembly: Assembly {
 //         TabBarBuilder 등록
         container.register(TabBarBuilder.self) { resolver in
             TabBarBuilderImpl(
-                container: resolver.resolve(AppDIContainer.self)!,
                 feedBuilder: resolver.resolve(FeedBuilder.self)!,
                 searchBuilder: resolver.resolve(SearchBuilder.self)!,
                 uploadBuilder: resolver.resolve(UploadBuilder.self)!,

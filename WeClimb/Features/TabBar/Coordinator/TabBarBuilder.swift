@@ -16,15 +16,13 @@ protocol TabBarBuilder {
 }
 
 final class TabBarBuilderImpl: TabBarBuilder {
-    private let container: AppDIContainer
     private let feedBuilder: FeedBuilder
     private let searchBuilder: SearchBuilder
     private let uploadBuilder: UploadBuilder
     private let notificationBuilder: NotificationBuilder
     private let userPageBuilder: UserPageBuilder
 
-    init(container: AppDIContainer, feedBuilder: FeedBuilder, searchBuilder: SearchBuilder, uploadBuilder: UploadBuilder, notificationBuilder: NotificationBuilder, userPageBuilder: UserPageBuilder) {
-        self.container = container
+    init(feedBuilder: FeedBuilder, searchBuilder: SearchBuilder, uploadBuilder: UploadBuilder, notificationBuilder: NotificationBuilder, userPageBuilder: UserPageBuilder) {
         self.feedBuilder = feedBuilder
         self.searchBuilder = searchBuilder
         self.uploadBuilder = uploadBuilder
@@ -34,7 +32,7 @@ final class TabBarBuilderImpl: TabBarBuilder {
     
     func buildFeedCoordinator() -> FeedCoordinator {
         let navigationController = UINavigationController()
-        let feedBuilder: FeedBuilder = container.resolve(FeedBuilder.self)
+        let feedBuilder: FeedBuilder = AppDIContainer.shared.resolve(FeedBuilder.self)
         let coordinator = FeedCoordinator(navigationController: navigationController, builder: feedBuilder)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,

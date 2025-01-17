@@ -88,5 +88,11 @@ final class LoginAssembly: Assembly {
                 registerNicknameUseCase: resolver.resolve(NicknameRegisterUseCase.self)!
             )
         }
+        
+        container.register(CreatePersonalDetailVM.self) { resolver in
+            CreatePersonalDetailImpl(
+                updateUseCase: resolver.resolve(PersonalDetailUseCase.self)!
+            )
+        }
     }
 }

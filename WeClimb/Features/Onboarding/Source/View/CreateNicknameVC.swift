@@ -244,42 +244,42 @@ class CreateNicknameVC: UIViewController {
             nicknameInput: nickNameTextField.rx.text.orEmpty.asObservable(),
             confirmButtonTap: confirmButton.rx.tap.asObservable()
         )
-
+        
         let output = viewModel.transform(input: input)
-
-        output.isNicknameValid
-            .drive(onNext: { [weak self] (isValid: Bool) in
-                self?.confirmButton.isEnabled = isValid
-                self?.confirmButton.backgroundColor = isValid ? OnboardingConst.CreateNickname.Color.confirmDeactivationColor : OnboardingConst.CreateNickname.Color.confirmActivationColor
-//                self?.rightIconImageView.isHidden = !isValid
-            })
-            .disposed(by: disposeBag)
-
+        
+//        output.isNicknameValid
+//            .drive(onNext: { [weak self] isValid in
+//                guard let self = self else { return }
+////                self.rightIconImageView.isHidden = !isValid
+////                self.crossIconImageView.isHidden = isValid
+////                self.errorMessageLabel.isHidden = isValid
+////                self.errorMessageLabel.text = isValid ? "" : "닉네임은 2~12자의 한글, 영문, 숫자만 가능합니다."
+//            })
+//            .disposed(by: disposeBag)
+        
         output.characterCount
             .map { "\($0)/12" }
             .drive(characterCountLabel.rx.text)
             .disposed(by: disposeBag)
-
-        output.errorMessage
-            .drive(onNext: { [weak self] message in
-                guard let self else { return }
-                self.errorMessageLabel.text = message
-                self.errorMessageLabel.textColor = .red
-                self.errorMessageLabel.isHidden = message.isEmpty
-            })
-            .disposed(by: disposeBag)
-
+        
         output.updateResult
-            .drive(onNext: { (success: Bool) in
+            .drive(onNext: { [weak self] success in
+                guard let self = self else { return }
                 if success {
                     self.onCreateNickname?()
-                    print("성공햇서오")
                 } else {
-                    print("실패햇서오")
+                    self.errorMessageLabel.isHidden = false
+                    self.errorMessageLabel.text = OnboardingConst.CreateNickname.Text.errorMessageDuplicate
                 }
             })
             .disposed(by: disposeBag)
+        
+        Observable.combineLatest(output.isNicknameValid.asObservable(), output.characterCount.asObservable())
+            .map { isValid, count in isValid && count <= OnboardingConst.CreateNickname.Size.maxCharacterCount }
+            .bind(to: confirmButton.rx.isEnabled)
+            .disposed(by: disposeBag)
     }
+
 
     private func setupDismissKeyboardGesture() {
         let tapGesture = UITapGestureRecognizer()
