@@ -12,7 +12,7 @@ protocol MainFeedUseCase {
     func execute(user: User?) -> Single<[Post]>
 }
 
-struct MainFeedUseCaseImpl: MainFeedUseCase {
+public struct MainFeedUseCaseImpl: MainFeedUseCase {
     private let mainFeedRepository: MainFeedRepository
     
     init(mainFeedRepository: MainFeedRepository) {

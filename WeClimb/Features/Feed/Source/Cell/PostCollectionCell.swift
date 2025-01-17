@@ -7,9 +7,11 @@
 
 import UIKit
 
+import Swinject
 import SnapKit
 import RxSwift
 import RxCocoa
+import Kingfisher
 
 import FirebaseFirestore
 
@@ -44,7 +46,24 @@ class PostCollectionCell: UICollectionViewCell {
         case media
     }
     
+    var disposeBag = DisposeBag()
+    
+    private let container = AppDIContainer.shared
+    
+    private var viewModel: PostCollectionCellVM?
+    
     private let profileView = PostProfileView()
+    
+    private let postSidebarView = PostSidebarView()
+    
+    private var user: User? {
+        didSet {
+            guard let user, let postItem else { return }
+            configureProfileView(postItem: postItem, user: user)
+        }
+    }
+    
+    private var postItem: PostItem?
     
     private lazy var mediaCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -61,6 +80,7 @@ class PostCollectionCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setLayout()
+        
     }
     
     required init?(coder: NSCoder) {
@@ -73,18 +93,45 @@ class PostCollectionCell: UICollectionViewCell {
     }
     
     func configure(postItem: PostItem) {
-        configureProfileView(postItem: postItem)
+        self.postItem = postItem
+        bindViewModel()
     }
     
-    private func configureProfileView(postItem: PostItem) {
-        profileView.configure(with: PostProfileModel(profileImage: .appleIcon, name: postItem.authorUID, gymName: postItem.gym, heightArmReach: "아직 없어용", level: .appleIcon, hold: .holdRed, caption: postItem.caption))
+    private func configureProfileView(postItem: PostItem, user: User) {
+        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: "아직 없어용", level: .appleIcon, hold: .holdRed, caption: postItem.caption))
+    }
+    
+    private func bindViewModel() {
+        viewModel = container.resolve(PostCollectionCellVM.self)
+        guard let viewModel, let postItem else { return }
+        
+        let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(postItem: postItem))
+        
+        output.user
+            .map { user -> User in
+                return user
+            }
+            .asDriver(onErrorJustReturn: User.erroredUser)
+            .drive(onNext: { [weak self] user in
+                guard let self else { return }
+                self.user = user
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setLayout() {
         contentView.backgroundColor = .clear
-        contentView.addSubview(profileView)
+        [profileView, postSidebarView]
+            .forEach {
+                contentView.addSubview($0)
+            }
         profileView.snp.makeConstraints {
             $0.bottom.leading.trailing.equalToSuperview()
+        }
+        
+        postSidebarView.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(FeedConsts.PostCollectionCell.Size.sidebarBottom)
+            $0.trailing.equalToSuperview().inset(FeedConsts.Profile.Size.padding)
         }
     }
     

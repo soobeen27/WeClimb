@@ -15,5 +15,9 @@ final class UserUseCaseAssembly: Assembly {
         container.register(SNSAgreeUsecase.self) { resolver in
             SNSAgreeUsecaseImpl(userUpdateRepository: resolver.resolve(UserUpdateRepository.self)!)
         }
+        
+        container.register(UserInfoFromUIDUseCase.self) { resolver in
+            UserInfoFromUIDUseCaseImpl(userReadRepository: resolver.resolve(UserReadRepository.self)!)
+        }
     }
 }

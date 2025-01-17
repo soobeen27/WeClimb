@@ -13,6 +13,10 @@ final class FeedAssembly: Assembly {
             FeedVMImpl(mainFeedUseCase: resolver.resolve(MainFeedUseCase.self)!,
                        myUserInfo: resolver.resolve(MyUserInfoUseCase.self)!)
         }
+        
+        container.register(PostCollectionCellVM.self) { resolver in
+            PostCollectionCellVMImpl(userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!)
+        }
     }
 }
 

@@ -11,8 +11,16 @@ import FirebaseFirestore
 import RxSwift
 import RxCocoa
 
+protocol FeedInput {
+    var fetchType: BehaviorRelay<FetchPostType> { get }
+}
+
+protocol FeedOutput {
+    var postItems: BehaviorRelay<[PostItem]> { get }
+}
+
 protocol FeedVM {
-    func transform(input: FeedVMImpl.Input) -> FeedVMImpl.Output
+    func transform(input: FeedInput) -> FeedOutput
 }
 
 struct PostItem: Hashable {
@@ -57,15 +65,15 @@ class FeedVMImpl: FeedVM {
         fetchPost(type: .initial)
     }
     
-    struct Input {
+    struct Input: FeedInput {
         let fetchType: BehaviorRelay<FetchPostType>
     }
     
-    struct Output {
+    struct Output: FeedOutput {
         let postItems: BehaviorRelay<[PostItem]>
     }
     
-    func transform(input: Input) -> Output {
+    func transform(input: FeedInput) -> FeedOutput {
         input.fetchType
             .subscribe { [weak self] in
                 self?.fetchPost(type: $0)

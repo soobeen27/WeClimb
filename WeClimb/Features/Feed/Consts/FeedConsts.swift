@@ -28,6 +28,7 @@ enum FeedConsts {
             static let tagsViewHSpacing: CGFloat = 8
             static let captionShortHeight: CGFloat = 44
             static let captionLongHeight: CGFloat = 400
+            static let captionTrailing: CGFloat = 40
         }
         enum Font {
             static let name: UIFont = UIFont.customFont(style: .label2SemiBold)
@@ -57,6 +58,40 @@ enum FeedConsts {
         enum Text {
             static let level: String = "레벨"
             static let hold: String = "홀드"
+        }
+    }
+    enum Sidebar {
+        enum Size {
+            static let buttonSize: CGFloat = 24
+            static let spacing: CGFloat = 16
+            static let countSpacing: CGFloat = 4
+        }
+        enum Font {
+            static let count: UIFont = UIFont.customFont(style: .caption2SemiBold)
+        }
+        enum Color {
+            static let tint: UIColor = UIColor.labelWhite
+            static let liked: UIColor = UIColor.red
+        }
+        enum Image {
+            static let heart: UIImage? = UIImage.heartIcon
+                .resize(targetSize: CGSize(width: Size.buttonSize, height: Size.buttonSize))?
+                .withTintColor(Color.tint)
+            static let heartFill: UIImage? = UIImage.heartIconFill
+                .resize(targetSize: CGSize(width: Size.buttonSize, height: Size.buttonSize))?
+                .withTintColor(Color.liked)
+            static let comment: UIImage? = UIImage.commentIcon
+                .resize(targetSize: CGSize(width: Size.buttonSize, height: Size.buttonSize))?
+                .withTintColor(Color.tint)
+            static let extraFunc: UIImage? = UIImage.moreIcon
+                .resize(targetSize: CGSize(width: Size.buttonSize, height: Size.buttonSize))?
+                .withTintColor(Color.tint)
+        }
+    }
+    
+    enum PostCollectionCell {
+        enum Size {
+            static let sidebarBottom: CGFloat = 196
         }
     }
 }

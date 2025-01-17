@@ -10,9 +10,10 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import Kingfisher
 
 struct PostProfileModel {
-    let profileImage: UIImage?
+    let profileImage: String?
     let name: String?
     let gymName: String?
     let heightArmReach: String?
@@ -152,8 +153,8 @@ class PostProfileView: UIView {
         heightArmReachLabel.text = nil
         hideButton.isSelected = false
         gymTag.text = nil
-        levelTag.text = nil
-        holdTag.text = nil
+        levelTag.rightImage = nil
+        holdTag.rightImage = nil
         captionLabel.text = nil
         disposeBag = DisposeBag()
     }
@@ -174,13 +175,21 @@ class PostProfileView: UIView {
     
     private func setData() {
         guard let profileModel else { return }
-        profileImageView.image = profileModel.profileImage
+        setProfileImageView(urlString: profileModel.profileImage)
         nameLabel.text = profileModel.name
         gymTag.text = profileModel.gymName
         heightArmReachLabel.text = profileModel.heightArmReach
         levelTag.rightImage = profileModel.level
         holdTag.rightImage = profileModel.hold
         captionLabel.text = profileModel.caption
+    }
+    
+    private func setProfileImageView(urlString: String?) {
+        if let urlString, let url = URL(string: urlString) {
+            profileImageView.kf.setImage(with: url)
+        } else {
+            profileImageView.image = UIImage.defaultAvatarProfile
+        }
     }
     
     private func showFullCaption() {
@@ -226,10 +235,8 @@ class PostProfileView: UIView {
     private func dataCheck() {
         if profileModel?.caption?.isEmpty ?? true {
             profileStackView.arrangedSubviews[2].isHidden = true
-            profileStackView.layer.layoutIfNeeded()
         } else {
             profileStackView.arrangedSubviews[2].isHidden = hideButton.isSelected
-            profileStackView.layer.layoutIfNeeded()
         }
     }
     
@@ -296,7 +303,8 @@ class PostProfileView: UIView {
     
     private func setCaptionLayout() {
         captionSCV.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
+            $0.leading.equalToSuperview()
+            $0.trailing.equalToSuperview().inset(FeedConsts.Profile.Size.captionTrailing)
             $0.height.equalTo(FeedConsts.Profile.Size.captionShortHeight)
         }
         captionLabel.snp.makeConstraints {

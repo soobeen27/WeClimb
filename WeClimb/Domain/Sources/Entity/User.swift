@@ -46,3 +46,7 @@ enum UserUpdate: String {
         }
     }
 }
+
+extension User {
+    static let erroredUser = User(userName: "정보를 불러오지 못함", profileImage: nil, registerationDate: Date(), lastModified: Date(), userRole: "user", armReach: nil, height: nil, posts: nil, comments: nil, followers: nil, following: nil, snsConsent: false)
+}
