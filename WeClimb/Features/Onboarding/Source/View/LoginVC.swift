@@ -13,10 +13,10 @@ import SnapKit
 
 class LoginVC: UIViewController {
     var coordinator: LoginCoordinator?
-    private let viewModel: LoginVM
+    private let viewModel: LoginImpl
     private let disposeBag = DisposeBag()
     
-    init(coordinator: LoginCoordinator? = nil, viewModel: LoginVM) {
+    init(coordinator: LoginCoordinator? = nil, viewModel: LoginImpl) {
         self.coordinator = coordinator
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -114,7 +114,7 @@ class LoginVC: UIViewController {
     }
     
     private func loginBind() {
-        let input = LoginVM.Input(
+        let input = LoginImpl.Input(
             loginType: Observable.merge(
                 googleLoginButton.rx.tap.map { LoginType.google },
                 kakaoLoginButton.rx.tap.map { LoginType.kakao },

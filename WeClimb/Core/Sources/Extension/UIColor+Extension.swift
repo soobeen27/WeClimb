@@ -38,7 +38,7 @@ extension UIColor {
     static let fillSoildDarkNormal = UIColor(hex: "#27282B")
     static let lineOpacityHeavy = UIColor(hex: "#7F818A", alpha: 0.4)
     static let lineOpacityNormal = UIColor(hex: "#7F818A", alpha: 0.16)
-    static let labelAssistive = UIColor(hex: "#BFCOC4")
+    static let labelAssistive = UIColor(hex: "#BFC0C4")
     static let MaterialNormal = UIColor(hex: "#1A1A1A", alpha: 0.12)
     
     //MARK: - 필터 커스텀 컬러
@@ -61,4 +61,5 @@ extension UIColor {
     static let fillSolidDarkBlack = UIColor(hex: "#141415")
     static let labelNormal = UIColor(hex: "#585960")
     static let fillSolidLightLight = UIColor(hex: "#FAFAFA")
+    static let statusNegative = UIColor(hex: "FB283E")
 }
