@@ -33,66 +33,73 @@ class CreateNicknameImpl: CreateNicknameVM {
     struct Output {
         let isNicknameValid: Driver<Bool>
         let characterCount: Driver<Int>
-        let errorMessage: Driver<String>
         let updateResult: Driver<Bool>
     }
     
     func transform(input: Input) -> Output {
-        let nicknameRelay = BehaviorRelay<String>(value: "")
-        let errorMessageRelay = BehaviorRelay<String?>(value: nil)
-        let updateResultRelay = PublishRelay<Bool>()
-
-        input.nicknameInput
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { $0.count <= OnboardingConst.CreateNickname.Size.maxCharacterCount }
-            .bind(to: nicknameRelay)
-            .disposed(by: disposeBag)
+        let sanitizedInput = input.nicknameInput
+            .map { self.normalizeNickname($0) }
+            .share(replay: 1, scope: .whileConnected)
         
-        let isNicknameValid = nicknameRelay
-            .map { [weak self] nickname in
-                guard let self = self else { return false }
-                return self.normalizeNickname(nickname).count >= OnboardingConst.CreateNickname.Size.minCharacterCount
+        let nicknameValid = sanitizedInput
+            .map { nickname -> Bool in
+                return nickname.count >= OnboardingConst.CreateNickname.Size.minCharacterCount && nickname.count <= OnboardingConst.CreateNickname.Size.maxCharacterCount
             }
-            .asDriver(onErrorJustReturn: false)
+            .share(replay: 1, scope: .whileConnected)
         
-        let characterCount: Driver<Int> = nicknameRelay
+        let characterCount = sanitizedInput
             .map { $0.count }
-            .asDriver(onErrorJustReturn: OnboardingConst.CreateNickname.Status.boolValue)
+            .asDriver(onErrorJustReturn: 0)
         
-        input.confirmButtonTap
-            .withLatestFrom(nicknameRelay)
-            .flatMapLatest { nickname in
-                self.checkDuplicationUseCase.execute(name: nickname)
-                    .flatMap { isDuplicate -> Single<Bool> in
-                        if isDuplicate {
-                            errorMessageRelay.accept(OnboardingConst.CreateNickname.Text.errorMessageDuplicate)
-                            return Single.just(false)
-                        }
-                        return self.registerNicknameUseCase.execute(name: nickname)
-                            .andThen(Single.just(true))
-                    }
+        let isNicknameAvailable = Observable.combineLatest(
+            sanitizedInput,
+            input.confirmButtonTap.startWith(Void())
+        )
+            .map { nickname, _ in nickname }
+            .flatMapLatest { nickname -> Observable<Bool> in
+                if nickname.isEmpty || nickname.count < OnboardingConst.CreateNickname.Size.minCharacterCount || nickname.count > OnboardingConst.CreateNickname.Size.maxCharacterCount {
+                    return Observable.just(true)
+                }
+                
+                return self.checkDuplicationUseCase.execute(name: nickname)
+                    .asObservable()
                     .catch { error in
-                        errorMessageRelay.accept("\(OnboardingConst.CreateNickname.Text.errorMessage) \(error.localizedDescription)")
-
-                        return Single.just(false)
+                        print("Error checking duplication: \(error)")
+                        return Observable.just(false)
                     }
             }
-            .subscribe(onNext: { success in
-                updateResultRelay.accept(success)
+            .startWith(true)
+            .share(replay: 1, scope: .whileConnected)
+
+        let isNicknameAvailableCombined = Observable.combineLatest(
+            nicknameValid,
+            isNicknameAvailable
+        ) { isValid, isAvailable in
+            return isValid && isAvailable
+        }
+            .share(replay: 1, scope: .whileConnected)
+        
+        Observable.combineLatest(nicknameValid, isNicknameAvailable)
+            .subscribe(onNext: { isValid, isAvailable in
             })
             .disposed(by: disposeBag)
         
-        let errorMessage = errorMessageRelay
-            .map { $0 ?? "" }
-            .asDriver(onErrorJustReturn: "")
-        
-        let updateResult = updateResultRelay
+        let updateResult = input.confirmButtonTap
+            .withLatestFrom(Observable.combineLatest(sanitizedInput, isNicknameAvailableCombined))
+            .flatMapLatest { nickname, isAvailableCombined -> Observable<Bool> in
+                guard isAvailableCombined else {
+                    return .just(false)
+                }
+                return self.registerNicknameUseCase.execute(name: nickname)
+                    .flatMap { _ in Single.just(true) }
+                    .asObservable()
+                    .catchAndReturn(false)
+            }
             .asDriver(onErrorJustReturn: false)
         
         return Output(
-            isNicknameValid: isNicknameValid,
+            isNicknameValid: nicknameValid.asDriver(onErrorJustReturn: false),
             characterCount: characterCount,
-            errorMessage: errorMessage,
             updateResult: updateResult
         )
     }

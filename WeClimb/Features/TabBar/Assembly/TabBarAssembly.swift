@@ -1,15 +1,19 @@
+////
+////  TabBarAssembly.swift
+////  WeClimb
+////
+////  Created by 윤대성 on 1/7/25.
+////
 //
-//  TabBarAssembly.swift
-//  WeClimb
-//
-//  Created by 윤대성 on 1/7/25.
-//
+import UIKit
 
 import Swinject
 
 final class TabBarAssembly: Assembly {
+
     func assemble(container: Container) {
         
+        // 개별 Builder 등록
         container.register(FeedBuilder.self) { _ in
             FeedBuilderImpl()
         }
@@ -26,10 +30,9 @@ final class TabBarAssembly: Assembly {
             UserPageBuilderImpl()
         }
         
-        container.register(TabBarCoordinator.self) { resolver in
-            let tabBarVC = TabBarVC()
-            return TabBarCoordinator(
-                tabBarController: tabBarVC,
+//         TabBarBuilder 등록
+        container.register(TabBarBuilder.self) { resolver in
+            TabBarBuilderImpl(
                 feedBuilder: resolver.resolve(FeedBuilder.self)!,
                 searchBuilder: resolver.resolve(SearchBuilder.self)!,
                 uploadBuilder: resolver.resolve(UploadBuilder.self)!,
@@ -38,6 +41,19 @@ final class TabBarAssembly: Assembly {
             )
         }
         
+        // TabBarCoordinator 등록
+        container.register(TabBarCoordinator.self) { resolver in
+            let tabBarVC = TabBarVC()
+            let navi = UINavigationController()
+            let tabBarBuilder = resolver.resolve(TabBarBuilder.self)!
+            return TabBarCoordinator(
+                tabBarController: tabBarVC,
+                navigationController: navi,
+                builder: tabBarBuilder
+            )
+        }
+        
+        // FeedVM 등록
         container.register(FeedVM.self) { resolver in
             let mainFeedUseCase = resolver.resolve(MainFeedUseCase.self)!
             let myUserInfoUseCase = resolver.resolve(MyUserInfoUseCase.self)!

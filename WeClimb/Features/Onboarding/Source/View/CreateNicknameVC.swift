@@ -17,6 +17,8 @@ class CreateNicknameVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel: CreateNicknameVM
     
+    var onCreateNickname: (() -> Void)?
+    
     init(coordinator: CreateNickNameCoordinator? = nil, viewModel: CreateNicknameVM) {
         self.coordinator = coordinator
         self.viewModel = viewModel
@@ -148,7 +150,8 @@ class CreateNicknameVC: UIViewController {
     
     private func setLayout() {
         view.backgroundColor = OnboardingConst.CreateNickname.Color.backgroundColor
-        
+        self.navigationItem.hidesBackButton = true
+
         [
             nickNameTitleLabel,
             nickNameSubTitleLabel,
@@ -208,8 +211,8 @@ class CreateNicknameVC: UIViewController {
         
         errorMessageLabel.snp.makeConstraints {
             $0.top.equalTo(nickNameTextField.snp.bottom).offset(OnboardingConst.CreateNickname.Spacing.labelTopOffset)
-            $0.leading.equalTo(nickNameTextField)
-            $0.height.width.equalTo(OnboardingConst.CreateNickname.Size.errorMessageHeight)
+            $0.leading.trailing.equalTo(nickNameTextField)
+            $0.height.equalTo(OnboardingConst.CreateNickname.Size.errorMessageHeight)
         }
         
         rightIconImageView.snp.makeConstraints {
@@ -242,39 +245,42 @@ class CreateNicknameVC: UIViewController {
             nicknameInput: nickNameTextField.rx.text.orEmpty.asObservable(),
             confirmButtonTap: confirmButton.rx.tap.asObservable()
         )
-
+        
         let output = viewModel.transform(input: input)
-
-        output.isNicknameValid
-            .drive(onNext: { [weak self] (isValid: Bool) in
-                self?.confirmButton.isEnabled = isValid
-                self?.confirmButton.backgroundColor = isValid ? OnboardingConst.CreateNickname.Color.confirmDeactivationColor : OnboardingConst.CreateNickname.Color.confirmActivationColor
-//                self?.rightIconImageView.isHidden = !isValid
-            })
-            .disposed(by: disposeBag)
-
+        
+//        output.isNicknameValid
+//            .drive(onNext: { [weak self] isValid in
+//                guard let self = self else { return }
+////                self.rightIconImageView.isHidden = !isValid
+////                self.crossIconImageView.isHidden = isValid
+////                self.errorMessageLabel.isHidden = isValid
+////                self.errorMessageLabel.text = isValid ? "" : "닉네임은 2~12자의 한글, 영문, 숫자만 가능합니다."
+//            })
+//            .disposed(by: disposeBag)
+        
         output.characterCount
             .map { "\($0)/12" }
             .drive(characterCountLabel.rx.text)
             .disposed(by: disposeBag)
-
-        output.errorMessage
-            .drive(onNext: { [weak self] message in
-                guard let self else { return }
-                self.errorMessageLabel.text = message
-                self.errorMessageLabel.textColor = .red
-                self.errorMessageLabel.isHidden = message.isEmpty
+        
+        output.updateResult
+            .drive(onNext: { [weak self] success in
+                guard let self = self else { return }
+                if success {
+                    self.onCreateNickname?()
+                } else {
+                    self.errorMessageLabel.isHidden = false
+                    self.errorMessageLabel.text = OnboardingConst.CreateNickname.Text.errorMessageDuplicate
+                }
             })
             .disposed(by: disposeBag)
-
-        output.updateResult
-            .drive(onNext: { (success: Bool) in
-                if success {
-//                    self?.coordinator?.moveToNextScreen()  성공 시 다음 화면으로 이동
-                    print("성공햇서오")
-                } else {
-                    print("실패햇서오")
-                }
+        
+        Observable.combineLatest(output.isNicknameValid.asObservable(), output.characterCount.asObservable())
+            .subscribe(onNext: { [weak self] isValid, count in
+                guard let self = self else { return }
+                let isEnabled = isValid && count <= OnboardingConst.CreateNickname.Size.maxCharacterCount
+                self.confirmButton.isEnabled = isEnabled
+                self.confirmButton.backgroundColor = isEnabled ? OnboardingConst.CreateNickname.Color.confirmDeactivationColor : OnboardingConst.CreateNickname.Color.confirmActivationColor
             })
             .disposed(by: disposeBag)
     }

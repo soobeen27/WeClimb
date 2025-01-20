@@ -10,20 +10,26 @@ import SafariServices
 
 final class PrivacyPolicyCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
+    private let builder: OnboardingBuilder
     
-    init(navigationController: UINavigationController) {
+    var onFinish: (() -> Void)?
+    
+    init(navigationController: UINavigationController, builder: OnboardingBuilder) {
         self.navigationController = navigationController
+        self.builder = builder
     }
     
     override func start() {
-        let userUpdateDatasource = UserUpdateDataSourceImpl()
-        var userUpdateRepository = UserUpdateRepositoryImpl(userUpdateDataSource: userUpdateDatasource)
-        var userUpdateUsecase = SNSAgreeUsecaseImpl(userUpdateRepository: userUpdateRepository)
-        var userUpdateVM = PrivacyPolicyImpl(usecase: userUpdateUsecase)
-        var privacyPolicyVC = PrivacyPolicyVC(viewModel: userUpdateVM)
-        
-//        let privacyPolicyVC = PrivacyPolicyVC()
+        showPrivacyPolicy()
+    }
+    
+    private func showPrivacyPolicy() {
+        let privacyPolicyVC = builder.buildPrivacyPolicy()
         privacyPolicyVC.coordinator = self
+        privacyPolicyVC.onTermsAgreed = { [weak self] in
+            self?.onFinish?()
+        }
+        
         navigationController.pushViewController(privacyPolicyVC, animated: true)
     }
     

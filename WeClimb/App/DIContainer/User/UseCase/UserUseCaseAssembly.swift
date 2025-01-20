@@ -22,6 +22,14 @@ final class UserUseCaseAssembly: Assembly {
         
         container.register(MyUIDUseCase.self) { resolver in
             MyUIDUseCaseImpl(userReadRepository: resolver.resolve(UserReadRepository.self)!)
+        container.register(NicknameDuplicationCheckUseCase.self) { resolver in
+            NicknameDuplicationCheckUseCaseImpl(NicknameDuplicationCheckRepository: resolver.resolve(NicknameDuplicationCheckRepository.self)!)
+        }
+        container.register(NicknameRegisterUseCase.self) { resolver in
+            NicknameRegisterUseCaseImpl(userUpdateRepository: resolver.resolve(UserUpdateRepository.self)!)
+        }
+        container.register(PersonalDetailUseCase.self) { resolver in
+            PersonalDetailUseCaseImpl(userUpdateRepository: resolver.resolve(UserUpdateRepository.self)!)
         }
     }
 }

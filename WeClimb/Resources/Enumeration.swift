@@ -14,6 +14,11 @@ enum LoginResult {
     case createAccount
 }
 
+enum LoginStatus {
+    case tabBar
+    case privacyPolicy
+}
+
 //enum UserUpdate {
 //    case userName
 //    case height

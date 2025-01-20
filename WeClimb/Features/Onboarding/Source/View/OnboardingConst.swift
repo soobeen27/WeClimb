@@ -285,10 +285,6 @@ enum OnboardingConst {
             static let heightTextFieldHeight: CGFloat = 46
             static let armrichTextFieldHeight: CGFloat = 46
         }
-        
-        enum Image {
-            
-        }
     }
     
     enum RegisterResult {
@@ -297,6 +293,7 @@ enum OnboardingConst {
             static let titleNumberofLine = 2
             
             static let GreetingComment = "위클에 오신 것을 진심으로 환영합니다!"
+            static let confirmText = "시작"
         }
         
         enum Font {
@@ -306,7 +303,23 @@ enum OnboardingConst {
         
         enum Color {
             static let titleTextColor: UIColor = UIColor.labelStrong
-            static let GreetingCommentColor: UIColor = UIColor.labelNormal
+            static let greetingCommentColor: UIColor = UIColor.labelNormal
+            static let confirmColor: UIColor = UIColor.primaryStrong
+        }
+        
+        enum CornerRadius {
+            static let confirmButton: CGFloat = 8
+        }
+        
+        enum Size {
+            static let logoSize: CGSize = CGSize(width: 60, height: 60)
+        }
+        
+        enum Spacing {
+            static let logoTopSpacing: CGFloat = 30
+            static let baseSpacing: CGFloat = 16
+            static let commentTopSpacing: CGFloat = 32
+            static let confirmBottomSpacing: CGFloat = 20
         }
     }
 }

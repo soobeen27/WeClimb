@@ -9,14 +9,22 @@ import UIKit
 
 final class CreatePersonalDetailCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
+    private let builder: OnboardingBuilder
     
-    init(navigationController: UINavigationController) {
+    var onFinish: (() -> Void)?
+    
+    init(navigationController: UINavigationController, builder: OnboardingBuilder) {
         self.navigationController = navigationController
+        self.builder = builder
     }
     
     override func start() {
-        let createPersonalDetailVC = CreatePersonalDetailVC()
+        let createPersonalDetailVC = builder.buildCreatePersonalDetail()
         createPersonalDetailVC.coordinator = self
+        createPersonalDetailVC.onRegisterResult = { [weak self] in
+            self?.onFinish?()
+        }
+        
         navigationController.pushViewController(createPersonalDetailVC, animated: true)
     }
 }

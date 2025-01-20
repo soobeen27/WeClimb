@@ -13,10 +13,12 @@ import SnapKit
 
 class LoginVC: UIViewController {
     var coordinator: LoginCoordinator?
-    private let viewModel: LoginImpl
+    private let viewModel: LoginVM
     private let disposeBag = DisposeBag()
     
-    init(coordinator: LoginCoordinator? = nil, viewModel: LoginImpl) {
+    var loginButtonSelected: ((LoginStatus) -> Void)?
+    
+    init(coordinator: LoginCoordinator? = nil, viewModel: LoginVM) {
         self.coordinator = coordinator
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -114,55 +116,61 @@ class LoginVC: UIViewController {
     }
     
     private func loginBind() {
+        // Kakao, Apple 버튼 동작
         let input = LoginImpl.Input(
             loginType: Observable.merge(
-                googleLoginButton.rx.tap.map { LoginType.google },
                 kakaoLoginButton.rx.tap.map { LoginType.kakao },
                 appleLoginButton.rx.tap.map { LoginType.apple }
             ),
             loginButtonTapped: Observable.merge(
-                googleLoginButton.rx.tap.asObservable(),
                 kakaoLoginButton.rx.tap.asObservable(),
                 appleLoginButton.rx.tap.asObservable()
-            )
+            ),
+            presentProvider: { [weak self] in
+                guard let self = self else { fatalError(OnboardingConst.Login.Text.noVC) }
+                return self
+            }
         )
-               let output = viewModel.transform(input: input)
-
-        input.loginType
-            .subscribe(onNext: { [weak self] loginType in
-                guard let self else { return }
-                
-                switch loginType {
-                case .google:
-                    self.handleGoogleLogin()
-                default:
-                    output.loginResult
-                        .observe(on: MainScheduler.instance)
-                        .subscribe(onNext: { result in
-                            switch result {
-                            case .success:
-                                print(OnboardingConst.Login.Text.successLoginText)
-                            case .failure(let error):
-                                print(OnboardingConst.Login.Text.failureLoginText, "\(AppError.unknown)")
-                            }
-                        })
-                        .disposed(by: self.disposeBag)
+        
+        let output = viewModel.transform(input: input)
+        
+        googleLoginButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                self?.handleGoogleLogin()
+            })
+            .disposed(by: disposeBag)
+        
+        output.loginResult
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { result in
+                switch result {
+                case .success:
+                    print(OnboardingConst.Login.Text.successLoginText)
+                    self.loginButtonSelected?(.privacyPolicy)
+                case .failure(let error):
+                    print(OnboardingConst.Login.Text.failureLoginText, error.localizedDescription)
                 }
             })
             .disposed(by: disposeBag)
-            }
-                       
+    }
+    
     private func handleGoogleLogin() {
+        guard let loginImpl = viewModel as? LoginImpl else {
+            fatalError("viewModel is not of type LoginImpl")
+        }
+        
         let presenterProvider: PresenterProvider = { [weak self] in
             guard let self = self else { fatalError(OnboardingConst.Login.Text.noVC) }
             return self
         }
         
-        viewModel.usecase.execute(loginType: .google, presentProvider: presenterProvider)
+        // Google 로그인 실행
+        loginImpl.usecase.execute(loginType: .google, presentProvider: presenterProvider)
             .subscribe(onSuccess: { _ in
                 print(OnboardingConst.Login.Text.successLoginText)
+                self.loginButtonSelected?(.privacyPolicy)
             }, onFailure: { error in
-                print(OnboardingConst.Login.Text.failureLoginText, "\(AppError.unknown)")
+                print(OnboardingConst.Login.Text.failureLoginText, "\(error.localizedDescription)")
             })
             .disposed(by: disposeBag)
     }

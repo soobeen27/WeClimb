@@ -80,11 +80,11 @@ class PrivacyPolicyImpl: PrivacyPolicyVM {
         
         let updateResult = input.confirmButtonTap
             .withLatestFrom(optionalTermsRelay.asObservable())
-            .flatMapLatest { terms -> Observable<Bool> in
-                guard terms.contains(true) else {
-                    return Observable.just(false)
-                }
-                return self.usecase.execute(data: true, for: .snsConsent)
+            .flatMapLatest { [weak self] optionalTerms -> Observable<Bool> in
+                guard let self else { return Observable.just(false) }
+                
+                let isSnsConsentGiven = optionalTerms.first ?? false
+                return self.usecase.execute(data: isSnsConsentGiven, for: .snsConsent)
                     .andThen(Observable.just(true))
                     .catchAndReturn(false)
             }

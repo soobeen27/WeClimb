@@ -23,5 +23,8 @@ final class UserRepositoryAssembly: Assembly {
         container.register(UserUpdateRepository.self) { resolver in
             UserUpdateRepositoryImpl(userUpdateDataSource: resolver.resolve(UserUpdateDataSource.self)!)
         }
+        container.register(NicknameDuplicationCheckRepository.self) { resolver in
+            NicknameDuplicationCheckRepositoryImpl(userReadDataSource: resolver.resolve(UserReadDataSource.self)!)
+        }
     }
 }

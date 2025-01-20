@@ -30,6 +30,8 @@ class PrivacyPolicyVC: UIViewController {
         isSnsConsentGivenCheckBox
     ]
     
+    var onTermsAgreed: (() -> Void)?
+    
     init(coordinator: PrivacyPolicyCoordinator? = nil, viewModel: PrivacyPolicyVM) {
         self.coordinator = coordinator
         self.viewModel = viewModel
@@ -256,6 +258,7 @@ class PrivacyPolicyVC: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-OnboardingConst.PrivacyPolicy.Spacing.confirmButtonBottomOffset)
             $0.leading.equalToSuperview().offset(OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
             $0.trailing.equalToSuperview().offset(-OnboardingConst.PrivacyPolicy.Spacing.horizontalPadding)
+            $0.height.equalTo(OnboardingConst.PrivacyPolicy.Size.confirmButtonHeight)
         }
     }
     
@@ -278,6 +281,7 @@ class PrivacyPolicyVC: UIViewController {
         
         output.requiredTermsAgreed
             .drive(onNext: { states in
+                print("Required Terms States: \(states)")
                 for (index, state) in states.enumerated() {
                     let imageName = state ? OnboardingConst.PrivacyPolicy.Image.clickCheckBox : OnboardingConst.PrivacyPolicy.Image.clearCheckBox
                     self.requiredCheckBoxes[index].setImage(imageName, for: .normal)
@@ -287,6 +291,7 @@ class PrivacyPolicyVC: UIViewController {
         
         output.optionalTermsAgreed
             .drive(onNext: { states in
+                print("Optional Terms States: \(states)")
                 for (index, state) in states.enumerated() {
                     let imageName = state ? OnboardingConst.PrivacyPolicy.Image.clickCheckBox : OnboardingConst.PrivacyPolicy.Image.clearCheckBox
                     self.optionalCheckBoxes[index].setImage(imageName, for: .normal)
@@ -296,8 +301,19 @@ class PrivacyPolicyVC: UIViewController {
         
         output.isConfirmButtonEnabled
             .drive(onNext: { [weak self] isEnabled in
+                print("Confirm Button Enabled: \(isEnabled)")
                 self?.confirmButton.isEnabled = isEnabled
                 self?.confirmButton.backgroundColor = isEnabled ? OnboardingConst.PrivacyPolicy.Color.confirmDeactivationColor : OnboardingConst.PrivacyPolicy.Color.confirmActivationColor
+            })
+            .disposed(by: disposeBag)
+        
+        output.updateResult
+            .drive(onNext: { isUpdated in
+                if isUpdated {
+                    print("Firebase 업데이트 성공")
+                } else {
+                    print("Firebase 업데이트 실패")
+                }
             })
             .disposed(by: disposeBag)
     }
@@ -305,6 +321,10 @@ class PrivacyPolicyVC: UIViewController {
     private func setupButtonActions() {
         allAgreeCheckBox.rx.tap
             .bind(to: toggleAllTermsRelay)
+            .disposed(by: disposeBag)
+        
+        confirmButton.rx.tap
+            .bind(to: confirmButtonTapRelay)
             .disposed(by: disposeBag)
         
         requiredCheckBoxes.enumerated().forEach { index, button in
@@ -322,8 +342,10 @@ class PrivacyPolicyVC: UIViewController {
         }
         
         confirmButton.rx.tap
-            .bind(to: confirmButtonTapRelay)
-            .disposed(by: disposeBag)
+                .subscribe(onNext: { [weak self] in
+                    self?.onTermsAgreed?()
+                })
+                .disposed(by: disposeBag)
     }
     
     private func linkButtonTapBind() {
