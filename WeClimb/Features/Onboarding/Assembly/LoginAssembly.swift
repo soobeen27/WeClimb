@@ -23,6 +23,10 @@ final class LoginAssembly: Assembly {
             LoginFirebaseDataSourceImpl()
         }
         
+        container.register(OnboardingBuilder.self) { resolver in
+            OnboardingBuilderImpl()
+        }
+        
         container.register(AppleLoginRepository.self) { resolver in
             AppleLoginRepositoryImpl(
                 appleLoginDataSource: resolver.resolve(AppleLoginDataSource.self)!,
@@ -70,10 +74,25 @@ final class LoginAssembly: Assembly {
             )
         }
         
-//        container.register(LoginVM.self) { resolver in
-//            LoginVM(
-//                usecase: resolver.resolve(LoginUseCase.self)!
-//            )
-//        }
+        container.register(LoginVM.self) { resolver in
+            LoginImpl(usecase: resolver.resolve(LoginUseCase.self)!)
+        }
+        
+        container.register(PrivacyPolicyVM.self) { resolver in
+            PrivacyPolicyImpl(usecase: resolver.resolve(SNSAgreeUsecase.self)!)
+        }
+        
+        container.register(CreateNicknameVM.self) { resolver in
+            CreateNicknameImpl(
+                checkDuplicationUseCase: resolver.resolve(NicknameDuplicationCheckUseCase.self)!,
+                registerNicknameUseCase: resolver.resolve(NicknameRegisterUseCase.self)!
+            )
+        }
+        
+        container.register(CreatePersonalDetailVM.self) { resolver in
+            CreatePersonalDetailImpl(
+                updateUseCase: resolver.resolve(PersonalDetailUseCase.self)!
+            )
+        }
     }
 }

@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 
 protocol NicknameRegisterUseCase {
-    func execute(name: String) -> Completable
+    func execute(name: String) -> Single<Void>
 }
 
 final class NicknameRegisterUseCaseImpl: NicknameRegisterUseCase {
@@ -20,7 +20,8 @@ final class NicknameRegisterUseCaseImpl: NicknameRegisterUseCase {
         self.userUpdateRepository = userUpdateRepository
     }
     
-    func execute(name: String) -> Completable {
+    func execute(name: String) -> Single<Void> {
         return userUpdateRepository.updateUser(with: name, for: .userName)
+            .andThen(Single.just(()))
     }
 }

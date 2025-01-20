@@ -15,7 +15,7 @@ struct User: Codable {
     let lastModified: Date
     let userRole: String
     let armReach: Int?
-    let height: Int?
+    let height: Int
     let posts: [DocumentReference]?
     let comments: [DocumentReference]?
     let followers: [String]?
@@ -48,5 +48,5 @@ enum UserUpdate: String {
 }
 
 extension User {
-    static let erroredUser = User(userName: "정보를 불러오지 못함", profileImage: nil, registerationDate: Date(), lastModified: Date(), userRole: "user", armReach: nil, height: nil, posts: nil, comments: nil, followers: nil, following: nil, snsConsent: false)
+    static let erroredUser = User(userName: "정보를 불러오지 못함", profileImage: nil, registerationDate: Date(), lastModified: Date(), userRole: "user", armReach: nil, height: 0, posts: nil, comments: nil, followers: nil, following: nil, snsConsent: false)
 }

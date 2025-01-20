@@ -20,20 +20,50 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        
-        let container = AppDIContainer.shared.container
-        
-        let tabBarVC = TabBarVC()
-        let tabBarCoordinator = container.resolve(TabBarCoordinator.self)!
-        
-        let appCoordinator = AppCoordinator(
-                window: window,
-                navigationController: UINavigationController(),
-                tabBarCoordinator: tabBarCoordinator
-            )
-        
         self.window = window
-        appCoordinator.start()
+        
+        // 의존성 주입
+        let appDIContainer = AppDIContainer.shared
+        let navigationController = UINavigationController()
+        
+        appCoordinator = AppCoordinator(
+            window: window,
+            navigationController: navigationController,
+            appDIContainer: appDIContainer
+        )
+        
+        window.rootViewController = navigationController
+        window.makeKeyAndVisible()
+        
+        // Coordinator 시작
+        appCoordinator?.start()
+
+        
+//        // 1. DataSource 생성
+//        let userUpdateDataSource = UserUpdateDataSourceImpl()
+//        let userReadDataSource = UserReadDataSourceImpl()
+//        
+//        // 2. Repository 생성
+//        let userUpdateRepository = UserUpdateRepositoryImpl(userUpdateDataSource: userUpdateDataSource)
+//        
+//        // 3. UseCase 생성
+//        let personalDetailUseCase = PersonalDetailUseCaseImpl(userUpdateRepository: userUpdateRepository)
+//        
+//        // 4. ViewModel 생성
+//        let createPersonalDetailVM = CreatePersonalDetailImpl(
+//            
+//            updateUseCase: personalDetailUseCase
+//        )
+//        
+//        // 5. ViewController 생성
+//        let createPersonalDetailVC = CreatePersonalDetailVC(viewModel: createPersonalDetailVM)
+//        
+//        // 6. UIWindow 설정
+//        let navigationController = UINavigationController(rootViewController: createPersonalDetailVC)
+//        let window = UIWindow(windowScene: windowScene)
+//        window.rootViewController = navigationController
+//        self.window = window
+//        window.makeKeyAndVisible()
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {

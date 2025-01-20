@@ -9,14 +9,26 @@ import UIKit
 
 final class CreateNickNameCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
+    private let builder: OnboardingBuilder
     
-    init(navigationController: UINavigationController) {
+    var onFinish: (() -> Void)?
+    
+    init(navigationController: UINavigationController, builder: OnboardingBuilder) {
         self.navigationController = navigationController
+        self.builder = builder
     }
     
     override func start() {
-//        let createNicknameVC = CreateNicknameVC()
-//        createNicknameVC.coordinator = self
-//        navigationController.pushViewController(createNicknameVC, animated: true)
+        showCreateNickname()
+    }
+    
+    private func showCreateNickname() {
+        let createNicknameVC = builder.buildCreateNickname()
+        createNicknameVC.coordinator = self
+        createNicknameVC.onCreateNickname = { [weak self] in
+            self?.onFinish?()
+        }
+        
+        navigationController.pushViewController(createNicknameVC, animated: true)
     }
 }

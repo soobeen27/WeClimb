@@ -7,10 +7,27 @@
 
 import UIKit
 
+import RxCocoa
+import RxSwift
 import SnapKit
 
 class CreatePersonalDetailVC: UIViewController {
     var coordinator: CreatePersonalDetailCoordinator?
+    
+    private let viewModel: CreatePersonalDetailVM
+    private let disposeBag = DisposeBag()
+    
+    var onRegisterResult:(() -> Void)?
+    
+    init(coordinator: CreatePersonalDetailCoordinator? = nil, viewModel: CreatePersonalDetailVM) {
+        self.coordinator = coordinator
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private let logoImage: UIImageView = {
         var image = UIImageView()
@@ -86,6 +103,7 @@ class CreatePersonalDetailVC: UIViewController {
     private let heightTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = OnboardingConst.PersonalDetail.Text.heightPlaceholder
+        textField.keyboardType = .numberPad
         
         textField.borderStyle = .roundedRect
         textField.font = OnboardingConst.PersonalDetail.Font.placeholderFont
@@ -105,9 +123,10 @@ class CreatePersonalDetailVC: UIViewController {
         return textField
     }()
     
-    private let armrichTextField: UITextField = {
+    private let armReachTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = OnboardingConst.PersonalDetail.Text.armrichPlaceholder
+        textField.keyboardType = .numberPad
         
         textField.borderStyle = .roundedRect
         textField.font = OnboardingConst.PersonalDetail.Font.placeholderFont
@@ -140,10 +159,15 @@ class CreatePersonalDetailVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
+        viewModelBind()
+        textFieldNumberFilter()
+        setupDismissKeyboardGesture()
     }
     
     private func setLayout() {
         view.backgroundColor = OnboardingConst.CreateNickname.Color.backgroundColor
+        self.navigationItem.hidesBackButton = true
+
         [
             heightTitleLabel,
             requiredLabel,
@@ -161,7 +185,7 @@ class CreatePersonalDetailVC: UIViewController {
             heightTitleStackView,
             armrichTitleStackView,
             heightTextField,
-            armrichTextField,
+            armReachTextField,
             confirmButton,
         ].forEach { view.addSubview($0) }
         
@@ -218,7 +242,7 @@ class CreatePersonalDetailVC: UIViewController {
             $0.width.height.equalTo(OnboardingConst.PersonalDetail.Size.selectionLabelSize)
         }
         
-        armrichTextField.snp.makeConstraints {
+        armReachTextField.snp.makeConstraints {
             $0.top.equalTo(armrichTitleStackView.snp.bottom).offset(OnboardingConst.PersonalDetail.Spacing.textFieldTopSpacing)
             $0.leading.equalToSuperview().offset(OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
             $0.trailing.equalToSuperview().offset(-OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
@@ -230,5 +254,64 @@ class CreatePersonalDetailVC: UIViewController {
             $0.leading.equalToSuperview().offset(OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
             $0.trailing.equalToSuperview().offset(-OnboardingConst.PersonalDetail.Spacing.viewHorizontalMargin)
         }
+    }
+    
+    private func viewModelBind() {
+        let input = CreatePersonalDetailImpl.Input(
+            height: heightTextField.rx.text.orEmpty
+                .map { Int($0) ?? 0 }
+                .asObservable(),
+            armReach: armReachTextField.rx.text
+                .map { Int($0 ?? "") },
+            confirmButtonTap: confirmButton.rx.tap.asObservable()
+        )
+        
+        let output = viewModel.transform(input: input)
+        
+        output.isFormValid
+            .drive(onNext: { [weak self] isValid in
+                guard let self = self else { return }
+                self.confirmButton.isEnabled = isValid
+                self.confirmButton.backgroundColor = isValid
+                ? OnboardingConst.CreateNickname.Color.confirmDeactivationColor
+                : OnboardingConst.CreateNickname.Color.confirmActivationColor
+            })
+            .disposed(by: disposeBag)
+        
+        output.updateResult
+            .drive(onNext: { [weak self] in
+                guard let self = self else { return }
+                print("업데이트 성공!")
+                self.onRegisterResult?()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func textFieldNumberFilter() {
+        heightTextField.rx.text.orEmpty
+            .map { text in
+                return text.filter { $0.isNumber }
+            }
+            .bind(to: heightTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        armReachTextField.rx.text.orEmpty
+            .map { text in
+                return text.filter { $0.isNumber }
+            }
+            .bind(to: armReachTextField.rx.text)
+            .disposed(by: disposeBag)
+    }
+    
+    private func setupDismissKeyboardGesture() {
+        let tapGesture = UITapGestureRecognizer()
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+        
+        tapGesture.rx.event
+            .subscribe(onNext: { [weak self] _ in
+                self?.view.endEditing(true)
+            })
+            .disposed(by: disposeBag)
     }
 }
