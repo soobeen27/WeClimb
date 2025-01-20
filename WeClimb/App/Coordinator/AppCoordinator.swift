@@ -26,27 +26,27 @@ final class AppCoordinator: BaseCoordinator {
         let userReadDataSource = appDIContainer.resolve(UserReadDataSource.self)
         showOnboardingFlow()
         window.makeKeyAndVisible()
-//        if Auth.auth().currentUser != nil {
-//            userReadDataSource.myInfo()
-//                .observe(on: MainScheduler.instance)
-//                .subscribe(onSuccess: { [weak self] user in
-//                    guard let self else { return }
-//                    if let userName = user?.userName, !userName.isEmpty {
-//                        self.showMainTabBar()
-//                    } else {
-//                        self.showOnboardingFlow()
-//                    }
-//                    self.window.makeKeyAndVisible()
-//                }, onFailure: { [weak self] _ in
-//                    guard let self else { return }
-//                    self.showOnboardingFlow()
-//                    self.window.makeKeyAndVisible()
-//                })
-//                .disposed(by: disposeBag)
-//        } else {
-//            showOnboardingFlow()
-//            window.makeKeyAndVisible()
-//        }
+        if Auth.auth().currentUser != nil {
+            userReadDataSource.myInfo()
+                .observe(on: MainScheduler.instance)
+                .subscribe(onSuccess: { [weak self] user in
+                    guard let self else { return }
+                    if let userName = user?.userName, !userName.isEmpty {
+                        self.showMainTabBar()
+                    } else {
+                        self.showOnboardingFlow()
+                    }
+                    self.window.makeKeyAndVisible()
+                }, onFailure: { [weak self] _ in
+                    guard let self else { return }
+                    self.showOnboardingFlow()
+                    self.window.makeKeyAndVisible()
+                })
+                .disposed(by: disposeBag)
+        } else {
+            showOnboardingFlow()
+            window.makeKeyAndVisible()
+        }
     }
     
     override func childDidFinish(_ coordinator: Coordinator) {

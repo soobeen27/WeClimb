@@ -17,9 +17,9 @@ protocol PostCollectionCellInput {
 
 protocol PostCollectionCellOutput {
     var user: Single<User> { get }
-    var likes: Int { get }
-    var isLike: Bool? { get }
-    var likeResult: Single<[String]> { get }
+    var likeCount: BehaviorRelay<Int> { get }
+    var isLike: BehaviorRelay<Bool?> { get }
+//    var likeResult: Single<[String]> { get }
 }
 
 protocol PostCollectionCellVM {
@@ -41,27 +41,39 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
     
     struct Output: PostCollectionCellOutput {
         let user: Single<User>
-        let likes: Int
-        let isLike: Bool?
-        let likeResult: Single<[String]>
+        let likeCount: BehaviorRelay<Int>
+        let isLike: BehaviorRelay<Bool?>
+//        let likeResult: Single<[String]>
     }
 
     init(userInfoFromUIDUseCase: UserInfoFromUIDUseCase, myUIDUseCase: MyUIDUseCase, likePostUseCase: LikePostUseCase) {
         self.userInfoFromUIDUseCase = userInfoFromUIDUseCase
         self.myUIDUseCase = myUIDUseCase
         self.likePostUseCase = likePostUseCase
+        setMyUID()
     }
     
     func transform(input: PostCollectionCellInput) -> PostCollectionCellOutput {
         let user = userInfoFromUIDUseCase.execute(uid: input.postItem.authorUID)
-        let likeCount = getLikeCount(likes: input.postItem.like)
-        let isLike = getIsLike(likes: input.postItem.like)
-        let likeResult = input.likeButtonTap.compactMap { [weak self] _ in
-            return self?.like(postUID: input.postItem.postUID)
-        }.flatMap { $0.asObservable() }
-            .asSingle()
+        let likeCount = BehaviorRelay(value: getLikeCount(likes: input.postItem.like))
+        let isLike = BehaviorRelay(value: getIsLike(likes: input.postItem.like))
         
-        return Output(user: user, likes: likeCount, isLike: isLike, likeResult: likeResult )
+        input.likeButtonTap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                guard let self else { return }
+                self.like(postUID: input.postItem.postUID)
+                    .subscribe(onSuccess: { likes in
+                        isLike.accept(self.getIsLike(likes: likes))
+                        likeCount.accept(self.getLikeCount(likes: likes))
+                    }, onFailure: { error in
+                        print("좋아요 버튼 탭 에러 발생: \(error)")
+                    })
+                    .disposed(by: self.disposeBag)
+            })
+            .disposed(by: disposeBag)
+        
+        return Output(user: user, likeCount: likeCount, isLike: isLike)
     }
     
     private func getLikeCount(likes: [String]?) -> Int {
@@ -72,6 +84,14 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
             guard let myUID = try? myUIDUseCase.execute() else { return nil}
             let isLike = likes?.contains([myUID]) ?? false
             return isLike
+    }
+    
+    private func setMyUID() {
+        do {
+            self.myUID = try myUIDUseCase.execute()
+        } catch {
+            print(error)
+            }
     }
     
     private func like(postUID: String) -> Single<[String]> {

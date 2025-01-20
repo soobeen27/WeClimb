@@ -90,6 +90,7 @@ class PostCollectionCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         profileView.resetToDefaultState()
+        disposeBag = DisposeBag()
     }
     
     func configure(postItem: PostItem) {
@@ -118,16 +119,12 @@ class PostCollectionCell: UICollectionViewCell {
             })
             .disposed(by: disposeBag)
         
-        let isLike = output.isLike
-        let likeCount = output.likes
-        bindSidebarView(isLike: isLike, likeCount: likeCount)
-        
-        output.likeResult.subscribe(onSuccess: { likes in
-            print(likes)
-        }, onFailure: { error in
-            print(error)
-        })
-        .disposed(by: disposeBag)
+        output.isLike
+            .bind(to: postSidebarView.isLikeRelay)
+            .disposed(by: disposeBag)
+        output.likeCount
+            .bind(to: postSidebarView.likeCountRelay)
+            .disposed(by: disposeBag)
     }
     
     private func bindSidebarView(isLike: Bool?, likeCount: Int) {
