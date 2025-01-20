@@ -275,11 +275,14 @@ class CreateNicknameVC: UIViewController {
             .disposed(by: disposeBag)
         
         Observable.combineLatest(output.isNicknameValid.asObservable(), output.characterCount.asObservable())
-            .map { isValid, count in isValid && count <= OnboardingConst.CreateNickname.Size.maxCharacterCount }
-            .bind(to: confirmButton.rx.isEnabled)
+            .subscribe(onNext: { [weak self] isValid, count in
+                guard let self = self else { return }
+                let isEnabled = isValid && count <= OnboardingConst.CreateNickname.Size.maxCharacterCount
+                self.confirmButton.isEnabled = isEnabled
+                self.confirmButton.backgroundColor = isEnabled ? OnboardingConst.CreateNickname.Color.confirmDeactivationColor : OnboardingConst.CreateNickname.Color.confirmActivationColor
+            })
             .disposed(by: disposeBag)
     }
-
 
     private func setupDismissKeyboardGesture() {
         let tapGesture = UITapGestureRecognizer()

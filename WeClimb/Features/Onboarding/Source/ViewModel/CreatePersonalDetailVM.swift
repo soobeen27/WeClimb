@@ -36,7 +36,7 @@ class CreatePersonalDetailImpl: CreatePersonalDetailVM {
     
     func transform(input: Input) -> Output {
         let isHeightValid = input.height
-            .map { $0 > 0 }
+            .map { $0 > 1 }
             .share(replay: 1, scope: .whileConnected)
         
         let isFormValid = isHeightValid
