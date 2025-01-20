@@ -105,7 +105,7 @@ class PostCollectionCell: UICollectionViewCell {
         viewModel = container.resolve(PostCollectionCellVM.self)
         guard let viewModel, let postItem else { return }
         
-        let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(postItem: postItem))
+        let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(postItem: postItem, likeButtonTap: postSidebarView.likeButtonTap))
         
         output.user
             .map { user -> User in
@@ -117,6 +117,22 @@ class PostCollectionCell: UICollectionViewCell {
                 self.user = user
             })
             .disposed(by: disposeBag)
+        
+        let isLike = output.isLike
+        let likeCount = output.likes
+        bindSidebarView(isLike: isLike, likeCount: likeCount)
+        
+        output.likeResult.subscribe(onSuccess: { likes in
+            print(likes)
+        }, onFailure: { error in
+            print(error)
+        })
+        .disposed(by: disposeBag)
+    }
+    
+    private func bindSidebarView(isLike: Bool?, likeCount: Int) {
+        postSidebarView.isLikeRelay.accept(isLike)
+        postSidebarView.likeCountRelay.accept(likeCount)
     }
     
     private func setLayout() {

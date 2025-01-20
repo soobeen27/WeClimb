@@ -19,5 +19,9 @@ final class UserUseCaseAssembly: Assembly {
         container.register(UserInfoFromUIDUseCase.self) { resolver in
             UserInfoFromUIDUseCaseImpl(userReadRepository: resolver.resolve(UserReadRepository.self)!)
         }
+        
+        container.register(MyUIDUseCase.self) { resolver in
+            MyUIDUseCaseImpl(userReadRepository: resolver.resolve(UserReadRepository.self)!)
+        }
     }
 }

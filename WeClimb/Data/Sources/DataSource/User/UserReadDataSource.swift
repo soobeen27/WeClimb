@@ -14,6 +14,7 @@ protocol UserReadDataSource {
     func userInfoFromUID(uid: String) -> Single<User>
     func userInfoFromName(name: String) -> Single<User>
     func myInfo() -> Single<User?>
+    func myUID() throws -> String
 }
 
 final class UserReadDataSourceImpl: UserReadDataSource {
@@ -78,5 +79,9 @@ final class UserReadDataSourceImpl: UserReadDataSource {
             }
             return Disposables.create()
         }
+    }
+    
+    func myUID() throws -> String {
+        return try FirestoreHelper.userUID()
     }
 }

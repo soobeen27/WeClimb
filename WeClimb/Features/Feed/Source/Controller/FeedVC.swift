@@ -25,9 +25,7 @@ class FeedVC: UIViewController {
     private lazy var dataSource: UICollectionViewDiffableDataSource<Section, PostItem> = {
         let dataSource = UICollectionViewDiffableDataSource<Section, PostItem>(collectionView: postCollectionView) { collectionView, indexPath, item in
            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionCell.className, for: indexPath) as? PostCollectionCell
-           else {
-               return UICollectionViewCell()
-           }
+           else { return UICollectionViewCell() }
             cell.configure(postItem: item)
            return cell
         }
