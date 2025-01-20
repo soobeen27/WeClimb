@@ -166,6 +166,8 @@ class CreatePersonalDetailVC: UIViewController {
     
     private func setLayout() {
         view.backgroundColor = OnboardingConst.CreateNickname.Color.backgroundColor
+        self.navigationItem.hidesBackButton = true
+
         [
             heightTitleLabel,
             requiredLabel,
