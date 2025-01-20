@@ -5,8 +5,9 @@
 //  Created by 머성이 on 12/18/24.
 //
 
-import Foundation
 import UIKit
+
+import Kingfisher
 
 class SearchGymTableCell: UITableViewCell {
     
@@ -79,9 +80,17 @@ class SearchGymTableCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+
     func configure(with item: Item) {
-        gymImageView.image = UIImage(named: item.imageName)
         gymNameLabel.text = item.name
-        gymLocationLabel.text = item.location 
+        gymLocationLabel.text = item.location
+
+        if let imageURL = URL(string: item.imageName), !item.imageName.isEmpty {
+            gymImageView.kf.setImage(with: imageURL, placeholder: UIImage(named: ""))
+        } else {
+            gymImageView.image = UIImage(named: "placeholder_image")
+        }
     }
+
+
 }

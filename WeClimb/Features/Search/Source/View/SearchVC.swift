@@ -24,12 +24,186 @@ struct Item {
     var height: Int?
 }
 
-class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
+
+
+
+
+//class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
+//    var coordinator: SearchCoordinator?
+//    
+//    private let disposeBag = DisposeBag()
+//    private var viewModel: SearchVM
+//    
+//    private let searchTextField: UITextField = {
+//        let textField = UITextField()
+//        textField.placeholder = "검색하기"
+//        textField.layer.cornerRadius = 8
+//        textField.layer.borderWidth = 1
+//        textField.layer.borderColor = UIColor.lineOpacityNormal.cgColor
+//        textField.font = .customFont(style: .body2Medium)
+//        textField.textColor = .black
+//        
+//        let searchIcon = UIImageView(image: UIImage(named: "searchIcon"))
+//        searchIcon.contentMode = .scaleAspectFit
+//        let iconWrapper = UIView(frame: CGRect(x: 0, y: 0, width: 20 + 12 + 8, height: 20))
+//        iconWrapper.addSubview(searchIcon)
+//        searchIcon.frame.origin = CGPoint(x: 12, y: 0)
+//        
+//        textField.leftView = iconWrapper
+//        textField.leftViewMode = .always
+//        
+//        return textField
+//    }()
+//    
+//    private let titleLabel: UILabel = {
+//        let label = UILabel()
+//        label.text = "최근 방문"
+//        label.font = UIFont.customFont(style: .label1SemiBold)
+//        label.textColor = .labelStrong
+//        label.textAlignment = .left
+//        return label
+//    }()
+//    
+//    private let tableView: UITableView = {
+//        let tableView = UITableView()
+//        tableView.separatorStyle = .none
+//        tableView.register(SearchGymTableCell.self, forCellReuseIdentifier: SearchGymTableCell.className)
+//        tableView.register(SearchUserTableCell.self, forCellReuseIdentifier: SearchUserTableCell.className)
+//        tableView.rowHeight = 60
+//        return tableView
+//    }()
+//    
+//    private let smallCancelButton: UIButton = {
+//        let button = UIButton(type: .system)
+//        let closeIcon = UIImage(named: "closeIcon.circle")?.withRenderingMode(.alwaysTemplate)
+//        button.setImage(closeIcon, for: .normal)
+//        button.imageView?.contentMode = .scaleAspectFit
+//        button.tintColor = .labelAssistive
+//        button.alpha = 0
+//        return button
+//    }()
+//    
+//    private let cancelButton: UIButton = {
+//        let button = UIButton(type: .system)
+//        let closeIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysTemplate)
+//        button.setImage(closeIcon, for: .normal)
+//        button.imageView?.contentMode = .scaleAspectFit
+//        button.tintColor = .black
+//        button.alpha = 0
+//        return button
+//    }()
+//    
+//    private let rightViewContainer: UIView = {
+//        let view = UIView()
+//        return view
+//    }()
+//    
+//    init(viewModel: SearchVM) {
+//        self.viewModel = viewModel
+//        super.init(nibName: nil, bundle: nil)
+//    }
+//    
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
+//    
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//        view.backgroundColor = .white
+//        navigationController?.setNavigationBarHidden(true, animated: false)
+//        
+//        searchTextField.delegate = self
+//        
+//        setLayout()
+//        bindTableView()
+//        bindSearchTextField()
+//        setTextField()
+//        bindButtons()
+//    }
+//    
+//    private func setLayout() {
+//        [searchTextField, titleLabel, tableView, cancelButton]
+//            .forEach { view.addSubview($0)}
+//        
+//        searchTextField.snp.makeConstraints {
+//            $0.top.equalTo(view.safeAreaLayoutGuide).inset(16)
+//            $0.leading.trailing.equalToSuperview().inset(16)
+//            $0.height.equalTo(46)
+//        }
+//        
+//        titleLabel.snp.makeConstraints {
+//            $0.top.equalTo(searchTextField.snp.bottom).offset(16)
+//            $0.height.equalTo(56)
+//            $0.leading.equalToSuperview().inset(16)
+//        }
+//        
+//        tableView.snp.makeConstraints {
+//            $0.top.equalTo(titleLabel.snp.bottom)
+//            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+//            $0.leading.trailing.equalToSuperview()
+//        }
+//        
+//        cancelButton.snp.makeConstraints {
+//            $0.width.height.equalTo(24)
+//            $0.trailing.equalToSuperview().offset(48)
+//            $0.centerY.equalTo(searchTextField)
+//        }
+//    }
+//    
+//    private func bindTableView() {
+//        viewModel.itemsObservable
+//            .bind(to: tableView.rx.items) { tableView, row, item in
+//                let cell: UITableViewCell
+//                if item.type == .gym {
+//                    let gymCell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className, for: IndexPath(row: row, section: 0)) as! SearchGymTableCell
+//                    gymCell.configure(with: item)
+//                    cell = gymCell
+//                } else {
+//                    let userCell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className, for: IndexPath(row: row, section: 0)) as! SearchUserTableCell
+//                    userCell.configure(with: item)
+//                    cell = userCell
+//                }
+//                return cell
+//            }
+//            .disposed(by: disposeBag)
+//    }
+//
+//    
+//    private func bindSearchTextField() {
+//        searchTextField.rx.text.orEmpty
+//            .bind(to: viewModel.query)
+//            .disposed(by: disposeBag)
+//    }
+//    
+//    private func bindButtons() {
+//        smallCancelButton.rx.tap
+//            .subscribe(onNext: { [weak self] in
+//                self?.didTapSmallCancelButton()
+//            })
+//            .disposed(by: disposeBag)
+//        
+//        cancelButton.rx.tap
+//            .subscribe(onNext: { [weak self] in
+//                self?.didTapCancelButton()
+//            })
+//            .disposed(by: disposeBag)
+//    }
+//}
+//
+
+
+import UIKit
+
+import SnapKit
+import RxSwift
+import RxCocoa
+
+class SearchVC: UIViewController, UITextFieldDelegate {
     var coordinator: SearchCoordinator?
     
     private let disposeBag = DisposeBag()
-    private var viewModel: SearchViewModel!
-    
+    private var viewModel: SearchVM
+
     private let searchTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "검색하기"
@@ -38,19 +212,19 @@ class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
         textField.layer.borderColor = UIColor.lineOpacityNormal.cgColor
         textField.font = .customFont(style: .body2Medium)
         textField.textColor = .black
-        
+
         let searchIcon = UIImageView(image: UIImage(named: "searchIcon"))
         searchIcon.contentMode = .scaleAspectFit
         let iconWrapper = UIView(frame: CGRect(x: 0, y: 0, width: 20 + 12 + 8, height: 20))
         iconWrapper.addSubview(searchIcon)
         searchIcon.frame.origin = CGPoint(x: 12, y: 0)
-        
+
         textField.leftView = iconWrapper
         textField.leftViewMode = .always
-        
+
         return textField
     }()
-    
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "최근 방문"
@@ -59,7 +233,7 @@ class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
         label.textAlignment = .left
         return label
     }()
-    
+
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .none
@@ -68,7 +242,7 @@ class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
         tableView.rowHeight = 60
         return tableView
     }()
-    
+
     private let smallCancelButton: UIButton = {
         let button = UIButton(type: .system)
         let closeIcon = UIImage(named: "closeIcon.circle")?.withRenderingMode(.alwaysTemplate)
@@ -78,7 +252,7 @@ class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
         button.alpha = 0
         return button
     }()
-    
+
     private let cancelButton: UIButton = {
         let button = UIButton(type: .system)
         let closeIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysTemplate)
@@ -88,66 +262,66 @@ class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
         button.alpha = 0
         return button
     }()
-    
+
     private let rightViewContainer: UIView = {
         let view = UIView()
         return view
     }()
-    
-    init(viewModel: SearchViewModel) {
+
+    init(viewModel: SearchVM) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         navigationController?.setNavigationBarHidden(true, animated: false)
-        
+
         searchTextField.delegate = self
         
+        setTextField()
         setLayout()
         bindTableView()
-        bindSearchTextField()
-        setTextField()
         bindButtons()
     }
-    
+
     private func setLayout() {
         [searchTextField, titleLabel, tableView, cancelButton]
             .forEach { view.addSubview($0)}
-        
+
         searchTextField.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).inset(16)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(46)
         }
-        
+
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(searchTextField.snp.bottom).offset(16)
             $0.height.equalTo(56)
             $0.leading.equalToSuperview().inset(16)
         }
-        
+
         tableView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom)
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
             $0.leading.trailing.equalToSuperview()
         }
-        
+
         cancelButton.snp.makeConstraints {
             $0.width.height.equalTo(24)
             $0.trailing.equalToSuperview().offset(48)
             $0.centerY.equalTo(searchTextField)
         }
     }
-    
+
     private func bindTableView() {
-        viewModel.itemsObservable
+        viewModel.transform(input: SearchVMImpl.Input(query: searchTextField.rx.text.orEmpty.asObservable(), searchButtonTapped: smallCancelButton.rx.tap.asObservable()))
+            .items
             .bind(to: tableView.rx.items) { tableView, row, item in
                 let cell: UITableViewCell
                 if item.type == .gym {
@@ -163,20 +337,14 @@ class SearchVC: UIViewController, UISearchBarDelegate, UITextFieldDelegate {
             }
             .disposed(by: disposeBag)
     }
-    
-    private func bindSearchTextField() {
-        searchTextField.rx.text.orEmpty
-            .bind(to: viewModel.query)
-            .disposed(by: disposeBag)
-    }
-    
+
     private func bindButtons() {
         smallCancelButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 self?.didTapSmallCancelButton()
             })
             .disposed(by: disposeBag)
-        
+
         cancelButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 self?.didTapCancelButton()
@@ -206,7 +374,7 @@ extension SearchVC {
         searchTextField.layer.borderWidth = 1
         searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
         
-        UIView.animate(withDuration: 0.3, animations: {
+//        UIView.animate(withDuration: 0.3, animations: {
             self.searchTextField.snp.updateConstraints {
                 $0.leading.equalToSuperview().offset(16)
                 $0.trailing.equalToSuperview().offset(-48)
@@ -217,8 +385,8 @@ extension SearchVC {
                 $0.trailing.equalToSuperview().offset(-16)
             }
             
-            self.view.layoutIfNeeded()
-        })
+//            self.view.layoutIfNeeded()
+//        })
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -238,12 +406,12 @@ extension SearchVC {
         return true
     }
     
-    @objc func didTapCancelButton() {
+    func didTapCancelButton() {
         searchTextField.text = ""
         searchTextField.resignFirstResponder()
         searchTextField.layer.borderColor = UIColor.lineOpacityNormal.cgColor
         
-        UIView.animate(withDuration: 0.3) {
+//        UIView.animate(withDuration: 0.3) {
             self.searchTextField.snp.updateConstraints {
                 $0.leading.equalToSuperview().offset(16)
                 $0.trailing.equalToSuperview().offset(-16)
@@ -254,13 +422,12 @@ extension SearchVC {
             }
             
             self.cancelButton.alpha = 0
-            self.view.layoutIfNeeded()
-        }
+//
+//        }
     }
     
-    @objc func didTapSmallCancelButton() {
+    func didTapSmallCancelButton() {
         searchTextField.text = ""
         smallCancelButton.alpha = 0
-        searchTextField.rightView = nil
     }
 }

@@ -7,24 +7,18 @@
 
 import RxSwift
 
-
-protocol GymUseCase {
-    func gymInfo(gymName: String) -> Single<Gym>
-    func allGymInfo() -> Single<[Gym]>
+protocol FetchGymInfoUseCase {
+    func execute(gymName: String) -> Single<Gym>
 }
 
-class GymUseCaseImpl: GymUseCase {
+class FetchGymInfoUseCaseImpl: FetchGymInfoUseCase {
     private let gymRepository: GymRepository
     
     init(gymRepository: GymRepository) {
         self.gymRepository = gymRepository
     }
     
-    func gymInfo(gymName: String) -> Single<Gym> {
+    func execute(gymName: String) -> Single<Gym> {
         return gymRepository.gymInfo(gymName: gymName)
-    }
-    
-    func allGymInfo() -> Single<[Gym]> {
-        return gymRepository.allGymInfo()
     }
 }

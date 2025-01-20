@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol UserSearchUseCase {
-    func searchUsers(with searchText: String) -> Single<[User]>
+    func execute(with searchText: String) -> Single<[User]>
 }
 
 class UserSearchUseCaseImpl: UserSearchUseCase {
@@ -18,7 +18,7 @@ class UserSearchUseCaseImpl: UserSearchUseCase {
         self.userSearchRepository = userSearchRepository
     }
     
-    func searchUsers(with searchText: String) -> Single<[User]> {
+    func execute(with searchText: String) -> Single<[User]> {
         return userSearchRepository.searchUsers(with: searchText)
     }
 }

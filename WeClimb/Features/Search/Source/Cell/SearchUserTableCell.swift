@@ -5,8 +5,9 @@
 //  Created by 머성이 on 12/18/24.
 //
 
-import Foundation
 import UIKit
+
+import Kingfisher
 
 class SearchUserTableCell: UITableViewCell {
     
@@ -53,11 +54,9 @@ class SearchUserTableCell: UITableViewCell {
     }
     
     private func setLayout() {
-        
         [userImageView, userNameLabel, userHeightLabel, cancelButton]
             .forEach { contentView.addSubview($0) }
       
-        
         userImageView.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
@@ -81,13 +80,19 @@ class SearchUserTableCell: UITableViewCell {
     }
     
     func configure(with item: Item) {
-//           userImageView.image = UIImage(named: item.imageName)
-        userImageView.image = UIImage.defaultAvatarProfile
-           userNameLabel.text = item.name
-           if let height = item.height {
-               userHeightLabel.text = "\(height) cm"
-           } else {
-               userHeightLabel.text = nil
-           }
-       }
+        
+        if item.imageName.isEmpty || URL(string: item.imageName) == nil {
+            userImageView.image = UIImage.defaultAvatarProfile
+        } else {
+            let imageURL = URL(string: item.imageName)
+            userImageView.kf.setImage(with: imageURL)
+        }
+        
+        userNameLabel.text = item.name
+        if let height = item.height {
+            userHeightLabel.text = "\(height) cm"
+        } else {
+            userHeightLabel.text = nil
+        }
+    }
 }

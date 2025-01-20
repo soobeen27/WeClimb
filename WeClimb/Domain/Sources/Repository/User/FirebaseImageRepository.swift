@@ -9,6 +9,6 @@ import UIKit
 
 import RxSwift
 
-protocol ImageDataRepository {
-    func loadImage(from imageURL: String?, imageView: UIImageView)
+protocol FirebaseImageRepository {
+    func fetchImageURL(from gsURL: String) -> Single<String?>
 }
