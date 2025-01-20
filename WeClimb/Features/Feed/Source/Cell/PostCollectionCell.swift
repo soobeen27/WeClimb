@@ -99,7 +99,7 @@ class PostCollectionCell: UICollectionViewCell {
     }
     
     private func configureProfileView(postItem: PostItem, user: User) {
-        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: "아직 없어용", level: .appleIcon, hold: .holdRed, caption: postItem.caption))
+        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: heightArmReach(height: user.height, armReach: user.armReach), level: .appleIcon, hold: .holdRed, caption: postItem.caption))
     }
     
     private func bindViewModel() {
@@ -125,6 +125,15 @@ class PostCollectionCell: UICollectionViewCell {
         output.likeCount
             .bind(to: postSidebarView.likeCountRelay)
             .disposed(by: disposeBag)
+    }
+    
+    private func heightArmReach(height: Int?, armReach: Int?) -> String {
+        if let height, let armReach {
+            return "\(height)cmㆍ\(armReach)cm"
+        } else if let height {
+            return "\(height)cm"
+        }
+        return "정보가 없어용"
     }
     
     private func bindSidebarView(isLike: Bool?, likeCount: Int) {

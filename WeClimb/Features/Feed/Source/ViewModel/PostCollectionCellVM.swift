@@ -19,7 +19,6 @@ protocol PostCollectionCellOutput {
     var user: Single<User> { get }
     var likeCount: BehaviorRelay<Int> { get }
     var isLike: BehaviorRelay<Bool?> { get }
-//    var likeResult: Single<[String]> { get }
 }
 
 protocol PostCollectionCellVM {
@@ -43,7 +42,6 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         let user: Single<User>
         let likeCount: BehaviorRelay<Int>
         let isLike: BehaviorRelay<Bool?>
-//        let likeResult: Single<[String]>
     }
 
     init(userInfoFromUIDUseCase: UserInfoFromUIDUseCase, myUIDUseCase: MyUIDUseCase, likePostUseCase: LikePostUseCase) {
