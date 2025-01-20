@@ -5,6 +5,8 @@
 ////  Created by 윤대성 on 1/7/25.
 ////
 //
+import UIKit
+
 import Swinject
 
 final class TabBarAssembly: Assembly {
@@ -42,9 +44,11 @@ final class TabBarAssembly: Assembly {
         // TabBarCoordinator 등록
         container.register(TabBarCoordinator.self) { resolver in
             let tabBarVC = TabBarVC()
+            let navi = UINavigationController()
             let tabBarBuilder = resolver.resolve(TabBarBuilder.self)!
             return TabBarCoordinator(
                 tabBarController: tabBarVC,
+                navigationController: navi,
                 builder: tabBarBuilder
             )
         }

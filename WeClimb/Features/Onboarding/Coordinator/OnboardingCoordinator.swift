@@ -10,10 +10,14 @@ import UIKit
 final class OnboardingCoordinator: BaseCoordinator {
     private let navigationController: UINavigationController
     private let builder: OnboardingBuilder
+    private let tabBarController: UITabBarController
+    private let tabBarBuilder: TabBarBuilder
     
-    init(navigationController: UINavigationController, builder: OnboardingBuilder) {
+    init(navigationController: UINavigationController, builder: OnboardingBuilder, tabBarController: UITabBarController, tabBarBuilder: TabBarBuilder) {
         self.navigationController = navigationController
         self.builder = builder
+        self.tabBarController = tabBarController
+        self.tabBarBuilder = tabBarBuilder
     }
     
     override func start() {
@@ -67,7 +71,28 @@ final class OnboardingCoordinator: BaseCoordinator {
         addDependency(createPersonalDetailCoordinator)
         createPersonalDetailCoordinator.onFinish = { [weak self] in
             self?.removeDependency(createPersonalDetailCoordinator)
-            //               self?.finishOnboarding()
+            self?.showRegisterResult()
         }
+    }
+    
+    private func showRegisterResult() {
+        let registerResultCoordinator = RegisterResultCoordinator(navigationController: navigationController)
+        
+        registerResultCoordinator.start()
+        
+        addDependency(registerResultCoordinator)
+        registerResultCoordinator.onFinish = { [weak self] in
+            self?.removeDependency(registerResultCoordinator)
+            self?.moveToTabBar()
+        }
+    }
+    
+    private func moveToTabBar() {
+        let tabBarCoordinator = TabBarCoordinator(tabBarController: tabBarController, navigationController: navigationController, builder: tabBarBuilder)
+        
+        parentCoordinator?.addDependency(tabBarCoordinator)
+        parentCoordinator?.removeDependency(self)
+        
+        tabBarCoordinator.start()
     }
 }

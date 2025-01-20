@@ -57,18 +57,26 @@ final class AppCoordinator: BaseCoordinator {
         let tabBarBuilder = appDIContainer.resolve(TabBarBuilder.self)
         
         let tabBarController = UITabBarController()
-        let tabBarCoordinator = TabBarCoordinator(tabBarController: tabBarController, builder: tabBarBuilder)
+        
+        let tabBarCoordinator = TabBarCoordinator(
+            tabBarController: tabBarController,
+            navigationController: navigationController,
+            builder: tabBarBuilder)
         
         tabBarCoordinator.start()
         addDependency(tabBarCoordinator)
         
-        window.rootViewController = navigationController
+        window.rootViewController = tabBarController
     }
     
     private func showOnboardingFlow() {
+        let tabBarController = UITabBarController()
+        
         let onboardingCoordinator = OnboardingCoordinator(
             navigationController: navigationController,
-            builder: appDIContainer.resolve(OnboardingBuilder.self)
+            builder: appDIContainer.resolve(OnboardingBuilder.self),
+            tabBarController: tabBarController,
+            tabBarBuilder: appDIContainer.resolve(TabBarBuilder.self)
         )
         
         addDependency(onboardingCoordinator)

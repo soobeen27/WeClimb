@@ -14,6 +14,9 @@ protocol Coordinator: AnyObject {
 class BaseCoordinator: Coordinator {
     public var childCoordinators = [Coordinator]()
     
+    /// 상위 계층에서 하위 코디네이터를 관리할 수 있도록 함
+    weak var parentCoordinator: BaseCoordinator?
+    
     /// 자식 코디네이터의 의존성을 추가하여 메모리에서 해제되지 않도록 함
     public func addDependency(_ coordinator: Coordinator) {
         for element in childCoordinators {

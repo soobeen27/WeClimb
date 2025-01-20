@@ -17,6 +17,8 @@ class CreatePersonalDetailVC: UIViewController {
     private let viewModel: CreatePersonalDetailVM
     private let disposeBag = DisposeBag()
     
+    var onRegisterResult:(() -> Void)?
+    
     init(coordinator: CreatePersonalDetailCoordinator? = nil, viewModel: CreatePersonalDetailVM) {
         self.coordinator = coordinator
         self.viewModel = viewModel
@@ -255,17 +257,17 @@ class CreatePersonalDetailVC: UIViewController {
     private func viewModelBind() {
         let input = CreatePersonalDetailImpl.Input(
             height: heightTextField.rx.text.orEmpty
-                    .map { Int($0) ?? 0 }
-                    .asObservable(),
-                armReach: armReachTextField.rx.text
-                    .map { Int($0 ?? "") },
-                confirmButtonTap: confirmButton.rx.tap.asObservable()
+                .map { Int($0) ?? 0 }
+                .asObservable(),
+            armReach: armReachTextField.rx.text
+                .map { Int($0 ?? "") },
+            confirmButtonTap: confirmButton.rx.tap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
         
         output.isFormValid
-            .subscribe(onNext: { [weak self] (isValid: Bool) in
+            .drive(onNext: { [weak self] isValid in
                 guard let self = self else { return }
                 self.confirmButton.isEnabled = isValid
                 self.confirmButton.backgroundColor = isValid
@@ -275,14 +277,11 @@ class CreatePersonalDetailVC: UIViewController {
             .disposed(by: disposeBag)
         
         output.updateResult
-            .subscribe(
-                onCompleted: {
-                    print("업데이트 성공!")
-                },
-                onError: { error in
-                    print("업데이트 실패: \(error.localizedDescription)")
-                }
-            )
+            .drive(onNext: { [weak self] in
+                guard let self = self else { return }
+                print("업데이트 성공!")
+                self.onRegisterResult?()
+            })
             .disposed(by: disposeBag)
     }
     

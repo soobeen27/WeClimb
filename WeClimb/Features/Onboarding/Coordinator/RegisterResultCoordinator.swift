@@ -10,13 +10,23 @@ import UIKit
 final class RegisterResultCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
     
+    var onFinish: (() -> Void)?
+    
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
     
     override func start() {
+        showRegisterResult()
+    }
+    
+    private func showRegisterResult() {
         let registerResultVC = RegisterResultVC()
         registerResultVC.coordinator = self
+        registerResultVC.onTabBarPage = { [weak self] in
+            self?.onFinish?()
+        }
+        
         navigationController.pushViewController(registerResultVC, animated: true)
     }
 }

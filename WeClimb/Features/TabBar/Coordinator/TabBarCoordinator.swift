@@ -9,15 +9,19 @@ import UIKit
 
 final class TabBarCoordinator: BaseCoordinator {
     private let tabBarController: UITabBarController
+    private let navigationController: UINavigationController
     private let builder: TabBarBuilder
     
-    init(tabBarController: UITabBarController, builder: TabBarBuilder) {
+    init(tabBarController: UITabBarController, navigationController: UINavigationController, builder: TabBarBuilder) {
         self.tabBarController = tabBarController
+        self.navigationController = navigationController
         self.builder = builder
     }
     
     override func start() {
         setUpTabBar()
+        navigationController.setViewControllers([tabBarController], animated: true)
+
     }
     
     private func setUpTabBar() {

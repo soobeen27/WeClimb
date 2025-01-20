@@ -21,10 +21,10 @@ final class CreatePersonalDetailCoordinator: BaseCoordinator {
     override func start() {
         let createPersonalDetailVC = builder.buildCreatePersonalDetail()
         createPersonalDetailVC.coordinator = self
+        createPersonalDetailVC.onRegisterResult = { [weak self] in
+            self?.onFinish?()
+        }
+        
         navigationController.pushViewController(createPersonalDetailVC, animated: true)
-    }
-    
-    func finishLogin() {
-        onFinish?()
     }
 }

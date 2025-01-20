@@ -8,9 +8,14 @@
 import UIKit
 
 import SnapKit
+import RxCocoa
+import RxSwift
 
 class RegisterResultVC: UIViewController {
     var coordinator: RegisterResultCoordinator?
+    var disposeBag = DisposeBag()
+    
+    var onTabBarPage: (() -> Void)?
     
     private let logoImage: UIImageView = {
         var image = UIImageView()
@@ -30,24 +35,25 @@ class RegisterResultVC: UIViewController {
     private let commentLabel: UILabel = {
         let label = UILabel()
         label.text = OnboardingConst.RegisterResult.Text.GreetingComment
-        label.textColor = OnboardingConst.RegisterResult.Color.GreetingCommentColor
+        label.textColor = OnboardingConst.RegisterResult.Color.greetingCommentColor
         label.font = OnboardingConst.RegisterResult.Font.valueFont
         return label
     }()
     
-    private let confirmButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("시작", for: .normal)
-        button.backgroundColor = UIColor.purple
+    private let confirmButton: WeClimbButton = {
+        let button = WeClimbButton(style: .defaultRectangle)
+        button.setTitle(OnboardingConst.RegisterResult.Text.confirmText, for: .normal)
+        button.backgroundColor = OnboardingConst.RegisterResult.Color.confirmColor
         button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 8
-        button.isEnabled = false
+        button.layer.cornerRadius = OnboardingConst.RegisterResult.CornerRadius.confirmButton
+        button.isEnabled = true
         return button
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
+        confirmButtonTapped()
     }
     
     private func setLayout() {
@@ -61,29 +67,35 @@ class RegisterResultVC: UIViewController {
         ].forEach { view.addSubview($0) }
         
         logoImage.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(30)
-            $0.leading.equalToSuperview().offset(16)
-            $0.width.equalTo(60)
-            $0.height.equalTo(60)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(OnboardingConst.RegisterResult.Spacing.logoTopSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.RegisterResult.Spacing.baseSpacing)
+            $0.width.height.equalTo(OnboardingConst.RegisterResult.Size.logoSize)
         }
         
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(logoImage.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalTo(logoImage.snp.bottom).offset(OnboardingConst.RegisterResult.Spacing.baseSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.RegisterResult.Spacing.baseSpacing)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.RegisterResult.Spacing.baseSpacing)
         }
         
         commentLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(32)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(OnboardingConst.RegisterResult.Spacing.commentTopSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.RegisterResult.Spacing.baseSpacing)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.RegisterResult.Spacing.baseSpacing)
         }
         
         confirmButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.height.equalTo(50)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-OnboardingConst.RegisterResult.Spacing.confirmBottomSpacing)
+            $0.leading.equalToSuperview().offset(OnboardingConst.RegisterResult.Spacing.baseSpacing)
+            $0.trailing.equalToSuperview().offset(-OnboardingConst.RegisterResult.Spacing.baseSpacing)
         }
+    }
+    
+    private func confirmButtonTapped() {
+        confirmButton.rx.tap
+            .bind { [weak self] in
+                self?.onTabBarPage?()
+            }
+            .disposed(by: disposeBag)
     }
 }
