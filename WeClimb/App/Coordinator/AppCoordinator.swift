@@ -24,8 +24,8 @@ final class AppCoordinator: BaseCoordinator {
     
     override func start() {
         let userReadDataSource = appDIContainer.resolve(UserReadDataSource.self)
-        showOnboardingFlow()
-        window.makeKeyAndVisible()
+//        showOnboardingFlow()
+//        window.makeKeyAndVisible()
         if Auth.auth().currentUser != nil {
             userReadDataSource.myInfo()
                 .observe(on: MainScheduler.instance)
@@ -66,7 +66,8 @@ final class AppCoordinator: BaseCoordinator {
         tabBarCoordinator.start()
         addDependency(tabBarCoordinator)
         
-        window.rootViewController = tabBarController
+//        window.rootViewController = tabBarController
+        window.rootViewController = navigationController
     }
     
     private func showOnboardingFlow() {

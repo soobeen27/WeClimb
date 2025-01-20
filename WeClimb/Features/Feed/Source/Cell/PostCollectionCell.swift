@@ -65,6 +65,18 @@ class PostCollectionCell: UICollectionViewCell {
     
     private var postItem: PostItem?
     
+    private lazy var dataSource: UICollectionViewDiffableDataSource<Section, String> = {
+        let dataSource = UICollectionViewDiffableDataSource<Section, String>(collectionView: mediaCollectionView) { collectionView, indexPath, mediaPath in
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaCollectionCell.className, for: indexPath) as? MediaCollectionCell else {
+                return UICollectionViewCell()
+            }
+            cell.configure(mediaPath: mediaPath)
+            return cell
+        }
+        
+        return dataSource
+    }()
+    
     private lazy var mediaCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -73,14 +85,18 @@ class PostCollectionCell: UICollectionViewCell {
         let collectionView = UICollectionView(frame: contentView.bounds, collectionViewLayout: layout)
         collectionView.register(MediaCollectionCell.self, forCellWithReuseIdentifier: MediaCollectionCell.className)
         collectionView.showsHorizontalScrollIndicator = false
-//        self.contentView.addSubview(collectionView)
+        collectionView.contentInsetAdjustmentBehavior = .never
+        collectionView.isPagingEnabled = true
+        collectionView.backgroundColor = FeedConsts.CollectionView.backgroundColor
+        collectionView.delaysContentTouches = false
+
+        self.contentView.addSubview(collectionView)
         return collectionView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setLayout()
-        
     }
     
     required init?(coder: NSCoder) {
@@ -106,6 +122,9 @@ class PostCollectionCell: UICollectionViewCell {
         viewModel = container.resolve(PostCollectionCellVM.self)
         guard let viewModel, let postItem else { return }
         
+        guard let mediaPaths = postItem.medias else { return }
+        bindSnapShot(mediaPath: mediaPaths)
+        
         let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(postItem: postItem, likeButtonTap: postSidebarView.likeButtonTap))
         
         output.user
@@ -127,6 +146,13 @@ class PostCollectionCell: UICollectionViewCell {
             .disposed(by: disposeBag)
     }
     
+    private func bindSnapShot(mediaPath: [String]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
+        snapshot.appendSections([.media])
+        snapshot.appendItems(mediaPath)
+        dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
     private func heightArmReach(height: Int?, armReach: Int?) -> String {
         if let height, let armReach {
             return "\(height)cmㆍ\(armReach)cm"
@@ -145,8 +171,9 @@ class PostCollectionCell: UICollectionViewCell {
         contentView.backgroundColor = .clear
         [profileView, postSidebarView]
             .forEach {
-                contentView.addSubview($0)
+                self.addSubview($0)
             }
+        
         profileView.snp.makeConstraints {
             $0.bottom.leading.trailing.equalToSuperview()
         }
