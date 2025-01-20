@@ -10,7 +10,7 @@ protocol MyUserInfoUseCase {
     func execute() -> Single<User?>
 }
 
-struct MyUserInfoUseCaseImpl: MyUserInfoUseCase {
+public struct MyUserInfoUseCaseImpl: MyUserInfoUseCase {
     private let userReadRepository: UserReadRepository
     
     init(userReadRepository: UserReadRepository) {
