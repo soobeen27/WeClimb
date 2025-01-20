@@ -12,7 +12,8 @@ final class LoginCoordinator: BaseCoordinator {
     private let builder: OnboardingBuilder
     
     var onFinish: (() -> Void)?
-
+    var onTabBarPage: (() -> Void)?
+    
     init(navigationController: UINavigationController, builder: OnboardingBuilder) {
         self.navigationController = navigationController
         self.builder = builder
@@ -31,10 +32,10 @@ final class LoginCoordinator: BaseCoordinator {
         navigationController.pushViewController(loginVC, animated: true)
     }
     
-    private func handleLoginStatus(_ status: LoginStatus) {
+    func handleLoginStatus(_ status: LoginStatus) {
         switch status {
         case .tabBar:
-            print("안농") // 탭바 이동
+            onTabBarPage?()
         case .privacyPolicy:
             onFinish?()
         }
