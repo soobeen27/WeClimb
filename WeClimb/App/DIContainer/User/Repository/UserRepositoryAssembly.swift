@@ -8,9 +8,9 @@ import Swinject
 
 final class UserRepositoryAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(ImageDataRepository.self) { resolver in
-            ImageDataRepositoryImpl(imageDataSource: resolver.resolve(ImageDataSource.self)!)
-        }
+//        container.register(ImageDataRepository.self) { resolver in
+//            ImageDataRepositoryImpl(imageDataSource: resolver.resolve(ImageDataSource.self)!)
+//        }
         container.register(UserBlockRepository.self) { resolver in
             UserBlockRepositoryImpl(userBlockDataSource: resolver.resolve(UserBlockDataSource.self)!)
         }

@@ -9,29 +9,58 @@ import Swinject
 
 final class SearchAssembly: Assembly {
     func assemble(container: Container) {
-    
+        container.register(GymDataSource.self) { _ in
+            GymDataSourceImpl()
+        }
+        container.register(UserSearchDataSource.self) { _ in
+            UserSearchDataSourceImpl()
+        }
+        container.register(FirebaseImageDataSource.self) { _ in
+            FirebaseImageDataSourceImpl()
+        }
+        
+        container.register(GymRepository.self) { resolver in
+            GymRepositoryImpl(gymDataSource: resolver.resolve(GymDataSource.self)!)
+        }
+        
+        container.register(UserSearchRepository.self) { resolver in
+            UserSearchRepositoryImpl(userSearchDataSource: resolver.resolve(UserSearchDataSource.self)!
+            )
+        }
+        
+        container.register(FirebaseImageRepository.self) { resolver in
+            FirebaseImageRepositoryImpl(firebaseImageDataSource: resolver.resolve(FirebaseImageDataSource.self)!
+            )
+        }
+        
+        container.register(FetchAllGymsInfoUseCase.self) { resolver in
+            FetchAllGymsInfoUseCaseImpl(gymRepository: resolver.resolve(GymRepository.self)!
+            )
+        }
+        
+        container.register(FetchGymInfoUseCase.self) { resolver in
+            FetchGymInfoUseCaseImpl(gymRepository: resolver.resolve(GymRepository.self)!
+            )
+        }
+        
+        container.register(UserSearchUseCase.self) { resolver in
+            UserSearchUseCaseImpl(userSearchRepository: resolver.resolve(UserSearchRepository.self)!
+            )
+        }
+        
+        container.register(FetchImageURLUseCase.self) { resolver in
+            FetchImageURLUseCaseImpl(firebaseimageRepository: resolver.resolve(FirebaseImageRepository.self)!
+            )
+        }
+        
+        container.register(SearchVM.self) { resolver in
+            SearchVMImpl(
+                fetchAllGymsInfoUseCase: resolver.resolve(FetchAllGymsInfoUseCase.self)!,
+                fetchGymInfoUseCase: resolver.resolve(FetchGymInfoUseCase.self)!, userSearchUseCase: resolver.resolve(UserSearchUseCase.self)!, fetchImageURLUseCase: resolver.resolve(FetchImageURLUseCase.self)!)
+        }
+        
+        container.register(SearchResultVM.self) { resolver in
+            SearchResultVMImpl()
+        }
     }
 }
-
-/*
- 이런식으로 활용할 수 있어요!
- container.register(MainPageDataSource.self) { _ in
-     MainPageDataSourceImpl()
- }
-
- container.register(MainPageUsecase.self) { resolver in
-     MainPageUsecaseImpl(mainPageDataSource: resolver.resolve(MainPageDataSource.self)!)
- }
- 
- container.register(MainPageProtocol.self) { resolver in
-     resolver.resolve(MainPageVM.self)! as MainPageProtocol
- }
- 
- container.register(MainPageVM.self) { resolver in
-     MainPageVM(usecase: resolver.resolve(MainPageUsecase.self)!)
- }
- 
- container.register(MainPageBuilder.self) { resolver in
-     MainPageBuilderImpl(container: self.container)
- }
- */
