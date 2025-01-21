@@ -10,6 +10,7 @@ import UIKit
 final class SearchResultCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
     private let builder: SearchBuilder
+    var query: String?
     
     init(navigationController: UINavigationController, builder: SearchBuilder) {
         self.navigationController = navigationController
@@ -19,7 +20,11 @@ final class SearchResultCoordinator: BaseCoordinator {
     override func start() {
         let searchResultVC = builder.buildSearchResult()
         searchResultVC.coordinator = self
+        searchResultVC.query = query
         navigationController.pushViewController(searchResultVC, animated: true)
     }
     
+    func navigateBackToSearchVC() {
+        navigationController.popViewController(animated: true)
+    }
 }

@@ -23,8 +23,8 @@ final class SearchCoordinator: BaseCoordinator {
     }
     
     func navigateToSearchResult(query: String) {
-        let searchResultVC = builder.buildSearchResult()
-        searchResultVC.query = query
-        navigationController.pushViewController(searchResultVC, animated: true)
+        let searchResultCoordinator = SearchResultCoordinator(navigationController: navigationController, builder: builder)
+        searchResultCoordinator.query = query
+        searchResultCoordinator.start()
     }
 }
