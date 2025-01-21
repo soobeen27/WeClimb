@@ -15,13 +15,7 @@ class MediaCollectionCell: UICollectionViewCell {
     private var viewModel: MediaCollectionCellVM?
     
     var disposeBag = DisposeBag()
-    
-    private lazy var label: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 10)
-        label.textColor = .white
-        return label
-    }()
+    private let videoView = PostVideoView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -35,7 +29,8 @@ class MediaCollectionCell: UICollectionViewCell {
     func configure(mediaItem: MediaItem, mediaCollectionCellVM: MediaCollectionCellVM) {
         viewModel = mediaCollectionCellVM
         bindViewModel(mediaItem: mediaItem)
-        label.text = mediaItem.mediaUID
+        guard let url = URL(string: mediaItem.url) else { return }
+        videoView.videoInfo = (url, mediaItem.mediaUID)
     }
     
     override func prepareForReuse() {
@@ -57,10 +52,9 @@ class MediaCollectionCell: UICollectionViewCell {
     }
     
     private func setLayout() {
-        self.contentView.addSubview(label)
-        self.contentView.backgroundColor = .clear
-        label.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+        contentView.addSubview(videoView)
+        videoView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
 }
