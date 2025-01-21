@@ -39,9 +39,5 @@ class MediaCollectionCellVMImpl: MediaCollectionCellVM {
 //        let ref = pathToRef(path: input.mediaPath)
 //        return Output(mediaItem: fetchMediaUseCase.execute(ref: ref))
 //    }
-    
-    private func pathToRef(path: String) -> DocumentReference {
-        return Firestore.firestore().document(path)
-    }
- 
+     
 }

@@ -32,9 +32,10 @@ class MediaCollectionCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(mediaPath: String, mediaCollectionCellVM: MediaCollectionCellVM) {
+    func configure(mediaItem: MediaItem, mediaCollectionCellVM: MediaCollectionCellVM) {
         viewModel = mediaCollectionCellVM
-        bindViewModel(mediaPath: mediaPath)
+        bindViewModel(mediaItem: mediaItem)
+        label.text = mediaItem.mediaUID
     }
     
     override func prepareForReuse() {
@@ -43,7 +44,7 @@ class MediaCollectionCell: UICollectionViewCell {
 //        viewModel = nil
     }
     
-    private func bindViewModel(mediaPath: String) {
+    private func bindViewModel(mediaItem: MediaItem) {
         guard let viewModel else { return }
 //        let output = viewModel.transform(input: MediaCollectionCellVMImpl.Input(mediaPath: mediaPath))
 //        

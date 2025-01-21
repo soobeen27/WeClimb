@@ -65,14 +65,14 @@ class PostCollectionCell: UICollectionViewCell {
     
     private var postItem: PostItem?
     
-    private lazy var dataSource: UICollectionViewDiffableDataSource<Section, String> = {
-        let dataSource = UICollectionViewDiffableDataSource<Section, String>(collectionView: mediaCollectionView)
-        { [weak self] collectionView, indexPath, mediaPath in
+    private lazy var dataSource: UICollectionViewDiffableDataSource<Section, MediaItem> = {
+        let dataSource = UICollectionViewDiffableDataSource<Section, MediaItem>(collectionView: mediaCollectionView)
+        { [weak self] collectionView, indexPath, mediaItem in
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaCollectionCell.className, for: indexPath) as? MediaCollectionCell, let self else {
                 return UICollectionViewCell()
             }
             let viewModel = self.container.resolve(MediaCollectionCellVM.self)
-            cell.configure(mediaPath: mediaPath, mediaCollectionCellVM: viewModel)
+            cell.configure(mediaItem: mediaItem, mediaCollectionCellVM: viewModel)
             return cell
         }
         
@@ -124,10 +124,7 @@ class PostCollectionCell: UICollectionViewCell {
     
     private func bindViewModel() {
         guard let viewModel, let postItem else { return }
-        
-        guard let mediaPaths = postItem.medias else { return }
-        bindSnapShot(mediaPath: mediaPaths)
-        
+                
         let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(postItem: postItem, likeButtonTap: postSidebarView.likeButtonTap))
         
         output.user
@@ -147,12 +144,25 @@ class PostCollectionCell: UICollectionViewCell {
         output.likeCount
             .bind(to: postSidebarView.likeCountRelay)
             .disposed(by: disposeBag)
+//        output.mediaItems.bind(onNext: { [weak self] mediaItems in
+//            guard let self else { return }
+//            self.bindSnapShot(mediaItems: mediaItems)
+//        })
+//        .disposed(by: disposeBag)
+        output.mediaItems
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: {[weak self] mediaItems in
+                guard let self else { return }
+                self.bindSnapShot(mediaItems: mediaItems)
+                
+            })
+            .disposed(by: disposeBag)
     }
     
-    private func bindSnapShot(mediaPath: [String]) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
+    private func bindSnapShot(mediaItems: [MediaItem]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, MediaItem>()
         snapshot.appendSections([.media])
-        snapshot.appendItems(mediaPath)
+        snapshot.appendItems(mediaItems)
         dataSource.apply(snapshot, animatingDifferences: true)
     }
     

@@ -17,7 +17,8 @@ final class FeedAssembly: Assembly {
         container.register(PostCollectionCellVM.self) { resolver in
             PostCollectionCellVMImpl(userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!,
                                      myUIDUseCase: resolver.resolve(MyUIDUseCase.self)!,
-                                     likePostUseCase: resolver.resolve(LikePostUseCase.self)!
+                                     likePostUseCase: resolver.resolve(LikePostUseCase.self)!,
+                                     fetchMediasUseCase: resolver.resolve(FetchMediasUseCase.self)!
             )
         }
         
