@@ -81,7 +81,7 @@ class SearchGymTableCell: UITableViewCell {
     }
     
 
-    func configure(with item: Item) {
+    func configure(with item: SearchResultItem) {
         gymNameLabel.text = item.name
         gymLocationLabel.text = item.location
 

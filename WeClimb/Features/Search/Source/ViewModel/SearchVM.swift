@@ -16,7 +16,7 @@ protocol SearchInput {
 }
 
 protocol SearchOutput {
-    var items: Observable<[Item]> { get }
+    var items: Observable<[SearchResultItem]> { get }
     var isLoading: Observable<Bool> { get }
     var error: Observable<String> { get }
 }
@@ -33,8 +33,8 @@ class SearchVMImpl: SearchVM {
     private let userSearchUseCase: UserSearchUseCase
     private let fetchImageURLUseCase: FetchImageURLUseCase
     
-    private var allGyms: [Item] = []
-    private var allUsers: [Item] = []
+    private var allGyms: [SearchResultItem] = []
+    private var allUsers: [SearchResultItem] = []
     
     init(fetchAllGymsInfoUseCase: FetchAllGymsInfoUseCase,
          fetchGymInfoUseCase: FetchGymInfoUseCase,
@@ -52,14 +52,14 @@ class SearchVMImpl: SearchVM {
     }
     
     struct Output: SearchOutput {
-        let items: Observable<[Item]>
+        let items: Observable<[SearchResultItem]>
         let isLoading: Observable<Bool>
         let error: Observable<String>
     }
     
     func transform(input: SearchInput) -> SearchOutput{
         let isLoadingSubject = BehaviorSubject<Bool>(value: false)
-        let itemsSubject = BehaviorSubject<[Item]>(value: [])
+        let itemsSubject = BehaviorSubject<[SearchResultItem]>(value: [])
         let errorSubject = PublishSubject<String>()
         
         fetchInitialData()
@@ -71,7 +71,7 @@ class SearchVMImpl: SearchVM {
             .disposed(by: disposeBag)
         
         let filteredItems = Observable.combineLatest(input.query, itemsSubject.asObservable())
-            .flatMapLatest { query, items -> Observable<[Item]> in
+            .flatMapLatest { query, items -> Observable<[SearchResultItem]> in
                 if query.isEmpty {
                     return .just(items)
                 } else {
@@ -83,7 +83,7 @@ class SearchVMImpl: SearchVM {
         input.query
             .distinctUntilChanged()
             .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
-            .flatMapLatest { [weak self] query -> Observable<[Item]> in
+            .flatMapLatest { [weak self] query -> Observable<[SearchResultItem]> in
                 guard let self = self else {
                     return .empty()
                 }
@@ -118,22 +118,22 @@ class SearchVMImpl: SearchVM {
         )
     }
     
-    private func fetchInitialData() -> Observable<[Item]> {
+    private func fetchInitialData() -> Observable<[SearchResultItem]> {
         return fetchAllGymsInfoUseCase.execute()
             .asObservable()
-            .flatMap { [weak self] gyms -> Observable<[Item]> in
+            .flatMap { [weak self] gyms -> Observable<[SearchResultItem]> in
                 guard let self = self else {
                     return .just([])
                 }
 
-                let itemObservables = gyms.map { gym -> Observable<Item> in
+                let itemObservables = gyms.map { gym -> Observable<SearchResultItem> in
                     return self.fetchImageURLUseCase.execute(from: gym.profileImage ?? "")
                         .asObservable()
                         .do(onNext: { imageURLString in
                      
                         })
                         .map { imageURLString in
-                            return Item(type: .gym,
+                            return SearchResultItem(type: .gym,
                                          name: gym.gymName,
                                          imageName: imageURLString ?? "",
                                          location: gym.address,
@@ -148,11 +148,11 @@ class SearchVMImpl: SearchVM {
             .catch { _ in Observable.just([]) }
     }
 
-    private func searchGyms(with query: String) -> Observable<[Item]> {
+    private func searchGyms(with query: String) -> Observable<[SearchResultItem]> {
 
         return fetchGymInfoUseCase.execute(gymName: query)
             .asObservable()
-            .flatMap { gym -> Observable<Item?> in
+            .flatMap { gym -> Observable<SearchResultItem?> in
 
                 return self.fetchImageURLUseCase.execute(from: gym.profileImage ?? "")
                     .asObservable()
@@ -163,7 +163,7 @@ class SearchVMImpl: SearchVM {
                         let sanitizedQuery = query.replacingOccurrences(of: " ", with: "").lowercased()
 
                         if sanitizedGymName.contains(sanitizedQuery) {
-                            return Item(type: .gym,
+                            return SearchResultItem(type: .gym,
                                         name: gym.gymName,
                                         imageName: imageURLString ?? "",
                                         location: gym.address,
@@ -182,11 +182,11 @@ class SearchVMImpl: SearchVM {
             }
     }
    
-    private func searchUsers(with query: String) -> Observable<[Item]> {
+    private func searchUsers(with query: String) -> Observable<[SearchResultItem]> {
         return userSearchUseCase.execute(with: query)
             .map { users in
                 return users.map { user in
-                    return Item(type: .user,
+                    return SearchResultItem(type: .user,
                                 name: user.userName ?? "",
                                 imageName: user.profileImage ?? "",
                                 location: nil,

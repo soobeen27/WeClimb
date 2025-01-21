@@ -79,7 +79,7 @@ class SearchUserTableCell: UITableViewCell {
         }
     }
     
-    func configure(with item: Item) {
+    func configure(with item: SearchResultItem) {
         
         if item.imageName.isEmpty || URL(string: item.imageName) == nil {
             userImageView.image = UIImage.defaultAvatarProfile
