@@ -9,13 +9,15 @@ import UIKit
 
 final class SearchResultCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
+    private let builder: SearchBuilder
     
-    init(navigationController: UINavigationController) {
+    init(navigationController: UINavigationController, builder: SearchBuilder) {
         self.navigationController = navigationController
+        self.builder = builder
     }
     
     override func start() {
-        let searchResultVC = SearchResultVC()
+        let searchResultVC = builder.buildSearchResult()
         searchResultVC.coordinator = self
         navigationController.pushViewController(searchResultVC, animated: true)
     }

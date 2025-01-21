@@ -9,7 +9,7 @@ import Foundation
 
 protocol SearchBuilder {
     func buildSearch() -> SearchVC
-//    func buildSearchResult() -> SearchResultVC
+    func buildSearchResult() -> SearchResultVC
 }
 
 final class SearchBuilderImpl: SearchBuilder {
@@ -23,9 +23,9 @@ final class SearchBuilderImpl: SearchBuilder {
         let viewModel: SearchVM = container.resolve(SearchVM.self)
         return SearchVC(viewModel: viewModel)
     }
-//
-//    func buildSearchResult() -> SearchResultVC {
-//        let viewModel: SearchResultVM = container.resolve(SearchResultVM.self)
-//        return SearchResultVC(viewModel: viewModel)
-//    }
+    
+    func buildSearchResult() -> SearchResultVC {
+        let viewModel: SearchResultVM = container.resolve(SearchResultVM.self)
+        return SearchResultVC(viewModel: viewModel)
+    }
 }

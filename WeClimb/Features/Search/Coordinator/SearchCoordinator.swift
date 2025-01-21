@@ -21,4 +21,10 @@ final class SearchCoordinator: BaseCoordinator {
         searchVC.coordinator = self
         navigationController.pushViewController(searchVC, animated: true)
     }
+    
+    func navigateToSearchResult(query: String) {
+        let searchResultVC = builder.buildSearchResult()
+        searchResultVC.query = query
+        navigationController.pushViewController(searchResultVC, animated: true)
+    }
 }

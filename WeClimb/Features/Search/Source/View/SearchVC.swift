@@ -235,6 +235,11 @@ extension SearchVC {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        
+        if let searchText = textField.text, !searchText.isEmpty {
+            coordinator?.navigateToSearchResult(query: searchText)
+        }
+        
         return true
     }
     
