@@ -137,9 +137,9 @@ class SearchResultVC: UIViewController {
     
     private func bindButtons() {
         backButton.rx.tap
-            .subscribe(onNext: { [weak self] in
+            .bind { [weak self] in
                 self?.didTapCancelButton()
-            })
+            }
             .disposed(by: disposeBag)
     }
     

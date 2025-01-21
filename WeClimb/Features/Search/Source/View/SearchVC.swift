@@ -176,15 +176,15 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     
     private func bindButtons() {
         rightViewContainer.cancelButtonTapObservable
-            .subscribe(onNext: { [weak self] in
+            .bind { [weak self] in
                 self?.didTapSmallCancelButton()
-            })
+            }
             .disposed(by: disposeBag)
-        
+
         cancelButton.rx.tap
-            .subscribe(onNext: { [weak self] in
+            .bind { [weak self] in
                 self?.didTapCancelButton()
-            })
+            }
             .disposed(by: disposeBag)
     }
 }
