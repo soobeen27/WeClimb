@@ -49,7 +49,7 @@ class PostCollectionCell: UICollectionViewCell {
     var disposeBag = DisposeBag()
     
     private let container = AppDIContainer.shared
-    
+
     private var viewModel: PostCollectionCellVM?
     
     private let profileView = PostProfileView()
@@ -65,6 +65,20 @@ class PostCollectionCell: UICollectionViewCell {
     
     private var postItem: PostItem?
     
+    private lazy var dataSource: UICollectionViewDiffableDataSource<Section, MediaItem> = {
+        let dataSource = UICollectionViewDiffableDataSource<Section, MediaItem>(collectionView: mediaCollectionView)
+        { [weak self] collectionView, indexPath, mediaItem in
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaCollectionCell.className, for: indexPath) as? MediaCollectionCell, let self else {
+                return UICollectionViewCell()
+            }
+            let viewModel = self.container.resolve(MediaCollectionCellVM.self)
+            cell.configure(mediaItem: mediaItem, mediaCollectionCellVM: viewModel)
+            return cell
+        }
+        
+        return dataSource
+    }()
+    
     private lazy var mediaCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -73,14 +87,18 @@ class PostCollectionCell: UICollectionViewCell {
         let collectionView = UICollectionView(frame: contentView.bounds, collectionViewLayout: layout)
         collectionView.register(MediaCollectionCell.self, forCellWithReuseIdentifier: MediaCollectionCell.className)
         collectionView.showsHorizontalScrollIndicator = false
-//        self.contentView.addSubview(collectionView)
+        collectionView.contentInsetAdjustmentBehavior = .never
+        collectionView.isPagingEnabled = true
+        collectionView.backgroundColor = FeedConsts.CollectionView.backgroundColor
+        collectionView.delaysContentTouches = false
+
+        self.contentView.addSubview(collectionView)
         return collectionView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setLayout()
-        
     }
     
     required init?(coder: NSCoder) {
@@ -90,22 +108,24 @@ class PostCollectionCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         profileView.resetToDefaultState()
+        viewModel = nil
+        disposeBag = DisposeBag()
     }
     
-    func configure(postItem: PostItem) {
+    func configure(postItem: PostItem, postCollectionCellVM: PostCollectionCellVM) {
+        viewModel = postCollectionCellVM
         self.postItem = postItem
         bindViewModel()
     }
     
     private func configureProfileView(postItem: PostItem, user: User) {
-        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: "아직 없어용", level: .appleIcon, hold: .holdRed, caption: postItem.caption))
+        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: heightArmReach(height: user.height, armReach: user.armReach), level: .appleIcon, hold: .holdRed, caption: postItem.caption))
     }
     
     private func bindViewModel() {
-        viewModel = container.resolve(PostCollectionCellVM.self)
         guard let viewModel, let postItem else { return }
-        
-        let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(postItem: postItem))
+                
+        let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(postItem: postItem, likeButtonTap: postSidebarView.likeButtonTap))
         
         output.user
             .map { user -> User in
@@ -117,14 +137,56 @@ class PostCollectionCell: UICollectionViewCell {
                 self.user = user
             })
             .disposed(by: disposeBag)
+        
+        output.isLike
+            .bind(to: postSidebarView.isLikeRelay)
+            .disposed(by: disposeBag)
+        output.likeCount
+            .bind(to: postSidebarView.likeCountRelay)
+            .disposed(by: disposeBag)
+//        output.mediaItems.bind(onNext: { [weak self] mediaItems in
+//            guard let self else { return }
+//            self.bindSnapShot(mediaItems: mediaItems)
+//        })
+//        .disposed(by: disposeBag)
+        output.mediaItems
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: {[weak self] mediaItems in
+                guard let self else { return }
+                self.bindSnapShot(mediaItems: mediaItems)
+                
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindSnapShot(mediaItems: [MediaItem]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, MediaItem>()
+        snapshot.appendSections([.media])
+        snapshot.appendItems(mediaItems)
+        dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    private func heightArmReach(height: Int?, armReach: Int?) -> String {
+        if let height, let armReach {
+            return "\(height)cmㆍ\(armReach)cm"
+        } else if let height {
+            return "\(height)cm"
+        }
+        return "정보가 없어용"
+    }
+    
+    private func bindSidebarView(isLike: Bool?, likeCount: Int) {
+        postSidebarView.isLikeRelay.accept(isLike)
+        postSidebarView.likeCountRelay.accept(likeCount)
     }
     
     private func setLayout() {
         contentView.backgroundColor = .clear
         [profileView, postSidebarView]
             .forEach {
-                contentView.addSubview($0)
+                self.addSubview($0)
             }
+        
         profileView.snp.makeConstraints {
             $0.bottom.leading.trailing.equalToSuperview()
         }

@@ -18,5 +18,8 @@ final class PostDataSourceAssembly: Assembly {
         container.register(PostFilterDataSource.self) { _ in
             PostFilterDataSourceImpl()
         }
+        container.register(FetchMediasDataSource.self) { _ in
+            FetchMediasDataSourceImpl()
+        }
     }
 }
