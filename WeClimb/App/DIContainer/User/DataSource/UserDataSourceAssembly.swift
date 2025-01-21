@@ -9,7 +9,7 @@ import Swinject
 
 final class UserDataSourceAssembly: Assembly {
     func assemble(container: Container) {
-        container.register(ImageDataSource.self) { _ in ImageDataSourceImpl() }
+//        container.register(ImageDataSource.self) { _ in ImageDataSourceImpl() }
         container.register(UserBlockDataSource.self) { _ in UserBlockDataSourceImpl() }
         container.register(UserDeleteDataSource.self) {_ in UserDeleteDataSourceImpl()}
         container.register(UserReadDataSource.self) { _ in UserReadDataSourceImpl() }
