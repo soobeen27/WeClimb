@@ -40,19 +40,19 @@ class MediaCollectionCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         disposeBag = DisposeBag()
-        viewModel = nil
+//        viewModel = nil
     }
     
     private func bindViewModel(mediaPath: String) {
         guard let viewModel else { return }
-        let output = viewModel.transform(input: MediaCollectionCellVMImpl.Input(mediaPath: mediaPath))
-        
-        output.mediaItem
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(onNext: { [weak self] media in
-                self?.label.text = media.mediaUID
-            })
-            .disposed(by: disposeBag)
+//        let output = viewModel.transform(input: MediaCollectionCellVMImpl.Input(mediaPath: mediaPath))
+//        
+//        output.mediaItem
+//            .asDriver(onErrorDriveWith: .empty())
+//            .drive(onNext: { [weak self] media in
+//                self?.label.text = media.mediaUID
+//            })
+//            .disposed(by: disposeBag)
     }
     
     private func setLayout() {

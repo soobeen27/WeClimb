@@ -8,6 +8,6 @@
 import RxSwift
 import FirebaseFirestore
 
-protocol FetchMediaRepository {
-    func fetchMedia(ref: DocumentReference) -> Single<Media>
+protocol FetchMediasRepository {
+    func fetchMedias(refs: [DocumentReference]) -> Single<[Media]>
 }

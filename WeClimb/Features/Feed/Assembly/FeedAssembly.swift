@@ -22,7 +22,7 @@ final class FeedAssembly: Assembly {
         }
         
         container.register(MediaCollectionCellVM.self) { resolver in
-            MediaCollectionCellVMImpl(fetchMediaUseCase: resolver.resolve(FetchMediaUseCase.self)!)
+            MediaCollectionCellVMImpl()
         }
         
     }
