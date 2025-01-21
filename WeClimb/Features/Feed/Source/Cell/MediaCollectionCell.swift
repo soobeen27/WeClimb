@@ -12,8 +12,6 @@ import RxCocoa
 
 class MediaCollectionCell: UICollectionViewCell {
     
-    private let container = AppDIContainer.shared
-    
     private var viewModel: MediaCollectionCellVM?
     
     var disposeBag = DisposeBag()
@@ -34,12 +32,18 @@ class MediaCollectionCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(mediaPath: String) {
+    func configure(mediaPath: String, mediaCollectionCellVM: MediaCollectionCellVM) {
+        viewModel = mediaCollectionCellVM
         bindViewModel(mediaPath: mediaPath)
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        disposeBag = DisposeBag()
+        viewModel = nil
+    }
+    
     private func bindViewModel(mediaPath: String) {
-        viewModel = container.resolve(MediaCollectionCellVM.self)
         guard let viewModel else { return }
         let output = viewModel.transform(input: MediaCollectionCellVMImpl.Input(mediaPath: mediaPath))
         

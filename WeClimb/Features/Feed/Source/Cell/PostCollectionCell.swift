@@ -49,7 +49,7 @@ class PostCollectionCell: UICollectionViewCell {
     var disposeBag = DisposeBag()
     
     private let container = AppDIContainer.shared
-    
+
     private var viewModel: PostCollectionCellVM?
     
     private let profileView = PostProfileView()
@@ -66,11 +66,13 @@ class PostCollectionCell: UICollectionViewCell {
     private var postItem: PostItem?
     
     private lazy var dataSource: UICollectionViewDiffableDataSource<Section, String> = {
-        let dataSource = UICollectionViewDiffableDataSource<Section, String>(collectionView: mediaCollectionView) { collectionView, indexPath, mediaPath in
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaCollectionCell.className, for: indexPath) as? MediaCollectionCell else {
+        let dataSource = UICollectionViewDiffableDataSource<Section, String>(collectionView: mediaCollectionView)
+        { [weak self] collectionView, indexPath, mediaPath in
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaCollectionCell.className, for: indexPath) as? MediaCollectionCell, let self else {
                 return UICollectionViewCell()
             }
-            cell.configure(mediaPath: mediaPath)
+            let viewModel = self.container.resolve(MediaCollectionCellVM.self)
+            cell.configure(mediaPath: mediaPath, mediaCollectionCellVM: viewModel)
             return cell
         }
         
@@ -106,10 +108,12 @@ class PostCollectionCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         profileView.resetToDefaultState()
+        viewModel = nil
         disposeBag = DisposeBag()
     }
     
-    func configure(postItem: PostItem) {
+    func configure(postItem: PostItem, postCollectionCellVM: PostCollectionCellVM) {
+        viewModel = postCollectionCellVM
         self.postItem = postItem
         bindViewModel()
     }
@@ -119,7 +123,6 @@ class PostCollectionCell: UICollectionViewCell {
     }
     
     private func bindViewModel() {
-        viewModel = container.resolve(PostCollectionCellVM.self)
         guard let viewModel, let postItem else { return }
         
         guard let mediaPaths = postItem.medias else { return }
