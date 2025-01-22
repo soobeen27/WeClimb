@@ -96,6 +96,7 @@ class SearchResultVC: UIViewController {
         }
         
         setLayout()
+        bindUI()
         bindButtons()
     }
     
