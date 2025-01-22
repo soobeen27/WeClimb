@@ -29,7 +29,7 @@ class SearchVMImpl: SearchVM {
     private let disposeBag = DisposeBag()
     
     private let fetchAllGymsInfoUseCase: FetchAllGymsInfoUseCase
-    private let fetchGymInfoUseCase: FetchGymInfoUseCase
+    private let searchGymsUseCase: SearchGymsUseCase
     private let userSearchUseCase: UserSearchUseCase
     private let fetchImageURLUseCase: FetchImageURLUseCase
     
@@ -37,11 +37,11 @@ class SearchVMImpl: SearchVM {
     private var allUsers: [SearchResultItem] = []
     
     init(fetchAllGymsInfoUseCase: FetchAllGymsInfoUseCase,
-         fetchGymInfoUseCase: FetchGymInfoUseCase,
+         searchGymsUseCase: SearchGymsUseCase,
          userSearchUseCase: UserSearchUseCase,
          fetchImageURLUseCase: FetchImageURLUseCase) {
         self.fetchAllGymsInfoUseCase = fetchAllGymsInfoUseCase
-        self.fetchGymInfoUseCase = fetchGymInfoUseCase
+        self.searchGymsUseCase = searchGymsUseCase
         self.userSearchUseCase = userSearchUseCase
         self.fetchImageURLUseCase = fetchImageURLUseCase
     }
@@ -149,38 +149,30 @@ class SearchVMImpl: SearchVM {
     }
 
     private func searchGyms(with query: String) -> Observable<[SearchResultItem]> {
+         return searchGymsUseCase.execute(query: query)
+             .asObservable()
+             .flatMap { gyms -> Observable<[SearchResultItem]> in
+                 let itemObservables = gyms.map { gym -> Observable<SearchResultItem> in
+                     return self.fetchImageURLUseCase.execute(from: gym.profileImage ?? "")
+                         .asObservable()
+                         .map { imageURLString in
+                             return SearchResultItem(type: .gym,
+                                                      name: gym.gymName,
+                                                      imageName: imageURLString ?? "",
+                                                      location: gym.address,
+                                                      height: nil)
+                         }
+                 }
 
-        return fetchGymInfoUseCase.execute(gymName: query)
-            .asObservable()
-            .flatMap { gym -> Observable<SearchResultItem?> in
-
-                return self.fetchImageURLUseCase.execute(from: gym.profileImage ?? "")
-                    .asObservable()
-                    .do(onNext: { imageURLString in
-                    })
-                    .map { imageURLString in
-                        let sanitizedGymName = gym.gymName.replacingOccurrences(of: " ", with: "").lowercased()
-                        let sanitizedQuery = query.replacingOccurrences(of: " ", with: "").lowercased()
-
-                        if sanitizedGymName.contains(sanitizedQuery) {
-                            return SearchResultItem(type: .gym,
-                                        name: gym.gymName,
-                                        imageName: imageURLString ?? "",
-                                        location: gym.address,
-                                        height: nil)
-                        } else {
-                            return nil
-                        }
-                    }
-            }
-            .compactMap { $0 }
-            .toArray()
-            .asObservable()
-            .catch { error in
-                print("검색중 오류 발생: \(error)")
-                return Observable.just([])
-            }
-    }
+                 return Observable.concat(itemObservables)
+                     .toArray()
+                     .asObservable()
+             }
+             .catch { error in
+                 print("검색중 오류 발생: \(error)")
+                 return Observable.just([])
+             }
+     }
    
     private func searchUsers(with query: String) -> Observable<[SearchResultItem]> {
         return userSearchUseCase.execute(with: query)

@@ -8,6 +8,7 @@
 import UIKit
 
 import RxSwift
+import RxCocoa
 
 class SearchResultVC: UIViewController {
     var coordinator: SearchResultCoordinator?
@@ -45,7 +46,7 @@ class SearchResultVC: UIViewController {
         
         textField.rightView = rightViewContainer
         textField.rightViewMode = .whileEditing
-//        rightViewContainer.setCancelButtonAlpha(0)
+        rightViewContainer.setCancelButtonAlpha(1)
         
         return textField
     }()
@@ -76,6 +77,8 @@ class SearchResultVC: UIViewController {
         return tableView
     }()
     
+    private let selectedSegmentIndexSubject = BehaviorSubject<Int>(value: 0)
+
     init(viewModel: SearchResultVM) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -119,12 +122,13 @@ class SearchResultVC: UIViewController {
         
         segmentedControl.snp.makeConstraints {
             $0.top.equalTo(searchTextField.snp.bottom).offset(16)
-            $0.height.equalTo(56)
+            $0.height.equalTo(48)
             $0.leading.equalToSuperview().inset(16)
+            $0.trailing.equalToSuperview()
         }
         
         bottomLineView.snp.makeConstraints {
-            $0.top.equalTo(segmentedControl.snp.bottom).offset(1)
+            $0.top.equalTo(segmentedControl.snp.bottom).offset(-1)
             $0.height.equalTo(1)
             $0.leading.trailing.equalToSuperview()
         }
@@ -136,16 +140,61 @@ class SearchResultVC: UIViewController {
         }
     }
     
+    private func bindUI() {
+        let input = SearchResultVMImpl.Input(
+            query: searchTextField.rx.text.orEmpty.asObservable(),
+            selectedSegment: selectedSegmentIndexSubject.asObservable()
+        )
+        
+        let output = viewModel.transform(input: input)
+        
+        output.items
+            .bind(to: tableView.rx.items) { (tableView, index, item) in
+                switch item.type {
+                case .gym:
+                    let cell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className) as! SearchGymTableCell
+                    cell.configure(with: item)
+                    return cell
+                case .user:
+                    let cell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className) as! SearchUserTableCell
+                    cell.configure(with: item)
+                    return cell
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        output.error
+            .subscribe(onNext: { errorMessage in
+            })
+            .disposed(by: disposeBag)
+        
+        segmentedControl.onSegmentChanged = { [weak self] selectedIndex in
+            print("선택된 세그먼트 인덱스: \(selectedIndex)")
+            self?.selectedSegmentIndexSubject.onNext(selectedIndex)
+        }
+    }
+    
     private func bindButtons() {
         backButton.rx.tap
             .bind { [weak self] in
                 self?.didTapCancelButton()
             }
             .disposed(by: disposeBag)
+        
+        rightViewContainer.cancelButtonTapObservable
+            .bind { [weak self] in
+                self?.didTapSmallCancelButton()
+            }
+            .disposed(by: disposeBag)
     }
     
     private func didTapCancelButton() {
         coordinator?.navigateBackToSearchVC()
+        }
+   
+    private func didTapSmallCancelButton() {
+        searchTextField.text = ""
+        rightViewContainer.setCancelButtonAlpha(0)
     }
 }
 
