@@ -44,7 +44,8 @@ final class TabBarBuilderImpl: TabBarBuilder {
     
     func buildSearchCoordinator() -> SearchCoordinator {
         let navigationController = UINavigationController()
-        let coordinator = SearchCoordinator(navigationController: navigationController)
+        let searchBuilder: SearchBuilder = AppDIContainer.shared.resolve(SearchBuilder.self)
+        let coordinator = SearchCoordinator(navigationController: navigationController, builder: searchBuilder)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage.searchIcon,

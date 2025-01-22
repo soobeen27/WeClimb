@@ -13,4 +13,5 @@ protocol UserReadRepository {
     func getUserInfoFromUID(byUID uid: String) -> Single<User>
     func getUserInfoFromName(byName name: String) -> Single<User>
     func getMyUserInfo() -> Single<User?>
+    func myUID() throws -> String
 }

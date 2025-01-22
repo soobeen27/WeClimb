@@ -18,17 +18,18 @@ class FeedVC: UIViewController {
     let feedVM: FeedVM
     var coordinator: FeedCoordinator?
     
+    private let container = AppDIContainer.shared
+    
     let disposeBag = DisposeBag()
     
     private let fetchType: BehaviorRelay<FetchPostType> = .init(value: .initial)
 
     private lazy var dataSource: UICollectionViewDiffableDataSource<Section, PostItem> = {
-        let dataSource = UICollectionViewDiffableDataSource<Section, PostItem>(collectionView: postCollectionView) { collectionView, indexPath, item in
-           guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionCell.className, for: indexPath) as? PostCollectionCell
-           else {
-               return UICollectionViewCell()
-           }
-            cell.configure(postItem: item)
+        let dataSource = UICollectionViewDiffableDataSource<Section, PostItem>(collectionView: postCollectionView) { [weak self] collectionView, indexPath, item in
+           guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionCell.className, for: indexPath) as? PostCollectionCell, let self
+           else { return UICollectionViewCell() }
+            let viewModel = self.container.resolve(PostCollectionCellVM.self)
+            cell.configure(postItem: item, postCollectionCellVM: viewModel)
            return cell
         }
         return dataSource

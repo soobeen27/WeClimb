@@ -26,5 +26,9 @@ final class PostRepositoryAssembly: Assembly {
             PostRepositoryImpl(postRepository: resolver.resolve(PostRepository.self)!)
         }
         
+        container.register(FetchMediasRepository.self) { resolver in
+            FetchMediasRepositoryImpl(fetchMediasDataSource: resolver.resolve(FetchMediasDataSource.self)!)
+        }
+        
     }
 }

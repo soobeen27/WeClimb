@@ -202,7 +202,7 @@ class PostProfileView: UIView {
                 $0.height.equalTo(newHeight)
             }
             self.captionSCV.layer.layoutIfNeeded()
-        }  completion: { [weak self] _ in
+        }  completion: { [weak self] _ in 
             guard let self = self else { return }
             self.captionSCV.contentSize = self.captionLabel.intrinsicContentSize
         }

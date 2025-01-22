@@ -32,8 +32,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             appDIContainer: appDIContainer
         )
         
-        window.rootViewController = navigationController
-        window.makeKeyAndVisible()
+//        window.rootViewController = navigationController
+//        window.makeKeyAndVisible()
         
         // Coordinator 시작
         appCoordinator?.start()

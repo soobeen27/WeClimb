@@ -27,7 +27,7 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
         let selectedItems: Observable<[Int]>
     }
 
-    private let gymUseCase: GymUseCase
+    private let fetchGymInfoUseCase: FetchGymInfoUseCase
     private var gym: Gym?
 
     private var selectedLevelItems = BehaviorSubject<[Int]>(value: [])
@@ -39,8 +39,8 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
 
     private let disposeBag = DisposeBag()
 
-    init(gymUseCase: GymUseCase) {
-        self.gymUseCase = gymUseCase
+    init(fetchGymInfoUseCase: FetchGymInfoUseCase) {
+        self.fetchGymInfoUseCase = fetchGymInfoUseCase
     }
 
     func transform(input: Input) -> Output {
@@ -88,7 +88,7 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
     }
 
     private func fetchGymData(gymName: String, completion: @escaping () -> Void) {
-        gymUseCase.gymInfo(gymName: gymName)
+        fetchGymInfoUseCase.execute(gymName: gymName)
             .subscribe(onSuccess: { [weak self] gym in
                 self?.gym = gym
                 completion()
