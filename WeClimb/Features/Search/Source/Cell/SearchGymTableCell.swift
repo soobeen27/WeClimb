@@ -8,8 +8,11 @@
 import UIKit
 
 import Kingfisher
+import RxSwift
 
 class SearchGymTableCell: UITableViewCell {
+    
+    var disposeBag = DisposeBag()
     
     private let gymImageView: UIImageView = {
         let imageView = UIImageView()
@@ -35,13 +38,16 @@ class SearchGymTableCell: UITableViewCell {
         return label
     }()
     
-    private let cancelButton: UIButton = {
+    private lazy var cancelButton: UIButton = {
         let button = UIButton()
         button.setTitle("삭제", for: .normal)
         button.setTitleColor(.labelNeutral, for: .normal)
         button.titleLabel?.font = UIFont.customFont(style: .caption1Regular)
+        button.addTarget(self, action: #selector(didTapDeleteButton), for: .touchUpInside)
         return button
     }()
+    
+    var onDelete: ((SearchResultItem) -> Void)?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -91,7 +97,11 @@ class SearchGymTableCell: UITableViewCell {
             gymImageView.image = UIImage(named: "placeholder_image")
         }
     }
-
-
+    
+    @objc private func didTapDeleteButton() {
+        guard let name = gymNameLabel.text else { return }
+        let itemToDelete = SearchResultItem(type: .gym, name: name, imageName: "", location: nil, height: nil)
+        onDelete?(itemToDelete)
+    }
 }
 

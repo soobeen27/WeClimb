@@ -28,7 +28,6 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     var coordinator: SearchCoordinator?
     
     private let disposeBag = DisposeBag()
-    private var viewModel: SearchVM
     
     private lazy var rightViewContainer: TextFieldRightView = {
         let container = TextFieldRightView()
@@ -92,8 +91,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         return button
     }()
     
-    private let savedSearchResultItemsSubject = BehaviorSubject<[SearchResultItem]>(value: [])
-
+    private let savedRecentVisitItemsSubject = BehaviorSubject<[SearchResultItem]>(value: [])
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -103,21 +101,6 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         
         loadRecentVisitItems()
     }
-    
-    init(viewModel: SearchVM) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    //    override func viewWillAppear(_ animated: Bool) {
-    //        super.viewWillAppear(animated)
-    //
-    //        navigationController?.setNavigationBarHidden(true, animated: animated)
-    //    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -164,7 +147,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         if let savedData = UserDefaults.standard.value(forKey: "recentVisitItems") as? Data {
             let decoder = JSONDecoder()
             if let decodedItems = try? decoder.decode([SearchResultItem].self, from: savedData) {
-                savedSearchResultItemsSubject.onNext(decodedItems)
+                savedRecentVisitItemsSubject.onNext(decodedItems)
             } else {
                 print("Error: 데이터 디코딩 실패")
             }
@@ -174,21 +157,49 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     }
 
     private func bindTableView() {
-        savedSearchResultItemsSubject
+        savedRecentVisitItemsSubject
             .bind(to: tableView.rx.items) { tableView, row, item in
                 let cell: UITableViewCell
                 if item.type == .gym {
                     let gymCell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className, for: IndexPath(row: row, section: 0)) as! SearchGymTableCell
                     gymCell.configure(with: item)
+                    
+                    gymCell.onDelete = { [weak self] itemToDelete in
+                        self?.deleteItem(itemToDelete, at: row)
+                    }
+                    
                     cell = gymCell
                 } else {
                     let userCell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className, for: IndexPath(row: row, section: 0)) as! SearchUserTableCell
                     userCell.configure(with: item)
+                    
+                    userCell.onDelete = { [weak self] itemToDelete in
+                        self?.deleteItem(itemToDelete, at: row)
+                    }
+                    
                     cell = userCell
                 }
                 return cell
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func deleteItem(_ item: SearchResultItem, at index: Int) {
+        do {
+            var currentItems = try savedRecentVisitItemsSubject.value()
+            
+            currentItems.remove(at: index)
+            
+            if let encodedData = try? JSONEncoder().encode(currentItems) {
+                UserDefaults.standard.set(encodedData, forKey: "recentVisitItems")
+            }
+            
+            savedRecentVisitItemsSubject.onNext(currentItems)
+            
+            tableView.reloadData()
+        } catch {
+            print("Error while deleting item: \(error)")
+        }
     }
     
     private func bindButtons() {

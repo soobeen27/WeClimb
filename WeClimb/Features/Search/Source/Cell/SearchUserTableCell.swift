@@ -35,13 +35,16 @@ class SearchUserTableCell: UITableViewCell {
         return label
     }()
     
-    private let cancelButton: UIButton = {
+    private lazy var cancelButton: UIButton = {
         let button = UIButton()
         button.setTitle("삭제", for: .normal)
         button.setTitleColor(.labelNeutral, for: .normal)
         button.titleLabel?.font = UIFont.customFont(style: .caption1Regular)
+        button.addTarget(self, action: #selector(didTapDeleteButton), for: .touchUpInside)
         return button
     }()
+    
+    var onDelete: ((SearchResultItem) -> Void)?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -94,6 +97,12 @@ class SearchUserTableCell: UITableViewCell {
         } else {
             userHeightLabel.text = nil
         }
+    }
+    
+    @objc private func didTapDeleteButton() {
+        guard let name = userNameLabel.text else { return }
+        let itemToDelete = SearchResultItem(type: .user, name: name, imageName: "", location: nil, height: nil)
+        onDelete?(itemToDelete)
     }
 }
 

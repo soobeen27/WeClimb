@@ -146,7 +146,7 @@ class SearchResultVC: UIViewController {
         let input = SearchResultVMImpl.Input(
             query: searchTextField.rx.text.orEmpty.asObservable(),
             selectedSegment: selectedSegmentIndexSubject.asObservable(),
-            saveItem: saveItemSubject
+              SavedRecentVisitItems: saveItemSubject
         )
         
         let output = viewModel.transform(input: input)
@@ -167,13 +167,9 @@ class SearchResultVC: UIViewController {
             .disposed(by: disposeBag)
         
         tableView.rx.modelSelected(SearchResultItem.self)
-            .subscribe(onNext: { [weak self] item in
+            .bind(onNext: { [weak self] item in
+                guard let self = self else { return }
                 saveItemSubject.onNext(item)
-            })
-            .disposed(by: disposeBag)
-        
-        output.error
-            .subscribe(onNext: { errorMessage in
             })
             .disposed(by: disposeBag)
         

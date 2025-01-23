@@ -13,12 +13,11 @@ import RxCocoa
 protocol SearchResultInput {
     var query: Observable<String> { get }
     var selectedSegment: Observable<Int> { get }
-    var saveItem: Observable<SearchResultItem> { get }
+    var SavedRecentVisitItems: Observable<SearchResultItem> { get }
 }
 
 protocol SearchResultOutput {
     var items: Observable<[SearchResultItem]> { get }
-    var error: Observable<String> { get }
 }
 
 protocol SearchResultVM {
@@ -53,12 +52,11 @@ class SearchResultVMImpl: SearchResultVM {
     struct Input: SearchResultInput {
         let query: Observable<String>
         let selectedSegment: Observable<Int>
-        var saveItem: Observable<SearchResultItem>
+        var SavedRecentVisitItems: Observable<SearchResultItem>
     }
     
     struct Output: SearchResultOutput {
         let items: Observable<[SearchResultItem]>
-        let error: Observable<String>
     }
     
     func transform(input: SearchResultInput) -> SearchResultOutput {
@@ -116,15 +114,14 @@ class SearchResultVMImpl: SearchResultVM {
             .bind(to: itemsSubject)
             .disposed(by: disposeBag)
         
-         input.saveItem
+         input.SavedRecentVisitItems
              .subscribe(onNext: { [weak self] item in
-                 self?.saveSearchResultItem(item: item)
+                 self?.saveRecentVisitItem(item: item)
              })
              .disposed(by: disposeBag)
         
         return Output(
-            items: itemsSubject.asObservable(),
-            error: errorSubject.asObservable()
+            items: itemsSubject.asObservable()
         )
     }
     
@@ -175,8 +172,8 @@ class SearchResultVMImpl: SearchResultVM {
 }
 
 extension SearchResultVMImpl {
-    private func saveSearchResultItem(item: SearchResultItem) {
-        var savedItems = loadSavedSearchResultItems()
+    private func saveRecentVisitItem(item: SearchResultItem) {
+        var savedItems = loadSavedRecentVisitItems()
         
         if savedItems.count >= 10 {
             savedItems.removeFirst()
@@ -190,7 +187,7 @@ extension SearchResultVMImpl {
         }
     }
     
-    private func loadSavedSearchResultItems() -> [SearchResultItem] {
+    private func loadSavedRecentVisitItems() -> [SearchResultItem] {
         if let savedData = UserDefaults.standard.data(forKey: "recentVisitItems") {
             let decoder = JSONDecoder()
             if let loadedItems = try? decoder.decode([SearchResultItem].self, from: savedData) {
