@@ -11,12 +11,12 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-enum SearchResultType {
+enum SearchResultType: Codable {
     case gym
     case user
 }
 
-struct SearchResultItem {
+struct SearchResultItem: Codable {
     var type: SearchResultType
     var name: String
     var imageName: String
@@ -92,11 +92,16 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         return button
     }()
     
+    private let savedSearchResultItemsSubject = BehaviorSubject<[SearchResultItem]>(value: [])
+
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         searchTextField.alpha = 1
         cancelButton.alpha = 1
+        
+        loadRecentVisitItems()
     }
     
     init(viewModel: SearchVM) {
@@ -155,9 +160,21 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         }
     }
     
+    private func loadRecentVisitItems() {
+        if let savedData = UserDefaults.standard.value(forKey: "recentVisitItems") as? Data {
+            let decoder = JSONDecoder()
+            if let decodedItems = try? decoder.decode([SearchResultItem].self, from: savedData) {
+                savedSearchResultItemsSubject.onNext(decodedItems)
+            } else {
+                print("Error: 데이터 디코딩 실패")
+            }
+        } else {
+            print("No saved data found.")
+        }
+    }
+
     private func bindTableView() {
-        viewModel.transform(input: SearchVMImpl.Input(query: searchTextField.rx.text.orEmpty.asObservable(), searchButtonTapped: rightViewContainer.cancelButtonTap()))
-            .items
+        savedSearchResultItemsSubject
             .bind(to: tableView.rx.items) { tableView, row, item in
                 let cell: UITableViewCell
                 if item.type == .gym {

@@ -54,11 +54,7 @@ final class SearchAssembly: Assembly {
         }
         
         container.register(SearchVM.self) { resolver in
-            SearchVMImpl(
-                fetchAllGymsInfoUseCase: resolver.resolve(FetchAllGymsInfoUseCase.self)!,
-                searchGymsUseCase: resolver.resolve(SearchGymsUseCase.self)!,
-                userSearchUseCase: resolver.resolve(UserSearchUseCase.self)!,
-                fetchImageURLUseCase: resolver.resolve(FetchImageURLUseCase.self)!)
+            SearchVMImpl()
         }
         
         container.register(SearchResultVM.self) { resolver in

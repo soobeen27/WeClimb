@@ -5,12 +5,15 @@
 //  Created by 강유정 on 1/21/25.
 //
 
+import Foundation
+
 import RxSwift
 import RxCocoa
 
 protocol SearchResultInput {
     var query: Observable<String> { get }
     var selectedSegment: Observable<Int> { get }
+    var saveItem: Observable<SearchResultItem> { get }
 }
 
 protocol SearchResultOutput {
@@ -50,6 +53,7 @@ class SearchResultVMImpl: SearchResultVM {
     struct Input: SearchResultInput {
         let query: Observable<String>
         let selectedSegment: Observable<Int>
+        var saveItem: Observable<SearchResultItem>
     }
     
     struct Output: SearchResultOutput {
@@ -112,6 +116,12 @@ class SearchResultVMImpl: SearchResultVM {
             .bind(to: itemsSubject)
             .disposed(by: disposeBag)
         
+         input.saveItem
+             .subscribe(onNext: { [weak self] item in
+                 self?.saveSearchResultItem(item: item)
+             })
+             .disposed(by: disposeBag)
+        
         return Output(
             items: itemsSubject.asObservable(),
             error: errorSubject.asObservable()
@@ -163,3 +173,31 @@ class SearchResultVMImpl: SearchResultVM {
             .asObservable()
     }
 }
+
+extension SearchResultVMImpl {
+    private func saveSearchResultItem(item: SearchResultItem) {
+        var savedItems = loadSavedSearchResultItems()
+        
+        if savedItems.count >= 10 {
+            savedItems.removeFirst()
+        }
+        
+        savedItems.append(item)
+        
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(savedItems) {
+            UserDefaults.standard.set(encoded, forKey: "recentVisitItems")
+        }
+    }
+    
+    private func loadSavedSearchResultItems() -> [SearchResultItem] {
+        if let savedData = UserDefaults.standard.data(forKey: "recentVisitItems") {
+            let decoder = JSONDecoder()
+            if let loadedItems = try? decoder.decode([SearchResultItem].self, from: savedData) {
+                return loadedItems
+            }
+        }
+        return []
+    }
+}
+

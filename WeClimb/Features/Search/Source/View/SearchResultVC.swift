@@ -141,9 +141,12 @@ class SearchResultVC: UIViewController {
     }
     
     private func bindUI() {
+        let saveItemSubject = PublishSubject<SearchResultItem>()
+        
         let input = SearchResultVMImpl.Input(
             query: searchTextField.rx.text.orEmpty.asObservable(),
-            selectedSegment: selectedSegmentIndexSubject.asObservable()
+            selectedSegment: selectedSegmentIndexSubject.asObservable(),
+            saveItem: saveItemSubject
         )
         
         let output = viewModel.transform(input: input)
@@ -163,13 +166,18 @@ class SearchResultVC: UIViewController {
             }
             .disposed(by: disposeBag)
         
+        tableView.rx.modelSelected(SearchResultItem.self)
+            .subscribe(onNext: { [weak self] item in
+                saveItemSubject.onNext(item)
+            })
+            .disposed(by: disposeBag)
+        
         output.error
             .subscribe(onNext: { errorMessage in
             })
             .disposed(by: disposeBag)
         
         segmentedControl.onSegmentChanged = { [weak self] selectedIndex in
-            print("선택된 세그먼트 인덱스: \(selectedIndex)")
             self?.selectedSegmentIndexSubject.onNext(selectedIndex)
         }
     }
