@@ -18,17 +18,18 @@ class FeedVC: UIViewController {
     let feedVM: FeedVM
     var coordinator: FeedCoordinator?
     
+    private let container = AppDIContainer.shared
+    
     let disposeBag = DisposeBag()
     
     private let fetchType: BehaviorRelay<FetchPostType> = .init(value: .initial)
 
     private lazy var dataSource: UICollectionViewDiffableDataSource<Section, PostItem> = {
-        let dataSource = UICollectionViewDiffableDataSource<Section, PostItem>(collectionView: postCollectionView) { collectionView, indexPath, item in
-           guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionCell.className, for: indexPath) as? PostCollectionCell
-           else {
-               return UICollectionViewCell()
-           }
-            cell.configure(postItem: item)
+        let dataSource = UICollectionViewDiffableDataSource<Section, PostItem>(collectionView: postCollectionView) { [weak self] collectionView, indexPath, item in
+           guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionCell.className, for: indexPath) as? PostCollectionCell, let self
+           else { return UICollectionViewCell() }
+            let viewModel = self.container.resolve(PostCollectionCellVM.self)
+            cell.configure(postItem: item, postCollectionCellVM: viewModel)
            return cell
         }
         return dataSource
@@ -51,6 +52,7 @@ class FeedVC: UIViewController {
         collectionView.isPagingEnabled = true
         collectionView.contentInsetAdjustmentBehavior = .never
         collectionView.register(PostCollectionCell.self, forCellWithReuseIdentifier: PostCollectionCell.className)
+        collectionView.delegate = self
         view.addSubview(collectionView)
         return collectionView
     }()
@@ -86,6 +88,15 @@ class FeedVC: UIViewController {
         snapshot.appendSections([.feed])
         snapshot.appendItems(postItems)
         dataSource.apply(snapshot, animatingDifferences: true)
+        if let centerCell = findCenterCell(in: postCollectionView) {
+            let mediaCollectionview = centerCell.mediaCollectionView
+            mediaCollectionview.visibleCells.compactMap{ $0 as? MediaCollectionCell }.forEach {
+                $0.videoView.stopVideo()
+            }
+            if let mediaCenterCell = findMediaCenterCell(in:  mediaCollectionview) {
+                mediaCenterCell.videoView.playVideo()
+            }
+        }
     }
     
     private func setLayout() {
@@ -94,5 +105,75 @@ class FeedVC: UIViewController {
     
     private func hideNavigationBar() {
         navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+}
+
+extension FeedVC: UICollectionViewDelegate {
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { [weak self] in
+            guard let self else { return }
+            if let collectionView = scrollView as? UICollectionView {
+                if let ceterCell = self.findCenterCell(in: collectionView) {
+                    let mediaCollectionView = ceterCell.mediaCollectionView
+                    if let mediaCenterCell = self.findMediaCenterCell(in: mediaCollectionView) {
+                        mediaCenterCell.videoView.playVideo()
+                    }
+                }
+            }
+        }
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        VideoManager.shared.stopCurrentVideo()
+    }
+    
+    func findCenterCell(in collectionView: UICollectionView) -> PostCollectionCell? {
+        let centerPoint = CGPoint(x: collectionView.bounds.midX + collectionView.contentOffset.x,
+                                   y: collectionView.bounds.midY + collectionView.contentOffset.y)
+        
+        let visibleCells = collectionView.visibleCells.compactMap { $0 as? PostCollectionCell }
+        
+        var closestCell: PostCollectionCell?
+        var minimumDistance: CGFloat = .greatestFiniteMagnitude
+        
+        for cell in visibleCells {
+            if let indexPath = collectionView.indexPath(for: cell),
+               let attributes = collectionView.layoutAttributesForItem(at: indexPath) {
+                let cellCenter = attributes.center
+                let distance = hypot(centerPoint.x - cellCenter.x, centerPoint.y - cellCenter.y)
+                
+                if distance < minimumDistance {
+                    minimumDistance = distance
+                    closestCell = cell
+                }
+            }
+        }
+        
+        return closestCell
+    }
+    
+    func findMediaCenterCell(in collectionView: UICollectionView) -> MediaCollectionCell? {
+        let centerPoint = CGPoint(x: collectionView.bounds.midX + collectionView.contentOffset.x,
+                                   y: collectionView.bounds.midY + collectionView.contentOffset.y)
+        
+        let visibleCells = collectionView.visibleCells.compactMap { $0 as? MediaCollectionCell }
+        
+        var closestCell: MediaCollectionCell?
+        var minimumDistance: CGFloat = .greatestFiniteMagnitude
+        
+        for cell in visibleCells {
+            if let indexPath = collectionView.indexPath(for: cell),
+               let attributes = collectionView.layoutAttributesForItem(at: indexPath) {
+                let cellCenter = attributes.center
+                let distance = hypot(centerPoint.x - cellCenter.x, centerPoint.y - cellCenter.y)
+                
+                if distance < minimumDistance {
+                    minimumDistance = distance
+                    closestCell = cell
+                }
+            }
+        }
+        
+        return closestCell
     }
 }

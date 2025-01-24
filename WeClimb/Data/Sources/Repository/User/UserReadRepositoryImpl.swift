@@ -27,4 +27,8 @@ final class UserReadRepositoryImpl: UserReadRepository {
     func getMyUserInfo() -> Single<User?> {
         return userReadDataSource.myInfo()
     }
+    
+    func myUID() throws -> String {
+        return try userReadDataSource.myUID()
+    }
 }

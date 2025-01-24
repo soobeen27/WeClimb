@@ -76,7 +76,7 @@ enum FeedConsts {
         enum Image {
             static let heart: UIImage? = UIImage.heartIcon
                 .resize(targetSize: CGSize(width: Size.buttonSize, height: Size.buttonSize))?
-                .withTintColor(Color.tint)
+                .withTintColor(Color.tint, renderingMode: .alwaysOriginal)
             static let heartFill: UIImage? = UIImage.heartIconFill
                 .resize(targetSize: CGSize(width: Size.buttonSize, height: Size.buttonSize))?
                 .withTintColor(Color.liked)

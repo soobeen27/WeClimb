@@ -15,7 +15,7 @@ class PostSidebarView: UIView {
     
     var disposeBag = DisposeBag()
     
-    let isLikeRelay = PublishRelay<Bool>()
+    let isLikeRelay = PublishRelay<Bool?>()
     let likeCountRelay = PublishRelay<Int>()
     let commentCountRelay = PublishRelay<Int>()
     
@@ -30,8 +30,8 @@ class PostSidebarView: UIView {
     private lazy var likeButton: UIButton = {
         let button = UIButton()
         button.setImage(FeedConsts.Sidebar.Image.heart, for: .normal)
+        button.setImage(FeedConsts.Sidebar.Image.heart, for: .disabled)
         button.setImage(FeedConsts.Sidebar.Image.heartFill, for: .selected)
-        button.tintColor = FeedConsts.Sidebar.Color.tint
         return button
     }()
     
@@ -39,6 +39,7 @@ class PostSidebarView: UIView {
         let label = UILabel()
         label.font = FeedConsts.Sidebar.Font.count
         label.textColor = FeedConsts.Sidebar.Color.tint
+        label.textAlignment = .center
         return label
     }()
     
@@ -60,6 +61,7 @@ class PostSidebarView: UIView {
         let label = UILabel()
         label.font = FeedConsts.Sidebar.Font.count
         label.textColor = FeedConsts.Sidebar.Color.tint
+        label.textAlignment = .center
         return label
     }()
     
@@ -90,6 +92,7 @@ class PostSidebarView: UIView {
         setLayout()
         setStackView()
         likeCheck()
+        bindLikeButton()
     }
     
     required init?(coder: NSCoder) {
@@ -105,10 +108,25 @@ class PostSidebarView: UIView {
         isLikeRelay
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isLike in
-                guard let self else { return }
+                guard let self, let isLike else {
+                    self?.likeButton.isEnabled = false
+                    return
+                }
                 self.likeButton.isSelected = isLike
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func bindLikeButton() {
+        likeButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                self?.likeButton.isSelected.toggle()
+                self?.isLikeRelay.accept(self?.likeButton.isSelected ?? false)
+                
+            })
+            .disposed(by: disposeBag)
+        
     }
     
     private func setLikeStackView() {
