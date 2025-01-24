@@ -20,7 +20,8 @@ class PostVideoView: UIView {
     
     private var disposeBag = DisposeBag()
     
-    
+    private let loadComplete = BehaviorSubject<Bool>.init(value: false)
+            
     var videoInfo: (url: URL, uid: String)? {
         didSet {
             loadVideo()
@@ -45,10 +46,20 @@ class PostVideoView: UIView {
             .subscribe(onNext: { [weak self] cachedURL in
                 guard let self else { return }
                 self.setupPlayer(with: cachedURL)
+                self.loadComplete.onNext(true)
+            }, onError: { error in
+                print("StreamAndCacheVideoError: \(error)")
             })
             .disposed(by: disposeBag)
-        
-        
+    }
+    
+    func resetToDefaultState() {
+        videoInfo = nil
+        playerLayer?.removeFromSuperlayer()
+        player = nil
+        playerLayer = nil
+        loadComplete.onNext(false)
+        disposeBag = DisposeBag()
     }
     
     private func setupPlayer(with url: URL) {
@@ -83,6 +94,11 @@ class PostVideoView: UIView {
         if let playerLayer = playerLayer {
             self.layer.insertSublayer(playerLayer, at: 0)
         }
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        playerLayer?.frame = self.bounds
     }
     
     private func streamAndCacheVideo(with url: URL, cacheKey: String) -> Observable<URL> {
@@ -124,6 +140,22 @@ class PostVideoView: UIView {
             task.resume()
             return Disposables.create()
         }
+    }
+    
+    func stopVideo() {
+        VideoManager.shared.stopCurrentVideo()
+    }
+    
+    func playVideo() {
+        loadComplete
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { [weak self] success in
+                if success {
+                    guard let self, let player = self.player else { return }
+                    VideoManager.shared.playVideo(player: player)
+                }
+            })
+            .disposed(by: disposeBag)
     }
 }
 
