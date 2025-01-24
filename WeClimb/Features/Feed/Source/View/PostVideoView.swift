@@ -64,8 +64,8 @@ class PostVideoView: UIView {
                 guard let self else { return }
                 Task {
                     await self.setupPlayer(with: cachedURL)
+                    self.loadComplete.onNext(true)
                 }
-                self.loadComplete.onNext(true)
             }, onError: { error in
                 print("StreamAndCacheVideoError: \(error)")
             })
