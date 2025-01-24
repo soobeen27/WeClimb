@@ -62,7 +62,9 @@ class PostVideoView: UIView {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] cachedURL in
                 guard let self else { return }
-                self.setupPlayer(with: cachedURL)
+                Task {
+                    await self.setupPlayer(with: cachedURL)
+                }
                 self.loadComplete.onNext(true)
             }, onError: { error in
                 print("StreamAndCacheVideoError: \(error)")
@@ -79,7 +81,7 @@ class PostVideoView: UIView {
         disposeBag = DisposeBag()
     }
     
-    private func setupPlayer(with url: URL) {
+    private func setupPlayer(with url: URL) async {
         let asset = AVAsset(url: url)
         let playerItem = AVPlayerItem(asset: asset)
         player = AVQueuePlayer()
@@ -88,13 +90,24 @@ class PostVideoView: UIView {
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.frame = self.bounds
         playerLayer?.opacity = 1.0
-        playerLayer?.backgroundColor = UIColor(hex: "#0B1013").cgColor
-        guard let track = asset.tracks(withMediaType: .video).first else {
-            print("비디오 트랙을 찾을 수 없습니다.")
+        playerLayer?.backgroundColor = FeedConsts.CollectionView.backgroundColor.cgColor
+
+        guard let videoTrack = try? await asset.loadTracks(withMediaType: .video).first else {
+            print("setupPlayer: videoTrack 못구함")
             return
         }
-        
-        let size = track.naturalSize.applying(track.preferredTransform)
+
+        guard let naturalSize = try? await videoTrack.load(.naturalSize) else {
+            print("setupPlayer: naturalSize 못구함")
+            return
+        }
+        guard let preferredTransform = try? await videoTrack.load(.preferredTransform) else {
+            print("setupPlayer: prefferdTransform 못구함")
+            return
+        }
+
+        let size = naturalSize.applying(preferredTransform)
+
         let width = abs(size.width)
         let height = abs(size.height)
         let ratio = height / width
@@ -194,4 +207,9 @@ enum VideoError: Error {
             return "다운로드 실패"
         }
     }
+}
+
+enum PlayerError: Error {
+    case videoTrackNotFound
+    case failedToLoadVideoSize
 }
