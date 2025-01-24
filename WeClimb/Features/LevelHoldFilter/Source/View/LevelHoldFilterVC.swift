@@ -33,7 +33,7 @@ class LevelHoldFilterVC: UIViewController {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = LevelHoldFilterConst.Text.filterViewTiltle
+        label.text = LevelHoldFilterConst.Text.segmentFilterTiltle
         label.font = UIFont.customFont(style: .heading2SemiBold)
         label.textColor = .black
         label.textAlignment = .center
@@ -46,7 +46,7 @@ class LevelHoldFilterVC: UIViewController {
         return view
     }()
     
-    let segmentedControl = CustomSegmentedControl(items: [LevelHoldFilterConst.Text.firstSegmentTitle, LevelHoldFilterConst.Text.secondSegmentTitle])
+    let segmentedControl = CustomSegmentedControl(items: [LevelHoldFilterConst.Text.segmentLevelTiltle, LevelHoldFilterConst.Text.segmentHoldTiltle])
     
     private let bottomLineView: UIView = {
         let view = UIView()
