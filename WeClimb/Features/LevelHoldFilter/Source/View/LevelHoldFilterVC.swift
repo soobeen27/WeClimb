@@ -33,7 +33,7 @@ class LevelHoldFilterVC: UIViewController {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = LevelHoldFilterConst.Text.segmentFilterTiltle
+        label.text = LevelHoldFilterConst.Text.filterViewTiltle
         label.font = UIFont.customFont(style: .heading2SemiBold)
         label.textColor = .black
         label.textAlignment = .center
