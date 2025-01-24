@@ -21,6 +21,8 @@ class PostVideoView: UIView {
     private var disposeBag = DisposeBag()
     
     private let loadComplete = BehaviorSubject<Bool>.init(value: false)
+    
+    private var isPlaying: Bool = false
             
     var videoInfo: (url: URL, uid: String)? {
         didSet {
@@ -30,10 +32,22 @@ class PostVideoView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc private func handleTap() {
+        if isPlaying {
+            VideoManager.shared.stopVideo()
+            isPlaying.toggle()
+        } else {
+            guard let player else { return }
+            VideoManager.shared.playVideo(player: player)
+            isPlaying.toggle()
+        }
     }
     
     private func loadVideo() {
@@ -142,10 +156,6 @@ class PostVideoView: UIView {
         }
     }
     
-    func stopVideo() {
-        VideoManager.shared.stopCurrentVideo()
-    }
-    
     func playVideo() {
         loadComplete
             .asDriver(onErrorDriveWith: .empty())
@@ -153,6 +163,7 @@ class PostVideoView: UIView {
                 if success {
                     guard let self, let player = self.player else { return }
                     VideoManager.shared.playVideo(player: player)
+                    self.isPlaying = true
                 }
             })
             .disposed(by: disposeBag)

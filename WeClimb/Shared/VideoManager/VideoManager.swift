@@ -18,8 +18,12 @@ class VideoManager {
         currentPlayer?.play()
     }
 
-    func stopCurrentVideo() {
+    func reset() {
         currentPlayer?.pause()
         currentPlayer = nil
+    }
+    
+    func stopVideo() {
+        currentPlayer?.pause()
     }
 }

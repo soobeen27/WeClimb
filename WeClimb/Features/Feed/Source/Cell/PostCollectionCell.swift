@@ -223,7 +223,7 @@ extension PostCollectionCell: UICollectionViewDelegate {
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        VideoManager.shared.stopCurrentVideo()
+        VideoManager.shared.reset()
     }
     
     func findCenterCell(in collectionView: UICollectionView) -> MediaCollectionCell? {
