@@ -128,6 +128,20 @@ extension FeedVC: UICollectionViewDelegate {
         VideoManager.shared.reset()
     }
     
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let collectionView = scrollView as? UICollectionView else { return }
+        let contentOffset = scrollView.contentOffset
+        let scrollViewHeight = collectionView.frame.size.height
+        let scrollContentSizeHeight = collectionView.contentSize.height
+        let scrollOffsetThreshold = scrollContentSizeHeight - scrollViewHeight
+        
+        if contentOffset.y >= scrollOffsetThreshold {
+            if collectionView.indexPathsForVisibleItems.sorted().last != nil {
+                fetchType.accept(.more)
+            }
+        }
+    }
+    
     func findCenterCell(in collectionView: UICollectionView) -> PostCollectionCell? {
         let centerPoint = CGPoint(x: collectionView.bounds.midX + collectionView.contentOffset.x,
                                    y: collectionView.bounds.midY + collectionView.contentOffset.y)

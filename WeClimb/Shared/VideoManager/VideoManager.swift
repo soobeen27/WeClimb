@@ -8,11 +8,11 @@ import AVFoundation
 
 class VideoManager {
     static let shared = VideoManager()
-    private var currentPlayer: AVPlayer?
+    private var currentPlayer: AVQueuePlayer?
     
     private init() {}
 
-    func playVideo(player: AVPlayer) {
+    func playVideo(player: AVQueuePlayer) {
         currentPlayer?.pause()
         currentPlayer = player
         currentPlayer?.play()

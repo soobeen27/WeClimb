@@ -15,7 +15,10 @@ import Kingfisher
 
 class PostVideoView: UIView {
     
-    private var player: AVPlayer?
+    private var player: AVQueuePlayer?
+    
+    private var playerLooper: AVPlayerLooper?
+    
     private var playerLayer: AVPlayerLayer?
     
     private var disposeBag = DisposeBag()
@@ -78,7 +81,10 @@ class PostVideoView: UIView {
     
     private func setupPlayer(with url: URL) {
         let asset = AVAsset(url: url)
-        player = AVPlayer(url: url)
+        let playerItem = AVPlayerItem(asset: asset)
+        player = AVQueuePlayer()
+        guard let player else { return }
+        playerLooper = AVPlayerLooper(player: player, templateItem: playerItem)
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.frame = self.bounds
         playerLayer?.opacity = 1.0
