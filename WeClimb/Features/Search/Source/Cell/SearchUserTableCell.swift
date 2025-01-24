@@ -15,8 +15,8 @@ class SearchUserTableCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.image = UIImage.avatarIconFill
-        imageView.layer.cornerRadius = 36 / 2
+        imageView.image = SearchConst.Image.defaultUserImage
+        imageView.layer.cornerRadius = SearchConst.Shape.cellImageCornerRadius
         imageView.layer.masksToBounds = true
         return imageView
     }()
@@ -28,23 +28,29 @@ class SearchUserTableCell: UITableViewCell {
         return label
     }()
     
-    private let userHeightLabel : UILabel = {
+    private let userInfoLabel : UILabel = {
         let label = UILabel()
         label.font = UIFont.customFont(style: .caption2Regular)
         label.textColor = .labelNeutral
         return label
     }()
     
-    private lazy var cancelButton: UIButton = {
+    private lazy var deleteButton: UIButton = {
         let button = UIButton()
-        button.setTitle("삭제", for: .normal)
-        button.setTitleColor(.labelNeutral, for: .normal)
-        button.titleLabel?.font = UIFont.customFont(style: .caption1Regular)
+        button.setTitle(SearchConst.Text.cellCancelBtnTitle, for: .normal)
+        button.setTitleColor(SearchConst.Color.cellCancelBtnTitleColor, for: .normal)
+        button.titleLabel?.font = SearchConst.Font.cellCancelBtnFont
         button.addTarget(self, action: #selector(didTapDeleteButton), for: .touchUpInside)
         return button
     }()
     
     var onDelete: ((SearchResultItem) -> Void)?
+    
+    var shouldShowDeleteButton: Bool = true {
+        didSet {
+            deleteButton.isHidden = !shouldShowDeleteButton
+        }
+    }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -57,27 +63,27 @@ class SearchUserTableCell: UITableViewCell {
     }
     
     private func setLayout() {
-        [userImageView, userNameLabel, userHeightLabel, cancelButton]
+        [userImageView, userNameLabel, userInfoLabel, deleteButton]
             .forEach { contentView.addSubview($0) }
       
         userImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(16)
+            $0.leading.equalToSuperview().inset(SearchConst.userCell.Spacing.userImageleftSpacing)
             $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(36)
+            $0.width.height.equalTo(SearchConst.userCell.Size.userImageSize)
         }
         
         userNameLabel.snp.makeConstraints {
-            $0.leading.equalTo(userImageView.snp.trailing).offset(8)
+            $0.leading.equalTo(userImageView.snp.trailing).offset(SearchConst.userCell.Spacing.userNameleftSpacing)
             $0.top.equalTo(userImageView.snp.top)
         }
         
-        userHeightLabel.snp.makeConstraints {
-            $0.top.equalTo(userNameLabel.snp.bottom).offset(2)
+        userInfoLabel.snp.makeConstraints {
+            $0.top.equalTo(userNameLabel.snp.bottom).offset(SearchConst.userCell.Spacing.userInfoTopSpacing)
             $0.leading.equalTo(userNameLabel.snp.leading)
         }
         
-        cancelButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16)
+        deleteButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(SearchConst.userCell.Spacing.cancelBtnRightSpacing)
             $0.centerY.equalToSuperview()
         }
     }
@@ -92,16 +98,20 @@ class SearchUserTableCell: UITableViewCell {
         }
         
         userNameLabel.text = item.name
-        if let height = item.height {
-            userHeightLabel.text = "\(height) cm"
+        if let height = item.height, let armReach = item.armReach {
+            userInfoLabel.text = String(format: SearchConst.Text.UserInfo.heightAndArmReachLabel, "\(height)", "\(armReach)")
+        } else if let height = item.height {
+            userInfoLabel.text = String(format: SearchConst.Text.UserInfo.heightLabel, "\(height)")
+        } else if let armReach = item.armReach {
+            userInfoLabel.text = String(format: SearchConst.Text.UserInfo.armReachLabel, "\(armReach)")
         } else {
-            userHeightLabel.text = nil
+            userInfoLabel.text = nil
         }
     }
     
     @objc private func didTapDeleteButton() {
         guard let name = userNameLabel.text else { return }
-        let itemToDelete = SearchResultItem(type: .user, name: name, imageName: "", location: nil, height: nil)
+        let itemToDelete = SearchResultItem(type: .user, name: name, imageName: "", location: nil, height: nil, armReach: nil)
         onDelete?(itemToDelete)
     }
 }

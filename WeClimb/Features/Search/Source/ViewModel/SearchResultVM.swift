@@ -141,7 +141,8 @@ class SearchResultVMImpl: SearchResultVM {
                                                     name: gym.gymName,
                                                     imageName: imageURLString ?? "",
                                                     location: gym.address,
-                                                    height: nil)
+                                                    height: nil,
+                                                    armReach: nil)
                         }
                 }
                 
@@ -162,7 +163,12 @@ class SearchResultVMImpl: SearchResultVM {
         return userSearchUseCase.execute(with: query)
             .map { users in
                 self.cachedUsers = users.map { user in
-                    return SearchResultItem(type: .user, name: user.userName ?? "", imageName: user.profileImage ?? "", location: nil, height: user.height)
+                    return SearchResultItem(type: .user,
+                                            name: user.userName ?? "",
+                                            imageName: user.profileImage ?? "",
+                                            location: nil,
+                                            height: user.height,
+                                            armReach: user.armReach)
                 }
                 self.usersSubject.onNext(self.cachedUsers)
                 return self.cachedUsers
@@ -175,7 +181,7 @@ extension SearchResultVMImpl {
     private func saveRecentVisitItem(item: SearchResultItem) {
         var savedItems = loadSavedRecentVisitItems()
         
-        if savedItems.count >= 10 {
+        if savedItems.count >= SearchConst.saveRecentVisitItemMaxLimit {
             savedItems.removeFirst()
         }
         
@@ -183,12 +189,12 @@ extension SearchResultVMImpl {
         
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(savedItems) {
-            UserDefaults.standard.set(encoded, forKey: "recentVisitItems")
+            UserDefaults.standard.set(encoded, forKey: SearchConst.UserDefaultsKeys.recentVisitItems)
         }
     }
     
     private func loadSavedRecentVisitItems() -> [SearchResultItem] {
-        if let savedData = UserDefaults.standard.data(forKey: "recentVisitItems") {
+        if let savedData = UserDefaults.standard.data(forKey: SearchConst.UserDefaultsKeys.recentVisitItems) {
             let decoder = JSONDecoder()
             if let loadedItems = try? decoder.decode([SearchResultItem].self, from: savedData) {
                 return loadedItems

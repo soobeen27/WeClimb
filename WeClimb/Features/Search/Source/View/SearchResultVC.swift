@@ -17,50 +17,50 @@ class SearchResultVC: UIViewController {
     private var viewModel: SearchResultVM
     var query: String?
     
-    private lazy var rightViewContainer: TextFieldRightView = {
-        let container = TextFieldRightView()
+    private lazy var searchRightViewContainer: SearchFieldRightView = {
+        let container = SearchFieldRightView()
         
         container.snp.makeConstraints {
-            $0.width.height.equalTo(30)
+            $0.width.height.equalTo(SearchConst.Size.rightViewSize)
         }
         return container
     }()
     
     private lazy var searchTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "검색하기"
-        textField.layer.cornerRadius = 8
-        textField.layer.borderWidth = 1
-        textField.layer.borderColor = UIColor.black.cgColor
-        textField.font = .customFont(style: .body2Medium)
-        textField.textColor = .black
+        textField.placeholder = SearchConst.Text.searchFieldPlaceholder
+        textField.layer.cornerRadius = SearchConst.Shape.textFieldCornerRadius
+        textField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
+        textField.layer.borderColor = SearchConst.Color.textFieldBorderColor
+        textField.font = SearchConst.Font.textFieldFont
+        textField.textColor = SearchConst.Color.textFieldTextColor
         
-        let searchIcon = UIImageView(image: UIImage(named: "searchIcon"))
+        let searchIcon = SearchConst.Image.searchIcon
         searchIcon.contentMode = .scaleAspectFit
-        let iconWrapper = UIView(frame: CGRect(x: 0, y: 0, width: 20 + 12 + 8, height: 20))
+        let iconWrapper = UIView(frame: SearchConst.Size.searchIconSize)
         iconWrapper.addSubview(searchIcon)
-        searchIcon.frame.origin = CGPoint(x: 12, y: 0)
+        searchIcon.frame.origin = SearchConst.Spacing.searchIconleftSpacing
         
         textField.leftView = iconWrapper
         textField.leftViewMode = .always
         
-        textField.rightView = rightViewContainer
+        textField.rightView = searchRightViewContainer
         textField.rightViewMode = .whileEditing
-        rightViewContainer.setCancelButtonAlpha(1)
+        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
         
         return textField
     }()
     
     private let backButton: UIButton = {
         let button = UIButton(type: .system)
-        let closeIcon = UIImage(named: "chevronLeftIcon")?.withRenderingMode(.alwaysTemplate)
-        button.setImage(closeIcon, for: .normal)
+        let backIcon = SearchConst.Image.backIcon
+        button.setImage(backIcon, for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
-        button.tintColor = .black
+        button.tintColor = SearchConst.Color.backBtnTintColor
         return button
     }()
     
-    let segmentedControl = CustomSegmentedControl(items: ["전체", "암장", "계정"])
+    let segmentedControl = CustomSegmentedControl(items: [SearchConst.Text.SegmentedItems.all, SearchConst.Text.SegmentedItems.gym, SearchConst.Text.SegmentedItems.account])
     
     private let bottomLineView: UIView = {
         let view = UIView()
@@ -73,11 +73,11 @@ class SearchResultVC: UIViewController {
         tableView.separatorStyle = .none
         tableView.register(SearchGymTableCell.self, forCellReuseIdentifier: SearchGymTableCell.className)
         tableView.register(SearchUserTableCell.self, forCellReuseIdentifier: SearchUserTableCell.className)
-        tableView.rowHeight = 60
+        tableView.rowHeight = SearchConst.Size.tableViewRowHeight
         return tableView
     }()
     
-    private let selectedSegmentIndexSubject = BehaviorSubject<Int>(value: 0)
+    private let selectedSegmentIndexSubject = BehaviorSubject<Int>(value: SearchConst.defaultSegmentIndex)
 
     init(viewModel: SearchResultVM) {
         self.viewModel = viewModel
@@ -94,7 +94,6 @@ class SearchResultVC: UIViewController {
         searchTextField.delegate = self
         
         if let query = query {
-            print("해당 쿼리 : \(query)")
             searchTextField.text = query
         }
         
@@ -108,28 +107,28 @@ class SearchResultVC: UIViewController {
             .forEach { view.addSubview($0)}
         
         backButton.snp.makeConstraints {
-            $0.width.height.equalTo(24)
-            $0.leading.equalToSuperview().offset(16)
+            $0.width.height.equalTo(SearchConst.SearchResult.Size.backBtnSize)
+            $0.leading.equalToSuperview().offset(SearchConst.SearchResult.Spacing.backBtnleftSpacing)
             $0.centerY.equalTo(searchTextField)
         }
         
         searchTextField.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).inset(16)
-            $0.trailing.equalToSuperview().inset(16)
-            $0.leading.equalTo(backButton.snp.trailing).offset(8)
-            $0.height.equalTo(46)
+            $0.top.equalTo(view.safeAreaLayoutGuide).inset(SearchConst.SearchResult.Spacing.textFieldTopSpacing)
+            $0.trailing.equalToSuperview().inset(SearchConst.SearchResult.Spacing.textFieldRightSpacing)
+            $0.leading.equalTo(backButton.snp.trailing).offset(SearchConst.SearchResult.Spacing.textFieldLeftSpacing)
+            $0.height.equalTo(SearchConst.SearchResult.Size.textFieldHeight)
         }
         
         segmentedControl.snp.makeConstraints {
-            $0.top.equalTo(searchTextField.snp.bottom).offset(16)
-            $0.height.equalTo(48)
-            $0.leading.equalToSuperview().inset(16)
+            $0.top.equalTo(searchTextField.snp.bottom).offset(SearchConst.SearchResult.Spacing.segmentTopSpacing)
+            $0.height.equalTo(SearchConst.SearchResult.Size.segmentHeight)
+            $0.leading.equalToSuperview().inset(SearchConst.SearchResult.Spacing.segmentRightSpacing)
             $0.trailing.equalToSuperview()
         }
         
         bottomLineView.snp.makeConstraints {
-            $0.top.equalTo(segmentedControl.snp.bottom).offset(-1)
-            $0.height.equalTo(1)
+            $0.top.equalTo(segmentedControl.snp.bottom).offset(SearchConst.SearchResult.Spacing.bottomLineTopSpacing)
+            $0.height.equalTo(SearchConst.SearchResult.Size.bottomLineHeight)
             $0.leading.trailing.equalToSuperview()
         }
         
@@ -157,10 +156,12 @@ class SearchResultVC: UIViewController {
                 case .gym:
                     let cell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className) as! SearchGymTableCell
                     cell.configure(with: item)
+                    cell.shouldShowDeleteButton = false
                     return cell
                 case .user:
                     let cell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className) as! SearchUserTableCell
                     cell.configure(with: item)
+                    cell.shouldShowDeleteButton = false
                     return cell
                 }
             }
@@ -168,7 +169,7 @@ class SearchResultVC: UIViewController {
         
         tableView.rx.modelSelected(SearchResultItem.self)
             .bind(onNext: { [weak self] item in
-                guard let self = self else { return }
+                guard self != nil else { return }
                 saveItemSubject.onNext(item)
             })
             .disposed(by: disposeBag)
@@ -185,7 +186,7 @@ class SearchResultVC: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        rightViewContainer.cancelButtonTapObservable
+        searchRightViewContainer.cancelButtonTapObservable
             .bind { [weak self] in
                 self?.didTapSmallCancelButton()
             }
@@ -197,8 +198,8 @@ class SearchResultVC: UIViewController {
         }
    
     private func didTapSmallCancelButton() {
-        searchTextField.text = ""
-        rightViewContainer.setCancelButtonAlpha(0)
+        searchTextField.text = SearchConst.Text.emptyText
+        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
     }
 }
 
@@ -207,9 +208,9 @@ extension SearchResultVC: UITextFieldDelegate  {
         let newText = (textField.text as NSString?)?.replacingCharacters(in: range, with: string)
         
         if newText?.isEmpty == true {
-            rightViewContainer.setCancelButtonAlpha(0)
+            searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
         } else {
-            rightViewContainer.setCancelButtonAlpha(1)
+            searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaVisible)
         }
         return true
     }

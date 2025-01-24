@@ -18,36 +18,42 @@ class SearchGymTableCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.backgroundColor = .lightGray
-        imageView.layer.cornerRadius = 36 / 2
+        imageView.backgroundColor = SearchConst.Color.gymImageDefaultBackground
+        imageView.layer.cornerRadius = SearchConst.Shape.cellImageCornerRadius
         imageView.layer.masksToBounds = true
         return imageView
     }()
     
     private let gymLocationLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.customFont(style: .caption2Regular)
-        label.textColor = .labelNeutral
+        label.font = SearchConst.Font.gymLocationFont
+        label.textColor = SearchConst.Color.gymLocationtextColor
         return label
     }()
     
     private let gymNameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.customFont(style: .label2SemiBold)
-        label.textColor = .labelStrong
+        label.font = SearchConst.Font.gymNameFont
+        label.textColor = SearchConst.Color.gymNameTextColor
         return label
     }()
     
-    private lazy var cancelButton: UIButton = {
+    private lazy var deleteButton: UIButton = {
         let button = UIButton()
-        button.setTitle("삭제", for: .normal)
-        button.setTitleColor(.labelNeutral, for: .normal)
-        button.titleLabel?.font = UIFont.customFont(style: .caption1Regular)
+        button.setTitle(SearchConst.Text.cellCancelBtnTitle, for: .normal)
+        button.setTitleColor(SearchConst.Color.cellCancelBtnTitleColor, for: .normal)
+        button.titleLabel?.font = SearchConst.Font.cellCancelBtnFont
         button.addTarget(self, action: #selector(didTapDeleteButton), for: .touchUpInside)
         return button
     }()
     
     var onDelete: ((SearchResultItem) -> Void)?
+    
+    var shouldShowDeleteButton: Bool = true {
+        didSet {
+            deleteButton.isHidden = !shouldShowDeleteButton
+        }
+    }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -56,28 +62,27 @@ class SearchGymTableCell: UITableViewCell {
     
     private func setLayout() {
         
-        [gymImageView, gymLocationLabel, gymNameLabel, cancelButton]
+        [gymImageView, gymLocationLabel, gymNameLabel, deleteButton]
             .forEach { contentView.addSubview($0) }
         
-        
         gymImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(16)
+            $0.leading.equalToSuperview().inset(SearchConst.gymCell.Spacing.gymImageleftSpacing)
             $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(36)
+            $0.width.height.equalTo(SearchConst.gymCell.Size.gymImageSize)
         }
         
         gymLocationLabel.snp.makeConstraints {
-            $0.leading.equalTo(gymImageView.snp.trailing).offset(8)
+            $0.leading.equalTo(gymImageView.snp.trailing).offset(SearchConst.gymCell.Spacing.gymLocationleftSpacing)
             $0.top.equalTo(gymImageView.snp.top)
         }
         
         gymNameLabel.snp.makeConstraints {
             $0.leading.equalTo(gymLocationLabel)
-            $0.top.equalTo(gymLocationLabel.snp.bottom).offset(2)
+            $0.top.equalTo(gymLocationLabel.snp.bottom).offset(SearchConst.gymCell.Spacing.gymNameTopSpacing)
         }
         
-        cancelButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16)
+        deleteButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(SearchConst.gymCell.Spacing.cancelBtnRightSpacing)
             $0.centerY.equalToSuperview()
         }
     }
@@ -85,22 +90,21 @@ class SearchGymTableCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
 
     func configure(with item: SearchResultItem) {
         gymNameLabel.text = item.name
         gymLocationLabel.text = item.location
 
         if let imageURL = URL(string: item.imageName), !item.imageName.isEmpty {
-            gymImageView.kf.setImage(with: imageURL, placeholder: UIImage(named: ""))
+            gymImageView.kf.setImage(with: imageURL, placeholder: SearchConst.Image.emptyDefaultImage)
         } else {
-            gymImageView.image = UIImage(named: "placeholder_image")
+            gymImageView.image = SearchConst.Image.emptyDefaultImage
         }
     }
     
     @objc private func didTapDeleteButton() {
         guard let name = gymNameLabel.text else { return }
-        let itemToDelete = SearchResultItem(type: .gym, name: name, imageName: "", location: nil, height: nil)
+        let itemToDelete = SearchResultItem(type: .gym, name: name, imageName: "", location: nil, height: nil, armReach: nil)
         onDelete?(itemToDelete)
     }
 }
