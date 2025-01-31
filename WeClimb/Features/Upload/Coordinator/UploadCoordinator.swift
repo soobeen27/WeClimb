@@ -53,12 +53,17 @@ final class UploadCoordinator: BaseCoordinator {
         tabBarController.selectedIndex = 2
         navigateToSearchVC()
         dismissUploadView()
-        tabBarController.tabBar.isHidden = true
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            self.tabBarController.tabBar.alpha = 0
+        }) { _ in
+            self.tabBarController.tabBar.isHidden = true
+        }
     }
     
     func navigateToSearchVC() {
         let searchCoordinator = SearchCoordinator(navigationController: navigationController, builder: searchBuilder)
-        searchCoordinator.start()
+        searchCoordinator.navigateToUploadSearch()
     }
 }
 

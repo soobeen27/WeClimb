@@ -25,8 +25,14 @@ struct SearchResultItem: Codable {
     var armReach: Int?
 }
 
+enum SearchStyle {
+    case defaultSearch
+    case uploadSearch
+}
+
 class SearchVC: UIViewController, UITextFieldDelegate {
     var coordinator: SearchCoordinator?
+    private let searchStyle: SearchStyle
     
     private let disposeBag = DisposeBag()
     
@@ -104,6 +110,15 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
     }
     
+    init(searchStyle: SearchStyle = .defaultSearch) {
+        self.searchStyle = searchStyle
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -114,6 +129,36 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         setLayout()
         bindTableView()
         bindButtons()
+        applySearchStyle()
+    }
+    
+    private func applySearchStyle() {
+         switch searchStyle {
+         case .defaultSearch:
+             setupDefaultSearchStyle()
+         case .uploadSearch:
+             setupUploadSearchStyle()
+         }
+     }
+    
+    private func setupDefaultSearchStyle() {
+    }
+    
+    private func setupUploadSearchStyle() {
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        navigationItem.title = "암장"
+        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysOriginal) 
+        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapBackButton))
+        navigationItem.leftBarButtonItem = backButton
+    }
+
+    @objc private func didTapBackButton() {
+        tabBarController?.selectedIndex = 0
+        
+        tabBarController?.tabBar.isHidden = false
+         UIView.animate(withDuration: 0.1, animations: {
+             self.tabBarController?.tabBar.alpha = 1
+         })
     }
     
     private func setLayout() {
@@ -252,7 +297,13 @@ extension SearchVC {
         if let searchText = textField.text, !searchText.isEmpty {
             self.searchTextField.alpha = SearchConst.buttonAlphaHidden
             self.cancelButton.alpha = SearchConst.buttonAlphaHidden
-            coordinator?.navigateToSearchResult(query: searchText)
+            
+            switch searchStyle {
+            case .defaultSearch:
+                coordinator?.navigateToSearchResult(query: searchText)
+            case .uploadSearch:
+                coordinator?.navigateToUploadSearchResult(query: searchText) 
+            }
         }
         
         return true

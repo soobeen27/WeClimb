@@ -44,27 +44,31 @@ class UploadMenuVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupView()
+        setView()
+        setButton()
         setLayout()
-        climbingButton.addTarget(self, action: #selector(climbingButtonTapped), for: .touchUpInside)
-        addTopBorderToButton(climbingButton)
     }
     
     private func addTopBorderToButton(_ button: UIButton) {
-        let topBorderLayer = CALayer()
-        topBorderLayer.backgroundColor = UIColor.lineSolidLight.cgColor
-        topBorderLayer.frame = CGRect(x: -16, y: 0, width: view.frame.width - 16, height: 1)
+        let borderLayer = CALayer()
+        borderLayer.backgroundColor = UIColor.lineSolidLight.cgColor
+        borderLayer.frame = CGRect(x: -16, y: 0, width: 250, height: 1)
         
-        button.layer.addSublayer(topBorderLayer)
+        button.layer.addSublayer(borderLayer)
     }
     
-    private func setupView() {
+    private func setView() {
         view.backgroundColor = .white
         view.layer.cornerRadius = 16
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOpacity = 0.2
         view.layer.shadowOffset = CGSize(width: 0, height: 0)
         view.layer.shadowRadius = 10
+    }
+    
+    private func setButton() {
+        climbingButton.addTarget(self, action: #selector(climbingButtonTapped), for: .touchUpInside)
+        addTopBorderToButton(climbingButton)
     }
     
     private func setLayout() {

@@ -27,4 +27,11 @@ final class SearchResultCoordinator: BaseCoordinator {
     func navigateBackToSearchVC() {
         navigationController.popViewController(animated: true)
     }
+    
+    func navigateToUploadSearchResult() {
+        let searchResultVC = builder.buildUploadSearchResult()
+        searchResultVC.coordinator = self
+        searchResultVC.query = query
+        navigationController.pushViewController(searchResultVC, animated: true)
+    }
 }

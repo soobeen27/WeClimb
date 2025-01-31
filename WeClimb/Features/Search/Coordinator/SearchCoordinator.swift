@@ -27,4 +27,16 @@ final class SearchCoordinator: BaseCoordinator {
         searchResultCoordinator.query = query
         searchResultCoordinator.start()
     }
+    
+    func navigateToUploadSearch() {
+        let searchVC = SearchVC(searchStyle: .uploadSearch)
+        searchVC.coordinator = self
+        navigationController.pushViewController(searchVC, animated: true)
+    }
+    
+    func navigateToUploadSearchResult(query: String) {
+        let searchResultCoordinator = SearchResultCoordinator(navigationController: navigationController, builder: builder)
+        searchResultCoordinator.query = query
+        searchResultCoordinator.navigateToUploadSearchResult()
+    }
 }
