@@ -38,8 +38,8 @@ final class SearchAssembly: Assembly {
             )
         }
         
-        container.register(FetchGymInfoUseCase.self) { resolver in
-            FetchGymInfoUseCaseImpl(gymRepository: resolver.resolve(GymRepository.self)!
+        container.register(SearchGymsUseCase.self) { resolver in
+            SearchGymsUseCaseImpl(gymRepository: resolver.resolve(GymRepository.self)!
             )
         }
         
@@ -53,14 +53,12 @@ final class SearchAssembly: Assembly {
             )
         }
         
-        container.register(SearchVM.self) { resolver in
-            SearchVMImpl(
-                fetchAllGymsInfoUseCase: resolver.resolve(FetchAllGymsInfoUseCase.self)!,
-                fetchGymInfoUseCase: resolver.resolve(FetchGymInfoUseCase.self)!, userSearchUseCase: resolver.resolve(UserSearchUseCase.self)!, fetchImageURLUseCase: resolver.resolve(FetchImageURLUseCase.self)!)
-        }
-        
         container.register(SearchResultVM.self) { resolver in
-            SearchResultVMImpl()
+            SearchResultVMImpl(
+                fetchAllGymsInfoUseCase: resolver.resolve(FetchAllGymsInfoUseCase.self)!,
+                searchGymsUseCase: resolver.resolve(SearchGymsUseCase.self)!,
+                userSearchUseCase: resolver.resolve(UserSearchUseCase.self)!,
+                fetchImageURLUseCase: resolver.resolve(FetchImageURLUseCase.self)!)
         }
     }
 }

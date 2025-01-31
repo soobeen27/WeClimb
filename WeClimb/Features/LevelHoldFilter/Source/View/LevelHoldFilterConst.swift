@@ -23,8 +23,8 @@ enum LevelHoldFilterConst {
     
     enum Text {
         static let filterViewTiltle: String = "필터"
-        static let firstSegmentTitle: String = "레벨"
-        static let secondSegmentTitle: String = "홀드"
+        static let segmentLevelTiltle: String = "레벨"
+        static let segmentHoldTiltle: String = "홀드"
         static let applyButtonTitle : String = "적용"
     }
     

@@ -17,7 +17,7 @@ final class SearchCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        let searchVC = builder.buildSearch()
+        let searchVC = SearchVC()
         searchVC.coordinator = self
         navigationController.pushViewController(searchVC, animated: true)
     }

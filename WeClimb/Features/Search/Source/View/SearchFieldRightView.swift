@@ -10,22 +10,22 @@ import RxSwift
 import RxCocoa
 import SnapKit
 
-class TextFieldRightView: UIView {
+class SearchFieldRightView: UIView {
     
     private let disposeBag = DisposeBag()
     
-    private let smallCancelButton: UIButton = {
+    private let circleCancelButton: UIButton = {
         let button = UIButton(type: .system)
-        let closeIcon = UIImage(named: "closeIcon.circle")?.withRenderingMode(.alwaysTemplate)
+        let closeIcon = SearchConst.Image.circleCancelImage
         button.setImage(closeIcon, for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
-        button.tintColor = .labelAssistive
-        button.alpha = 0
+        button.tintColor = SearchConst.Color.circleCancelTintColor
+        button.alpha = SearchConst.buttonAlphaHidden
         return button
     }()
 
     var cancelButtonTapObservable: Observable<Void> {
-        return smallCancelButton.rx.tap.asObservable()
+        return circleCancelButton.rx.tap.asObservable()
     }
 
     override init(frame: CGRect) {
@@ -39,22 +39,22 @@ class TextFieldRightView: UIView {
     }
     
     private func setupLayout() {
-        addSubview(smallCancelButton)
+        addSubview(circleCancelButton)
         
-        smallCancelButton.snp.makeConstraints { make in
-            make.width.height.equalTo(16)
-            make.centerY.equalToSuperview()
-            make.trailing.equalToSuperview().inset(12)
+        circleCancelButton.snp.makeConstraints {
+            $0.width.height.equalTo(SearchConst.textFieldRightView.Size.circleCancelBtnSize)
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().inset(SearchConst.textFieldRightView.Spacing.circleCancelBtnRight)
         }
     }
     
     func setCancelButtonAlpha(_ alpha: CGFloat) {
         Observable.just(alpha)
-            .bind(to: smallCancelButton.rx.alpha)
+            .bind(to: circleCancelButton.rx.alpha)
             .disposed(by: disposeBag)
     }
     
-     func cancelButtonTap() -> Observable<Void> {
-         return smallCancelButton.rx.tap.asObservable()
-     }
+    func cancelButtonTap() -> Observable<Void> {
+        return circleCancelButton.rx.tap.asObservable()
+    }
 }

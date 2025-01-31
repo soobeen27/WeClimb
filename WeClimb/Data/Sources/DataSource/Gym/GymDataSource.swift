@@ -12,6 +12,7 @@ import RxSwift
 protocol GymDataSource {
     func gymInfo(gymName: String) -> Single<Gym>
     func allGymInfo() -> Single<[Gym]>
+    func searchGyms(with query: String) -> Observable<[Gym]>
 }
 
 class GymDataSourceImpl: GymDataSource {
@@ -118,4 +119,42 @@ class GymDataSourceImpl: GymDataSource {
             profileImage: profileImage, additionalInfo: additionalInfo
         )
     }
+    
+    func searchGyms(with query: String) -> Observable<[Gym]> {
+        return Observable.create { [weak self] observer in
+            guard let self = self else {
+                observer.onNext([])
+                observer.onCompleted()
+                return Disposables.create()
+            }
+
+            let queryStart = query
+            let queryEnd = query + "\u{f8ff}"
+
+            self.db.collection("climbingGyms")
+                .whereField("gymName", isGreaterThanOrEqualTo: queryStart)
+                .whereField("gymName", isLessThanOrEqualTo: queryEnd)
+                .addSnapshotListener { snapshot, error in
+                    if let error = error {
+                        observer.onError(error)
+                        return
+                    }
+
+                    guard let snapshot = snapshot else {
+                        observer.onNext([])
+                        observer.onCompleted()
+                        return
+                    }
+
+                    let gyms = snapshot.documents.compactMap { document in
+                        return self.gymDecode(queryDocument: document)
+                    }
+
+                    observer.onNext(gyms)
+                }
+
+            return Disposables.create()
+        }
+    }
+
 }
