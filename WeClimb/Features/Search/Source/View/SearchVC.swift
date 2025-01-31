@@ -30,7 +30,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     
     private let disposeBag = DisposeBag()
     
-    private lazy var searchRightViewContainer: SearchFieldRightView = {
+    private let searchRightViewContainer: SearchFieldRightView = {
         let container = SearchFieldRightView()
         
         container.snp.makeConstraints {
@@ -39,7 +39,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         return container
     }()
     
-    private lazy var searchTextField: UITextField = {
+    private let searchTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = SearchConst.Text.searchFieldPlaceholder
         textField.layer.cornerRadius = SearchConst.Shape.textFieldCornerRadius
@@ -47,19 +47,6 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         textField.layer.borderColor = SearchConst.Color.textFieldBorderColor
         textField.font = SearchConst.Font.textFieldFont
         textField.textColor = SearchConst.Color.textFieldTextColor
-        
-        let searchIcon = SearchConst.Image.searchIcon
-        searchIcon.contentMode = .scaleAspectFit
-        let iconWrapper = UIView(frame: SearchConst.Size.searchIconSize)
-        iconWrapper.addSubview(searchIcon)
-        searchIcon.frame.origin = SearchConst.Spacing.searchIconleftSpacing
-        
-        textField.leftView = iconWrapper
-        textField.leftViewMode = .always
-        
-        textField.rightView = searchRightViewContainer
-        textField.rightViewMode = .whileEditing
-        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
         
         return textField
     }()
@@ -101,6 +88,20 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         cancelButton.alpha = SearchConst.buttonAlphaVisible
         
         loadRecentVisitItems()
+        
+        let searchIcon = SearchConst.Image.searchIcon
+        searchIcon.contentMode = .scaleAspectFit
+        
+        let iconWrapper = UIView(frame: SearchConst.Size.searchIconSize)
+        iconWrapper.addSubview(searchIcon)
+        searchIcon.frame.origin = SearchConst.Spacing.searchIconleftSpacing
+        
+        searchTextField.leftView = iconWrapper
+        searchTextField.leftViewMode = .always
+        
+        searchTextField.rightView = searchRightViewContainer
+        searchTextField.rightViewMode = .whileEditing
+        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
     }
     
     override func viewDidLoad() {

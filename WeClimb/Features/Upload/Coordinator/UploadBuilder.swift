@@ -10,6 +10,7 @@ import Foundation
 protocol UploadBuilder {
 //    func buildUploadMedia() -> UploadMediaVC
 //    func buildUploadPost() -> UploadPostVC
+    func buildUploadMenuView() -> UploadMenuView
 }
 
 final class UploadBuilderImpl: UploadBuilder {
@@ -17,6 +18,11 @@ final class UploadBuilderImpl: UploadBuilder {
     
     init(container: AppDIContainer = .shared) {
         self.container = container
+    }
+    
+    func buildUploadMenuView() -> UploadMenuView {
+        let uploadMenuView = UploadMenuView()
+        return uploadMenuView
     }
     
 //    func buildUploadMedia() -> UploadMediaVC {

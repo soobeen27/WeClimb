@@ -10,18 +10,19 @@ import UIKit
 protocol TabBarBuilder {
     func buildFeedCoordinator() -> FeedCoordinator
     func buildSearchCoordinator() -> SearchCoordinator
-    func buildUploadCoordinator() -> UploadCoordinator
+    func buildUploadCoordinator(tabBarController: UITabBarController) -> UploadCoordinator
     func buildNotificationCoordinator() -> NotificationCoordinator
     func buildUserPageCoordinator() -> UserPageCoordinator
 }
 
 final class TabBarBuilderImpl: TabBarBuilder {
+    
     private let feedBuilder: FeedBuilder
     private let searchBuilder: SearchBuilder
     private let uploadBuilder: UploadBuilder
     private let notificationBuilder: NotificationBuilder
     private let userPageBuilder: UserPageBuilder
-
+    
     init(feedBuilder: FeedBuilder, searchBuilder: SearchBuilder, uploadBuilder: UploadBuilder, notificationBuilder: NotificationBuilder, userPageBuilder: UserPageBuilder) {
         self.feedBuilder = feedBuilder
         self.searchBuilder = searchBuilder
@@ -54,9 +55,10 @@ final class TabBarBuilderImpl: TabBarBuilder {
         return coordinator
     }
     
-    func buildUploadCoordinator() -> UploadCoordinator {
+    func buildUploadCoordinator(tabBarController: UITabBarController) -> UploadCoordinator {
         let navigationController = UINavigationController()
-        let coordinator = UploadCoordinator(navigationController: navigationController)
+        let uploadBuilder: UploadBuilder = AppDIContainer.shared.resolve(UploadBuilder.self)
+        let coordinator = UploadCoordinator(navigationController: navigationController, tabBarController: tabBarController, builder: uploadBuilder)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage.uploadIcon,
@@ -87,3 +89,4 @@ final class TabBarBuilderImpl: TabBarBuilder {
         return coordinator
     }
 }
+
