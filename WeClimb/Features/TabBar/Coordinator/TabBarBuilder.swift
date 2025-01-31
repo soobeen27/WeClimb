@@ -58,7 +58,12 @@ final class TabBarBuilderImpl: TabBarBuilder {
     func buildUploadCoordinator(tabBarController: UITabBarController) -> UploadCoordinator {
         let navigationController = UINavigationController()
         let uploadBuilder: UploadBuilder = AppDIContainer.shared.resolve(UploadBuilder.self)
-        let coordinator = UploadCoordinator(navigationController: navigationController, tabBarController: tabBarController, builder: uploadBuilder)
+        let searchBuilder: SearchBuilder = AppDIContainer.shared.resolve(SearchBuilder.self)
+        let coordinator = UploadCoordinator(
+            navigationController: navigationController,
+            tabBarController: tabBarController,
+            builder: uploadBuilder,
+            searchBuilder: searchBuilder)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage.uploadIcon,

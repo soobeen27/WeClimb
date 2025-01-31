@@ -4,12 +4,14 @@
 //
 //  Created by 강유정 on 1/24/25.
 //
+//
 
 import UIKit
 
 import SnapKit
 
-class UploadMenuView: UIView {
+class UploadMenuVC: UIViewController {
+    var coordinator: UploadCoordinator?
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -38,42 +40,36 @@ class UploadMenuView: UIView {
         return button
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    var onClimbingButtonTapped: (() -> Void)?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         setupView()
         setLayout()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func setupView() {
-        backgroundColor = .white
-        layer.cornerRadius = 16
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.2
-        layer.shadowOffset = CGSize(width: 0, height: 0)
-        layer.shadowRadius = 10
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
+        climbingButton.addTarget(self, action: #selector(climbingButtonTapped), for: .touchUpInside)
         addTopBorderToButton(climbingButton)
     }
     
     private func addTopBorderToButton(_ button: UIButton) {
         let topBorderLayer = CALayer()
         topBorderLayer.backgroundColor = UIColor.lineSolidLight.cgColor
-        topBorderLayer.frame = CGRect(x: -16, y: 0, width: self.frame.width, height: 1)
+        topBorderLayer.frame = CGRect(x: -16, y: 0, width: view.frame.width - 16, height: 1)
         
         button.layer.addSublayer(topBorderLayer)
     }
     
+    private func setupView() {
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 16
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOpacity = 0.2
+        view.layer.shadowOffset = CGSize(width: 0, height: 0)
+        view.layer.shadowRadius = 10
+    }
+    
     private func setLayout() {
         [titleLabel, descriptionLabel, climbingButton]
-            .forEach { addSubview($0) }
+            .forEach { view.addSubview($0) }
         
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(16)
@@ -92,5 +88,9 @@ class UploadMenuView: UIView {
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(54)
         }
+    }
+    
+    @objc private func climbingButtonTapped() {
+        onClimbingButtonTapped?()
     }
 }

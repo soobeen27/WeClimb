@@ -59,7 +59,6 @@ final class TabBarCoordinator: BaseCoordinator {
         ]
     }
 
-
     private func addTabBarGestureRecognizer() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTabBarTap(_:)))
         tabBarController.tabBar.addGestureRecognizer(tapGesture)

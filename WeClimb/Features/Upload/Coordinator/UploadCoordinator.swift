@@ -10,52 +10,68 @@ import UIKit
 import SnapKit
 
 final class UploadCoordinator: BaseCoordinator {
+    
     var navigationController: UINavigationController
     private let tabBarController: UITabBarController
-    private var uploadMenuView: UploadMenuView?
+    private let builder: UploadBuilder
+    private let searchBuilder: SearchBuilder
+    
+    private var uploadMenuVC: UploadMenuVC?
     
     var isUploadViewPresented: Bool {
-        return uploadMenuView != nil
+        return uploadMenuVC != nil
     }
     
-    private let builder: UploadBuilder
-
-    init(navigationController: UINavigationController, tabBarController: UITabBarController, builder: UploadBuilder) {
+    init(navigationController: UINavigationController, tabBarController: UITabBarController, builder: UploadBuilder, searchBuilder: SearchBuilder) {
         self.navigationController = navigationController
         self.tabBarController = tabBarController
         self.builder = builder
+        self.searchBuilder = searchBuilder
     }
     
     override func start() {
-        let uploadView = UploadMenuView()
-//        let uploadView = builder.buildUploadMenuView()
-        uploadView.alpha = 0
+        let uploadMenuVC = UploadMenuVC()
         
-        tabBarController.view.addSubview(uploadView)
+        uploadMenuVC.onClimbingButtonTapped = { [weak self] in
+            self?.navigateToTabIndex()
+        }
         
-        uploadView.snp.makeConstraints {
+        tabBarController.addChild(uploadMenuVC)
+        tabBarController.view.addSubview(uploadMenuVC.view)
+        
+        uploadMenuVC.view.snp.makeConstraints {
             $0.height.equalTo(190 - 54)
             $0.width.equalTo(250)
             $0.centerX.equalTo(tabBarController.view)
             $0.bottom.equalTo(tabBarController.tabBar.snp.top).offset(-16)
         }
         
-        UIView.animate(withDuration: 0.3) {
-            uploadView.alpha = 1
-        }
-        
-        uploadMenuView = uploadView
+        self.uploadMenuVC = uploadMenuVC
     }
     
+    func navigateToTabIndex() {
+        tabBarController.selectedIndex = 2
+        navigateToSearchVC()
+        dismissUploadView()
+        tabBarController.tabBar.isHidden = true
+    }
+    
+    func navigateToSearchVC() {
+        let searchCoordinator = SearchCoordinator(navigationController: navigationController, builder: searchBuilder)
+        searchCoordinator.start()
+    }
+}
+
+extension UploadCoordinator {
     func dismissUploadView() {
-        guard let uploadView = uploadMenuView else { return }
+        guard let uploadViewController = uploadMenuVC else { return }
         
         UIView.animate(withDuration: 0.3, animations: {
-            uploadView.alpha = 0
+            uploadViewController.view.alpha = 0
         }) { _ in
-            uploadView.removeFromSuperview()
-            self.uploadMenuView = nil
+            uploadViewController.view.removeFromSuperview()
+            uploadViewController.removeFromParent()
+            self.uploadMenuVC = nil
         }
     }
-    
 }
