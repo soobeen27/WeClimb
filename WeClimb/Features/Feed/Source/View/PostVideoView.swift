@@ -26,6 +26,8 @@ class PostVideoView: UIView {
     private let loadComplete = BehaviorSubject<Bool>.init(value: false)
     
     private var isPlaying: Bool = false
+    
+    private var overlayView: UIView?
             
     var videoInfo: (url: URL, uid: String)? {
         didSet {
@@ -78,6 +80,7 @@ class PostVideoView: UIView {
         player = nil
         playerLayer = nil
         loadComplete.onNext(false)
+        overlayView = nil
         disposeBag = DisposeBag()
     }
     
@@ -86,12 +89,17 @@ class PostVideoView: UIView {
         let playerItem = AVPlayerItem(asset: asset)
         player = AVQueuePlayer()
         guard let player else { return }
+        player.automaticallyWaitsToMinimizeStalling = false
         playerLooper = AVPlayerLooper(player: player, templateItem: playerItem)
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.frame = self.bounds
         playerLayer?.opacity = 1.0
         playerLayer?.backgroundColor = FeedConsts.CollectionView.backgroundColor.cgColor
-
+        
+        if checkIfVideoIsHDR(asset: asset) {
+            addDarkOverlay()
+        }
+        
         guard let videoTrack = try? await asset.loadTracks(withMediaType: .video).first else {
             print("setupPlayer: videoTrack 못구함")
             return
@@ -186,6 +194,22 @@ class PostVideoView: UIView {
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    func checkIfVideoIsHDR(asset: AVAsset) -> Bool {
+        let videoTracks = asset.tracks(withMediaType: .video)
+        if let videoTrack = videoTracks.first {
+            return videoTrack.hasMediaCharacteristic(.containsHDRVideo)
+        }
+        return false
+    }
+    
+    func addDarkOverlay() {
+        overlayView = UIView(frame: bounds)
+        guard let overlayView else { return }
+        overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
+        overlayView.isUserInteractionEnabled = false
+        addSubview(overlayView)
     }
 }
 
