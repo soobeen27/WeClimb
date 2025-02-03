@@ -15,11 +15,16 @@ final class GymRepositoryImpl: GymRepository {
     init(gymDataSource: GymDataSource) {
         self.gymDataSource = gymDataSource
     }
-    func gymInfo(gymName: String) -> RxSwift.Single<Gym> {
+    
+    func gymInfo(gymName: String) -> Single<Gym> {
         return gymDataSource.gymInfo(gymName: gymName)
     }
     
-    func allGymInfo() -> RxSwift.Single<[Gym]> {
+    func allGymInfo() -> Single<[Gym]> {
         return gymDataSource.allGymInfo()
+    }
+    
+    func searchGymsByQuery(with query: String) -> Observable<[Gym]> {
+        return gymDataSource.searchGyms(with: query)
     }
 }

@@ -12,4 +12,5 @@ import RxSwift
 protocol GymRepository {
     func gymInfo(gymName: String) -> Single<Gym>
     func allGymInfo() -> Single<[Gym]>
+    func searchGymsByQuery(with query: String) -> Observable<[Gym]>
 }

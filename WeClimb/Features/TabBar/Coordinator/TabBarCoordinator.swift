@@ -21,7 +21,7 @@ final class TabBarCoordinator: BaseCoordinator {
     override func start() {
         setUpTabBar()
         navigationController.setViewControllers([tabBarController], animated: true)
-
+        navigationController.setNavigationBarHidden(true, animated: false)
     }
     
     private func setUpTabBar() {

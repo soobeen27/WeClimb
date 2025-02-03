@@ -11,64 +11,64 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-enum SearchResultType {
+enum SearchResultType: Codable {
     case gym
     case user
 }
 
-struct SearchResultItem {
+struct SearchResultItem: Codable {
     var type: SearchResultType
     var name: String
     var imageName: String
     var location: String?
     var height: Int?
+    var armReach: Int?
 }
 
 class SearchVC: UIViewController, UITextFieldDelegate {
     var coordinator: SearchCoordinator?
     
     private let disposeBag = DisposeBag()
-    private var viewModel: SearchVM
     
-    private lazy var rightViewContainer: TextFieldRightView = {
-        let container = TextFieldRightView()
+    private lazy var searchRightViewContainer: SearchFieldRightView = {
+        let container = SearchFieldRightView()
         
         container.snp.makeConstraints {
-            $0.width.height.equalTo(30)
+            $0.width.height.equalTo(SearchConst.Size.rightViewSize)
         }
         return container
     }()
     
     private lazy var searchTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "검색하기"
-        textField.layer.cornerRadius = 8
-        textField.layer.borderWidth = 1
-        textField.layer.borderColor = UIColor.lineOpacityNormal.cgColor
-        textField.font = .customFont(style: .body2Medium)
-        textField.textColor = .black
+        textField.placeholder = SearchConst.Text.searchFieldPlaceholder
+        textField.layer.cornerRadius = SearchConst.Shape.textFieldCornerRadius
+        textField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
+        textField.layer.borderColor = SearchConst.Color.textFieldBorderColor
+        textField.font = SearchConst.Font.textFieldFont
+        textField.textColor = SearchConst.Color.textFieldTextColor
         
-        let searchIcon = UIImageView(image: UIImage(named: "searchIcon"))
+        let searchIcon = SearchConst.Image.searchIcon
         searchIcon.contentMode = .scaleAspectFit
-        let iconWrapper = UIView(frame: CGRect(x: 0, y: 0, width: 20 + 12 + 8, height: 20))
+        let iconWrapper = UIView(frame: SearchConst.Size.searchIconSize)
         iconWrapper.addSubview(searchIcon)
-        searchIcon.frame.origin = CGPoint(x: 12, y: 0)
+        searchIcon.frame.origin = SearchConst.Spacing.searchIconleftSpacing
         
         textField.leftView = iconWrapper
         textField.leftViewMode = .always
         
-        textField.rightView = rightViewContainer
+        textField.rightView = searchRightViewContainer
         textField.rightViewMode = .whileEditing
-        rightViewContainer.setCancelButtonAlpha(0)
+        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
         
         return textField
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "최근 방문"
-        label.font = UIFont.customFont(style: .label1SemiBold)
-        label.textColor = .labelStrong
+        label.text = SearchConst.Text.recentVisitTitle
+        label.font = SearchConst.Font.textLabelFont
+        label.textColor = SearchConst.Color.textLabelTextColor
         label.textAlignment = .left
         return label
     }()
@@ -78,41 +78,30 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         tableView.separatorStyle = .none
         tableView.register(SearchGymTableCell.self, forCellReuseIdentifier: SearchGymTableCell.className)
         tableView.register(SearchUserTableCell.self, forCellReuseIdentifier: SearchUserTableCell.className)
-        tableView.rowHeight = 60
+        tableView.rowHeight = SearchConst.Size.tableViewRowHeight
         return tableView
     }()
     
     private let cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        let closeIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysTemplate)
+        let closeIcon = SearchConst.Image.closeIcon
         button.setImage(closeIcon, for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
-        button.tintColor = .black
-        button.alpha = 0
+        button.tintColor = SearchConst.Color.cancelBtnTintColor
+        button.alpha = SearchConst.buttonAlphaHidden
         return button
     }()
+    
+    private let savedRecentVisitItemsSubject = BehaviorSubject<[SearchResultItem]>(value: [])
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        searchTextField.alpha = 1
-        cancelButton.alpha = 1
+        searchTextField.alpha = SearchConst.buttonAlphaVisible
+        cancelButton.alpha = SearchConst.buttonAlphaVisible
+        
+        loadRecentVisitItems()
     }
-    
-    init(viewModel: SearchVM) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    //    override func viewWillAppear(_ animated: Bool) {
-    //        super.viewWillAppear(animated)
-    //
-    //        navigationController?.setNavigationBarHidden(true, animated: animated)
-    //    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -131,15 +120,15 @@ class SearchVC: UIViewController, UITextFieldDelegate {
             .forEach { view.addSubview($0)}
         
         searchTextField.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).inset(16)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(46)
+            $0.top.equalTo(view.safeAreaLayoutGuide).inset(SearchConst.Search.Spacing.textFieldSpacing)
+            $0.leading.trailing.equalToSuperview().inset(SearchConst.Search.Spacing.textFieldSpacing)
+            $0.height.equalTo(SearchConst.Search.Size.textFieldHeight)
         }
         
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(searchTextField.snp.bottom).offset(16)
-            $0.height.equalTo(56)
-            $0.leading.equalToSuperview().inset(16)
+            $0.top.equalTo(searchTextField.snp.bottom).offset(SearchConst.Search.Spacing.titleLabelSpacing)
+            $0.height.equalTo(SearchConst.Search.Size.titleLabelHeight)
+            $0.leading.equalToSuperview().inset(SearchConst.Search.Spacing.titleLabelSpacing)
         }
         
         tableView.snp.makeConstraints {
@@ -149,24 +138,46 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         }
         
         cancelButton.snp.makeConstraints {
-            $0.width.height.equalTo(24)
-            $0.trailing.equalToSuperview().offset(48)
+            $0.width.height.equalTo(SearchConst.Search.Size.cancelButtonSize)
+            $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.cancelBtnRightSpacing)
             $0.centerY.equalTo(searchTextField)
         }
     }
     
+    private func loadRecentVisitItems() {
+        if let savedData = UserDefaults.standard.value(forKey: SearchConst.UserDefaultsKeys.recentVisitItems) as? Data {
+            let decoder = JSONDecoder()
+            if let decodedItems = try? decoder.decode([SearchResultItem].self, from: savedData) {
+                savedRecentVisitItemsSubject.onNext(decodedItems)
+            } else {
+                print("Error: 데이터 디코딩 실패")
+            }
+        } else {
+            print("No saved data found.")
+        }
+    }
+
     private func bindTableView() {
-        viewModel.transform(input: SearchVMImpl.Input(query: searchTextField.rx.text.orEmpty.asObservable(), searchButtonTapped: rightViewContainer.cancelButtonTap()))
-            .items
+        savedRecentVisitItemsSubject
             .bind(to: tableView.rx.items) { tableView, row, item in
                 let cell: UITableViewCell
                 if item.type == .gym {
-                    let gymCell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className, for: IndexPath(row: row, section: 0)) as! SearchGymTableCell
+                    let gymCell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className, for: IndexPath(row: row, section: SearchConst.defaultSectionNumbers)) as! SearchGymTableCell
                     gymCell.configure(with: item)
+                    
+                    gymCell.onDelete = { [weak self] itemToDelete in
+                        self?.deleteItem(itemToDelete, at: row)
+                    }
+                    
                     cell = gymCell
                 } else {
-                    let userCell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className, for: IndexPath(row: row, section: 0)) as! SearchUserTableCell
+                    let userCell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className, for: IndexPath(row: row, section: SearchConst.defaultSectionNumbers)) as! SearchUserTableCell
                     userCell.configure(with: item)
+                    
+                    userCell.onDelete = { [weak self] itemToDelete in
+                        self?.deleteItem(itemToDelete, at: row)
+                    }
+                    
                     cell = userCell
                 }
                 return cell
@@ -174,8 +185,26 @@ class SearchVC: UIViewController, UITextFieldDelegate {
             .disposed(by: disposeBag)
     }
     
+    private func deleteItem(_ item: SearchResultItem, at index: Int) {
+        do {
+            var currentItems = try savedRecentVisitItemsSubject.value()
+            
+            currentItems.remove(at: index)
+            
+            if let encodedData = try? JSONEncoder().encode(currentItems) {
+                UserDefaults.standard.set(encodedData, forKey: SearchConst.UserDefaultsKeys.recentVisitItems)
+            }
+            
+            savedRecentVisitItemsSubject.onNext(currentItems)
+            
+            tableView.reloadData()
+        } catch {
+            print("Error while deleting item: \(error)")
+        }
+    }
+    
     private func bindButtons() {
-        rightViewContainer.cancelButtonTapObservable
+        searchRightViewContainer.cancelButtonTapObservable
             .bind { [weak self] in
                 self?.didTapSmallCancelButton()
             }
@@ -191,17 +220,17 @@ class SearchVC: UIViewController, UITextFieldDelegate {
 
 extension SearchVC {
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        searchTextField.layer.borderWidth = 1
+        searchTextField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
         searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
         
         self.searchTextField.snp.updateConstraints {
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-48)
+            $0.leading.equalToSuperview().offset(SearchConst.Search.Spacing.textFieldSpacing)
+            $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.updatedTextFieldRightSpacing)
         }
         
-        self.cancelButton.alpha = 1
+        self.cancelButton.alpha = SearchConst.buttonAlphaVisible
         self.cancelButton.snp.updateConstraints {
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.updatedCancelBtnRightSpacing)
         }
     }
     
@@ -209,9 +238,9 @@ extension SearchVC {
         let newText = (textField.text as NSString?)?.replacingCharacters(in: range, with: string)
         
         if newText?.isEmpty == true {
-            rightViewContainer.setCancelButtonAlpha(0)
+            searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
         } else {
-            rightViewContainer.setCancelButtonAlpha(1)
+            searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaVisible)
         }
         return true
     }
@@ -220,8 +249,8 @@ extension SearchVC {
         textField.resignFirstResponder()
         
         if let searchText = textField.text, !searchText.isEmpty {
-            self.searchTextField.alpha = 0
-            self.cancelButton.alpha = 0
+            self.searchTextField.alpha = SearchConst.buttonAlphaHidden
+            self.cancelButton.alpha = SearchConst.buttonAlphaHidden
             coordinator?.navigateToSearchResult(query: searchText)
         }
         
@@ -229,24 +258,25 @@ extension SearchVC {
     }
     
     func didTapCancelButton() {
-        searchTextField.text = ""
+        searchTextField.text = SearchConst.Text.emptyText
         searchTextField.resignFirstResponder()
         searchTextField.layer.borderColor = UIColor.lineOpacityNormal.cgColor
         
         self.searchTextField.snp.updateConstraints {
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.leading.equalToSuperview().offset(SearchConst.Search.Spacing.textFieldSpacing)
+            $0.trailing.equalToSuperview().offset(-SearchConst.Search.Spacing.textFieldSpacing)
         }
         
         self.cancelButton.snp.updateConstraints {
-            $0.trailing.equalToSuperview().offset(16)
+            $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.returnCancelBtnRightSpacing)
         }
         
-        self.cancelButton.alpha = 0
+        self.cancelButton.alpha = SearchConst.buttonAlphaHidden
     }
     
     func didTapSmallCancelButton() {
-        searchTextField.text = ""
-        rightViewContainer.setCancelButtonAlpha(0)
+        searchTextField.text = SearchConst.Text.emptyText
+        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
     }
 }
+
