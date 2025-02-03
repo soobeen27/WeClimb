@@ -34,4 +34,9 @@ final class SearchResultCoordinator: BaseCoordinator {
         searchResultVC.query = query
         navigationController.pushViewController(searchResultVC, animated: true)
     }
+    
+    func navigateToUploadMedia(with gymItem: SearchResultItem) {
+        let uploadMediaCoordinator = UploadMediaCoordinator(navigationController: navigationController, gymItem: gymItem)
+        uploadMediaCoordinator.start()
+    }
 }

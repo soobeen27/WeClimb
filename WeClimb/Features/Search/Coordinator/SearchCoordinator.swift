@@ -39,4 +39,9 @@ final class SearchCoordinator: BaseCoordinator {
         searchResultCoordinator.query = query
         searchResultCoordinator.navigateToUploadSearchResult()
     }
+    
+//    func navigateToUploadMedia(with gymItem: SearchResultItem) {
+//        let uploadMediaCoordinator = UploadMediaCoordinator(navigationController: navigationController, gymItem: gymItem)
+//        uploadMediaCoordinator.start()
+//    }
 }

@@ -142,7 +142,6 @@ class SearchResultVC: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
             $0.leading.trailing.equalToSuperview()
         }
-        
     }
 
     @objc private func didTapBackButton() {
@@ -227,8 +226,13 @@ class SearchResultVC: UIViewController {
         
         tableView.rx.modelSelected(SearchResultItem.self)
             .bind(onNext: { [weak self] item in
-                guard self != nil else { return }
-                saveItemSubject.onNext(item)
+                guard let self = self else { return }
+                
+                if self.searchStyle == .uploadSearch {
+                    self.coordinator?.navigateToUploadMedia(with: item)
+                } else {
+                    saveItemSubject.onNext(item)
+                }
             })
             .disposed(by: disposeBag)
         
