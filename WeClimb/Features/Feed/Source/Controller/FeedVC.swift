@@ -90,9 +90,6 @@ class FeedVC: UIViewController {
         dataSource.apply(snapshot, animatingDifferences: true)
         if let centerCell = findCenterCell(in: postCollectionView) {
             let mediaCollectionview = centerCell.mediaCollectionView
-//            mediaCollectionview.visibleCells.compactMap{ $0 as? MediaCollectionCell }.forEach {
-//                VideoManager.shared.reset()
-//            }
             VideoManager.shared.reset()
             if let mediaCenterCell = findMediaCenterCell(in:  mediaCollectionview) {
                 mediaCenterCell.videoView.playVideo()

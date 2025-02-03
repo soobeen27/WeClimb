@@ -190,4 +190,23 @@ extension String {
         ]
         return colorMap[self] ?? self
     }
+    
+    func levelImage() -> UIImage {
+        switch self {
+        case "Black":
+            return UIImage.colorBlack
+        case "Blue":
+            return UIImage.colorBlue
+        case "Brown":
+            return UIImage.colorBrown
+        case "DarkBlue":
+            return UIImage.colorDarkBlue
+        case "":
+//            return UIImage.color
+            
+
+        default:
+            return UIImage.closeIcon
+        }
+    }
 }

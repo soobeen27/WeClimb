@@ -165,6 +165,11 @@ class PostProfileView: UIView {
         profileModel = data
     }
     
+    func updateHoldLevel(hold: UIImage, level: UIImage) {
+        levelTag.rightImage = level
+        holdTag.rightImage = hold
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

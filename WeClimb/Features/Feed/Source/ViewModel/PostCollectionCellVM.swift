@@ -14,6 +14,7 @@ import FirebaseFirestore
 protocol PostCollectionCellInput {
     var postItem: PostItem { get }
     var likeButtonTap: ControlEvent<Void> { get }
+    var currentMediaIndex: PublishRelay<Int> { get }
 }
 
 protocol PostCollectionCellOutput {
@@ -21,6 +22,7 @@ protocol PostCollectionCellOutput {
     var likeCount: BehaviorRelay<Int> { get }
     var isLike: BehaviorRelay<Bool?> { get }
     var mediaItems: Observable<[MediaItem]> { get }
+    var levelHoldImages: Observable<(level: UIImage?, hold: UIImage?)> { get }
 }
 
 protocol PostCollectionCellVM {
@@ -39,6 +41,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
     struct Input: PostCollectionCellInput {
         let postItem: PostItem
         let likeButtonTap: ControlEvent<Void>
+        let currentMediaIndex: PublishRelay<Int>
     }
     
     struct Output: PostCollectionCellOutput {
@@ -46,6 +49,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         let likeCount: BehaviorRelay<Int>
         let isLike: BehaviorRelay<Bool?>
         let mediaItems: Observable<[MediaItem]>
+        let levelHoldImages: Observable<(level: UIImage?, hold: UIImage?)>
     }
 
     init(userInfoFromUIDUseCase: UserInfoFromUIDUseCase, myUIDUseCase: MyUIDUseCase, likePostUseCase: LikePostUseCase, fetchMediasUseCase: FetchMediasUseCase) {
@@ -75,7 +79,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
                     .disposed(by: self.disposeBag)
             })
             .disposed(by: disposeBag)
-        guard let paths = input.postItem.medias else { return Output(user: user, likeCount: likeCount, isLike: isLike, mediaItems: Observable.error(FirebaseError.documentNil))
+        guard let paths = input.postItem.medias else { return Output(user: user, likeCount: likeCount, isLike: isLike, mediaItems: Observable.error(FirebaseError.documentNil), levelHoldImages: Observable.just((UIImage.closeIcon, UIImage.closeIcon)))
         }
         let refs = pathToRef(paths: paths)
         let medias = fetchMediasUseCase.execute(refs: refs).map { [weak self] medias in
@@ -83,9 +87,24 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
                 self?.mediaToItem(media: media)
             }
         }.asObservable()
-                
         
-        return Output(user: user, likeCount: likeCount, isLike: isLike, mediaItems: medias)
+        let levelHoldImages = input.currentMediaIndex.flatMap { index in
+            print("currentIndex: \(index)")
+            return medias.compactMap { (medias) -> (level: UIImage?, hold: UIImage?) in
+                guard let level = medias[index].grade, let hold = medias[index].hold else { return (nil, nil) }
+                print(level)
+                print(hold)
+                let levelImage = UIImage(named: level)
+                let holdImage = UIImage(named: hold)
+                return (level: levelImage, hold: holdImage)
+            }
+        }
+                
+        return Output(
+            user: user, likeCount: likeCount,
+            isLike: isLike, mediaItems: medias,
+            levelHoldImages: levelHoldImages
+        )
     }
     
     private func mediaToItem(media: Media) -> MediaItem {

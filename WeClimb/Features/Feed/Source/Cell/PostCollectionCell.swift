@@ -45,17 +45,14 @@ class PostCollectionCell: UICollectionViewCell {
     enum Section {
         case media
     }
-    
     var disposeBag = DisposeBag()
-    
     private let container = AppDIContainer.shared
-
     private var viewModel: PostCollectionCellVM?
-    
     private let profileView = PostProfileView()
-    
     private let postSidebarView = PostSidebarView()
-    
+    private let mediaItemsSubject = PublishSubject<[MediaItem]>.init()
+    private let currentMediaIndexRelay = PublishRelay<Int>.init()
+
     private var user: User? {
         didSet {
             guard let user, let postItem else { return }
@@ -100,6 +97,7 @@ class PostCollectionCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setLayout()
+        bindSnapShot()
     }
     
     required init?(coder: NSCoder) {
@@ -129,7 +127,7 @@ class PostCollectionCell: UICollectionViewCell {
     private func bindViewModel() {
         guard let viewModel, let postItem else { return }
                 
-        let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(postItem: postItem, likeButtonTap: postSidebarView.likeButtonTap))
+        let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(postItem: postItem, likeButtonTap: postSidebarView.likeButtonTap, currentMediaIndex: currentMediaIndexRelay))
         
         output.user
             .map { user -> User in
@@ -148,35 +146,50 @@ class PostCollectionCell: UICollectionViewCell {
         output.likeCount
             .bind(to: postSidebarView.likeCountRelay)
             .disposed(by: disposeBag)
+//        output.mediaItems
+//            .asDriver(onErrorDriveWith: .empty())
+//            .drive(onNext: {[weak self] mediaItems in
+//                guard let self else { return }
+//                self.bindSnapShot(mediaItems: mediaItems)
+//
+//            })
+//            .disposed(by: disposeBag)
         output.mediaItems
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(onNext: {[weak self] mediaItems in
-                guard let self else { return }
-                self.bindSnapShot(mediaItems: mediaItems)
-
-            })
+            .bind(to: mediaItemsSubject)
             .disposed(by: disposeBag)
-
-        
+        output.levelHoldImages
+            .bind(onNext: { [weak self] levelHold in
+                guard let level = levelHold.level, let hold = levelHold.hold else { return }
+                self?.profileView.updateHoldLevel(hold: hold, level: level)
+            })
+            .disposed(by: disposeBag)        
     }
     
-    private func bindSnapShot(mediaItems: [MediaItem]) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, MediaItem>()
-        snapshot.appendSections([.media])
-        snapshot.appendItems(mediaItems)
-        if mediaItems.count == 1 {
-            mediaCollectionView.isScrollEnabled = false
-        } else {
-            mediaCollectionView.isScrollEnabled = true
-        }
-        dataSource.apply(snapshot, animatingDifferences: true)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { [weak self] in
+    private func bindSnapShot() {
+        mediaItemsSubject
+            .asDriver(onErrorJustReturn: [])
+            .drive(onNext: { [weak self] mediaItems in
             guard let self else { return }
-            
-            if let centerCell = findCenterCell(in: self.mediaCollectionView) {
-                centerCell.videoView.playVideo()
+            var snapshot = NSDiffableDataSourceSnapshot<Section, MediaItem>()
+            snapshot.appendSections([.media])
+            snapshot.appendItems(mediaItems)
+            if mediaItems.count == 1 {
+                self.mediaCollectionView.isScrollEnabled = false
+            } else {
+                self.mediaCollectionView.isScrollEnabled = true
             }
-        }
+            self.dataSource.apply(snapshot, animatingDifferences: true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { [weak self] in
+                guard let self else { return }
+                
+                if let centerCell = findCenterCell(in: self.mediaCollectionView),
+                   let indexPathRow = self.indexPathFrom(collectionView: self.mediaCollectionView, cell: centerCell)?.row {
+                    centerCell.videoView.playVideo()
+                    self.currentMediaIndexRelay.accept(indexPathRow)
+                }
+            }
+        })
+        .disposed(by: disposeBag)
     }
     
     private func heightArmReach(height: Int?, armReach: Int?) -> String {
@@ -216,8 +229,10 @@ extension PostCollectionCell: UICollectionViewDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { [weak self] in
             guard let self else { return }
             if let collectionView = scrollView as? UICollectionView,
-               let centerCell = findCenterCell(in: collectionView) {
+               let centerCell = findCenterCell(in: collectionView),
+               let indexPathRow = self.indexPathFrom(collectionView: collectionView, cell: centerCell)?.row {
                 centerCell.videoView.playVideo()
+                self.currentMediaIndexRelay.accept(indexPathRow)
             }
         }
     }
@@ -226,7 +241,7 @@ extension PostCollectionCell: UICollectionViewDelegate {
         VideoManager.shared.reset()
     }
     
-    func findCenterCell(in collectionView: UICollectionView) -> MediaCollectionCell? {
+    private func findCenterCell(in collectionView: UICollectionView) -> MediaCollectionCell? {
         let centerPoint = CGPoint(x: collectionView.bounds.midX + collectionView.contentOffset.x,
                                    y: collectionView.bounds.midY + collectionView.contentOffset.y)
         
@@ -247,7 +262,10 @@ extension PostCollectionCell: UICollectionViewDelegate {
                 }
             }
         }
-        
         return closestCell
+    }
+    
+    private func indexPathFrom(collectionView: UICollectionView, cell: MediaCollectionCell) -> IndexPath? {
+        return collectionView.indexPath(for: cell)
     }
 }
