@@ -20,8 +20,12 @@ public enum InterfaceStyle {
     case light
     case dark
 }
-
-public class DefaultAlertVC: UIViewController {
+/// 예시)
+/// let alert = DefaultAlertVC(alertType: .titleDescription, interfaceStyle: .dark)
+/// alert.modalPresentationStyle = .overCurrentContext
+/// alert.modalTransitionStyle = .crossDissolve
+/// present(alert, animated: false, completion: nil)
+public class DefaultAlertVC: UIViewController{
     
     private var interfaceStyle: InterfaceStyle {
         didSet {
@@ -117,6 +121,7 @@ public class DefaultAlertVC: UIViewController {
         self.alertType = alertType
         self.interfaceStyle = interfaceStyle
         super.init(nibName: nil, bundle: nil)
+        self.view.alpha = 0
     }
     
     required init?(coder: NSCoder) {
@@ -125,6 +130,7 @@ public class DefaultAlertVC: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
         setInterfaceStyle(style: interfaceStyle)
         setLayout(alertType)
         setAddTarget()
@@ -193,6 +199,18 @@ public class DefaultAlertVC: UIViewController {
         return self
     }
     
+    @discardableResult
+    public func setCustomButtonTitle(_ title: String) -> Self {
+        self.customButton.setTitle(title, for: .normal)
+        return self
+    }
+    
+    @discardableResult
+    public func setCancelButtonTitle(_ title: String) -> Self {
+        self.cancelButton.setTitle(title, for: .normal)
+        return self
+    }
+    
     private func setAddTarget() {
         cancelButton.addTarget(self, action: #selector(dismissCurrentVC), for: .touchUpInside)
         customButton.addTarget(self, action: #selector(tappedCustomButton), for: .touchUpInside)
@@ -205,7 +223,7 @@ public class DefaultAlertVC: UIViewController {
     
     @objc
     private func tappedCustomButton() {
-        self.dismiss(animated: true) {
+        self.dismiss(animated: false) {
             self.customAction?()
         }
     }
@@ -307,6 +325,7 @@ extension DefaultAlertVC {
             self.alertView.transform = CGAffineTransform(scaleX: DefaultAlertConst.Animation.zoomOutScale, y: DefaultAlertConst.Animation.zoomOutScale)
         }, completion: { _ in
             self.dismiss(animated: false, completion: nil)
+            self.view.alpha = DefaultAlertConst.Animation.alphaHidden
         })
     }
 }

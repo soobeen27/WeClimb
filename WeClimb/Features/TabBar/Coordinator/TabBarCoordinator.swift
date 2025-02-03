@@ -49,7 +49,7 @@ final class TabBarCoordinator: BaseCoordinator {
 //        uploadCoordinator.start()
         notificationCoordinator.start()
         userPageCoordinator.start()
-
+        
         tabBarController.viewControllers = [
             feedCoordinator.navigationController,
             searchCoordinator.navigationController,
@@ -58,7 +58,7 @@ final class TabBarCoordinator: BaseCoordinator {
             userPageCoordinator.navigationController
         ]
     }
-
+    
     private func addTabBarGestureRecognizer() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTabBarTap(_:)))
         tabBarController.tabBar.addGestureRecognizer(tapGesture)
@@ -66,11 +66,11 @@ final class TabBarCoordinator: BaseCoordinator {
     
     @objc private func handleTabBarTap(_ sender: UITapGestureRecognizer) {
         let location = sender.location(in: tabBarController.tabBar)
-
+        
         guard let items = tabBarController.tabBar.items else { return }
-
+        
         let itemViews = tabBarController.tabBar.subviews.compactMap { $0 as? UIControl }
-
+        
         for (index, _) in items.enumerated() {
             guard index < itemViews.count else { continue }
             

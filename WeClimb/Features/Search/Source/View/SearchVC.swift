@@ -262,6 +262,28 @@ class SearchVC: UIViewController, UITextFieldDelegate {
             }
             .disposed(by: disposeBag)
     }
+    
+    func didTapCancelButton() {
+        searchTextField.text = SearchConst.Text.emptyText
+        searchTextField.resignFirstResponder()
+        searchTextField.layer.borderColor = UIColor.lineOpacityNormal.cgColor
+        
+        self.searchTextField.snp.updateConstraints {
+            $0.leading.equalToSuperview().offset(SearchConst.Search.Spacing.textFieldSpacing)
+            $0.trailing.equalToSuperview().offset(-SearchConst.Search.Spacing.textFieldSpacing)
+        }
+        
+        self.cancelButton.snp.updateConstraints {
+            $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.returnCancelBtnRightSpacing)
+        }
+        
+        self.cancelButton.alpha = SearchConst.buttonAlphaHidden
+    }
+    
+    func didTapSmallCancelButton() {
+        searchTextField.text = SearchConst.Text.emptyText
+        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
+    }
 }
 
 extension SearchVC {
@@ -307,28 +329,6 @@ extension SearchVC {
         }
         
         return true
-    }
-    
-    func didTapCancelButton() {
-        searchTextField.text = SearchConst.Text.emptyText
-        searchTextField.resignFirstResponder()
-        searchTextField.layer.borderColor = UIColor.lineOpacityNormal.cgColor
-        
-        self.searchTextField.snp.updateConstraints {
-            $0.leading.equalToSuperview().offset(SearchConst.Search.Spacing.textFieldSpacing)
-            $0.trailing.equalToSuperview().offset(-SearchConst.Search.Spacing.textFieldSpacing)
-        }
-        
-        self.cancelButton.snp.updateConstraints {
-            $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.returnCancelBtnRightSpacing)
-        }
-        
-        self.cancelButton.alpha = SearchConst.buttonAlphaHidden
-    }
-    
-    func didTapSmallCancelButton() {
-        searchTextField.text = SearchConst.Text.emptyText
-        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
     }
 }
 
