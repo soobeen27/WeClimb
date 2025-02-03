@@ -14,7 +14,7 @@ import FirebaseFirestore
 protocol PostCollectionCellInput {
     var postItem: PostItem { get }
     var likeButtonTap: ControlEvent<Void> { get }
-    var currentMediaIndex: PublishRelay<Int> { get }
+    var currentMediaIndex: BehaviorRelay<Int> { get }
 }
 
 protocol PostCollectionCellOutput {
@@ -41,7 +41,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
     struct Input: PostCollectionCellInput {
         let postItem: PostItem
         let likeButtonTap: ControlEvent<Void>
-        let currentMediaIndex: PublishRelay<Int>
+        let currentMediaIndex: BehaviorRelay<Int>
     }
     
     struct Output: PostCollectionCellOutput {
@@ -88,14 +88,14 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
             }
         }.asObservable()
         
-        let levelHoldImages = input.currentMediaIndex.flatMap { index in
-            print("currentIndex: \(index)")
+        let levelHoldImages = input.currentMediaIndex.flatMap { [weak self] index in
             return medias.compactMap { (medias) -> (level: UIImage?, hold: UIImage?) in
+                if medias.isEmpty || index >= medias.count {
+                    return (nil, nil)
+                }
                 guard let level = medias[index].grade, let hold = medias[index].hold else { return (nil, nil) }
-                print(level)
-                print(hold)
-                let levelImage = UIImage(named: level)
-                let holdImage = UIImage(named: hold)
+                let levelImage = self?.levelStringToImage(level)
+                let holdImage = self?.holdStringToImage(hold)
                 return (level: levelImage, hold: holdImage)
             }
         }
@@ -138,5 +138,12 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         return paths.map {
             Firestore.firestore().document($0)
         }
+    }
+    
+    private func levelStringToImage(_ string: String) -> UIImage {
+        LHColors.fromEng(string).toImage()
+    }
+    private func holdStringToImage(_ string: String) -> UIImage {
+        LHColors.fromHoldEng(string).toImage()
     }
 }

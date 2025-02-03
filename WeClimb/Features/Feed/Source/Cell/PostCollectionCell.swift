@@ -51,7 +51,7 @@ class PostCollectionCell: UICollectionViewCell {
     private let profileView = PostProfileView()
     private let postSidebarView = PostSidebarView()
     private let mediaItemsSubject = PublishSubject<[MediaItem]>.init()
-    private let currentMediaIndexRelay = PublishRelay<Int>.init()
+    private let currentMediaIndexRelay = BehaviorRelay<Int>.init(value: 0)
 
     private var user: User? {
         didSet {
@@ -121,7 +121,7 @@ class PostCollectionCell: UICollectionViewCell {
     }
     
     private func configureProfileView(postItem: PostItem, user: User) {
-        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: heightArmReach(height: user.height, armReach: user.armReach), level: .appleIcon, hold: .holdRed, caption: postItem.caption))
+        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: heightArmReach(height: user.height, armReach: user.armReach), level: .closeIcon, hold: .closeIcon, caption: postItem.caption))
     }
     
     private func bindViewModel() {
@@ -134,7 +134,7 @@ class PostCollectionCell: UICollectionViewCell {
                 return user
             }
             .asDriver(onErrorJustReturn: User.erroredUser)
-            .drive(onNext: { [weak self] user in
+            .drive(onNext: { [weak self] (user: User) in
                 guard let self else { return }
                 self.user = user
             })
@@ -157,12 +157,14 @@ class PostCollectionCell: UICollectionViewCell {
         output.mediaItems
             .bind(to: mediaItemsSubject)
             .disposed(by: disposeBag)
+        
         output.levelHoldImages
-            .bind(onNext: { [weak self] levelHold in
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { [weak self] levelHold in
                 guard let level = levelHold.level, let hold = levelHold.hold else { return }
                 self?.profileView.updateHoldLevel(hold: hold, level: level)
             })
-            .disposed(by: disposeBag)        
+            .disposed(by: disposeBag)
     }
     
     private func bindSnapShot() {
