@@ -69,8 +69,7 @@ class PostCollectionCell: UICollectionViewCell {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaCollectionCell.className, for: indexPath) as? MediaCollectionCell, let self else {
                 return UICollectionViewCell()
             }
-            let viewModel = self.container.resolve(MediaCollectionCellVM.self)
-            cell.configure(mediaItem: mediaItem, mediaCollectionCellVM: viewModel)
+            cell.configure(mediaItem: mediaItem)
             return cell
         }
         

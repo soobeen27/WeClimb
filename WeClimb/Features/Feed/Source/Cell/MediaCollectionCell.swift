@@ -12,9 +12,6 @@ import RxCocoa
 import Kingfisher
 
 class MediaCollectionCell: UICollectionViewCell {
-    
-    private var viewModel: MediaCollectionCellVM?
-    
     var disposeBag = DisposeBag()
 
     lazy var videoView: PostVideoView = {
@@ -32,8 +29,7 @@ class MediaCollectionCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(mediaItem: MediaItem, mediaCollectionCellVM: MediaCollectionCellVM) {
-        viewModel = mediaCollectionCellVM
+    func configure(mediaItem: MediaItem) {
         guard let url = URL(string: mediaItem.url) else { return }
         if isVideo(url: url) {
             setVideoView(info: (url, mediaItem.mediaUID))

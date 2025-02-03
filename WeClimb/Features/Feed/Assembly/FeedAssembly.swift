@@ -21,11 +21,6 @@ final class FeedAssembly: Assembly {
                                      fetchMediasUseCase: resolver.resolve(FetchMediasUseCase.self)!
             )
         }
-        
-        container.register(MediaCollectionCellVM.self) { resolver in
-            MediaCollectionCellVMImpl()
-        }
-        
     }
 }
 
