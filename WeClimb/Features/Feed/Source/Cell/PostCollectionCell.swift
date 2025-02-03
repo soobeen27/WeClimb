@@ -50,7 +50,7 @@ class PostCollectionCell: UICollectionViewCell {
     private var viewModel: PostCollectionCellVM?
     private let profileView = PostProfileView()
     private let postSidebarView = PostSidebarView()
-    private let mediaItemsSubject = PublishSubject<[MediaItem]>.init()
+    
     private let currentMediaIndexRelay = BehaviorRelay<Int>.init(value: 0)
 
     private var user: User? {
@@ -97,7 +97,6 @@ class PostCollectionCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setLayout()
-        bindSnapShot()
     }
     
     required init?(coder: NSCoder) {
@@ -146,17 +145,13 @@ class PostCollectionCell: UICollectionViewCell {
         output.likeCount
             .bind(to: postSidebarView.likeCountRelay)
             .disposed(by: disposeBag)
-//        output.mediaItems
-//            .asDriver(onErrorDriveWith: .empty())
-//            .drive(onNext: {[weak self] mediaItems in
-//                guard let self else { return }
-//                self.bindSnapShot(mediaItems: mediaItems)
-//
-//            })
-//            .disposed(by: disposeBag)
+
         output.mediaItems
-            .bind(to: mediaItemsSubject)
-            .disposed(by: disposeBag)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { [weak self] mediaItems in
+            guard let self else { return }
+                self.bindSnapShot(mediaItems: mediaItems)
+        }).disposed(by: disposeBag)
         
         output.levelHoldImages
             .asDriver(onErrorDriveWith: .empty())
@@ -167,31 +162,25 @@ class PostCollectionCell: UICollectionViewCell {
             .disposed(by: disposeBag)
     }
     
-    private func bindSnapShot() {
-        mediaItemsSubject
-            .asDriver(onErrorJustReturn: [])
-            .drive(onNext: { [weak self] mediaItems in
+    private func bindSnapShot(mediaItems: [MediaItem]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, MediaItem>()
+        snapshot.appendSections([.media])
+        snapshot.appendItems(mediaItems)
+        if mediaItems.count == 1 {
+            self.mediaCollectionView.isScrollEnabled = false
+        } else {
+            self.mediaCollectionView.isScrollEnabled = true
+        }
+        self.dataSource.apply(snapshot, animatingDifferences: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { [weak self] in
             guard let self else { return }
-            var snapshot = NSDiffableDataSourceSnapshot<Section, MediaItem>()
-            snapshot.appendSections([.media])
-            snapshot.appendItems(mediaItems)
-            if mediaItems.count == 1 {
-                self.mediaCollectionView.isScrollEnabled = false
-            } else {
-                self.mediaCollectionView.isScrollEnabled = true
+            
+            if let centerCell = findCenterCell(in: self.mediaCollectionView),
+               let indexPathRow = self.indexPathFrom(collectionView: self.mediaCollectionView, cell: centerCell)?.row {
+                centerCell.videoView.playVideo()
+                self.currentMediaIndexRelay.accept(indexPathRow)
             }
-            self.dataSource.apply(snapshot, animatingDifferences: true)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { [weak self] in
-                guard let self else { return }
-                
-                if let centerCell = findCenterCell(in: self.mediaCollectionView),
-                   let indexPathRow = self.indexPathFrom(collectionView: self.mediaCollectionView, cell: centerCell)?.row {
-                    centerCell.videoView.playVideo()
-                    self.currentMediaIndexRelay.accept(indexPathRow)
-                }
-            }
-        })
-        .disposed(by: disposeBag)
+        }
     }
     
     private func heightArmReach(height: Int?, armReach: Int?) -> String {

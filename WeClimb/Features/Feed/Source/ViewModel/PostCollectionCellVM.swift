@@ -37,7 +37,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
     
     private let disposeBag = DisposeBag()
     private var myUID: String?
-
+    
     struct Input: PostCollectionCellInput {
         let postItem: PostItem
         let likeButtonTap: ControlEvent<Void>
@@ -81,13 +81,15 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
             .disposed(by: disposeBag)
         guard let paths = input.postItem.medias else { return Output(user: user, likeCount: likeCount, isLike: isLike, mediaItems: Observable.error(FirebaseError.documentNil), levelHoldImages: Observable.just((UIImage.closeIcon, UIImage.closeIcon)))
         }
+//        print("vm uid: \(input.postItem.medias?.first)")
+
         let refs = pathToRef(paths: paths)
         let medias = fetchMediasUseCase.execute(refs: refs).map { [weak self] medias in
+//            print("fetch first one: \(medias.first?.mediaUID)")
             return medias.compactMap { media in
                 self?.mediaToItem(media: media)
             }
         }.asObservable()
-        
         let levelHoldImages = input.currentMediaIndex.flatMap { [weak self] index in
             return medias.compactMap { (medias) -> (level: UIImage?, hold: UIImage?) in
                 if medias.isEmpty || index >= medias.count {
@@ -116,9 +118,9 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
     }
     
     private func getIsLike(likes: [String]?) -> Bool? {
-            guard let myUID = try? myUIDUseCase.execute() else { return nil}
-            let isLike = likes?.contains([myUID]) ?? false
-            return isLike
+        guard let myUID = try? myUIDUseCase.execute() else { return nil}
+        let isLike = likes?.contains([myUID]) ?? false
+        return isLike
     }
     
     private func setMyUID() {
