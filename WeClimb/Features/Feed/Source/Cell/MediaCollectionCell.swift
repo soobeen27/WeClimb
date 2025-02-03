@@ -9,17 +9,23 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import Kingfisher
 
 class MediaCollectionCell: UICollectionViewCell {
     
     private var viewModel: MediaCollectionCellVM?
     
     var disposeBag = DisposeBag()
-    let videoView = PostVideoView()
+
+    lazy var videoView: PostVideoView = {
+        let v = PostVideoView(frame: contentView.bounds)
+        return v
+    }()
+    
+    private var imageView: UIImageView?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -28,25 +34,42 @@ class MediaCollectionCell: UICollectionViewCell {
     
     func configure(mediaItem: MediaItem, mediaCollectionCellVM: MediaCollectionCellVM) {
         viewModel = mediaCollectionCellVM
-        bindViewModel(mediaItem: mediaItem)
         guard let url = URL(string: mediaItem.url) else { return }
-        videoView.videoInfo = (url, mediaItem.mediaUID)
+        if isVideo(url: url) {
+            setVideoView(info: (url, mediaItem.mediaUID))
+        } else {
+            setImageView(url: url)
+        }
+        
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
         disposeBag = DisposeBag()
         videoView.resetToDefaultState()
+        imageView = nil
+        contentView.subviews.forEach { $0.removeFromSuperview() }
     }
-    
-    private func bindViewModel(mediaItem: MediaItem) {
-        guard let viewModel else { return }
-    }
-    
-    private func setLayout() {
+    private func setVideoView(info: (url: URL, uid: String)) {
+        videoView.videoInfo = info
         contentView.addSubview(videoView)
-        videoView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+    }
+    
+    private func setImageView(url: URL) {
+        imageView = UIImageView(frame: contentView.bounds)
+        guard let imageView else { return }
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.backgroundColor = .clear
+        imageView.kf.setImage(with: url)
+        contentView.addSubview(imageView)
+    }
+    
+    private func isVideo(url: URL) -> Bool {
+        if url.pathExtension == "mp4" {
+            return true
+        } else {
+            return false
         }
     }
 }
