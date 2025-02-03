@@ -73,6 +73,16 @@ class FeedVC: UIViewController {
         hideNavigationBar()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        VideoManager.shared.stopVideo()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        VideoManager.shared.playCurrentVideo()
+    }
+    
     private func bindViewModel() {
         let input = FeedVMImpl.Input(fetchType: fetchType)
         feedVM.transform(input: input)
