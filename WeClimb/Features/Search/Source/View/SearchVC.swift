@@ -32,6 +32,11 @@ enum SearchStyle {
 
 class SearchVC: UIViewController, UITextFieldDelegate {
     var coordinator: SearchCoordinator?
+//    var toSearchResult: ((String) -> String)?
+    var toSearchResult: ((String) -> Void)?
+    
+    var toUploadSearchResult: ((String) -> Void)?
+    
     private let searchStyle: SearchStyle
     
     private let disposeBag = DisposeBag()
@@ -291,6 +296,10 @@ extension SearchVC {
         searchTextField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
         searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
         
+        if searchStyle == .uploadSearch {
+            return
+        }
+        
         self.searchTextField.snp.updateConstraints {
             $0.leading.equalToSuperview().offset(SearchConst.Search.Spacing.textFieldSpacing)
             $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.updatedTextFieldRightSpacing)
@@ -322,9 +331,9 @@ extension SearchVC {
             
             switch searchStyle {
             case .defaultSearch:
-                coordinator?.navigateToSearchResult(query: searchText)
+                self.toSearchResult?(searchText)
             case .uploadSearch:
-                coordinator?.navigateToUploadSearchResult(query: searchText) 
+                self.toUploadSearchResult?(searchText)
             }
         }
         

@@ -12,6 +12,9 @@ import RxCocoa
 
 class SearchResultVC: UIViewController {
     var coordinator: SearchResultCoordinator?
+    
+    var toUpoadVC: ((SearchResultItem) -> Void)?
+    
     private let disposeBag = DisposeBag()
     
     private var viewModel: SearchResultVM
@@ -229,7 +232,7 @@ class SearchResultVC: UIViewController {
                 guard let self = self else { return }
                 
                 if self.searchStyle == .uploadSearch {
-                    self.coordinator?.navigateToUploadMedia(with: item)
+                    self.toUpoadVC?(item)
                 } else {
                     saveItemSubject.onNext(item)
                 }

@@ -10,7 +10,6 @@ import UIKit
 import SnapKit
 
 final class UploadCoordinator: BaseCoordinator {
-    
     var navigationController: UINavigationController
     private let tabBarController: UITabBarController
     private let builder: UploadBuilder
@@ -30,6 +29,10 @@ final class UploadCoordinator: BaseCoordinator {
     }
     
     override func start() {
+        showUploadMenu()
+    }
+    
+    private func showUploadMenu() {
         let uploadMenuVC = UploadMenuVC()
         
         uploadMenuVC.onClimbingButtonTapped = { [weak self] in
@@ -47,6 +50,7 @@ final class UploadCoordinator: BaseCoordinator {
         }
         
         self.uploadMenuVC = uploadMenuVC
+        
     }
     
     func navigateToTabIndex() {
@@ -60,10 +64,37 @@ final class UploadCoordinator: BaseCoordinator {
             self.tabBarController.tabBar.isHidden = true
         }
     }
-    
-    func navigateToSearchVC() {
+
+    private func navigateToSearchVC() {
         let searchCoordinator = SearchCoordinator(navigationController: navigationController, builder: searchBuilder)
+        addDependency(searchCoordinator)
         searchCoordinator.navigateToUploadSearch()
+        
+        searchCoordinator.onUploadSearchFinish = { [weak self] query in
+            self?.removeDependency(searchCoordinator)
+            self?.navigateToSearchResultVC(query: query)
+        }
+    }
+    
+    func navigateToSearchResultVC(query: String) {
+        let searchResultCoordinator = SearchResultCoordinator(navigationController: navigationController, builder: searchBuilder)
+        addDependency(searchResultCoordinator)
+        searchResultCoordinator.query = query
+        searchResultCoordinator.navigateToUploadSearchResult()
+        
+        searchResultCoordinator.onFinish = { [weak self] result in
+            self?.removeDependency(searchResultCoordinator)
+            self?.navigateToUploadMedia(gymItem: result)
+        }
+    }
+    
+    private func navigateToUploadMedia(gymItem: SearchResultItem) {
+        let uploadMediaCoordinator = UploadMediaCoordinator(navigationController: navigationController, gymItem: gymItem)
+        
+        parentCoordinator?.addDependency(uploadMediaCoordinator)
+        parentCoordinator?.removeDependency(self)
+        
+        uploadMediaCoordinator.start()
     }
 }
 

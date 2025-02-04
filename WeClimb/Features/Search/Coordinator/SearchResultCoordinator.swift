@@ -12,6 +12,8 @@ final class SearchResultCoordinator: BaseCoordinator {
     private let builder: SearchBuilder
     var query: String?
     
+    var onFinish: ((SearchResultItem) -> Void)?
+    
     init(navigationController: UINavigationController, builder: SearchBuilder) {
         self.navigationController = navigationController
         self.builder = builder
@@ -32,11 +34,9 @@ final class SearchResultCoordinator: BaseCoordinator {
         let searchResultVC = builder.buildUploadSearchResult()
         searchResultVC.coordinator = self
         searchResultVC.query = query
+        searchResultVC.toUpoadVC = { [weak self] gymItem in
+            self?.onFinish?(gymItem)
+        }
         navigationController.pushViewController(searchResultVC, animated: true)
-    }
-    
-    func navigateToUploadMedia(with gymItem: SearchResultItem) {
-        let uploadMediaCoordinator = UploadMediaCoordinator(navigationController: navigationController, gymItem: gymItem)
-        uploadMediaCoordinator.start()
     }
 }
