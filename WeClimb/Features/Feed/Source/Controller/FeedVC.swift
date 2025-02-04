@@ -90,9 +90,7 @@ class FeedVC: UIViewController {
         dataSource.apply(snapshot, animatingDifferences: true)
         if let centerCell = findCenterCell(in: postCollectionView) {
             let mediaCollectionview = centerCell.mediaCollectionView
-            mediaCollectionview.visibleCells.compactMap{ $0 as? MediaCollectionCell }.forEach {
-                $0.videoView.stopVideo()
-            }
+            VideoManager.shared.reset()
             if let mediaCenterCell = findMediaCenterCell(in:  mediaCollectionview) {
                 mediaCenterCell.videoView.playVideo()
             }
@@ -124,7 +122,21 @@ extension FeedVC: UICollectionViewDelegate {
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        VideoManager.shared.stopCurrentVideo()
+        VideoManager.shared.reset()
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let collectionView = scrollView as? UICollectionView else { return }
+        let contentOffset = scrollView.contentOffset
+        let scrollViewHeight = collectionView.frame.size.height
+        let scrollContentSizeHeight = collectionView.contentSize.height
+        let scrollOffsetThreshold = scrollContentSizeHeight - scrollViewHeight
+        
+        if contentOffset.y >= scrollOffsetThreshold {
+            if collectionView.indexPathsForVisibleItems.sorted().last != nil {
+                fetchType.accept(.more)
+            }
+        }
     }
     
     func findCenterCell(in collectionView: UICollectionView) -> PostCollectionCell? {

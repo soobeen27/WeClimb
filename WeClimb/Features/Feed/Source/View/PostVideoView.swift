@@ -15,12 +15,19 @@ import Kingfisher
 
 class PostVideoView: UIView {
     
-    private var player: AVPlayer?
+    private var player: AVQueuePlayer?
+    
+    private var playerLooper: AVPlayerLooper?
+    
     private var playerLayer: AVPlayerLayer?
     
     private var disposeBag = DisposeBag()
     
     private let loadComplete = BehaviorSubject<Bool>.init(value: false)
+    
+    private var isPlaying: Bool = false
+    
+    private var overlayView: UIView?
             
     var videoInfo: (url: URL, uid: String)? {
         didSet {
@@ -30,10 +37,22 @@ class PostVideoView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc private func handleTap() {
+        if isPlaying {
+            VideoManager.shared.stopVideo()
+            isPlaying.toggle()
+        } else {
+            guard let player else { return }
+            VideoManager.shared.playVideo(player: player)
+            isPlaying.toggle()
+        }
     }
     
     private func loadVideo() {
@@ -45,8 +64,10 @@ class PostVideoView: UIView {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] cachedURL in
                 guard let self else { return }
-                self.setupPlayer(with: cachedURL)
-                self.loadComplete.onNext(true)
+                Task {
+                    await self.setupPlayer(with: cachedURL)
+                    self.loadComplete.onNext(true)
+                }
             }, onError: { error in
                 print("StreamAndCacheVideoError: \(error)")
             })
@@ -59,22 +80,42 @@ class PostVideoView: UIView {
         player = nil
         playerLayer = nil
         loadComplete.onNext(false)
+        overlayView = nil
         disposeBag = DisposeBag()
     }
     
-    private func setupPlayer(with url: URL) {
+    private func setupPlayer(with url: URL) async {
         let asset = AVAsset(url: url)
-        player = AVPlayer(url: url)
+        let playerItem = AVPlayerItem(asset: asset)
+        player = AVQueuePlayer()
+        guard let player else { return }
+        player.automaticallyWaitsToMinimizeStalling = false
+        playerLooper = AVPlayerLooper(player: player, templateItem: playerItem)
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.frame = self.bounds
         playerLayer?.opacity = 1.0
-        playerLayer?.backgroundColor = UIColor(hex: "#0B1013").cgColor
-        guard let track = asset.tracks(withMediaType: .video).first else {
-            print("비디오 트랙을 찾을 수 없습니다.")
-            return
+        playerLayer?.backgroundColor = FeedConsts.CollectionView.backgroundColor.cgColor
+        
+        if checkIfVideoIsHDR(asset: asset) {
+            addDarkOverlay()
         }
         
-        let size = track.naturalSize.applying(track.preferredTransform)
+        guard let videoTrack = try? await asset.loadTracks(withMediaType: .video).first else {
+            print("setupPlayer: videoTrack 못구함")
+            return
+        }
+
+        guard let naturalSize = try? await videoTrack.load(.naturalSize) else {
+            print("setupPlayer: naturalSize 못구함")
+            return
+        }
+        guard let preferredTransform = try? await videoTrack.load(.preferredTransform) else {
+            print("setupPlayer: prefferdTransform 못구함")
+            return
+        }
+
+        let size = naturalSize.applying(preferredTransform)
+
         let width = abs(size.width)
         let height = abs(size.height)
         let ratio = height / width
@@ -142,10 +183,6 @@ class PostVideoView: UIView {
         }
     }
     
-    func stopVideo() {
-        VideoManager.shared.stopCurrentVideo()
-    }
-    
     func playVideo() {
         loadComplete
             .asDriver(onErrorDriveWith: .empty())
@@ -153,9 +190,26 @@ class PostVideoView: UIView {
                 if success {
                     guard let self, let player = self.player else { return }
                     VideoManager.shared.playVideo(player: player)
+                    self.isPlaying = true
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    func checkIfVideoIsHDR(asset: AVAsset) -> Bool {
+        let videoTracks = asset.tracks(withMediaType: .video)
+        if let videoTrack = videoTracks.first {
+            return videoTrack.hasMediaCharacteristic(.containsHDRVideo)
+        }
+        return false
+    }
+    
+    func addDarkOverlay() {
+        overlayView = UIView(frame: bounds)
+        guard let overlayView else { return }
+        overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
+        overlayView.isUserInteractionEnabled = false
+        addSubview(overlayView)
     }
 }
 
@@ -177,4 +231,9 @@ enum VideoError: Error {
             return "다운로드 실패"
         }
     }
+}
+
+enum PlayerError: Error {
+    case videoTrackNotFound
+    case failedToLoadVideoSize
 }
