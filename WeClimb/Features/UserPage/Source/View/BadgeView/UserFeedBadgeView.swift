@@ -14,9 +14,8 @@ import SnapKit
 
 struct FeedBageModel {
     let gymName: String?
-    let hold: UIImage?
-    let holdValue: String?
-    let gymThmbnail: UIImage?
+    let hold: [String]?
+    let gymThmbnail: String?
 }
 
 class UserFeedBadgeView: UIView {
@@ -72,9 +71,9 @@ class UserFeedBadgeView: UIView {
     
     private func setData() {
         guard let model = feedBageModel else { return }
-        nameBadge.gymNameText = model.gymName
-        valueBadge.leftImage = model.hold
-        valueBadge.text = model.holdValue
+//        nameBadge.gymNameText = model.gymName
+//        valueBadge.leftImage = model.hold
+//        valueBadge.text = model.holdValue
     }
     
     func resetToDefalueState() {

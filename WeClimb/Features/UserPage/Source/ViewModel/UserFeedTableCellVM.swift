@@ -5,6 +5,8 @@
 //  Created by 윤대성 on 2/4/25.
 //
 
+import Foundation
+
 import RxCocoa
 import RxSwift
 
@@ -26,6 +28,13 @@ protocol UserFeedTableCellVM {
 
 class UserFeedTableCellVMImpl: UserFeedTableCellVM {
     private let disposeBag = DisposeBag()
+    private let useCase: FetchUserFeedInfoUseCase
+    private let userId: String
+    
+    init(useCase: FetchUserFeedInfoUseCase, userId: String) {
+        self.useCase = useCase
+        self.userId = userId
+    }
     
     func transform(input: UserFeedTableCellInput) -> UserFeedTableCellOutput {
         let dateTextRelay = BehaviorRelay<String>(value: "")
@@ -33,18 +42,26 @@ class UserFeedTableCellVMImpl: UserFeedTableCellVM {
         let commentCountRelay = BehaviorRelay<String>(value: "0")
         let captionTextRelay = BehaviorRelay<String>(value: "")
         let badgeModelRelay = BehaviorRelay<FeedBageModel?>(value: nil)
-        
+
         input.fetchDataTrigger
-//        // usecase들어갈자리
-//            .flatMapLatest { [useCase] in
-//                useCase.fetchFeedData() // Firebase에서 데이터 가져오는 로직
-//            }
-            .subscribe(onNext: { feedData in
-                dateTextRelay.accept(feedData.dateString)
-                likeCountRelay.accept("\(feedData.likeCount)")
-                commentCountRelay.accept("\(feedData.commentCount)")
-                captionTextRelay.accept(feedData.caption)
-                badgeModelRelay.accept(feedData.badgeModel)
+            .flatMapLatest { [useCase] in
+                useCase.execute(userId: self.userId)
+            }
+            .subscribe(onNext: { postsWithHold in
+                guard let firstPost = postsWithHold.first else { return }
+                
+                let post = firstPost.post
+                dateTextRelay.accept(self.formatDate(post.creationDate))
+                likeCountRelay.accept("\(post.like?.count ?? 0)")
+                commentCountRelay.accept("\(post.commentCount ?? 0)")
+                captionTextRelay.accept(post.caption ?? "")
+                
+                let badgeModel = FeedBageModel(
+                    gymName: post.gym,
+                    hold: firstPost.holds,
+                    gymThmbnail: nil
+                )
+                badgeModelRelay.accept(badgeModel)
             })
             .disposed(by: disposeBag)
         
@@ -55,6 +72,12 @@ class UserFeedTableCellVMImpl: UserFeedTableCellVM {
             captionText: captionTextRelay.asDriver(),
             badgeModel: badgeModelRelay.asDriver().compactMap { $0 }
         )
+    }
+    
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
     }
 }
 
