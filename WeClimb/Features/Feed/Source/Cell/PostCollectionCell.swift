@@ -50,9 +50,11 @@ class PostCollectionCell: UICollectionViewCell {
     private var viewModel: PostCollectionCellVM?
     private let profileView = PostProfileView()
     private let postSidebarView = PostSidebarView()
+    private let postPageControl = PostPageControl()
     
     private let currentMediaIndexRelay = BehaviorRelay<Int>.init(value: 0)
-
+    private var totalMediaCountRelay = BehaviorRelay<Int>.init(value: 0)
+    
     private var user: User? {
         didSet {
             guard let user, let postItem else { return }
@@ -116,6 +118,9 @@ class PostCollectionCell: UICollectionViewCell {
         self.postItem = postItem
         bindViewModel()
         caption = postItem.caption
+        bindMediaIndex()
+        bindTotalPageCount()
+
     }
     
     private func configureProfileView(postItem: PostItem, user: User) {
@@ -149,6 +154,7 @@ class PostCollectionCell: UICollectionViewCell {
             .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { [weak self] mediaItems in
             guard let self else { return }
+                self.totalMediaCountRelay.accept(mediaItems.count)
                 self.bindSnapShot(mediaItems: mediaItems)
         }).disposed(by: disposeBag)
         
@@ -196,9 +202,27 @@ class PostCollectionCell: UICollectionViewCell {
         postSidebarView.likeCountRelay.accept(likeCount)
     }
     
+    private func bindMediaIndex() {
+        currentMediaIndexRelay
+            .asDriver()
+            .drive(onNext: { [weak self] index in
+                self?.postPageControl.currentPageCount = index + 1
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindTotalPageCount() {
+        totalMediaCountRelay
+            .asDriver()
+            .drive(onNext: { [weak self] count in
+                self?.postPageControl.totalPageCount = count
+            })
+            .disposed(by: disposeBag)
+    }
+    
     private func setLayout() {
         contentView.backgroundColor = .clear
-        [profileView, postSidebarView]
+        [profileView, postSidebarView, postPageControl]
             .forEach {
                 self.addSubview($0)
             }
@@ -210,6 +234,11 @@ class PostCollectionCell: UICollectionViewCell {
         postSidebarView.snp.makeConstraints {
             $0.bottom.equalToSuperview().inset(FeedConsts.PostCollectionCell.Size.sidebarBottom)
             $0.trailing.equalToSuperview().inset(FeedConsts.Profile.Size.padding)
+        }
+        
+        postPageControl.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(FeedConsts.pageControl.Size.top)
+            $0.trailing.equalToSuperview().offset(-FeedConsts.pageControl.Size.trailing)
         }
     }
 }

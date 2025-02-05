@@ -55,6 +55,7 @@ extension UIColor {
     static let fillSolidLightNormal = UIColor(hex: "#F4F5F5")
     static let fillOpacityLightStrong = UIColor(hex: "#DFE0E2", alpha: 0.2)
     static let staticWhite = UIColor(hex: "#FFFFFF")
+    static let fillOpacityDarkHeavy = UIColor(hex: "#313235", alpha: 0.4)
     
     
     // DS

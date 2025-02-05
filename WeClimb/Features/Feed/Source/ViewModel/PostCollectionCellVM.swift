@@ -81,11 +81,9 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
             .disposed(by: disposeBag)
         guard let paths = input.postItem.medias else { return Output(user: user, likeCount: likeCount, isLike: isLike, mediaItems: Observable.error(FirebaseError.documentNil), levelHoldImages: Observable.just((UIImage.closeIcon, UIImage.closeIcon)))
         }
-//        print("vm uid: \(input.postItem.medias?.first)")
 
         let refs = pathToRef(paths: paths)
         let medias = fetchMediasUseCase.execute(refs: refs).map { [weak self] medias in
-//            print("fetch first one: \(medias.first?.mediaUID)")
             return medias.compactMap { media in
                 self?.mediaToItem(media: media)
             }

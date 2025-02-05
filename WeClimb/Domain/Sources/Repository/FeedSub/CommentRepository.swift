@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 
 protocol CommentRepository {
-    func AddCommnet(postUID: String, content: String) -> Single<Void>
-    func FetchComments(postUID: String, postOwner: String) -> Single<[Comment]>
-    func DeleteComments(postUID: String, commentUID: String) -> Single<Void>
+    func addCommnet(postUID: String, content: String) -> Single<Void>
+    func fetchComments(postUID: String, postOwner: String) -> Single<[Comment]>
+    func deleteComments(postUID: String, commentUID: String) -> Single<Void>
 }
