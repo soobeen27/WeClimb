@@ -237,7 +237,7 @@ class PostCollectionCell: UICollectionViewCell {
         }
         
         postPageControl.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(FeedConsts.pageControl.Size.top)
+            $0.top.equalTo(self.safeAreaLayoutGuide).offset(FeedConsts.pageControl.Size.top)
             $0.trailing.equalToSuperview().offset(-FeedConsts.pageControl.Size.trailing)
         }
     }

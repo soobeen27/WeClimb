@@ -102,7 +102,7 @@ enum FeedConsts {
             static let vPadding: CGFloat = 5
             static let spacing: CGFloat = 2
             static let cornerRadius: CGFloat = 13
-            static let top: CGFloat = 74
+            static let top: CGFloat = 20
             static let trailing: CGFloat = 16
         }
         enum Color {
