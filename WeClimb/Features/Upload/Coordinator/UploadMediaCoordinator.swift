@@ -17,8 +17,17 @@ final class UploadMediaCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        let uploadMediaVC = UploadMediaVC(gymItem: gymItem)
+        let uploadVM = UploadVM()
+        let uploadMediaVC = UploadMediaVC(gymItem: gymItem, viewModel: uploadVM)
         uploadMediaVC.coordinator = self
+        
+        uploadMediaVC.onBackButton = { [weak self] in
+            self?.handleBackButtonTapped()
+        }
         navigationController.pushViewController(uploadMediaVC, animated: true)
+    }
+    
+    private func handleBackButtonTapped() {
+        navigationController.popViewController(animated: true)
     }
 }

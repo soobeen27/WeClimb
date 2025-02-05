@@ -8,8 +8,14 @@
 import UIKit
 
 import SnapKit
+import RxSwift
 
 class UploadOptionView : UIView {
+    
+    var didTapBackButton: (() -> Void)?
+    var didTapNextButton: (() -> Void)?
+    
+    private let disposeBag = DisposeBag()
     
     var gradeOptionLabel: UILabel = {
         let label = UILabel()
@@ -117,6 +123,7 @@ class UploadOptionView : UIView {
         
         setLayout()
         applyCornerRadius()
+        bindButton()
     }
     
     required init?(coder: NSCoder) {
@@ -131,6 +138,20 @@ class UploadOptionView : UIView {
         layer.cornerRadius = 20
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         clipsToBounds = true
+    }
+    
+    private func bindButton() {
+        backButton.rx.tap
+            .bind { [weak self] in
+                self?.didTapBackButton?()
+            }
+            .disposed(by: disposeBag)
+        
+        nextButton.rx.tap
+            .bind { [weak self] in
+                self?.didTapNextButton?()
+            }
+            .disposed(by: disposeBag)
     }
 
     private func setLayout() {
@@ -186,6 +207,5 @@ class UploadOptionView : UIView {
             $0.height.equalTo(30)
             $0.bottom.equalToSuperview().offset(-10)
         }
-        
     }
 }
