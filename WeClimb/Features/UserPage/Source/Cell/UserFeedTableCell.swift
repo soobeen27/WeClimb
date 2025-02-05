@@ -119,34 +119,39 @@ class UserFeedTableCell: UITableViewCell {
         }
     }
   
-    // 바인드 부분
-//    private func bindViewModel() {
-//        let input = UserFeedTableCellInputImpl(fetchDataTrigger: PublishSubject<Void>())
-//        let output = viewModel.transform(input: input)
-//        
-//        output.dateText
-//            .drive(dateLabel.rx.text)
-//            .disposed(by: disposeBag)
-//        
-//        output.likeCountText
-//            .drive(likeCountLabel.rx.text)
-//            .disposed(by: disposeBag)
-//        
-//        output.commentCountText
-//            .drive(commentCountLabel.rx.text)
-//            .disposed(by: disposeBag)
-//        
-//        output.captionText
-//            .drive(captionLabel.rx.text)
-//            .disposed(by: disposeBag)
-//        
-//        output.badgeModel
-//            .drive(onNext: { [weak self] model in
-//                self?.badgeView.configure(with: model)
-//            })
-//            .disposed(by: disposeBag)
-//        
-//        // 데이터 로드 트리거
-//        input.fetchDataTrigger.onNext(())
-//    }
+    func configure(with viewModel: UserFeedTableCellVMImpl) {
+        self.viewModel = viewModel
+        bindViewModel()
+    }
+    
+    private func bindViewModel() {
+        guard let viewModel = viewModel else { return }
+
+        let input = UserFeedTableCellVMImpl.Input()
+        let output = viewModel.transform(input: input)
+        
+        output.dateText
+            .drive(dateLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        output.likeCountText
+            .drive(likeCountLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        output.commentCountText
+            .drive(commentCountLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        output.captionText
+            .drive(captionLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        output.badgeModel
+            .drive(onNext: { [weak self] model in
+                self?.badgeView.configure(with: model)
+            })
+            .disposed(by: disposeBag)
+        
+        input.fetchDataTrigger.onNext(())
+    }
 }

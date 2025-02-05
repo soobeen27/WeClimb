@@ -14,6 +14,23 @@ import RxSwift
 class UserPageVC: UIViewController {
     var coordinator: UserPageCoordinator?
     
+    private let disposeBag = DisposeBag()
+    private let userFeedPageVM: UserFeedPageVM
+    private let userSummaryPageVM: UserSummaryPageVM
+    private var cellViewModels: [UserFeedTableCellVMImpl] = []
+    
+    init(coordinator: UserPageCoordinator? = nil, userFeedPageVM: UserFeedPageVM, userSummaryPageVM: UserSummaryPageVM, cellViewModels: [UserFeedTableCellVMImpl]) {
+        self.coordinator = coordinator
+        self.userFeedPageVM = userFeedPageVM
+        self.userSummaryPageVM = userSummaryPageVM
+        self.cellViewModels = cellViewModels
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - 유저 정보
     private let userNameLabel: UILabel = {
       let label = UILabel()
@@ -173,4 +190,8 @@ class UserPageVC: UIViewController {
             $0.top.equalTo(indicatorBar.snp.bottom)
         }
     }
+    
+//    private func bindViewModel() {
+//        viewModel.user
+//    }
 }

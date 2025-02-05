@@ -11,7 +11,7 @@ import RxCocoa
 import RxSwift
 
 protocol UserFeedTableCellInput {
-    var fetchDataTrigger: PublishSubject<Void> { get }
+    var fetchDataTrigger: ReplaySubject<Void> { get }
 }
 
 protocol UserFeedTableCellOutput {
@@ -34,6 +34,18 @@ class UserFeedTableCellVMImpl: UserFeedTableCellVM {
     init(useCase: FetchUserFeedInfoUseCase, userId: String) {
         self.useCase = useCase
         self.userId = userId
+    }
+    
+    struct Input: UserFeedTableCellInput {
+        var fetchDataTrigger: ReplaySubject<Void> = ReplaySubject.create(bufferSize: 1)
+    }
+    
+    struct Output: UserFeedTableCellOutput {
+        let dateText: Driver<String>
+        let likeCountText: Driver<String>
+        let commentCountText: Driver<String>
+        let captionText: Driver<String>
+        let badgeModel: Driver<FeedBageModel>
     }
     
     func transform(input: UserFeedTableCellInput) -> UserFeedTableCellOutput {
@@ -65,7 +77,7 @@ class UserFeedTableCellVMImpl: UserFeedTableCellVM {
             })
             .disposed(by: disposeBag)
         
-        return UserFeedTableCellOutputImpl(
+        return Output (
             dateText: dateTextRelay.asDriver(),
             likeCountText: likeCountRelay.asDriver(),
             commentCountText: commentCountRelay.asDriver(),
@@ -79,12 +91,4 @@ class UserFeedTableCellVMImpl: UserFeedTableCellVM {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: date)
     }
-}
-
-struct UserFeedTableCellOutputImpl: UserFeedTableCellOutput {
-    let dateText: Driver<String>
-    let likeCountText: Driver<String>
-    let commentCountText: Driver<String>
-    let captionText: Driver<String>
-    let badgeModel: Driver<FeedBageModel>
 }
