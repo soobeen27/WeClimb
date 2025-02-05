@@ -1,0 +1,239 @@
+//
+//  PostVideoView.swift
+//  WeClimb
+//
+//  Created by Soobeen Jang on 1/21/25.
+//
+
+import AVKit
+import AVFoundation
+import UIKit
+
+import RxSwift
+import RxCocoa
+import Kingfisher
+
+class PostVideoView: UIView {
+    
+    private var player: AVQueuePlayer?
+    
+    private var playerLooper: AVPlayerLooper?
+    
+    private var playerLayer: AVPlayerLayer?
+    
+    private var disposeBag = DisposeBag()
+    
+    private let loadComplete = BehaviorSubject<Bool>.init(value: false)
+    
+    private var isPlaying: Bool = false
+    
+    private var overlayView: UIView?
+            
+    var videoInfo: (url: URL, uid: String)? {
+        didSet {
+            loadVideo()
+        }
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc private func handleTap() {
+        if isPlaying {
+            VideoManager.shared.stopVideo()
+            isPlaying.toggle()
+        } else {
+            guard let player else { return }
+            VideoManager.shared.playVideo(player: player)
+            isPlaying.toggle()
+        }
+    }
+    
+    private func loadVideo() {
+        guard let videoInfo else { return }
+        
+        let cacheKey = "\(videoInfo.uid).mp4"
+        
+        streamAndCacheVideo(with: videoInfo.url, cacheKey: cacheKey)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] cachedURL in
+                guard let self else { return }
+                Task {
+                    await self.setupPlayer(with: cachedURL)
+                    self.loadComplete.onNext(true)
+                }
+            }, onError: { error in
+                print("StreamAndCacheVideoError: \(error)")
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func resetToDefaultState() {
+        videoInfo = nil
+        playerLayer?.removeFromSuperlayer()
+        player = nil
+        playerLayer = nil
+        loadComplete.onNext(false)
+        overlayView = nil
+        disposeBag = DisposeBag()
+    }
+    
+    private func setupPlayer(with url: URL) async {
+        let asset = AVAsset(url: url)
+        let playerItem = AVPlayerItem(asset: asset)
+        player = AVQueuePlayer()
+        guard let player else { return }
+        player.automaticallyWaitsToMinimizeStalling = false
+        playerLooper = AVPlayerLooper(player: player, templateItem: playerItem)
+        playerLayer = AVPlayerLayer(player: player)
+        playerLayer?.frame = self.bounds
+        playerLayer?.opacity = 1.0
+        playerLayer?.backgroundColor = FeedConsts.CollectionView.backgroundColor.cgColor
+        
+        if checkIfVideoIsHDR(asset: asset) {
+            addDarkOverlay()
+        }
+        
+        guard let videoTrack = try? await asset.loadTracks(withMediaType: .video).first else {
+            print("setupPlayer: videoTrack 못구함")
+            return
+        }
+
+        guard let naturalSize = try? await videoTrack.load(.naturalSize) else {
+            print("setupPlayer: naturalSize 못구함")
+            return
+        }
+        guard let preferredTransform = try? await videoTrack.load(.preferredTransform) else {
+            print("setupPlayer: prefferdTransform 못구함")
+            return
+        }
+
+        let size = naturalSize.applying(preferredTransform)
+
+        let width = abs(size.width)
+        let height = abs(size.height)
+        let ratio = height / width
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            if ratio < 1.4 {
+                self.playerLayer?.videoGravity = .resizeAspect
+            } else {
+                self.playerLayer?.videoGravity = .resizeAspectFill
+            }
+            CATransaction.commit()
+        }
+        
+        if let playerLayer = playerLayer {
+            self.layer.insertSublayer(playerLayer, at: 0)
+        }
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        playerLayer?.frame = self.bounds
+    }
+    
+    private func streamAndCacheVideo(with url: URL, cacheKey: String) -> Observable<URL> {
+        return Observable.create { observer in
+            guard let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+                print("캐시 디렉토리를 찾을 수 없음.")
+                observer.onError(VideoError.cacheDirectory)
+                return Disposables.create()
+            }
+            
+            let cachedFileURL = cacheDirectory.appendingPathComponent(cacheKey)
+            
+            if FileManager.default.fileExists(atPath: cachedFileURL.path) {
+                observer.onNext(cachedFileURL)
+                return Disposables.create()
+            }
+            
+            let task = URLSession.shared.downloadTask(with: url) { (location, response, error) in
+                if let error = error {
+                    print("Error downloading video: \(error.localizedDescription)")
+                    observer.onError(error)
+                    return
+                }
+                
+                guard let location = location else {
+                    print("다운로드된 파일이 없습니다.")
+                    observer.onError(VideoError.noDownloadedFile)
+                    return
+                }
+                
+                do {
+                    try FileManager.default.moveItem(at: location, to: cachedFileURL)
+                    observer.onNext(cachedFileURL)
+                } catch {
+                    print("파일 이동 중 오류 발생: \(error.localizedDescription)")
+                    observer.onError(error)
+                }
+            }
+            task.resume()
+            return Disposables.create()
+        }
+    }
+    
+    func playVideo() {
+        loadComplete
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { [weak self] success in
+                if success {
+                    guard let self, let player = self.player else { return }
+                    VideoManager.shared.playVideo(player: player)
+                    self.isPlaying = true
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func checkIfVideoIsHDR(asset: AVAsset) -> Bool {
+        let videoTracks = asset.tracks(withMediaType: .video)
+        if let videoTrack = videoTracks.first {
+            return videoTrack.hasMediaCharacteristic(.containsHDRVideo)
+        }
+        return false
+    }
+    
+    func addDarkOverlay() {
+        overlayView = UIView(frame: bounds)
+        guard let overlayView else { return }
+        overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
+        overlayView.isUserInteractionEnabled = false
+        addSubview(overlayView)
+    }
+}
+
+enum VideoError: Error {
+    case cacheDirectory
+    case noDownloadedFile
+    case fileMove
+    case downloadFailed
+    
+    var description: String {
+        switch self {
+        case .cacheDirectory:
+            return "캐시 디렉터리 못찾음"
+        case .noDownloadedFile:
+            return "다운로드된 파일 X"
+        case .fileMove:
+            return "파일 이동중 에러"
+        case .downloadFailed:
+            return "다운로드 실패"
+        }
+    }
+}
+
+enum PlayerError: Error {
+    case videoTrackNotFound
+    case failedToLoadVideoSize
+}

@@ -46,7 +46,7 @@ class LevelHoldFilterVC: UIViewController {
         return view
     }()
     
-    let segmentedControl = CustomSegmentedControl(items: [LevelHoldFilterConst.Text.firstSegmentTitle, LevelHoldFilterConst.Text.secondSegmentTitle])
+    let segmentedControl = CustomSegmentedControl(items: [LevelHoldFilterConst.Text.segmentLevelTiltle, LevelHoldFilterConst.Text.segmentHoldTiltle])
     
     private let bottomLineView: UIView = {
         let view = UIView()

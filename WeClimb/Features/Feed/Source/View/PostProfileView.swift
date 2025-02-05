@@ -23,7 +23,7 @@ struct PostProfileModel {
 }
 
 class PostProfileView: UIView {
-    private var disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
     private var profileModel: PostProfileModel? {
         didSet {
@@ -132,18 +132,18 @@ class PostProfileView: UIView {
     
     private lazy var gradientLayer: CAGradientLayer = {
         let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = self.bounds
         gradientLayer.colors = [
-            UIColor(hex: "1A1A1A", alpha: 0.0),
-            UIColor(hex: "1A1A1A", alpha: 0.8)
+            UIColor(hex: "000000", alpha: 0.0).cgColor,
+            UIColor(hex: "000000", alpha: 0.8).cgColor
         ]
-        gradientLayer.locations = [0, 1]
-        
+        gradientLayer.startPoint = CGPoint(x: 0.5, y: 0)
+        gradientLayer.endPoint = CGPoint(x: 0.5, y: 1)
         return gradientLayer
     }()
     
     init() {
         super.init(frame: .zero)
+        self.layer.insertSublayer(gradientLayer, at: 0)
         setLayout()
     }
     
@@ -156,6 +156,8 @@ class PostProfileView: UIView {
         levelTag.rightImage = nil
         holdTag.rightImage = nil
         captionLabel.text = nil
+        hideButton.isSelected = false
+        captionSCV.isScrollEnabled = false
         disposeBag = DisposeBag()
     }
     
@@ -163,10 +165,26 @@ class PostProfileView: UIView {
         profileModel = data
     }
     
+    func updateHoldLevel(hold: UIImage, level: UIImage) {
+        levelTag.rightImage = level
+        holdTag.rightImage = hold
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if self.bounds.height > self.gradientLayer.frame.height {
+            self.gradientLayer.frame = self.bounds
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+                self.gradientLayer.frame = self.bounds
+            })
+        }
+    }
+
     @objc private func captionSCVTapped() {
         if captionLabel.calculateNumberOfLines() > 2 {
             showFullCaption()

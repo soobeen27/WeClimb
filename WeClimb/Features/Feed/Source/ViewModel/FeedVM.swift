@@ -75,6 +75,7 @@ class FeedVMImpl: FeedVM {
     
     func transform(input: FeedInput) -> FeedOutput {
         input.fetchType
+            .throttle(.seconds(3), scheduler: MainScheduler.instance)
             .subscribe { [weak self] in
                 self?.fetchPost(type: $0)
             }
