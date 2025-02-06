@@ -96,32 +96,30 @@ class UploadFeedView: UIView {
     }
     
     private func bindCell() {
-        viewModel.cellData
+        self.viewModel.mediaUploadDataRelay
+            .observe(on: MainScheduler.instance)
             .bind(to: collectionView.rx.items(
                 cellIdentifier: UploadMediaCollectionCell.className,
                 cellType: UploadMediaCollectionCell.self)
             ) { row, data, cell in
-                
                 cell.configure(with: data)
-            
             }
             .disposed(by: disposeBag)
-        
-        viewModel.cellData
+
+        self.viewModel.mediaUploadDataRelay
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] mediaItems in
-                guard let self = self, !mediaItems.isEmpty else { return }
-                DispatchQueue.main.async {
+                guard let self = self else { return }
+                
+                if !mediaItems.isEmpty {
                     self.totalMediaCount = mediaItems.count
                     self.updateCurrentIndex()
-                    
-                    self.playFirstMedia() // 🎯 첫 번째 미디어 자동 실행
+                    self.playFirstMedia()
                 }
-                
             })
             .disposed(by: disposeBag)
     }
-    
-    // 📌 첫 번째 미디어 자동 실행
+
     private func playFirstMedia() {
         let indexPath = IndexPath(row: 0, section: 0)
         if let cell = collectionView.cellForItem(at: indexPath) as? UploadMediaCollectionCell {
@@ -166,12 +164,12 @@ extension UploadFeedView: UICollectionViewDelegate {
         targetContentOffset.pointee.x = targetX
     }
     
-//    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-//        updateCurrentIndex()
-//    }
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         updateCurrentIndex()
     }
+//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        updateCurrentIndex()
+//    }
     
     private func updateCurrentIndex() {
         let itemWidth: CGFloat = 256

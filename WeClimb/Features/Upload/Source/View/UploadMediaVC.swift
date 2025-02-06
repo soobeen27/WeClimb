@@ -20,6 +20,9 @@ class UploadMediaVC: UIViewController {
     var onBackButton: (() -> Void)?
     var onNextButton: (() -> Void)?
     
+    var onLevelFilter: ((String) -> String)?
+    var onHoldFilter: ((String) -> String)?
+    
     var selectedMediaItems: [PHPickerResult] = []
     
     var gymInfo: Gym?
@@ -101,6 +104,10 @@ class UploadMediaVC: UIViewController {
         return indicator
     }()
     
+    private let mediaItemsSubject = PublishSubject<[PHPickerResult]>()
+    private let selectedGradeSubject = BehaviorSubject<String>(value: "")
+    private let selectedHoldSubject = BehaviorSubject<String?>(value: nil)
+    
     init(gymItem: SearchResultItem, viewModel: UploadVM) {
         self.gymItem = gymItem
         self.viewModel = viewModel
@@ -113,10 +120,11 @@ class UploadMediaVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        bindViewModel()
         setLayout()
         setNavigation()
         bindOptionButtonActions()
-        mediaItemsBind()
     }
     
     private func setNavigation() {
@@ -168,31 +176,73 @@ class UploadMediaVC: UIViewController {
         self.present(picker, animated: true, completion: nil)
     }
     
-    func mediaItemsBind() {
-        viewModel.feedRelay
-            .asDriver(onErrorJustReturn: [])
-            .drive(onNext: { [weak self] items in
-                guard let self else { return }
-                
-                let feed = UploadFeedView(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
-                                          viewModel: self.viewModel)
-                self.uploadFeedView = feed
-                self.callPHPickerButton.isHidden = true
-                self.selectedMediaView.addSubview(feed)
-                
-                feed.snp.makeConstraints {
-                    $0.edges.equalToSuperview()
+    private func bindViewModel() {
+        let input = UploadVM.Input(
+            mediaSelection: mediaItemsSubject.asObservable(),
+            gradeSelection: selectedGradeSubject.asObservable(),
+            holdSelection: selectedHoldSubject.asObservable()
+        )
+        
+        let output = viewModel.transform(input: input)
+        
+        output.mediaItems
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] mediaItems in
+                guard let self = self else { return }
+
+                if mediaItems.isEmpty {
+                    print("선택된 미디어 없음")
+                    self.uploadFeedView?.removeFromSuperview()
+                    self.callPHPickerButton.isHidden = false
+                } else {
+                    self.reloadMediaUI()
                 }
+            })
+            .disposed(by: disposeBag)
+        
+        output.selectedGrade
+            .bind(onNext: { grade in
+//                print("선택된 등급: \(grade)")
+            })
+            .disposed(by: disposeBag)
+        
+        output.selectedHold
+            .bind(onNext: { hold in
+//                print("선택된 홀드: \(hold ?? "없음")")
             })
             .disposed(by: disposeBag)
     }
     
+    private func reloadMediaUI() {
+        self.uploadFeedView?.removeFromSuperview()
+
+        let feed = UploadFeedView(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
+                                  viewModel: self.viewModel)
+        self.uploadFeedView = feed
+        self.callPHPickerButton.isHidden = true
+        self.selectedMediaView.addSubview(feed)
+
+        feed.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+
     private func bindOptionButtonActions() {
         uploadOptionView.didTapBackButton = { [weak self] in
             self?.onBackButton?()
         }
         uploadOptionView.didTapNextButton = { [weak self] in
             self?.onNextButton?()
+        }
+        
+        uploadOptionView.selectedLevelButton = { [weak self] in
+            guard let self = self else { return }
+            _ = self.onLevelFilter?(self.gymItem.name)
+        }
+
+        uploadOptionView.selectedHoldButton = { [weak self] in
+            guard let self = self else { return }
+            _ = self.onHoldFilter?(self.gymItem.name)
         }
     }
     
@@ -246,14 +296,13 @@ class UploadMediaVC: UIViewController {
 extension UploadMediaVC: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         let mediaData: [(index: Int, mediaItem: PHPickerResult)] = results.enumerated().map { (index, mediaItem) in
-            print("피커뷰에서 인덱스: \(index) 미디어아이템\(mediaItem.itemProvider)")
             return (index, mediaItem)
         }
         
-        viewModel.mediaItems.accept(mediaData)
+        let pickedMediaItems = mediaData.map { $0.mediaItem }
         
-        picker.dismiss(animated: true) {
-            self.viewModel.setMedia()
-        }
+        mediaItemsSubject.onNext(pickedMediaItems)
+
+        picker.dismiss(animated: true)
     }
 }

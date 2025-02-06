@@ -21,24 +21,70 @@ import PhotosUI
 //    let grade: String?
 //    let thumbnailURL: URL?
 //}
-class UploadVM {
-    var mediaItems = BehaviorRelay<[(index: Int, mediaItem: PHPickerResult)]>(value: [])
-    var selectedMediaItems = BehaviorRelay<[PHPickerResult]>(value: [])
-    var selectedGrade = BehaviorRelay<String>(value: "")
-    var selectedHold = BehaviorRelay<String?>(value: nil)
-    var feedRelay = PublishRelay<[MediaUploadData]>()
-    var cellData = PublishRelay<[MediaUploadData]>()
+import RxSwift
+import RxRelay
+import PhotosUI
+
+protocol UploadVMProtocol {
+    func transform(input: UploadVM.Input) -> UploadVM.Output
 }
 
-extension UploadVM {
-    func setMedia() {
-        let group = DispatchGroup()
-        var models = [MediaUploadData?](repeating: nil, count: mediaItems.value.count)
+final class UploadVM: UploadVMProtocol {
+    
+    struct Input {
+        let mediaSelection: Observable<[PHPickerResult]>
+        let gradeSelection: Observable<String>
+        let holdSelection: Observable<String?>
+    }
+    
+    struct Output {
+        let mediaItems: Observable<[MediaUploadData]>
+        let selectedGrade: Observable<String>
+        let selectedHold: Observable<String?>
+    }
+    
+    private let disposeBag = DisposeBag()
+    
+    private let mediaItemsRelay = BehaviorRelay<[PHPickerResult]>(value: [])
+    private let selectedGradeRelay = BehaviorRelay<String>(value: "")
+    private let selectedHoldRelay = BehaviorRelay<String?>(value: nil)
+    var mediaUploadDataRelay = BehaviorRelay<[MediaUploadData]>(value: [])
+//    var cellData = PublishRelay<[MediaUploadData]>()
+    
+    func transform(input: Input) -> Output {
+
+        input.mediaSelection
+            .subscribe(onNext: { [weak self] mediaItems in
+                self?.mediaItemsRelay.accept(mediaItems)
+            })
+            .disposed(by: disposeBag)
         
-        mediaItems.value.forEach { mediaData in
-            let index = mediaData.index
-            let mediaItem = mediaData.mediaItem
-            print("셋미디어 인덱스: \(index), 미디어: \(mediaItem)")
+        input.gradeSelection
+            .bind(to: selectedGradeRelay)
+            .disposed(by: disposeBag)
+        
+        input.holdSelection
+            .bind(to: selectedHoldRelay)
+            .disposed(by: disposeBag)
+        
+        mediaItemsRelay
+            .subscribe(onNext: { [weak self] mediaItems in
+                self?.processMediaItems(mediaItems: mediaItems)
+            })
+            .disposed(by: disposeBag)
+        
+        return Output(
+            mediaItems: mediaUploadDataRelay.asObservable(),
+            selectedGrade: selectedGradeRelay.asObservable(),
+            selectedHold: selectedHoldRelay.asObservable()
+        )
+    }
+    
+    private func processMediaItems(mediaItems: [PHPickerResult]) {
+        let group = DispatchGroup()
+        var models = [MediaUploadData?](repeating: nil, count: mediaItems.count)
+        
+        mediaItems.enumerated().forEach { index, mediaItem in
             group.enter()
             
             if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
@@ -49,7 +95,10 @@ extension UploadVM {
                         return
                     }
                     
-                    let tempVideoURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("mp4")
+                    let tempVideoURL = FileManager.default.temporaryDirectory
+                        .appendingPathComponent(UUID().uuidString)
+                        .appendingPathExtension("mp4")
+                    
                     do {
                         try FileManager.default.copyItem(at: url, to: tempVideoURL)
                         print("비디오 파일이 임시 디렉토리에 저장됨: \(tempVideoURL.path)")
@@ -73,29 +122,32 @@ extension UploadVM {
                     
                     models[index] = MediaUploadData(
                         url: tempVideoURL,
-                        hold: self.selectedHold.value,
-                        grade: self.selectedGrade.value,
+                        hold: self.selectedHoldRelay.value,
+                        grade: self.selectedGradeRelay.value,
                         thumbnailURL: tempVideoURL
                     )
                     group.leave()
                 }
-            }
-            else if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+            } else if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
                 mediaItem.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
                     guard let uiImage = image as? UIImage else {
-                        print("이미지 로드 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
+                        print("🚨 이미지 로드 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
                         group.leave()
                         return
                     }
                     
-                    let tempImageURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
+                    let tempImageURL = FileManager.default.temporaryDirectory
+                        .appendingPathComponent(UUID().uuidString)
+                        .appendingPathExtension("jpg")
+                    
                     if let data = uiImage.jpegData(compressionQuality: 1) {
                         do {
                             try data.write(to: tempImageURL)
+                            
                             models[index] = MediaUploadData(
                                 url: tempImageURL,
-                                hold: self.selectedHold.value,
-                                grade: self.selectedGrade.value,
+                                hold: self.selectedHoldRelay.value,
+                                grade: self.selectedGradeRelay.value,
                                 thumbnailURL: tempImageURL
                             )
                         } catch {
@@ -104,14 +156,16 @@ extension UploadVM {
                     }
                     group.leave()
                 }
+            } else {
+                group.leave()
             }
         }
         
         group.notify(queue: .main) { [weak self] in
             guard let self = self else { return }
-            
-            self.feedRelay.accept(models.compactMap { $0 })
-            self.cellData.accept(models.compactMap { $0 })
+            let validModels = models.compactMap { $0 }
+            self.mediaUploadDataRelay.accept(validModels)
+//            self.cellData.accept(models.compactMap { $0 })
         }
     }
 }

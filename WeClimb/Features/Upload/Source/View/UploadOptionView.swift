@@ -15,7 +15,7 @@ class UploadOptionView : UIView {
     var didTapBackButton: (() -> Void)?
     var didTapNextButton: (() -> Void)?
     
-    var selectedGradeButton: (() -> Void)?
+    var selectedLevelButton: (() -> Void)?
     var selectedHoldButton: (() -> Void)?
     
     private let disposeBag = DisposeBag()
@@ -28,7 +28,7 @@ class UploadOptionView : UIView {
         return label
     }()
     
-    let gradeSelectedButton: UIButton = {
+    let levelSelectedButton: UIButton = {
         var config = UIButton.Configuration.plain()
         config.title = "선택해주세요"
         config.image = UIImage.chevronRightIcon.resize(targetSize: CGSize(width: 20, height: 20))?
@@ -155,12 +155,24 @@ class UploadOptionView : UIView {
                 self?.didTapNextButton?()
             }
             .disposed(by: disposeBag)
+        
+        levelSelectedButton.rx.tap
+            .bind { [weak self] in
+                self?.selectedLevelButton?()
+            }
+            .disposed(by: disposeBag)
+        
+        holdSelectedButton.rx.tap
+            .bind { [weak self] in
+                self?.selectedHoldButton?()
+            }
+            .disposed(by: disposeBag)
     }
 
     private func setLayout() {
         self.backgroundColor = UIColor.fillSolidDarkStrong
         
-        [gradeOptionLabel, gradeSelectedButton, topSeparatorLine, holdOptionLabel, holdSelectedButton, bottomSeparatorLine, backButton, nextButton]
+        [gradeOptionLabel, levelSelectedButton, topSeparatorLine, holdOptionLabel, holdSelectedButton, bottomSeparatorLine, backButton, nextButton]
             .forEach { self.addSubview($0) }
      
         gradeOptionLabel.snp.makeConstraints {
@@ -169,7 +181,7 @@ class UploadOptionView : UIView {
             $0.height.equalTo(56)
         }
         
-        gradeSelectedButton.snp.makeConstraints {
+        levelSelectedButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().offset(-16)
             $0.centerY.equalTo(gradeOptionLabel)
         }

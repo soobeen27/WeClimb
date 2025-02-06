@@ -11,6 +11,9 @@ final class UploadMediaCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
     private let gymItem: SearchResultItem
 
+    var holdFilterGymName: ((String) -> String)?
+    var LevelFilterGymName: ((String) -> String)?
+    
     init(navigationController: UINavigationController, gymItem: SearchResultItem) {
         self.navigationController = navigationController
         self.gymItem = gymItem
@@ -25,6 +28,14 @@ final class UploadMediaCoordinator: BaseCoordinator {
             self?.handleBackButtonTapped()
         }
         navigationController.pushViewController(uploadMediaVC, animated: true)
+        
+        uploadMediaVC.onLevelFilter = { [weak self] gymName in
+            self?.LevelFilterGymName?(gymName) ?? ""
+        }
+        
+        uploadMediaVC.onHoldFilter = { [weak self] gymName in
+            self?.holdFilterGymName?(gymName) ?? ""
+        }
     }
     
     private func handleBackButtonTapped() {
