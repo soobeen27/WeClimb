@@ -21,6 +21,13 @@ final class FeedAssembly: Assembly {
                                      fetchMediasUseCase: resolver.resolve(FetchMediasUseCase.self)!
             )
         }
+        
+        container.register(PostCommentVM.self) { resolver in
+            PostCommentVMImpl(addCommentUseCase: resolver.resolve(AddCommentUseCase.self)!,
+                              fetchCommentUseCase: resolver.resolve(FetchCommentUseCase.self)!,
+                              deleteCommentUseCase: resolver.resolve(DeleteCommentUseCase.self)!,
+                              userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!)
+        }
     }
 }
 

@@ -15,6 +15,7 @@ protocol PostCollectionCellInput {
     var postItem: PostItem { get }
     var likeButtonTap: ControlEvent<Void> { get }
     var currentMediaIndex: BehaviorRelay<Int> { get }
+    var commentButtonTap: ControlEvent<Void> { get }
 }
 
 protocol PostCollectionCellOutput {
@@ -23,6 +24,7 @@ protocol PostCollectionCellOutput {
     var isLike: BehaviorRelay<Bool?> { get }
     var mediaItems: Observable<[MediaItem]> { get }
     var levelHoldImages: Observable<(level: UIImage?, hold: UIImage?)> { get }
+    var currentPost: BehaviorRelay<PostItem?> { get }
 }
 
 protocol PostCollectionCellVM {
@@ -42,6 +44,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         let postItem: PostItem
         let likeButtonTap: ControlEvent<Void>
         let currentMediaIndex: BehaviorRelay<Int>
+        var commentButtonTap: ControlEvent<Void>
     }
     
     struct Output: PostCollectionCellOutput {
@@ -50,6 +53,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         let isLike: BehaviorRelay<Bool?>
         let mediaItems: Observable<[MediaItem]>
         let levelHoldImages: Observable<(level: UIImage?, hold: UIImage?)>
+        var currentPost: BehaviorRelay<PostItem?>
     }
 
     init(userInfoFromUIDUseCase: UserInfoFromUIDUseCase, myUIDUseCase: MyUIDUseCase, likePostUseCase: LikePostUseCase, fetchMediasUseCase: FetchMediasUseCase) {
@@ -79,8 +83,14 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
                     .disposed(by: self.disposeBag)
             })
             .disposed(by: disposeBag)
-        guard let paths = input.postItem.medias else { return Output(user: user, likeCount: likeCount, isLike: isLike, mediaItems: Observable.error(FirebaseError.documentNil), levelHoldImages: Observable.just((UIImage.closeIcon, UIImage.closeIcon)))
-        }
+        guard let paths = input.postItem.medias else { return Output(
+            user: user,
+            likeCount: likeCount,
+            isLike: isLike,
+            mediaItems: Observable.error(FirebaseError.documentNil),
+            levelHoldImages: Observable.just((UIImage.closeIcon, UIImage.closeIcon)),
+            currentPost: BehaviorRelay<PostItem?>.init(value: nil)
+        )}
 
         let refs = pathToRef(paths: paths)
         let medias = fetchMediasUseCase.execute(refs: refs).map { [weak self] medias in
@@ -99,11 +109,20 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
                 return (level: levelImage, hold: holdImage)
             }
         }
+        
+        let currentPost = BehaviorRelay<PostItem?>(value: nil)
+
+        input.commentButtonTap
+            .map { input.postItem }
+            .bind(to: currentPost)
+            .disposed(by: disposeBag)
+        
                 
         return Output(
             user: user, likeCount: likeCount,
             isLike: isLike, mediaItems: medias,
-            levelHoldImages: levelHoldImages
+            levelHoldImages: levelHoldImages,
+            currentPost: currentPost
         )
     }
     

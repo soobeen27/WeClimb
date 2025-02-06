@@ -16,11 +16,13 @@ class FeedVC: UIViewController {
         case feed
     }
     let feedVM: FeedVM
-    var coordinator: FeedCoordinator?
+    var coordinator: FeedChildCoordinator?
     
     private let container = AppDIContainer.shared
     
     let disposeBag = DisposeBag()
+    
+    var commentTapped: ((PostItem) -> Void)?
     
     private let fetchType: BehaviorRelay<FetchPostType> = .init(value: .initial)
 
@@ -30,6 +32,13 @@ class FeedVC: UIViewController {
            else { return UICollectionViewCell() }
             let viewModel = self.container.resolve(PostCollectionCellVM.self)
             cell.configure(postItem: item, postCollectionCellVM: viewModel)
+            cell.currentPost
+                .asDriver()
+                .drive(onNext: { [weak self] postItem in
+                    guard let self, let postItem else { return }
+                    self.commentTapped?(postItem)
+                })
+                .disposed(by: disposeBag)
            return cell
         }
         return dataSource
@@ -146,6 +155,10 @@ extension FeedVC: UICollectionViewDelegate {
             if collectionView.indexPathsForVisibleItems.sorted().last != nil {
                 fetchType.accept(.more)
             }
+        }
+        
+        if collectionView.contentOffset.y < -100 {
+            fetchType.accept(.initial)
         }
     }
     

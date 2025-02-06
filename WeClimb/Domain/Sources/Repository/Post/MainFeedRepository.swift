@@ -10,5 +10,5 @@ import Foundation
 import RxSwift
 
 protocol MainFeedRepository {
-    func getFeed(user: User?) -> Single<[Post]>
+    func getFeed(user: User?, isInitial: Bool) -> Single<[Post]>
 }

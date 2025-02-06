@@ -55,6 +55,8 @@ class PostCollectionCell: UICollectionViewCell {
     private let currentMediaIndexRelay = BehaviorRelay<Int>.init(value: 0)
     private var totalMediaCountRelay = BehaviorRelay<Int>.init(value: 0)
     
+    let currentPost = BehaviorRelay<PostItem?>(value: nil)
+    
     private var user: User? {
         didSet {
             guard let user, let postItem else { return }
@@ -64,6 +66,7 @@ class PostCollectionCell: UICollectionViewCell {
     var caption: String?
     
     private var postItem: PostItem?
+    
     
     private lazy var dataSource: UICollectionViewDiffableDataSource<Section, MediaItem> = {
         let dataSource = UICollectionViewDiffableDataSource<Section, MediaItem>(collectionView: mediaCollectionView)
@@ -130,7 +133,12 @@ class PostCollectionCell: UICollectionViewCell {
     private func bindViewModel() {
         guard let viewModel, let postItem else { return }
                 
-        let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(postItem: postItem, likeButtonTap: postSidebarView.likeButtonTap, currentMediaIndex: currentMediaIndexRelay))
+        let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(
+            postItem: postItem,
+            likeButtonTap: postSidebarView.likeButtonTap,
+            currentMediaIndex: currentMediaIndexRelay,
+            commentButtonTap: postSidebarView.commentButtonTap)
+        )
         
         output.user
             .map { user -> User in
@@ -164,6 +172,10 @@ class PostCollectionCell: UICollectionViewCell {
                 guard let level = levelHold.level, let hold = levelHold.hold else { return }
                 self?.profileView.updateHoldLevel(hold: hold, level: level)
             })
+            .disposed(by: disposeBag)
+        
+        output.currentPost
+            .bind(to: currentPost)
             .disposed(by: disposeBag)
     }
     

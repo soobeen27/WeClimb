@@ -49,13 +49,15 @@ extension UIColor {
     static let labelStrong = UIColor(hex: "#27282B")
     static let labelAlternative = UIColor(hex: "#AAABB1")
     static let lineSolidLight = UIColor(hex: "#F4F5F5")
-    static let fillSolidLightWhite = UIColor(hex: "#FFF")
+    static let fillSolidLightWhite = UIColor(hex: "#FFFFFF")
     static let labelWhite = UIColor(hex: "#FFFFFF")
     static let labelNeutral = UIColor(hex: "#7F818A")
     static let fillSolidLightNormal = UIColor(hex: "#F4F5F5")
     static let fillOpacityLightStrong = UIColor(hex: "#DFE0E2", alpha: 0.2)
     static let staticWhite = UIColor(hex: "#FFFFFF")
     static let fillOpacityDarkHeavy = UIColor(hex: "#313235", alpha: 0.4)
+    static let backgroundLight = UIColor(hex: "#FFFFFF")
+    static let labelBlack = UIColor(hex: "#141415")
     
     
     // DS

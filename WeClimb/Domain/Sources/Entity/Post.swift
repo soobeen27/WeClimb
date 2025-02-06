@@ -38,7 +38,7 @@ struct Post: Codable {
 }
 
 // 댓글
-struct Comment: Codable {
+struct Comment: Codable, Hashable {
     let commentUID: String
     let authorUID: String
     let content: String
