@@ -204,13 +204,6 @@ class UploadMediaVC: UIViewController {
                 view.addSubview($0)
             }
         
-        uploadFeedView?.snp.makeConstraints {
-            $0.top.equalTo(gymButton.snp.bottom).offset(20)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.height.equalTo(400)
-        }
-        
         separatorLine.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.height.equalTo(1)
@@ -223,7 +216,7 @@ class UploadMediaVC: UIViewController {
         }
         
         selectedMediaView.snp.makeConstraints {
-            $0.top.equalTo(gymButton.snp.bottom).offset(16)
+            $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(uploadOptionView.snp.top)
         }

@@ -6,10 +6,8 @@
 //
 
 import UIKit
-import PhotosUI
 
 import SnapKit
-import RxRelay
 import RxSwift
 
 class UploadFeedView: UIView {
@@ -19,14 +17,28 @@ class UploadFeedView: UIView {
     
     var selectedMediaItems: [MediaUploadData] = []
     
+    private var totalMediaCount: Int = 0
+    
+    private lazy var countLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.customFont(style: .caption1Medium)
+        label.textColor = .white
+        label.layer.cornerRadius = 13
+        label.clipsToBounds = true
+        label.text = "1 / \(totalMediaCount)"
+        label.backgroundColor = UIColor.init(hex: "313235", alpha: 0.4)  // fillOpacityDarkHeavy
+        label.textAlignment = .center
+        return label
+    }()
+    
     lazy var collectionView: UICollectionView = {
-         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+        collectionView.isPagingEnabled = false
         collectionView.decelerationRate = .fast
         collectionView.register(UploadMediaCollectionCell.self, forCellWithReuseIdentifier: UploadMediaCollectionCell.className)
         collectionView.showsHorizontalScrollIndicator = false
-//        collectionView.delegate = self
         collectionView.backgroundColor = UIColor.fillSolidDarkBlack
+        collectionView.delegate = self
 
         return collectionView
     }()
@@ -58,21 +70,28 @@ class UploadFeedView: UIView {
 
         layout.itemSize = CGSize(width: itemWidth, height: itemHeight)
 
-        let leftInset: CGFloat = (self.frame.width - itemWidth) / 2
-        layout.sectionInset = UIEdgeInsets(top: 0, left: leftInset, bottom: 0, right: leftInset)
+        let inset: CGFloat = (self.frame.width - itemWidth) / 2
+        layout.sectionInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
 
         return layout
     }
     
     private func setLayout() {
-        self.backgroundColor = UIColor.fillSolidDarkBlack
+        self.backgroundColor = UIColor.clear
 
-        [collectionView]
-            .forEach {
-                self.addSubview($0)
-            }
+        self.addSubview(collectionView)
+        self.addSubview(countLabel)
+        
+        countLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(16)
+            $0.trailing.equalToSuperview().offset(-16)
+            $0.width.equalTo(41)
+            $0.height.equalTo(26)
+        }
+
         collectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.equalTo(countLabel.snp.bottom).offset(16)
+            $0.leading.trailing.bottom.equalToSuperview()
         }
     }
     
@@ -84,31 +103,88 @@ class UploadFeedView: UIView {
             ) { row, data, cell in
                 
                 cell.configure(with: data)
+            
             }
             .disposed(by: disposeBag)
+        
+        viewModel.cellData
+            .subscribe(onNext: { [weak self] mediaItems in
+                guard let self = self, !mediaItems.isEmpty else { return }
+                DispatchQueue.main.async {
+                    self.totalMediaCount = mediaItems.count
+                    self.updateCurrentIndex()
+                    
+                    self.playFirstMedia() // 🎯 첫 번째 미디어 자동 실행
+                }
+                
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    // 📌 첫 번째 미디어 자동 실행
+    private func playFirstMedia() {
+        let indexPath = IndexPath(row: 0, section: 0)
+        if let cell = collectionView.cellForItem(at: indexPath) as? UploadMediaCollectionCell {
+            cell.playVideo()
+        }
+        countLabel.text = "1 / \(totalMediaCount)"
     }
 }
 
 extension UploadFeedView: UICollectionViewDelegate {
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
         
-        let itemWidth = layout.itemSize.width
-        let spacing = layout.minimumLineSpacing
-        let pageWidth = itemWidth + spacing
+        let largeItemWidth: CGFloat = 256
+        let spacing: CGFloat = 12
         
-        let proposedContentOffsetX = targetContentOffset.pointee.x + (scrollView.frame.width / 2) - (itemWidth / 2)
-        let approximatePage = proposedContentOffsetX / pageWidth
-        let currentPage = round(approximatePage)
+        let moveDistance = largeItemWidth + spacing
         
-        let targetX = (currentPage * pageWidth) - (scrollView.frame.width / 2) + (itemWidth / 2)
-        targetContentOffset.pointee = CGPoint(x: targetX, y: scrollView.contentOffset.y)
-
-        print("넘어갈 페이지: \(Int(currentPage))")
+        let sectionInset = (self.frame.width - largeItemWidth) / 2
+        
+        let approximatePage = (scrollView.contentOffset.x + sectionInset) / moveDistance
+        var nearestPage = round(approximatePage)
+        
+        if velocity.x > 0.4 {
+            nearestPage = floor(approximatePage + 1)
+        } else if velocity.x < -0.4 {
+            nearestPage = ceil(approximatePage - 1)
+        }
+        
+        var targetX = (nearestPage * moveDistance)
+        
+        if nearestPage == 0 {
+            targetX -= sectionInset
+        }
+        
+        let maxPage = ceil(scrollView.contentSize.width / moveDistance) - 1
+        if nearestPage >= maxPage {
+            targetX += sectionInset
+        }
+        
+        targetX = round(targetX / moveDistance) * moveDistance
+        
+        targetContentOffset.pointee.x = targetX
     }
-
     
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        VideoManager.shared.reset()
+//    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+//        updateCurrentIndex()
+//    }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updateCurrentIndex()
+    }
+    
+    private func updateCurrentIndex() {
+        let itemWidth: CGFloat = 256
+        let spacing: CGFloat = 12
+        let moveDistance = itemWidth + spacing
+        
+        let currentPageIndex = Int(collectionView.contentOffset.x / moveDistance)
+        
+        countLabel.text = "\(currentPageIndex + 1) / \(self.totalMediaCount)"
+        
+           if let indexPath = IndexPath(row: currentPageIndex, section: 0) as IndexPath?,
+              let cell = collectionView.cellForItem(at: indexPath) as? UploadMediaCollectionCell {
+               cell.playVideo()
+           }
     }
 }

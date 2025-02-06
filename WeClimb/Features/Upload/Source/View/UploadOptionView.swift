@@ -15,6 +15,9 @@ class UploadOptionView : UIView {
     var didTapBackButton: (() -> Void)?
     var didTapNextButton: (() -> Void)?
     
+    var selectedGradeButton: (() -> Void)?
+    var selectedHoldButton: (() -> Void)?
+    
     private let disposeBag = DisposeBag()
     
     var gradeOptionLabel: UILabel = {
