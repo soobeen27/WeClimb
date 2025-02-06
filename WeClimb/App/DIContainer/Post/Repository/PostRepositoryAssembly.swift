@@ -30,5 +30,12 @@ final class PostRepositoryAssembly: Assembly {
             FetchMediasRepositoryImpl(fetchMediasDataSource: resolver.resolve(FetchMediasDataSource.self)!)
         }
         
+        container.register(PostAggregationRepository.self) { resolver in
+            PostAggregationRepositoryImpl(
+                postRemoteDataSource: resolver.resolve(PostRemoteDataSource.self)!,
+                mediaRemoteDataSource: resolver.resolve(MediaRemoteDataSource.self)!
+            )
+        }
+        
     }
 }

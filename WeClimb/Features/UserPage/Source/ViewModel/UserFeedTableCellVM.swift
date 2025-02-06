@@ -28,12 +28,11 @@ protocol UserFeedTableCellVM {
 
 class UserFeedTableCellVMImpl: UserFeedTableCellVM {
     private let disposeBag = DisposeBag()
-    private let useCase: FetchUserFeedInfoUseCase
-    private let userId: String
+   
+    private let postWithHold: PostWithHold
     
-    init(useCase: FetchUserFeedInfoUseCase, userId: String) {
-        self.useCase = useCase
-        self.userId = userId
+    init(postWithHold: PostWithHold) {
+        self.postWithHold = postWithHold
     }
     
     struct Input: UserFeedTableCellInput {
@@ -49,40 +48,23 @@ class UserFeedTableCellVMImpl: UserFeedTableCellVM {
     }
     
     func transform(input: UserFeedTableCellInput) -> UserFeedTableCellOutput {
-        let dateTextRelay = BehaviorRelay<String>(value: "")
-        let likeCountRelay = BehaviorRelay<String>(value: "0")
-        let commentCountRelay = BehaviorRelay<String>(value: "0")
-        let captionTextRelay = BehaviorRelay<String>(value: "")
-        let badgeModelRelay = BehaviorRelay<FeedBageModel?>(value: nil)
-
-        input.fetchDataTrigger
-            .flatMapLatest { [useCase] in
-                useCase.execute(userId: self.userId)
-            }
-            .subscribe(onNext: { postsWithHold in
-                guard let firstPost = postsWithHold.first else { return }
-                
-                let post = firstPost.post
-                dateTextRelay.accept(self.formatDate(post.creationDate))
-                likeCountRelay.accept("\(post.like?.count ?? 0)")
-                commentCountRelay.accept("\(post.commentCount ?? 0)")
-                captionTextRelay.accept(post.caption ?? "")
-                
-                let badgeModel = FeedBageModel(
-                    gymName: post.gym,
-                    hold: firstPost.holds,
-                    gymThmbnail: nil
-                )
-                badgeModelRelay.accept(badgeModel)
-            })
-            .disposed(by: disposeBag)
+        let dateTextRelay = BehaviorRelay<String>(value: formatDate(postWithHold.post.creationDate))
+        let likeCountRelay = BehaviorRelay<String>(value: "\(postWithHold.post.like?.count ?? 0)")
+        let commentCountRelay = BehaviorRelay<String>(value: "\(postWithHold.post.commentCount ?? 0)")
+        let captionTextRelay = BehaviorRelay<String>(value: postWithHold.post.caption ?? "")
         
-        return Output (
+        let badgeModel = FeedBageModel(
+            gymName: postWithHold.post.gym,
+            hold: postWithHold.holds,
+            gymThmbnail: nil
+        )
+        
+        return Output(
             dateText: dateTextRelay.asDriver(),
             likeCountText: likeCountRelay.asDriver(),
             commentCountText: commentCountRelay.asDriver(),
             captionText: captionTextRelay.asDriver(),
-            badgeModel: badgeModelRelay.asDriver().compactMap { $0 }
+            badgeModel: Driver.just(badgeModel)
         )
     }
     

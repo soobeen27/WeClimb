@@ -13,14 +13,14 @@ protocol FetchUserFeedInfoUseCase {
     func execute(userId: String) -> Single<[PostWithHold]>
 }
 
-class FetchUserFeedInfoUseCaseImpl {
-    private let repository: PostAggregationRepository
+class FetchUserFeedInfoUseCaseImpl: FetchUserFeedInfoUseCase {
+    private let postAggregationRepository: PostAggregationRepository
     
-    init(repository: PostAggregationRepository) {
-        self.repository = repository
+    init(postAggregationRepository: PostAggregationRepository) {
+        self.postAggregationRepository = postAggregationRepository
     }
     
     func execute(userId: String) -> Single<[PostWithHold]> {
-        return repository.getUserFeed(userId: userId)
+        return postAggregationRepository.getUserFeed(userId: userId)
     }
 }

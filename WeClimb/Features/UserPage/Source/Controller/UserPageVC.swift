@@ -17,13 +17,11 @@ class UserPageVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let userFeedPageVM: UserFeedPageVM
     private let userSummaryPageVM: UserSummaryPageVM
-    private var cellViewModels: [UserFeedTableCellVMImpl] = []
     
-    init(coordinator: UserPageCoordinator? = nil, userFeedPageVM: UserFeedPageVM, userSummaryPageVM: UserSummaryPageVM, cellViewModels: [UserFeedTableCellVMImpl]) {
+    init(coordinator: UserPageCoordinator? = nil, userFeedPageVM: UserFeedPageVM, userSummaryPageVM: UserSummaryPageVM) {
         self.coordinator = coordinator
         self.userFeedPageVM = userFeedPageVM
         self.userSummaryPageVM = userSummaryPageVM
-        self.cellViewModels = cellViewModels
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -118,6 +116,7 @@ class UserPageVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
+        bindTableFeed()
     }
     
     private func setLayout() {
@@ -191,7 +190,16 @@ class UserPageVC: UIViewController {
         }
     }
     
-//    private func bindViewModel() {
-//        viewModel.user
-//    }
+    private func bindTableFeed() {
+        let input = UserFeedPageVMImpl.Input()
+        let output = userFeedPageVM.transform(input: input)
+        
+        input.fetchUserFeedTrigger.accept(())
+        
+        output.userFeedList
+            .bind(to: userFeedtableView.rx.items(cellIdentifier: UserFeedTableCell.identifier, cellType: UserFeedTableCell.self)) { _, viewModel, cell in
+                cell.configure(with: viewModel)
+            }
+            .disposed(by: disposeBag)
+    }
 }

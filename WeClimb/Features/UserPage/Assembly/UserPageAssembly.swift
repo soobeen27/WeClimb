@@ -10,6 +10,9 @@ import Swinject
 final class UserPageAssembly: Assembly {
     func assemble(container: Container) {
     
+        container.register(UserFeedPageVM.self) { resolver in
+            UserFeedPageVMImpl(fetchFeedUseCase: resolver.resolve(FetchUserFeedInfoUseCase.self)!)
+        }
     }
 }
 

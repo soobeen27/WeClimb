@@ -12,6 +12,8 @@ import RxSwift
 import SnapKit
 
 class UserFeedTableCell: UITableViewCell {
+    static let identifier = "UserFeedTableCell"
+    
     private var disposeBag = DisposeBag()
     private var viewModel: UserFeedTableCellVM?
     
@@ -124,7 +126,7 @@ class UserFeedTableCell: UITableViewCell {
         bindViewModel()
     }
     
-    private func bindViewModel() {
+    func bindViewModel() {
         guard let viewModel = viewModel else { return }
 
         let input = UserFeedTableCellVMImpl.Input()

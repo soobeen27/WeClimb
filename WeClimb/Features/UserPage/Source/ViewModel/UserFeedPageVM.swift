@@ -26,7 +26,16 @@ protocol UserFeedPageVM {
 
 class UserFeedPageVMImpl: UserFeedPageVM {
     private let disposeBag = DisposeBag()
+    private let fetchFeedUseCase: FetchUserFeedInfoUseCase
+    private let userId: String
     
+    let userFeedList = BehaviorRelay<[UserFeedTableCellVMImpl]>(value: [])
+    let isLoading = BehaviorRelay<Bool>(value: false)
+    
+    init(fetchFeedUseCase: FetchUserFeedInfoUseCase, userId: String) {
+        self.fetchFeedUseCase = fetchFeedUseCase
+        self.userId = userId
+    }
     
     struct Input: UserFeedPageVMInput {
         var fetchUserFeedTrigger = PublishRelay<Void>() // 최초 데이터 로드
@@ -39,6 +48,27 @@ class UserFeedPageVMImpl: UserFeedPageVM {
     }
     
     func transform(input: UserFeedPageVMInput) -> UserFeedPageVMOutput {
-        <#code#>
+        input.fetchUserFeedTrigger
+            .flatMapLatest { [weak self] _ -> Observable<[PostWithHold]> in
+                guard let self = self else { return .just([]) }
+                self.isLoading.accept(true)
+                return self.fetchFeedUseCase.execute(userId: self.userId)
+                    .asObservable()
+            }
+            .subscribe(onNext: { [weak self] postsWithHold in
+                guard let self = self else { return }
+                self.isLoading.accept(false)
+                
+                self.userFeedList.accept(postsWithHold.map { UserFeedTableCellVMImpl(postWithHold: $0) })
+            }, onError: { [weak self] error in
+                self?.isLoading.accept(false)
+                print("Error fetching feeds: \(error.localizedDescription)")
+            })
+            .disposed(by: disposeBag)
+        
+        return Output(
+            userFeedList: userFeedList,
+            isLoading: isLoading
+        )
     }
 }
