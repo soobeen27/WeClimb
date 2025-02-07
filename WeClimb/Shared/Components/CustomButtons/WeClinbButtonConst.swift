@@ -117,8 +117,8 @@ enum WeClimbButtonConst {
         }
         
         enum Spacing {
-            static let rightPadding: CGFloat = 14
-            static let leftPadding: CGFloat = 10
+            static let rightPadding: CGFloat = 10
+            static let leftPadding: CGFloat = 14
             static let spacing: CGFloat = 6
         }
     }

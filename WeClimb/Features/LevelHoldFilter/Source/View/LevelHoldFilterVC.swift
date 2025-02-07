@@ -14,7 +14,9 @@ import SnapKit
 /// 클래스 생성후
 /// levelHoldFilterVC.setFilterViewTheme(theme: .dark) 이런식으로 테마를 설정할 수 있습니다.
 class LevelHoldFilterVC: UIViewController {
-    private let viewModel: LevelHoldFilterVMImpl
+    var coordinator: LevelHoldFilterCoordinator?
+    
+    private let viewModel: LevelHoldFilterVM
     private let disposeBag = DisposeBag()
     
     private var themeType: FilterViewTheme = .light {
@@ -66,16 +68,17 @@ class LevelHoldFilterVC: UIViewController {
         return button
     }()
     
-    private let selectedSegmentIndexSubject = PublishSubject<Int>()
+    private lazy var selectedSegmentIndexSubject = BehaviorSubject<Int>(value: filterType.index)
     private var gymName: String
     private let cellCountSubject = BehaviorSubject<Int>(value: LevelHoldFilterConst.CellState.initialCellCount)
+    private var filterType: FilterType
     
-    init(gymName: String, viewModel: LevelHoldFilterVMImpl) {
+    init(gymName: String, viewModel: LevelHoldFilterVM, filterType: FilterType = .level) {
         self.viewModel = viewModel
         self.gymName = gymName
+        self.filterType = filterType
         super.init(nibName: nil, bundle: nil)
-       
-      }
+    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -84,19 +87,26 @@ class LevelHoldFilterVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        segmentedControl.selectedSegmentIndex = filterType.index
+        selectedSegmentIndexSubject.onNext(filterType.index)
+        
         setLayout()
         bindUI(gymName: gymName)
         adjustModalHeight()
+
     }
+
     
     private func bindUI(gymName: String) {
+        selectedSegmentIndexSubject.onNext(filterType.index)
+        
         segmentedControl.onSegmentChanged = { [weak self] selectedIndex in
             self?.selectedSegmentIndexSubject.onNext(selectedIndex)
         }
         
         let input = LevelHoldFilterVMImpl.Input(
             gymName: gymName,
-            segmentedControlSelection: selectedSegmentIndexSubject.asObservable(),
+            segmentedControlSelection: selectedSegmentIndexSubject.asObservable().startWith(filterType.index),
             cellSelection: tableView.rx.modelSelected((text: String, image: String, isChecked: Bool).self).asObservable(),
             applyButtonTap: applyButton.rx.tap.asObservable()
         )
@@ -264,6 +274,18 @@ extension LevelHoldFilterVC {
             ]
             sheet.preferredCornerRadius = LevelHoldFilterConst.Size.filterViewCornerRadius
             sheet.prefersGrabberVisible = true
+        }
+    }
+}
+
+enum FilterType {
+    case level
+    case hold
+
+    var index: Int {
+        switch self {
+        case .level: return 0
+        case .hold: return 1
         }
     }
 }

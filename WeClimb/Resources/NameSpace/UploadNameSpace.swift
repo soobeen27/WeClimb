@@ -8,7 +8,8 @@
 import Foundation
 
 enum UploadNameSpace {
-    static let placeholder = "등반에 관한 설명을 추가하세요!"
+//    static let placeholder = "등반에 관한 설명을 추가하세요!"
+    static let placeholder = ""
     
     static let gym = "암장"
     static let setting = "세팅"

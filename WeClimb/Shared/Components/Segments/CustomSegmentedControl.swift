@@ -52,8 +52,15 @@ class CustomSegmentedControl: UIView {
     }
     
     var selectedSegmentIndex: Int {
-        return segmentControl.selectedSegmentIndex
+        get {
+            return segmentControl.selectedSegmentIndex
+        }
+        set {
+            segmentControl.selectedSegmentIndex = newValue
+            bindSegmentControl()
+        }
     }
+    
     
     var onSegmentChanged: ((Int) -> Void)?
     
