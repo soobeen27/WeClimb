@@ -50,9 +50,13 @@ class PostCollectionCell: UICollectionViewCell {
     private var viewModel: PostCollectionCellVM?
     private let profileView = PostProfileView()
     private let postSidebarView = PostSidebarView()
-    private let mediaItemsSubject = PublishSubject<[MediaItem]>.init()
-    private let currentMediaIndexRelay = PublishRelay<Int>.init()
-
+    private let postPageControl = PostPageControl()
+    
+    private let currentMediaIndexRelay = BehaviorRelay<Int>.init(value: 0)
+    private var totalMediaCountRelay = BehaviorRelay<Int>.init(value: 0)
+    
+    let currentPost = BehaviorRelay<PostItem?>(value: nil)
+    
     private var user: User? {
         didSet {
             guard let user, let postItem else { return }
@@ -63,14 +67,14 @@ class PostCollectionCell: UICollectionViewCell {
     
     private var postItem: PostItem?
     
+    
     private lazy var dataSource: UICollectionViewDiffableDataSource<Section, MediaItem> = {
         let dataSource = UICollectionViewDiffableDataSource<Section, MediaItem>(collectionView: mediaCollectionView)
         { [weak self] collectionView, indexPath, mediaItem in
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaCollectionCell.className, for: indexPath) as? MediaCollectionCell, let self else {
                 return UICollectionViewCell()
             }
-            let viewModel = self.container.resolve(MediaCollectionCellVM.self)
-            cell.configure(mediaItem: mediaItem, mediaCollectionCellVM: viewModel)
+            cell.configure(mediaItem: mediaItem)
             return cell
         }
         
@@ -97,7 +101,6 @@ class PostCollectionCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setLayout()
-        bindSnapShot()
     }
     
     required init?(coder: NSCoder) {
@@ -118,23 +121,31 @@ class PostCollectionCell: UICollectionViewCell {
         self.postItem = postItem
         bindViewModel()
         caption = postItem.caption
+        bindMediaIndex()
+        bindTotalPageCount()
+
     }
     
     private func configureProfileView(postItem: PostItem, user: User) {
-        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: heightArmReach(height: user.height, armReach: user.armReach), level: .appleIcon, hold: .holdRed, caption: postItem.caption))
+        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: heightArmReach(height: user.height, armReach: user.armReach), level: .closeIcon, hold: .closeIcon, caption: postItem.caption))
     }
     
     private func bindViewModel() {
         guard let viewModel, let postItem else { return }
                 
-        let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(postItem: postItem, likeButtonTap: postSidebarView.likeButtonTap, currentMediaIndex: currentMediaIndexRelay))
+        let output = viewModel.transform(input: PostCollectionCellVMImpl.Input(
+            postItem: postItem,
+            likeButtonTap: postSidebarView.likeButtonTap,
+            currentMediaIndex: currentMediaIndexRelay,
+            commentButtonTap: postSidebarView.commentButtonTap)
+        )
         
         output.user
             .map { user -> User in
                 return user
             }
             .asDriver(onErrorJustReturn: User.erroredUser)
-            .drive(onNext: { [weak self] user in
+            .drive(onNext: { [weak self] (user: User) in
                 guard let self else { return }
                 self.user = user
             })
@@ -146,50 +157,47 @@ class PostCollectionCell: UICollectionViewCell {
         output.likeCount
             .bind(to: postSidebarView.likeCountRelay)
             .disposed(by: disposeBag)
-//        output.mediaItems
-//            .asDriver(onErrorDriveWith: .empty())
-//            .drive(onNext: {[weak self] mediaItems in
-//                guard let self else { return }
-//                self.bindSnapShot(mediaItems: mediaItems)
-//
-//            })
-//            .disposed(by: disposeBag)
+
         output.mediaItems
-            .bind(to: mediaItemsSubject)
-            .disposed(by: disposeBag)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { [weak self] mediaItems in
+            guard let self else { return }
+                self.totalMediaCountRelay.accept(mediaItems.count)
+                self.bindSnapShot(mediaItems: mediaItems)
+        }).disposed(by: disposeBag)
+        
         output.levelHoldImages
-            .bind(onNext: { [weak self] levelHold in
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { [weak self] levelHold in
                 guard let level = levelHold.level, let hold = levelHold.hold else { return }
                 self?.profileView.updateHoldLevel(hold: hold, level: level)
             })
-            .disposed(by: disposeBag)        
+            .disposed(by: disposeBag)
+        
+        output.currentPost
+            .bind(to: currentPost)
+            .disposed(by: disposeBag)
     }
     
-    private func bindSnapShot() {
-        mediaItemsSubject
-            .asDriver(onErrorJustReturn: [])
-            .drive(onNext: { [weak self] mediaItems in
+    private func bindSnapShot(mediaItems: [MediaItem]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, MediaItem>()
+        snapshot.appendSections([.media])
+        snapshot.appendItems(mediaItems)
+        if mediaItems.count == 1 {
+            self.mediaCollectionView.isScrollEnabled = false
+        } else {
+            self.mediaCollectionView.isScrollEnabled = true
+        }
+        self.dataSource.apply(snapshot, animatingDifferences: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { [weak self] in
             guard let self else { return }
-            var snapshot = NSDiffableDataSourceSnapshot<Section, MediaItem>()
-            snapshot.appendSections([.media])
-            snapshot.appendItems(mediaItems)
-            if mediaItems.count == 1 {
-                self.mediaCollectionView.isScrollEnabled = false
-            } else {
-                self.mediaCollectionView.isScrollEnabled = true
+            
+            if let centerCell = findCenterCell(in: self.mediaCollectionView),
+               let indexPathRow = self.indexPathFrom(collectionView: self.mediaCollectionView, cell: centerCell)?.row {
+                centerCell.videoView.playVideo()
+                self.currentMediaIndexRelay.accept(indexPathRow)
             }
-            self.dataSource.apply(snapshot, animatingDifferences: true)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { [weak self] in
-                guard let self else { return }
-                
-                if let centerCell = findCenterCell(in: self.mediaCollectionView),
-                   let indexPathRow = self.indexPathFrom(collectionView: self.mediaCollectionView, cell: centerCell)?.row {
-                    centerCell.videoView.playVideo()
-                    self.currentMediaIndexRelay.accept(indexPathRow)
-                }
-            }
-        })
-        .disposed(by: disposeBag)
+        }
     }
     
     private func heightArmReach(height: Int?, armReach: Int?) -> String {
@@ -206,9 +214,27 @@ class PostCollectionCell: UICollectionViewCell {
         postSidebarView.likeCountRelay.accept(likeCount)
     }
     
+    private func bindMediaIndex() {
+        currentMediaIndexRelay
+            .asDriver()
+            .drive(onNext: { [weak self] index in
+                self?.postPageControl.currentPageCount = index + 1
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindTotalPageCount() {
+        totalMediaCountRelay
+            .asDriver()
+            .drive(onNext: { [weak self] count in
+                self?.postPageControl.totalPageCount = count
+            })
+            .disposed(by: disposeBag)
+    }
+    
     private func setLayout() {
         contentView.backgroundColor = .clear
-        [profileView, postSidebarView]
+        [profileView, postSidebarView, postPageControl]
             .forEach {
                 self.addSubview($0)
             }
@@ -220,6 +246,11 @@ class PostCollectionCell: UICollectionViewCell {
         postSidebarView.snp.makeConstraints {
             $0.bottom.equalToSuperview().inset(FeedConsts.PostCollectionCell.Size.sidebarBottom)
             $0.trailing.equalToSuperview().inset(FeedConsts.Profile.Size.padding)
+        }
+        
+        postPageControl.snp.makeConstraints {
+            $0.top.equalTo(self.safeAreaLayoutGuide).offset(FeedConsts.pageControl.Size.top)
+            $0.trailing.equalToSuperview().offset(-FeedConsts.pageControl.Size.trailing)
         }
     }
 }

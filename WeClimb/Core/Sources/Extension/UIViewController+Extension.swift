@@ -43,7 +43,7 @@ extension UIViewController {
     ///   사용법 : let testVC = ModalTestVC()
     ///   self.presentCustomHeightModal(modalVC: testVC, heightRatio: 원하는비율)
     
-    func presentCustomHeightModal(modalVC: UIViewController, heightRatio: CGFloat) {
+    func presentCustomHeightModal(modalVC: UIViewController, heightRatio: CGFloat, grabber: Bool = false) {
         modalVC.modalPresentationStyle = .pageSheet
         modalVC.isModalInPresentation = false
         
@@ -62,7 +62,7 @@ extension UIViewController {
                 modalVC.view.frame.size.height = height
             }
             sheet.preferredCornerRadius = 20
-            sheet.prefersGrabberVisible = false
+            sheet.prefersGrabberVisible = grabber
         }
         present(modalVC, animated: true, completion: nil)
     }

@@ -12,7 +12,7 @@ import Firebase
 
 
 protocol MainFeedDataSource {
-    func getFeed(user: User?) -> Single<[Post]>
+    func getFeed(user: User?, isInitial: Bool) -> Single<[Post]>
 }
 
 class MainFeedDataSourceImpl: MainFeedDataSource {
@@ -21,13 +21,13 @@ class MainFeedDataSourceImpl: MainFeedDataSource {
     private let disposeBag = DisposeBag()
     
     // MARK: 피드가져오기 (처음 실행되어야할 메소드)
-    func getFeed(user: User?) -> Single<[Post]> {
+    func getFeed(user: User?, isInitial: Bool) -> Single<[Post]> {
         return Single<Query>.create { [weak self] single in
             guard let self else {
                 single(.failure(CommonError.selfNil))
                 return Disposables.create()
             }
-            let postRef = self.getPostRef(user: user)
+            let postRef = self.getPostRef(user: user, isInitial: isInitial)
             single(.success(postRef))
             return Disposables.create()
         }
@@ -39,13 +39,16 @@ class MainFeedDataSourceImpl: MainFeedDataSource {
     
     
     
-    private func getPostRef(user: User? = nil) -> Query {
+    private func getPostRef(user: User? = nil, isInitial: Bool) -> Query {
         var postsRef = db.collection("posts")
             .order(by: "creationDate", descending: true)
             .limit(to: 10)
         
         if let user {
             postsRef = checkBlackList(quary: postsRef, user: user)
+        }
+        if isInitial {
+            lastFeed = nil
         }
         if let lastFeed {
             postsRef = postsRef.start(afterDocument: lastFeed)

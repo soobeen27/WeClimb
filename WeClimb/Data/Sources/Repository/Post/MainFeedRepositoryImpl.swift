@@ -16,7 +16,7 @@ final class MainFeedRepositoryImpl: MainFeedRepository {
         self.mainFeedDataSource = mainFeedDataSource
     }
     
-    func getFeed(user: User?) -> Single<[Post]> {
-        return mainFeedDataSource.getFeed(user: user)
+    func getFeed(user: User?, isInitial: Bool) -> Single<[Post]> {
+        return mainFeedDataSource.getFeed(user: user, isInitial: isInitial)
     }
 }

@@ -16,15 +16,15 @@ final class CommentRepositoryImpl: CommentRepository {
         self.commentDataSource = commentDataSource
     }
 
-    func AddCommnet(postUID: String, content: String) -> Single<Void> {
+    func addCommnet(postUID: String, content: String) -> Single<Void> {
         return commentDataSource.addComment(postUID: postUID, content: content)
     }
     
-    func FetchComments(postUID: String, postOwner: String) -> Single<[Comment]> {
+    func fetchComments(postUID: String, postOwner: String) -> Single<[Comment]> {
         return commentDataSource.fetchComments(postUID: postUID, postOwner: postOwner)
     }
     
-    func DeleteComments(postUID: String, commentUID: String) -> Single<Void> {
+    func deleteComments(postUID: String, commentUID: String) -> Single<Void> {
         return commentDataSource.deleteComments(postUID: postUID, commentUID: commentUID)
     }
 }

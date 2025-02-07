@@ -17,11 +17,11 @@ enum LHColors {
     ]
 
     private static let engMap: [String: LHColors] = [
-        "black": .black, "blue": .blue, "brown": .brown, "darkBlue": .darkBlue,
-        "darkGreen": .darkGreen, "darkRed": .darkRed, "darkYellow": .darkYellow,
-        "gray": .gray, "green": .green, "lightGreen": .lightGreen, "mint": .mint,
-        "navy": .navy, "orange": .orange, "pink": .pink, "purple": .purple,
-        "red": .red, "white": .white, "yellow": .yellow
+        "Black": .black, "Blue": .blue, "Brown": .brown, "DarkBlue": .darkBlue,
+        "DarkGreen": .darkGreen, "DarkRed": .darkRed, "DarkYellow": .darkYellow,
+        "Gray": .gray, "Green": .green, "LightGreen": .lightGreen, "Mint": .mint,
+        "Navy": .navy, "Orange": .orange, "Pink": .pink, "Purple": .purple,
+        "Red": .red, "White": .white, "Yellow": .yellow
     ]
 
     private static let holdEngMap: [String: LHColors] = Dictionary(

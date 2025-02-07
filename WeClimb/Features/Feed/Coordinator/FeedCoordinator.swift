@@ -17,8 +17,27 @@ final class FeedCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        let feedVC = builder.buildFeed()
-        feedVC.coordinator = self
-        navigationController.pushViewController(feedVC, animated: true)
+        showFeed()
+    }
+    private func showFeed() {
+        let feedChildCoordinator = FeedChildCoordinator(navigationController: navigationController, builder: builder)
+        addDependency(feedChildCoordinator)
+        
+        feedChildCoordinator.start()
+        
+        feedChildCoordinator.onFinish = { [weak self] postItem in
+            self?.showComment(postItem: postItem)
+        }
+    }
+    
+    private func showComment(postItem: PostItem) {
+        let commentCoordinator = PostCommentCoordinator(navigationController: navigationController, builder: builder)
+        addDependency(commentCoordinator)
+        
+        commentCoordinator.start(postItem: postItem)
+
+        commentCoordinator.onFinish = { [weak self] in
+            self?.removeDependency(commentCoordinator)
+        }
     }
 }

@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol MainFeedUseCase {
-    func execute(user: User?) -> Single<[Post]>
+    func execute(user: User?, isInitial: Bool) -> Single<[Post]>
 }
 
 public struct MainFeedUseCaseImpl: MainFeedUseCase {
@@ -19,7 +19,7 @@ public struct MainFeedUseCaseImpl: MainFeedUseCase {
         self.mainFeedRepository = mainFeedRepository
     }
     
-    func execute(user: User?) -> Single<[Post]> {
-        return mainFeedRepository.getFeed(user: user)
+    func execute(user: User?, isInitial: Bool) -> Single<[Post]> {
+        return mainFeedRepository.getFeed(user: user, isInitial: isInitial)
     }
 }
