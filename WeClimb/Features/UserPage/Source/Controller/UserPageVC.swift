@@ -15,6 +15,8 @@ class UserPageVC: UIViewController {
     var coordinator: UserPageCoordinator?
     
     private let disposeBag = DisposeBag()
+    
+//    private let userPageVM: UserPageVM
     private let userFeedPageVM: UserFeedPageVM
 //    private let userSummaryPageVM: UserSummaryPageVM
     
@@ -78,6 +80,7 @@ class UserPageVC: UIViewController {
     
     private let userFeedtableView: UITableView = {
         let tableView = UITableView()
+        tableView.register(UserFeedTableCell.self, forCellReuseIdentifier: "UserFeedTableCell")
         return tableView
     }()
     
@@ -195,11 +198,17 @@ class UserPageVC: UIViewController {
     private func bindTableFeed() {
         let input = UserFeedPageVMImpl.Input()
         let output = userFeedPageVM.transform(input: input)
-        
+
         input.fetchUserFeedTrigger.accept(())
-        
+
         output.userFeedList
+            .do(onNext: { items in
+//                print("✅ 최종 userFeedList count:", items.count) // ✅ 데이터 개수 확인
+//                items.forEach { print("✅ 최종 변환된 데이터:", $0) } // ✅ 데이터 값 확인
+            })
+            .observe(on: MainScheduler.instance)
             .bind(to: userFeedtableView.rx.items(cellIdentifier: UserFeedTableCell.identifier, cellType: UserFeedTableCell.self)) { _, viewModel, cell in
+//                print("🟢 Cell에 ViewModel 전달됨: \(viewModel)")
                 cell.configure(with: viewModel)
             }
             .disposed(by: disposeBag)

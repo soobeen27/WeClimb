@@ -123,13 +123,17 @@ class UserFeedTableCell: UITableViewCell {
   
     func configure(with viewModel: UserFeedTableCellVMImpl) {
         self.viewModel = viewModel
-        bindViewModel()
+        disposeBag = DisposeBag()
+        
+        let input = UserFeedTableCellVMImpl.Input()
+        bindViewModel(input: input)
+        
+        input.fetchDataTrigger.onNext(())
     }
-    
-    func bindViewModel() {
+
+    func bindViewModel(input: UserFeedTableCellVMImpl.Input) {
         guard let viewModel = viewModel else { return }
 
-        let input = UserFeedTableCellVMImpl.Input()
         let output = viewModel.transform(input: input)
         
         output.dateText
@@ -153,7 +157,5 @@ class UserFeedTableCell: UITableViewCell {
                 self?.badgeView.configure(with: model)
             })
             .disposed(by: disposeBag)
-        
-        input.fetchDataTrigger.onNext(())
     }
 }
