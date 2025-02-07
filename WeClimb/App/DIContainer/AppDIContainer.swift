@@ -10,7 +10,7 @@ import Swinject
 
 final class AppDIContainer {
     static let shared = AppDIContainer()
-    private let assembler: Assembler
+    let assembler: Assembler
     let container: Container
     
     private init() {

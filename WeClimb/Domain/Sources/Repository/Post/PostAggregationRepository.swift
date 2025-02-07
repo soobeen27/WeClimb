@@ -15,5 +15,5 @@ struct PostWithHold {
 }
 
 protocol PostAggregationRepository {
-    func getUserFeed(userId: String) -> Single<[PostWithHold]>
+    func getUserFeed(userUID: String) -> Single<[PostWithHold]>
 }

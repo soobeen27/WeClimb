@@ -16,12 +16,12 @@ class UserPageVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private let userFeedPageVM: UserFeedPageVM
-    private let userSummaryPageVM: UserSummaryPageVM
+//    private let userSummaryPageVM: UserSummaryPageVM
     
-    init(coordinator: UserPageCoordinator? = nil, userFeedPageVM: UserFeedPageVM, userSummaryPageVM: UserSummaryPageVM) {
+    init(coordinator: UserPageCoordinator? = nil, userFeedPageVM: UserFeedPageVM /*userSummaryPageVM: UserSummaryPageVM*/) {
         self.coordinator = coordinator
         self.userFeedPageVM = userFeedPageVM
-        self.userSummaryPageVM = userSummaryPageVM
+//        self.userSummaryPageVM = userSummaryPageVM
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -187,6 +187,8 @@ class UserPageVC: UIViewController {
         
         userFeedtableView.snp.makeConstraints {
             $0.top.equalTo(indicatorBar.snp.bottom)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview()
         }
     }
     

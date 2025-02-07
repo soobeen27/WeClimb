@@ -27,14 +27,14 @@ protocol UserFeedPageVM {
 class UserFeedPageVMImpl: UserFeedPageVM {
     private let disposeBag = DisposeBag()
     private let fetchFeedUseCase: FetchUserFeedInfoUseCase
-    private let userId: String
+    private let userUID: String
     
     let userFeedList = BehaviorRelay<[UserFeedTableCellVMImpl]>(value: [])
     let isLoading = BehaviorRelay<Bool>(value: false)
     
-    init(fetchFeedUseCase: FetchUserFeedInfoUseCase, userId: String) {
+    init(fetchFeedUseCase: FetchUserFeedInfoUseCase, userUID: String) {
         self.fetchFeedUseCase = fetchFeedUseCase
-        self.userId = userId
+        self.userUID = userUID
     }
     
     struct Input: UserFeedPageVMInput {
@@ -49,12 +49,12 @@ class UserFeedPageVMImpl: UserFeedPageVM {
     
     func transform(input: UserFeedPageVMInput) -> UserFeedPageVMOutput {
         input.fetchUserFeedTrigger
-            .flatMapLatest { [weak self] _ -> Observable<[PostWithHold]> in
-                guard let self = self else { return .just([]) }
-                self.isLoading.accept(true)
-                return self.fetchFeedUseCase.execute(userId: self.userId)
-                    .asObservable()
-            }
+                .flatMapLatest { [weak self] _ -> Observable<[PostWithHold]> in
+                    guard let self = self else { return .just([]) }
+                    self.isLoading.accept(true)
+                    return self.fetchFeedUseCase.execute(userUID: self.userUID)
+                        .asObservable()
+                }
             .subscribe(onNext: { [weak self] postsWithHold in
                 guard let self = self else { return }
                 self.isLoading.accept(false)

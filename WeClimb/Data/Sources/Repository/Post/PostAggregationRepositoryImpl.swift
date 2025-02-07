@@ -19,8 +19,8 @@ final class PostAggregationRepositoryImpl: PostAggregationRepository {
         self.mediaRemoteDataSource = mediaRemoteDataSource
     }
     
-    func getUserFeed(userId: String) -> Single<[PostWithHold]> {
-        return postRemoteDataSource.fetchUserPosts(userId: userId)
+    func getUserFeed(userUID: String) -> Single<[PostWithHold]> {
+        return postRemoteDataSource.fetchUserPosts(userUID: userUID)
             .flatMap { posts in
                 let holdFetchObservables = posts.map { post in
                     self.mediaRemoteDataSource.fetchHolds(for: post.postUID)

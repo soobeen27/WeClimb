@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 
 protocol FetchUserFeedInfoUseCase {
-    func execute(userId: String) -> Single<[PostWithHold]>
+    func execute(userUID: String) -> Single<[PostWithHold]>
 }
 
 class FetchUserFeedInfoUseCaseImpl: FetchUserFeedInfoUseCase {
@@ -20,7 +20,7 @@ class FetchUserFeedInfoUseCaseImpl: FetchUserFeedInfoUseCase {
         self.postAggregationRepository = postAggregationRepository
     }
     
-    func execute(userId: String) -> Single<[PostWithHold]> {
-        return postAggregationRepository.getUserFeed(userId: userId)
+    func execute(userUID: String) -> Single<[PostWithHold]> {
+        return postAggregationRepository.getUserFeed(userUID: userUID)
     }
 }

@@ -31,8 +31,12 @@ final class UserPageBuilderImpl: UserPageBuilder {
 //    }
     
     func buildUserPage() -> UserPageVC {
-        let userFeedPageVM = container.resolve(UserFeedPageVM.self)
-        let userSummaryPageVM: UserSummaryPageVM = container.resolve(UserSummaryPageVM.self)
-        return UserPageVC(userFeedPageVM: userFeedPageVM, userSummaryPageVM: userSummaryPageVM)
+        let userUID = try! FirestoreHelper.userUID()
+        
+        let userFeedPageVM = container.assembler.resolver.resolve(UserFeedPageVM.self, argument: userUID)!
+        
+//        let userSummaryPageVM: UserSummaryPageVM = container.resolve(UserSummaryPageVM.self)
+        
+        return UserPageVC(userFeedPageVM: userFeedPageVM/*, userSummaryPageVM: userSummaryPageVM*/)
     }
 }

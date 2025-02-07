@@ -11,17 +11,17 @@ import FirebaseFirestore
 import RxSwift
 
 protocol PostRemoteDataSource {
-    func fetchUserPosts(userId: String) -> Single<[Post]>
+    func fetchUserPosts(userUID: String) -> Single<[Post]>
 }
 
 final class PostRemoteDataSourceImpl: PostRemoteDataSource {
     private let db = Firestore.firestore()
     
-    func fetchUserPosts(userId: String) -> Single<[Post]> {
+    func fetchUserPosts(userUID: String) -> Single<[Post]> {
         return Single.create { single in
             let postsRef = self.db.collection("posts")
             
-            postsRef.whereField("authorUID", isEqualTo: userId)
+            postsRef.whereField("authorUID", isEqualTo: userUID)
                 .order(by: "creationDate", descending: true)
                 .getDocuments { snapshot, error in
                     if let error = error {
