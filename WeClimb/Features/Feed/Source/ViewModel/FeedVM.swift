@@ -88,7 +88,8 @@ class FeedVMImpl: FeedVM {
         myUserInfo.execute()
             .flatMap { [weak self] user -> Single<[Post]> in
                 guard let self else { return Single.error(UserError.noID) }
-                return self.mainFeedUseCase.execute(user: user)
+                let isInitial = type == .initial
+                return self.mainFeedUseCase.execute(user: user, isInitial: isInitial)
             }
             .subscribe(onSuccess: { [weak self] posts in
                 guard let self else { return }

@@ -22,10 +22,12 @@ final class FeedAssembly: Assembly {
             )
         }
         
-        container.register(MediaCollectionCellVM.self) { resolver in
-            MediaCollectionCellVMImpl()
+        container.register(PostCommentVM.self) { resolver in
+            PostCommentVMImpl(addCommentUseCase: resolver.resolve(AddCommentUseCase.self)!,
+                              fetchCommentUseCase: resolver.resolve(FetchCommentUseCase.self)!,
+                              deleteCommentUseCase: resolver.resolve(DeleteCommentUseCase.self)!,
+                              userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!)
         }
-        
     }
 }
 

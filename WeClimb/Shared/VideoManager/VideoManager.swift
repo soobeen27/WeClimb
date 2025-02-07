@@ -12,9 +12,13 @@ class VideoManager {
     
     private init() {}
 
-    func playVideo(player: AVQueuePlayer) {
+    func playNewVideo(player: AVQueuePlayer) {
         currentPlayer?.pause()
         currentPlayer = player
+        currentPlayer?.play()
+    }
+    
+    func playCurrentVideo() {
         currentPlayer?.play()
     }
 

@@ -50,7 +50,7 @@ class PostVideoView: UIView {
             isPlaying.toggle()
         } else {
             guard let player else { return }
-            VideoManager.shared.playVideo(player: player)
+            VideoManager.shared.playNewVideo(player: player)
             isPlaying.toggle()
         }
     }
@@ -189,7 +189,7 @@ class PostVideoView: UIView {
             .drive(onNext: { [weak self] success in
                 if success {
                     guard let self, let player = self.player else { return }
-                    VideoManager.shared.playVideo(player: player)
+                    VideoManager.shared.playNewVideo(player: player)
                     self.isPlaying = true
                 }
             })

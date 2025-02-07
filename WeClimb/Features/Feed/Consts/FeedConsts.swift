@@ -94,4 +94,32 @@ enum FeedConsts {
             static let sidebarBottom: CGFloat = 196
         }
     }
+    
+    enum pageControl {
+        enum Size {
+            static let height: CGFloat = 26
+            static let hPadding: CGFloat = 9
+            static let vPadding: CGFloat = 5
+            static let spacing: CGFloat = 2
+            static let cornerRadius: CGFloat = 13
+            static let top: CGFloat = 20
+            static let trailing: CGFloat = 16
+        }
+        enum Color {
+            static let background: UIColor = UIColor.fillOpacityDarkHeavy
+            static let text: UIColor = UIColor.labelWhite
+            static let slash: UIColor = UIColor.labelAssistive
+        }
+        
+        enum Font {
+            static let text: UIFont = UIFont.customFont(style: .caption1Medium)
+            static let slash: UIFont = UIFont.customFont(style: .caption1Regular)
+        }
+        
+        enum Text {
+            static let slash: String = "/"
+        }
+        
+        
+    }
 }
