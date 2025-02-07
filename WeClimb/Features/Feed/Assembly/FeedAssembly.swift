@@ -26,7 +26,10 @@ final class FeedAssembly: Assembly {
             PostCommentVMImpl(addCommentUseCase: resolver.resolve(AddCommentUseCase.self)!,
                               fetchCommentUseCase: resolver.resolve(FetchCommentUseCase.self)!,
                               deleteCommentUseCase: resolver.resolve(DeleteCommentUseCase.self)!,
-                              userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!)
+                              userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!,
+                              myUserInfoUseCase: resolver.resolve(MyUserInfoUseCase.self)!,
+                              myUIDUseCase: resolver.resolve(MyUIDUseCase.self)!
+            )
         }
     }
 }

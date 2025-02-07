@@ -51,11 +51,16 @@ enum CommentConsts {
             static let profileImage: CGSize = CGSize(width: 32, height: 32)
             static let vPadding: CGFloat = 12
             static let hPadding: CGFloat = 16
+            static let spacing: CGFloat = 8
+            static let contentPadding: CGFloat = 10
         }
         enum Font {
             static let userName: UIFont = UIFont.customFont(style: .caption1SemiBold)
             static let content: UIFont = UIFont.customFont(style: .caption1Regular)
             static let date: UIFont = UIFont.customFont(style: .caption2Regular)
+        }
+        enum Color {
+            static let date: UIColor = UIColor.labelAlternative
         }
     }
 }
