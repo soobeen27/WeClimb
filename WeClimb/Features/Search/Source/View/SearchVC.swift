@@ -25,12 +25,23 @@ struct SearchResultItem: Codable {
     var armReach: Int?
 }
 
+enum SearchStyle {
+    case defaultSearch
+    case uploadSearch
+}
+
 class SearchVC: UIViewController, UITextFieldDelegate {
     var coordinator: SearchCoordinator?
+//    var toSearchResult: ((String) -> String)?
+    var toSearchResult: ((String) -> Void)?
+    
+    var toUploadSearchResult: ((String) -> Void)?
+    
+    private let searchStyle: SearchStyle
     
     private let disposeBag = DisposeBag()
     
-    private lazy var searchRightViewContainer: SearchFieldRightView = {
+    private let searchRightViewContainer: SearchFieldRightView = {
         let container = SearchFieldRightView()
         
         container.snp.makeConstraints {
@@ -39,7 +50,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         return container
     }()
     
-    private lazy var searchTextField: UITextField = {
+    private let searchTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = SearchConst.Text.searchFieldPlaceholder
         textField.layer.cornerRadius = SearchConst.Shape.textFieldCornerRadius
@@ -47,19 +58,6 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         textField.layer.borderColor = SearchConst.Color.textFieldBorderColor
         textField.font = SearchConst.Font.textFieldFont
         textField.textColor = SearchConst.Color.textFieldTextColor
-        
-        let searchIcon = SearchConst.Image.searchIcon
-        searchIcon.contentMode = .scaleAspectFit
-        let iconWrapper = UIView(frame: SearchConst.Size.searchIconSize)
-        iconWrapper.addSubview(searchIcon)
-        searchIcon.frame.origin = SearchConst.Spacing.searchIconleftSpacing
-        
-        textField.leftView = iconWrapper
-        textField.leftViewMode = .always
-        
-        textField.rightView = searchRightViewContainer
-        textField.rightViewMode = .whileEditing
-        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
         
         return textField
     }()
@@ -101,6 +99,29 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         cancelButton.alpha = SearchConst.buttonAlphaVisible
         
         loadRecentVisitItems()
+        
+        let searchIcon = SearchConst.Image.searchIcon
+        searchIcon.contentMode = .scaleAspectFit
+        
+        let iconWrapper = UIView(frame: SearchConst.Size.searchIconSize)
+        iconWrapper.addSubview(searchIcon)
+        searchIcon.frame.origin = SearchConst.Spacing.searchIconleftSpacing
+        
+        searchTextField.leftView = iconWrapper
+        searchTextField.leftViewMode = .always
+        
+        searchTextField.rightView = searchRightViewContainer
+        searchTextField.rightViewMode = .whileEditing
+        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
+    }
+    
+    init(searchStyle: SearchStyle = .defaultSearch) {
+        self.searchStyle = searchStyle
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -113,6 +134,36 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         setLayout()
         bindTableView()
         bindButtons()
+        applySearchStyle()
+    }
+    
+    private func applySearchStyle() {
+         switch searchStyle {
+         case .defaultSearch:
+             setupDefaultSearchStyle()
+         case .uploadSearch:
+             setupUploadSearchStyle()
+         }
+     }
+    
+    private func setupDefaultSearchStyle() {
+    }
+    
+    private func setupUploadSearchStyle() {
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        navigationItem.title = "암장"
+        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysOriginal) 
+        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapBackButton))
+        navigationItem.leftBarButtonItem = backButton
+    }
+
+    @objc private func didTapBackButton() {
+        tabBarController?.selectedIndex = 0
+        
+        tabBarController?.tabBar.isHidden = false
+         UIView.animate(withDuration: 0.1, animations: {
+             self.tabBarController?.tabBar.alpha = 1
+         })
     }
     
     private func setLayout() {
@@ -216,12 +267,38 @@ class SearchVC: UIViewController, UITextFieldDelegate {
             }
             .disposed(by: disposeBag)
     }
+    
+    func didTapCancelButton() {
+        searchTextField.text = SearchConst.Text.emptyText
+        searchTextField.resignFirstResponder()
+        searchTextField.layer.borderColor = UIColor.lineOpacityNormal.cgColor
+        
+        self.searchTextField.snp.updateConstraints {
+            $0.leading.equalToSuperview().offset(SearchConst.Search.Spacing.textFieldSpacing)
+            $0.trailing.equalToSuperview().offset(-SearchConst.Search.Spacing.textFieldSpacing)
+        }
+        
+        self.cancelButton.snp.updateConstraints {
+            $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.returnCancelBtnRightSpacing)
+        }
+        
+        self.cancelButton.alpha = SearchConst.buttonAlphaHidden
+    }
+    
+    func didTapSmallCancelButton() {
+        searchTextField.text = SearchConst.Text.emptyText
+        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
+    }
 }
 
 extension SearchVC {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         searchTextField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
         searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
+        
+        if searchStyle == .uploadSearch {
+            return
+        }
         
         self.searchTextField.snp.updateConstraints {
             $0.leading.equalToSuperview().offset(SearchConst.Search.Spacing.textFieldSpacing)
@@ -251,32 +328,16 @@ extension SearchVC {
         if let searchText = textField.text, !searchText.isEmpty {
             self.searchTextField.alpha = SearchConst.buttonAlphaHidden
             self.cancelButton.alpha = SearchConst.buttonAlphaHidden
-            coordinator?.navigateToSearchResult(query: searchText)
+            
+            switch searchStyle {
+            case .defaultSearch:
+                self.toSearchResult?(searchText)
+            case .uploadSearch:
+                self.toUploadSearchResult?(searchText)
+            }
         }
         
         return true
-    }
-    
-    func didTapCancelButton() {
-        searchTextField.text = SearchConst.Text.emptyText
-        searchTextField.resignFirstResponder()
-        searchTextField.layer.borderColor = UIColor.lineOpacityNormal.cgColor
-        
-        self.searchTextField.snp.updateConstraints {
-            $0.leading.equalToSuperview().offset(SearchConst.Search.Spacing.textFieldSpacing)
-            $0.trailing.equalToSuperview().offset(-SearchConst.Search.Spacing.textFieldSpacing)
-        }
-        
-        self.cancelButton.snp.updateConstraints {
-            $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.returnCancelBtnRightSpacing)
-        }
-        
-        self.cancelButton.alpha = SearchConst.buttonAlphaHidden
-    }
-    
-    func didTapSmallCancelButton() {
-        searchTextField.text = SearchConst.Text.emptyText
-        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
     }
 }
 

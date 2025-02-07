@@ -10,6 +10,7 @@ import Foundation
 protocol SearchBuilder {
 //    func buildSearch() -> SearchVC
     func buildSearchResult() -> SearchResultVC
+    func buildUploadSearchResult() -> SearchResultVC
 }
 
 final class SearchBuilderImpl: SearchBuilder {
@@ -26,6 +27,11 @@ final class SearchBuilderImpl: SearchBuilder {
     
     func buildSearchResult() -> SearchResultVC {
         let viewModel: SearchResultVM = container.resolve(SearchResultVM.self)
-        return SearchResultVC(viewModel: viewModel)
+        return SearchResultVC(viewModel: viewModel, searchStyle: .defaultSearch)
+    }
+    
+    func buildUploadSearchResult() -> SearchResultVC {
+        let viewModel: SearchResultVM = container.resolve(SearchResultVM.self)
+        return SearchResultVC(viewModel: viewModel, searchStyle: .uploadSearch)
     }
 }

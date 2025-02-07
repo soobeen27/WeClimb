@@ -13,6 +13,7 @@ class WeClimbButton: UIButton {
         case defaultRectangle
         case iconRectangle
         case rightIconRound
+        case leftIconRound
     }
     
     var buttonStyle: ButtonStyle {
@@ -55,6 +56,18 @@ class WeClimbButton: UIButton {
         return imageView
     }()
     
+    var leftIconTintColor: UIColor? {
+        didSet {
+            updateIconImages()
+        }
+    }
+    
+    var rightIconTintColor: UIColor? {
+        didSet {
+            updateIconImages()
+        }
+    }
+    
     init(style: ButtonStyle, size: WeClimbButtonConst.IconRectangleSize = .medium) {
         self.buttonStyle = style
         self.buttonSize = size
@@ -78,6 +91,8 @@ class WeClimbButton: UIButton {
             
         case .rightIconRound:
             return CGSize(width: WeClimbButtonConst.RightIconRound.Size.width, height:  WeClimbButtonConst.RightIconRound.Size.height)
+        case .leftIconRound:
+            return CGSize(width: WeClimbButtonConst.RightIconRound.Size.width, height:  WeClimbButtonConst.RightIconRound.Size.height)
         }
     }
     
@@ -98,6 +113,12 @@ class WeClimbButton: UIButton {
             backgroundColor = WeClimbButtonConst.Color.defaultBackgroundColor
             
         case .rightIconRound:
+            layer.cornerRadius = WeClimbButtonConst.RightIconRound.cornerRadius
+            clipsToBounds = true
+            titleLabel?.font = UIFont.customFont(style: .caption1Medium)
+            setTitleColor(WeClimbButtonConst.Color.defaultTitleColor, for: .normal)
+            backgroundColor = WeClimbButtonConst.Color.defaultBackgroundColor
+        case .leftIconRound:
             layer.cornerRadius = WeClimbButtonConst.RightIconRound.cornerRadius
             clipsToBounds = true
             titleLabel?.font = UIFont.customFont(style: .caption1Medium)
@@ -146,11 +167,45 @@ class WeClimbButton: UIButton {
                 $0.trailing.equalTo(rightIconView.snp.leading).offset(-WeClimbButtonConst.RightIconRound.Spacing.spacing)
                 $0.leading.equalToSuperview().offset(WeClimbButtonConst.RightIconRound.Spacing.leftPadding)
             }
+        case .leftIconRound:
+            leftIconView.snp.makeConstraints {
+                $0.leading.equalToSuperview().offset(10)
+                $0.centerY.equalToSuperview()
+                $0.width.height.equalTo(14)
+            }
+            
+            titleLabel.snp.makeConstraints {
+                $0.leading.equalTo(leftIconView.snp.trailing).offset(6)
+                $0.trailing.equalToSuperview().offset(14)
+            }
         }
     }
     
+    //    private func updateIconImages() {
+    //        leftIconView.image = leftIcon
+    //        rightIconView.image = rightIcon
+    //
+    ////        leftIconView.tintColor = leftIconTintColor
+    ////        rightIconView.tintColor = rightIconTintColor
+    ////
+    ////        leftIcon?.withTintColor(tintColor ?? self.tintColor, renderingMode: .alwaysTemplate)
+    ////        rightIcon?.withTintColor(tintColor ?? self.tintColor, renderingMode: .alwaysTemplate)
+    //
+    //        if let leftIcon = leftIcon {
+    //            leftIconView.image = leftIcon.withRenderingMode(.alwaysTemplate)
+    //            leftIconView.tintColor = leftIconTintColor ?? self.tintColor
+    //        }
+    //
+    //        if let rightIcon = rightIcon {
+    //            rightIconView.image = rightIcon.withRenderingMode(.alwaysTemplate)
+    //            rightIconView.tintColor = rightIconTintColor ?? self.tintColor
+    //        }
+    //    }
     private func updateIconImages() {
         leftIconView.image = leftIcon
         rightIconView.image = rightIcon
+        
+        leftIconView.tintColor = leftIconTintColor
+        rightIconView.tintColor = leftIconTintColor
     }
 }
