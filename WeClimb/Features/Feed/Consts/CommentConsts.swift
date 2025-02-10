@@ -63,4 +63,14 @@ enum CommentConsts {
             static let date: UIColor = UIColor.labelAlternative
         }
     }
+    
+    enum Alert {
+        static let alertDeleteTitle = "댓글을 삭제하시겠습니까?"
+        static let alertReportTitle = "신고하시겠습니까?"
+        static let alertBlockTitle = "차단하시겠습니까?"
+        static let delete = "삭제"
+        static let cancel = "취소"
+        static let report = "신고"
+        static let block = "차단"
+    }
 }

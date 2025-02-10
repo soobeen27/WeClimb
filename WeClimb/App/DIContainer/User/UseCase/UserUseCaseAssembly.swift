@@ -35,5 +35,8 @@ final class UserUseCaseAssembly: Assembly {
         container.register(UserReportUseCase.self) { resolver in
             UserReportUseCaseImpl(userReportRepository: resolver.resolve(UserReportRepository.self)!)
         }
+        container.register(AddBlackListUseCase.self) { resolver in
+            AddBlackListUseCaseImpl(userBlockRepository: resolver.resolve(UserBlockRepository.self)!)
+        }
     }
 }

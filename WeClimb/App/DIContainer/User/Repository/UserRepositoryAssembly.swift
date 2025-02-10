@@ -29,5 +29,8 @@ final class UserRepositoryAssembly: Assembly {
         container.register(UserReportRepository.self) { resolver in
             UserReportRepositoryImpl(userReportDataSource: resolver.resolve(UserReportDataSource.self)!)
         }
+        container.register(UserBlockRepository.self) { resolver in
+            UserBlockRepositoryImpl(userBlockDataSource: resolver.resolve(UserBlockDataSource.self)!)
+        }
     }
 }

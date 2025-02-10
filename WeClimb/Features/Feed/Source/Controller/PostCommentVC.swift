@@ -21,6 +21,7 @@ class PostCommentVC: UIViewController {
     private let disposeBag = DisposeBag()
     private let commentCellDatasRelay = BehaviorRelay<[CommentCellData]>.init(value: [])
     private let cellLongPressed = PublishRelay<(commentUID: String, authorUID: String)>()
+    private let additionalActionTapped = PublishRelay<CommentAdditionalAction>()
     
     private let titleView = CommentTitleView()
     private let textFieldView = CommentTFView()
@@ -30,6 +31,11 @@ class PostCommentVC: UIViewController {
         tv.separatorStyle = .none
         tv.register(PostCommentTableCell.self, forCellReuseIdentifier: PostCommentTableCell.className)
         return tv
+    }()
+    private let customAlert: DefaultAlertVC = {
+        let alert = DefaultAlertVC(alertType: .title)
+        alert.modalPresentationStyle = .overCurrentContext
+        return alert
     }()
     
     override func viewDidLoad() {
@@ -50,9 +56,11 @@ class PostCommentVC: UIViewController {
     }
     
     private func bindViewModel() {
-        let input = PostCommentVMImpl.Input(postItem: Observable.just(postItem), sendButtonTap: textFieldView.sendButtonTap, cellLongPressed: cellLongPressed)
+        let input = PostCommentVMImpl.Input(postItem: Observable.just(postItem), sendButtonTap: textFieldView.sendButtonTap, cellLongPressed: cellLongPressed, additonalActionTapped: additionalActionTapped)
         let output = commentVM.transform(input: input)
+        
         output.commentCellDatas.bind(to: commentCellDatasRelay).disposed(by: disposeBag)
+        
         output.postOwnerName
             .asDriver(onErrorJustReturn: "")
             .drive(onNext: { [weak self] name in
@@ -61,9 +69,13 @@ class PostCommentVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        cellLongPressed.subscribe(onNext: { data in
-            print(data)
-        }).disposed(by: disposeBag)
+        output.isMyComment
+            .asDriver(onErrorJustReturn: false)
+            .drive(onNext: { [weak self] isMine in
+                guard let self else { return }
+                self.presentAlert(isMyComment: isMine)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func bindTableView() {
@@ -102,51 +114,66 @@ class PostCommentVC: UIViewController {
             $0.bottom.equalTo(textFieldView.snp.top)
         }
     }
-    
-//    private func actionSheet(for comment: Comment) {
-//        var actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-////        guard let user = Auth.auth().currentUser else { return }
-//        
-//        if comment.authorUID == user.uid {
-//            actionSheet = deleteActionSheet(comment: comment)
-//        } else {
-//            actionSheet = reportBlockActionSheet(comment: comment)
-//        }
-//        
-//        self.present(actionSheet, animated: true, completion: nil)
-//    }
-    
-    private func deleteActionSheet(comment: Comment) -> UIAlertController {
-        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        let deleteAction = UIAlertAction(title: "삭제하기", style: .destructive) { [weak self] _ in
-            guard let self else { return }
-            let alert = Alert()
-            alert.showAlert(from: self, title: "댓글 삭제", message: "삭제하시겠습니까?", includeCancel: true) {
-//                self.viewModel.deleteComments(commentUID: comment.commentUID)
-            }
+    private func presentAlert(isMyComment: Bool) {
+        var actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        if isMyComment {
+            actionSheet = deleteCommentAlert()
+        } else {
+            actionSheet = reportBlockAlert()
         }
-        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+        self.present(actionSheet, animated: true, completion: nil)
+    }
+    
+    private func deleteCommentAlert() -> UIAlertController {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let deleteAction = UIAlertAction(title: CommentConsts.Alert.delete, style: .destructive) { [weak self] _ in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.customAlert.setTitle(CommentConsts.Alert.alertDeleteTitle)
+                self.present(self.customAlert, animated: false)
+                self.customAlert.customAction = { [weak self] in
+                    guard let self else { return }
+                    self.additionalActionTapped.accept(.delete)
+                }
+            }
+
+        }
+        let cancelAction = UIAlertAction(title: CommentConsts.Alert.cancel, style: .cancel, handler: nil)
         
         [deleteAction, cancelAction]
             .forEach {
                 actionSheet.addAction($0)
             }
         return actionSheet
+
     }
     
-    private func reportBlockActionSheet(comment: Comment) -> UIAlertController {
+    private func reportBlockAlert() -> UIAlertController {
            let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
            
-           let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
-   //            self?.reportModal()
-//               let modalVC = FeedReportModalVC()
-//               self?.presentModal(modalVC: modalVC)
+        let reportAction = UIAlertAction(title: CommentConsts.Alert.report, style: .default) { [weak self] _ in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.customAlert.setTitle(CommentConsts.Alert.alertReportTitle)
+                self.present(self.customAlert, animated: false)
+                self.customAlert.customAction = { [weak self] in
+                    guard let self else { return }
+                    self.additionalActionTapped.accept(.report)
+                }
+            }
            }
-           let blockAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
+        let blockAction = UIAlertAction(title: CommentConsts.Alert.block, style: .destructive) { [weak self] _ in
                guard let self else { return }
-//               self.blockUser(authorUID: comment.authorUID)
+            DispatchQueue.main.async {
+                self.customAlert.setTitle(CommentConsts.Alert.alertBlockTitle)
+                self.present(self.customAlert, animated: false)
+                self.customAlert.customAction = { [weak self] in
+                    guard let self else { return }
+                    self.additionalActionTapped.accept(.block)
+                }
+            }
            }
-           let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: CommentConsts.Alert.cancel, style: .cancel, handler: nil)
            
            [reportAction, blockAction, cancelAction]
                .forEach {
@@ -154,6 +181,27 @@ class PostCommentVC: UIViewController {
                }
            return actionSheet
        }
+
+//    private func reportBlockActionSheet(comment: Comment) -> UIAlertController {
+//           let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//           
+//           let reportAction = UIAlertAction(title: "신고하기", style: .default) { [weak self] _ in
+//   //            self?.reportModal()
+////               let modalVC = FeedReportModalVC()
+////               self?.presentModal(modalVC: modalVC)
+//           }
+//           let blockAction = UIAlertAction(title: "차단하기", style: .destructive) { [weak self] _ in
+//               guard let self else { return }
+////               self.blockUser(authorUID: comment.authorUID)
+//           }
+//           let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+//           
+//           [reportAction, blockAction, cancelAction]
+//               .forEach {
+//                   actionSheet.addAction($0)
+//               }
+//           return actionSheet
+//       }
 //       
 //       //MARK: - 차단하기 관련 메서드
 //       private func blockUser(authorUID: String) {
