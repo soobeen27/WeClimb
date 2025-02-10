@@ -32,5 +32,8 @@ final class UserUseCaseAssembly: Assembly {
         container.register(PersonalDetailUseCase.self) { resolver in
             PersonalDetailUseCaseImpl(userUpdateRepository: resolver.resolve(UserUpdateRepository.self)!)
         }
+        container.register(UserReportUseCase.self) { resolver in
+            UserReportUseCaseImpl(userReportRepository: resolver.resolve(UserReportRepository.self)!)
+        }
     }
 }

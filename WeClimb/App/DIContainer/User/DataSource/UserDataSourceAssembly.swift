@@ -15,6 +15,6 @@ final class UserDataSourceAssembly: Assembly {
         container.register(UserReadDataSource.self) { _ in UserReadDataSourceImpl() }
         container.register(UserSearchDataSource.self) { _ in UserSearchDataSourceImpl() }
         container.register(UserUpdateDataSource.self) { _ in UserUpdateDataSourceImpl() }
-        
+        container.register(UserReportDataSource.self) { _ in UserReportDataSourceImpl() }
     }
 }
