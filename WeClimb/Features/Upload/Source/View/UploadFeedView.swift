@@ -79,8 +79,8 @@ class UploadFeedView: UIView {
     private func setLayout() {
         self.backgroundColor = UIColor.clear
         
-        self.addSubview(collectionView)
-        self.addSubview(countLabel)
+        [collectionView, countLabel]
+            .forEach { self.addSubview($0) }
         
         countLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(16)

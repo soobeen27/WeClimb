@@ -151,19 +151,41 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     
     private func setupUploadSearchStyle() {
         navigationController?.setNavigationBarHidden(false, animated: false)
-        navigationItem.title = "암장"
-        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysOriginal) 
-        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapBackButton))
+        
+        navigationController?.navigationBar.barStyle = .default
+        navigationController?.navigationBar.barTintColor = UIColor.fillSolidDarkBlack
+        
+        navigationItem.title = "편집"
+        
+        navigationController?.navigationBar.titleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.customFont(style: .heading2SemiBold)
+        ]
+        
+        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysTemplate)
+        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapCloseButton))
+        backButton.tintColor = .white
+        
         navigationItem.leftBarButtonItem = backButton
     }
-
-    @objc private func didTapBackButton() {
-        tabBarController?.selectedIndex = 0
+    
+    @objc private func didTapCloseButton() {
+        let alert = DefaultAlertVC(alertType: .titleDescription, interfaceStyle: .dark)
+        alert.setTitle("정말 나가시겠어요?", "입력된 내용은 저장되지 않아요.")
+        alert.setCustomButtonTitle("삭제")
+        alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  //StatusNegative
         
-        tabBarController?.tabBar.isHidden = false
-         UIView.animate(withDuration: 0.1, animations: {
-             self.tabBarController?.tabBar.alpha = 1
-         })
+        alert.customAction = { [weak self] in
+            self?.tabBarController?.selectedIndex = 0
+            self?.tabBarController?.tabBar.isHidden = false
+            UIView.animate(withDuration: 0.1, animations: {
+                self?.tabBarController?.tabBar.alpha = 1
+            })
+        }
+        
+        alert.modalPresentationStyle = .overCurrentContext
+        alert.modalTransitionStyle = .crossDissolve
+        present(alert, animated: false, completion: nil)
     }
     
     private func setLayout() {

@@ -5,8 +5,6 @@
 //  Created by 강유정 on 2/3/25.
 //
 
-import RxRelay
-import PhotosUI
 //// 업로드용
 //struct PostUploadData {
 //    let user: User
@@ -25,20 +23,33 @@ import RxSwift
 import RxRelay
 import PhotosUI
 
-protocol UploadVMProtocol {
-    func transform(input: UploadVM.Input) -> UploadVM.Output
+protocol UploadInput {
+    var mediaSelection: Observable<[PHPickerResult]> { get }
+    var gradeSelection: Observable<(Int, String)> { get }
+    var holdSelection: Observable<(Int, String?)> { get }
+    var selectedMediaIndex: Observable<Int> { get }
 }
 
-final class UploadVM: UploadVMProtocol {
+protocol UploadOutput {
+    var mediaItems: Observable<[MediaUploadData]> { get }
+}
+
+protocol UploadVM {
+    var mediaUploadDataRelay: BehaviorRelay<[MediaUploadData]> { get }
+    func transform(input: UploadInput) -> UploadOutput
+}
+
+
+final class UploadVMImpl : UploadVM {
     
-    struct Input {
+    struct Input: UploadInput {
         let mediaSelection: Observable<[PHPickerResult]>
         let gradeSelection: Observable<(Int, String)>
         let holdSelection: Observable<(Int, String?)>
         let selectedMediaIndex: Observable<Int>
     }
     
-    struct Output {
+    struct Output: UploadOutput {
         let mediaItems: Observable<[MediaUploadData]>
     }
     
@@ -46,8 +57,10 @@ final class UploadVM: UploadVMProtocol {
     
     private let mediaItemsRelay = BehaviorRelay<[PHPickerResult]>(value: [])
     var mediaUploadDataRelay = BehaviorRelay<[MediaUploadData]>(value: [])
+
+
         
-        func transform(input: Input) -> Output {
+        func transform(input: UploadInput) -> UploadOutput {
             
             input.mediaSelection
                 .subscribe(onNext: { [weak self] mediaItems in

@@ -9,7 +9,13 @@ import Swinject
 
 final class UploadAssembly: Assembly {
     func assemble(container: Container) {
-    
+//        container.register(UploadVM.self) { resolver in
+//            UploadVMImpl()
+//        }
+        container.register(UploadVM.self) { _ in
+            UploadVMImpl()
+        }.inObjectScope(.container)
+
     }
 }
 

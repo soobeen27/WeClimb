@@ -122,6 +122,9 @@ class UploadMediaVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        selectedMediaItems.removeAll()
+        mediaItemsSubject.onNext([])
+        
         bindViewModel()
         setLayout()
         setNavigation()
@@ -178,7 +181,7 @@ class UploadMediaVC: UIViewController {
     }
     
     private func bindViewModel() {
-        let input = UploadVM.Input(
+        let input = UploadVMImpl.Input(
             mediaSelection: mediaItemsSubject.asObservable(),
             
             gradeSelection: selectedGradeSubject
@@ -236,7 +239,6 @@ class UploadMediaVC: UIViewController {
 
     private func reloadMediaUI() {
         if shouldFeedUpdateUI {
-            
             self.uploadFeedView?.removeFromSuperview()
             
             let feed = UploadFeedView(frame: selectedMediaView.bounds, viewModel: self.viewModel)
@@ -251,12 +253,12 @@ class UploadMediaVC: UIViewController {
             shouldUpdateUI = true
             shouldFeedUpdateUI = false
         }
-
-            self.uploadFeedView?.onMediaIndexChanged = { [weak self] index in
-                self?.selectedMediaIndexSubject.onNext(index)
+        
+        self.uploadFeedView?.onMediaIndexChanged = { [weak self] index in
+            self?.selectedMediaIndexSubject.onNext(index)
         }
     }
-
+    
     private func bindOptionButtonActions() {
         uploadOptionView.didTapBackButton = { [weak self] in
             self?.onBackButton?()
