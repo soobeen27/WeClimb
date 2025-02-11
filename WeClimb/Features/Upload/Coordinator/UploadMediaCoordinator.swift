@@ -14,6 +14,8 @@ final class UploadMediaCoordinator: BaseCoordinator {
     var holdFilterGymName: ((String) -> String)?
     var LevelFilterGymName: ((String) -> String)?
     
+    var onLevelHoldFiltersApplied: ((String, String) -> Void)?
+    
     init(navigationController: UINavigationController, gymItem: SearchResultItem) {
         self.navigationController = navigationController
         self.gymItem = gymItem

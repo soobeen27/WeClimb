@@ -19,8 +19,8 @@ struct PostUploadData {
 
 struct MediaUploadData {
     let url: URL
-    let hold: String?
-    let grade: String?
+    var hold: String?
+    var grade: String?
     let thumbnailURL: URL?
 }
 

@@ -33,53 +33,68 @@ final class UploadVM: UploadVMProtocol {
     
     struct Input {
         let mediaSelection: Observable<[PHPickerResult]>
-        let gradeSelection: Observable<String>
-        let holdSelection: Observable<String?>
+        let gradeSelection: Observable<(Int, String)>
+        let holdSelection: Observable<(Int, String?)>
+        let selectedMediaIndex: Observable<Int>
     }
     
     struct Output {
         let mediaItems: Observable<[MediaUploadData]>
-        let selectedGrade: Observable<String>
-        let selectedHold: Observable<String?>
     }
     
     private let disposeBag = DisposeBag()
     
     private let mediaItemsRelay = BehaviorRelay<[PHPickerResult]>(value: [])
-    private let selectedGradeRelay = BehaviorRelay<String>(value: "")
-    private let selectedHoldRelay = BehaviorRelay<String?>(value: nil)
     var mediaUploadDataRelay = BehaviorRelay<[MediaUploadData]>(value: [])
-//    var cellData = PublishRelay<[MediaUploadData]>()
-    
-    func transform(input: Input) -> Output {
+        
+        func transform(input: Input) -> Output {
+            
+            input.mediaSelection
+                .subscribe(onNext: { [weak self] mediaItems in
+                    self?.mediaItemsRelay.accept(mediaItems)
+                    self?.processMediaItems(mediaItems: mediaItems)
+                })
+                .disposed(by: disposeBag)
+            
+            input.gradeSelection
+                .subscribe(onNext: { [weak self] (index, newGrade) in
+                    guard let self = self else { return }
+                    
+                    var mediaList = self.mediaUploadDataRelay.value
+                    guard index >= 0, index < mediaList.count else { return }
 
-        input.mediaSelection
-            .subscribe(onNext: { [weak self] mediaItems in
-                self?.mediaItemsRelay.accept(mediaItems)
-            })
-            .disposed(by: disposeBag)
-        
-        input.gradeSelection
-            .bind(to: selectedGradeRelay)
-            .disposed(by: disposeBag)
-        
-        input.holdSelection
-            .bind(to: selectedHoldRelay)
-            .disposed(by: disposeBag)
-        
-        mediaItemsRelay
-            .subscribe(onNext: { [weak self] mediaItems in
-                self?.processMediaItems(mediaItems: mediaItems)
-            })
-            .disposed(by: disposeBag)
-        
-        return Output(
-            mediaItems: mediaUploadDataRelay.asObservable(),
-            selectedGrade: selectedGradeRelay.asObservable(),
-            selectedHold: selectedHoldRelay.asObservable()
-        )
-    }
-    
+                    if mediaList[index].grade == newGrade { return }
+
+                    var updatedMedia = mediaList[index]
+                    updatedMedia.grade = newGrade
+                    mediaList[index] = updatedMedia
+
+                    self.mediaUploadDataRelay.accept(mediaList)
+                })
+                .disposed(by: disposeBag)
+
+            input.holdSelection
+                .subscribe(onNext: { [weak self] (index, newHold) in
+                    guard let self = self else { return }
+                    
+                    var mediaList = self.mediaUploadDataRelay.value
+                    guard index >= 0, index < mediaList.count else { return }
+
+                    if mediaList[index].hold == newHold { return }
+                    
+                    var updatedMedia = mediaList[index]
+                    updatedMedia.hold = newHold
+                    mediaList[index] = updatedMedia
+
+                    self.mediaUploadDataRelay.accept(mediaList)
+                })
+                .disposed(by: disposeBag)
+
+            return Output(
+                mediaItems: mediaUploadDataRelay.asObservable()
+            )
+        }
+
     private func processMediaItems(mediaItems: [PHPickerResult]) {
         let group = DispatchGroup()
         var models = [MediaUploadData?](repeating: nil, count: mediaItems.count)
@@ -108,13 +123,8 @@ final class UploadVM: UploadVMProtocol {
                         return
                     }
                     
-                    // AVAsset으로 비디오 상태 확인
                     let asset = AVAsset(url: tempVideoURL)
-                    let isPlayable = asset.isPlayable
-                    let hasProtectedContent = asset.hasProtectedContent
-                    print("비디오 파일 상태: isPlayable=\(isPlayable), hasProtectedContent=\(hasProtectedContent)")
-                    
-                    guard isPlayable else {
+                    guard asset.isPlayable else {
                         print("비디오 파일이 재생 불가능 상태입니다.")
                         group.leave()
                         return
@@ -122,8 +132,8 @@ final class UploadVM: UploadVMProtocol {
                     
                     models[index] = MediaUploadData(
                         url: tempVideoURL,
-                        hold: self.selectedHoldRelay.value,
-                        grade: self.selectedGradeRelay.value,
+                        hold: nil,
+                        grade: "",
                         thumbnailURL: tempVideoURL
                     )
                     group.leave()
@@ -146,8 +156,8 @@ final class UploadVM: UploadVMProtocol {
                             
                             models[index] = MediaUploadData(
                                 url: tempImageURL,
-                                hold: self.selectedHoldRelay.value,
-                                grade: self.selectedGradeRelay.value,
+                                hold: nil,
+                                grade: "",
                                 thumbnailURL: tempImageURL
                             )
                         } catch {
@@ -165,7 +175,6 @@ final class UploadVM: UploadVMProtocol {
             guard let self = self else { return }
             let validModels = models.compactMap { $0 }
             self.mediaUploadDataRelay.accept(validModels)
-//            self.cellData.accept(models.compactMap { $0 })
         }
     }
 }

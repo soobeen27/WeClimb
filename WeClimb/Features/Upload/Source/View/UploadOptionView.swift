@@ -20,7 +20,14 @@ class UploadOptionView : UIView {
     
     private let disposeBag = DisposeBag()
     
-    var gradeOptionLabel: UILabel = {
+    var levelOptionImage: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage.colorWhite.resize(targetSize: CGSize(width: 16, height: 16))?.withRenderingMode(.alwaysTemplate)
+        imageView.isHidden = true
+        return imageView
+    }()
+    
+    var levelOptionLabel: UILabel = {
         let label = UILabel()
         label.text = "레벨"
         label.font = .customFont(style: .label1Medium)
@@ -40,14 +47,20 @@ class UploadOptionView : UIView {
         config.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
         
         var titleAttributes = AttributedString("선택해주세요")
-           titleAttributes.font = UIFont.customFont(style: .label2Regular)
-           
-           config.attributedTitle = titleAttributes
+        titleAttributes.font = UIFont.customFont(style: .label2Regular)
+        
+        config.attributedTitle = titleAttributes
         
         let button = UIButton(configuration: config)
         button.tintColor = .labelAssistive
-        
         return button
+    }()
+    
+    var holdOptionImage: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage.colorWhite.resize(targetSize: CGSize(width: 16, height: 16))?.withRenderingMode(.alwaysTemplate)
+        imageView.isHidden = true
+        return imageView
     }()
     
     var holdOptionLabel: UILabel = {
@@ -70,14 +83,12 @@ class UploadOptionView : UIView {
         config.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
         
         var titleAttributes = AttributedString("선택해주세요")
-           titleAttributes.font = UIFont.customFont(style: .label2Regular)
-           
-           config.attributedTitle = titleAttributes
+        titleAttributes.font = UIFont.customFont(style: .label2Regular)
+        
+        config.attributedTitle = titleAttributes
         
         let button = UIButton(configuration: config)
         button.tintColor = .labelAssistive
-        
-        
         return button
     }()
     
@@ -107,7 +118,7 @@ class UploadOptionView : UIView {
         
         return button
     }()
-
+    
     private let nextButton: UIButton = {
         let button = WeClimbButton(style: .rightIconRound)
         button.setTitle("다음", for: .normal)
@@ -146,10 +157,9 @@ class UploadOptionView : UIView {
     func updateOptionView(grade: String?, hold: String?) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-
+            
             let customFont = UIFont.customFont(style: .label2Regular)
-
-            // ✅ 레벨(Grade) 버튼 텍스트 & 이미지 업데이트
+            
             if let grade = grade {
                 var config = self.levelSelectedButton.configuration
                 let attributedTitle = NSAttributedString(
@@ -158,14 +168,13 @@ class UploadOptionView : UIView {
                 )
                 config?.attributedTitle = AttributedString(attributedTitle)
                 self.levelSelectedButton.configuration = config
-
-                // ✅ `LHColors.fromShortKor(_:)`를 활용해 한국어 → 이미지 변환
-                let gradeColor = LHColors.fromEng(grade)
-                self.levelOptionImage.isHidden = false
-                self.levelOptionImage.image = gradeColor.toImage()
+                
+                let levelColor = LHColors.fromKoreanFull(grade).toImage()
+                self.levelOptionImage.image = levelColor
+                self.levelOptionImage.isHidden = (levelColor == UIImage.closeIconCircle)
+                
             }
-
-            // ✅ 홀드 버튼 텍스트 & 이미지 업데이트 (`LHColors.fromShortKor(_:)` 활용)
+            
             if let hold = hold {
                 var config = self.holdSelectedButton.configuration
                 let attributedTitle = NSAttributedString(
@@ -174,16 +183,15 @@ class UploadOptionView : UIView {
                 )
                 config?.attributedTitle = AttributedString(attributedTitle)
                 self.holdSelectedButton.configuration = config
-
-                // ✅ `LHColors.fromShortKor(_:)`를 활용해 한국어 → 이미지 변환
-                let holdColor = LHColors.fromEng(hold)
-                self.holdOptionImage.isHidden = false
-                self.holdOptionImage.image = holdColor.toImage()
+                
+                let holdColor = LHColors.fromKoreanFull(hold).toImage()
+                self.holdOptionImage.image = holdColor
+                self.holdOptionImage.isHidden = (holdColor == UIImage.closeIconCircle)
+                
             }
         }
     }
-
-
+    
     private func bindButton() {
         backButton.rx.tap
             .bind { [weak self] in
@@ -209,28 +217,33 @@ class UploadOptionView : UIView {
             }
             .disposed(by: disposeBag)
     }
-
+    
     private func setLayout() {
         self.backgroundColor = UIColor.fillSolidDarkStrong
         
-        [gradeOptionLabel, levelSelectedButton, topSeparatorLine, holdOptionLabel, holdSelectedButton, bottomSeparatorLine, backButton, nextButton]
+        [levelOptionLabel, levelSelectedButton, levelOptionImage, topSeparatorLine, holdOptionLabel, holdSelectedButton, holdOptionImage, bottomSeparatorLine, backButton, nextButton]
             .forEach { self.addSubview($0) }
-     
-        gradeOptionLabel.snp.makeConstraints {
+        
+        levelOptionLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(16)
             $0.top.equalToSuperview()
             $0.height.equalTo(56)
         }
         
+        levelOptionImage.snp.makeConstraints {
+            $0.trailing.equalTo(levelSelectedButton.snp.leading).offset(-8)
+            $0.centerY.equalTo(levelOptionLabel)
+        }
+        
         levelSelectedButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().offset(-16)
-            $0.centerY.equalTo(gradeOptionLabel)
+            $0.centerY.equalTo(levelOptionLabel)
         }
         
         topSeparatorLine.snp.makeConstraints {
             $0.height.equalTo(1)
             $0.leading.trailing.equalToSuperview()
-            $0.top.equalTo(gradeOptionLabel.snp.bottom)
+            $0.top.equalTo(levelOptionLabel.snp.bottom)
         }
         
         holdOptionLabel.snp.makeConstraints {
@@ -244,18 +257,10 @@ class UploadOptionView : UIView {
             $0.centerY.equalTo(holdOptionLabel)
         }
         
-        holdOptionLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(16)
-            $0.top.equalToSuperview()
-            $0.height.equalTo(56)
-        }
-        
         holdOptionImage.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(16)
-            $0.top.equalToSuperview()
-            $0.height.equalTo(56)
+            $0.trailing.equalTo(holdSelectedButton.snp.leading).offset(-8)
+            $0.centerY.equalTo(holdOptionLabel)
         }
-        
         
         bottomSeparatorLine.snp.makeConstraints {
             $0.height.equalTo(1)

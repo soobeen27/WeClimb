@@ -57,6 +57,10 @@ enum LHColors {
     static func fromHoldEng(_ string: String) -> LHColors {
         return holdEngMap[string] ?? .other
     }
+    
+    static func fromKoreanFull(_ string: String) -> LHColors {
+        return LHColors.koreanNames.first(where: { $0.value == string })?.key ?? .other
+    }
 
     func toKorean() -> String {
         return LHColors.koreanNames[self] ?? "기타"

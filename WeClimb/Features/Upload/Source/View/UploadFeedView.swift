@@ -18,6 +18,7 @@ class UploadFeedView: UIView {
     var selectedMediaItems: [MediaUploadData] = []
     
     private var totalMediaCount: Int = 0
+    var onMediaIndexChanged: ((Int) -> Void)?
     
     private lazy var countLabel: UILabel = {
         let label = UILabel()
@@ -39,7 +40,6 @@ class UploadFeedView: UIView {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.backgroundColor = UIColor.fillSolidDarkBlack
         collectionView.delegate = self
-
         return collectionView
     }()
     
@@ -64,21 +64,21 @@ class UploadFeedView: UIView {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 12
-
+        
         let itemWidth: CGFloat = 256
         let itemHeight: CGFloat = self.frame.height
-
+        
         layout.itemSize = CGSize(width: itemWidth, height: itemHeight)
-
+        
         let inset: CGFloat = (self.frame.width - itemWidth) / 2
         layout.sectionInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
-
+        
         return layout
     }
     
     private func setLayout() {
         self.backgroundColor = UIColor.clear
-
+        
         self.addSubview(collectionView)
         self.addSubview(countLabel)
         
@@ -88,7 +88,7 @@ class UploadFeedView: UIView {
             $0.width.equalTo(41)
             $0.height.equalTo(26)
         }
-
+        
         collectionView.snp.makeConstraints {
             $0.top.equalTo(countLabel.snp.bottom).offset(16)
             $0.leading.trailing.bottom.equalToSuperview()
@@ -105,7 +105,7 @@ class UploadFeedView: UIView {
                 cell.configure(with: data)
             }
             .disposed(by: disposeBag)
-
+        
         self.viewModel.mediaUploadDataRelay
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] mediaItems in
@@ -119,7 +119,7 @@ class UploadFeedView: UIView {
             })
             .disposed(by: disposeBag)
     }
-
+    
     private func playFirstMedia() {
         let indexPath = IndexPath(row: 0, section: 0)
         if let cell = collectionView.cellForItem(at: indexPath) as? UploadMediaCollectionCell {
@@ -167,9 +167,6 @@ extension UploadFeedView: UICollectionViewDelegate {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         updateCurrentIndex()
     }
-//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        updateCurrentIndex()
-//    }
     
     private func updateCurrentIndex() {
         let itemWidth: CGFloat = 256
@@ -178,11 +175,13 @@ extension UploadFeedView: UICollectionViewDelegate {
         
         let currentPageIndex = Int(collectionView.contentOffset.x / moveDistance)
         
+        onMediaIndexChanged?(currentPageIndex)
+        
         countLabel.text = "\(currentPageIndex + 1) / \(self.totalMediaCount)"
         
-           if let indexPath = IndexPath(row: currentPageIndex, section: 0) as IndexPath?,
-              let cell = collectionView.cellForItem(at: indexPath) as? UploadMediaCollectionCell {
-               cell.playVideo()
-           }
+        if let indexPath = IndexPath(row: currentPageIndex, section: 0) as IndexPath?,
+           let cell = collectionView.cellForItem(at: indexPath) as? UploadMediaCollectionCell {
+            cell.playVideo()
+        }
     }
 }

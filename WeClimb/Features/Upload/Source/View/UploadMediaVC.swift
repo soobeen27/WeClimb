@@ -9,8 +9,6 @@ import AVKit
 import PhotosUI
 import UIKit
 
-import RxCocoa
-import RxRelay
 import RxSwift
 import SnapKit
 
@@ -64,8 +62,7 @@ class UploadMediaVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     private var uploadFeedView: UploadFeedView?
-    
-    let uploadOptionView = UploadOptionView()
+    private let uploadOptionView = UploadOptionView()
     
     private lazy var selectedMediaView: UIView = {
         let view = UIView()
@@ -105,8 +102,12 @@ class UploadMediaVC: UIViewController {
     }()
     
     private let mediaItemsSubject = PublishSubject<[PHPickerResult]>()
-    private let selectedGradeSubject = BehaviorSubject<String>(value: "")
+    private var selectedGradeSubject = BehaviorSubject<String>(value: "")
     private let selectedHoldSubject = BehaviorSubject<String?>(value: nil)
+    private let selectedMediaIndexSubject = BehaviorSubject<Int>(value: 0)
+    
+    private var shouldUpdateUI = true
+    private var shouldFeedUpdateUI = true
     
     init(gymItem: SearchResultItem, viewModel: UploadVM) {
         self.gymItem = gymItem
@@ -179,19 +180,34 @@ class UploadMediaVC: UIViewController {
     private func bindViewModel() {
         let input = UploadVM.Input(
             mediaSelection: mediaItemsSubject.asObservable(),
-            gradeSelection: selectedGradeSubject.asObservable(),
-            holdSelection: selectedHoldSubject.asObservable()
+            
+            gradeSelection: selectedGradeSubject
+                .distinctUntilChanged()
+                .flatMapLatest { grade in
+                    self.selectedMediaIndexSubject
+                        .take(1)
+                        .map { index in (index, grade) }
+                },
+
+            holdSelection: selectedHoldSubject
+                .distinctUntilChanged()
+                .flatMapLatest { hold in
+                    self.selectedMediaIndexSubject
+                        .take(1)
+                        .map { index in (index, hold) }
+                },
+
+            selectedMediaIndex: selectedMediaIndexSubject.distinctUntilChanged()
         )
-        
+
         let output = viewModel.transform(input: input)
-        
+
         output.mediaItems
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] mediaItems in
-                guard let self = self else { return }
+                guard let self = self, self.shouldUpdateUI else { return }
 
                 if mediaItems.isEmpty {
-                    print("선택된 미디어 없음")
                     self.uploadFeedView?.removeFromSuperview()
                     self.callPHPickerButton.isHidden = false
                 } else {
@@ -200,30 +216,44 @@ class UploadMediaVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        output.selectedGrade
-            .bind(onNext: { grade in
-//                print("선택된 등급: \(grade)")
-            })
-            .disposed(by: disposeBag)
-        
-        output.selectedHold
-            .bind(onNext: { hold in
-//                print("선택된 홀드: \(hold ?? "없음")")
+        selectedMediaIndexSubject
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak self] index in
+                guard let self = self else { return }
+
+                let mediaList = self.viewModel.mediaUploadDataRelay.value
+                guard index >= 0, index < mediaList.count else { return }
+
+                let selectedMedia = mediaList[index]
+                
+                self.uploadOptionView.updateOptionView(
+                    grade: selectedMedia.grade ?? "선택해주세요",
+                    hold: selectedMedia.hold ?? "선택해주세요"
+                )
             })
             .disposed(by: disposeBag)
     }
-    
+
     private func reloadMediaUI() {
-        self.uploadFeedView?.removeFromSuperview()
+        if shouldFeedUpdateUI {
+            
+            self.uploadFeedView?.removeFromSuperview()
+            
+            let feed = UploadFeedView(frame: selectedMediaView.bounds, viewModel: self.viewModel)
+            self.uploadFeedView = feed
+            self.callPHPickerButton.isHidden = true
+            self.selectedMediaView.addSubview(feed)
+            
+            feed.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+            
+            shouldUpdateUI = true
+            shouldFeedUpdateUI = false
+        }
 
-        let feed = UploadFeedView(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)),
-                                  viewModel: self.viewModel)
-        self.uploadFeedView = feed
-        self.callPHPickerButton.isHidden = true
-        self.selectedMediaView.addSubview(feed)
-
-        feed.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            self.uploadFeedView?.onMediaIndexChanged = { [weak self] index in
+                self?.selectedMediaIndexSubject.onNext(index)
         }
     }
 
@@ -243,6 +273,29 @@ class UploadMediaVC: UIViewController {
         uploadOptionView.selectedHoldButton = { [weak self] in
             guard let self = self else { return }
             _ = self.onHoldFilter?(self.gymItem.name)
+        }
+        
+        coordinator?.onLevelHoldFiltersApplied = { [weak self] levelFilters, holdFilters in
+            guard let self = self else { return }
+
+            self.shouldUpdateUI = false
+ 
+            let currentIndex = (try? self.selectedMediaIndexSubject.value()) ?? 0
+            var mediaList = self.viewModel.mediaUploadDataRelay.value
+
+            guard currentIndex >= 0, currentIndex < mediaList.count else { return }
+
+            var updatedMedia = mediaList[currentIndex]
+            updatedMedia.grade = levelFilters
+            updatedMedia.hold = holdFilters
+            mediaList[currentIndex] = updatedMedia
+
+            self.viewModel.mediaUploadDataRelay.accept(mediaList)
+
+            self.uploadOptionView.updateOptionView(
+                grade: levelFilters,
+                hold: holdFilters
+            )
         }
     }
     
