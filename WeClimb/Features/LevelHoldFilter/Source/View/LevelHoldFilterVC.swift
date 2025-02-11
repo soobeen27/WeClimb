@@ -154,6 +154,7 @@ class LevelHoldFilterVC: UIViewController {
         output.appliedFilters
             .subscribe(onNext: { filters in
                 print("선택된 필터: \(filters)")
+                self?.appliedFiltersSubject.onNext(filters)
             })
             .disposed(by: disposeBag)
     }

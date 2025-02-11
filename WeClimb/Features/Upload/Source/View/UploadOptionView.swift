@@ -143,6 +143,47 @@ class UploadOptionView : UIView {
         clipsToBounds = true
     }
     
+    func updateOptionView(grade: String?, hold: String?) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+
+            let customFont = UIFont.customFont(style: .label2Regular)
+
+            // ✅ 레벨(Grade) 버튼 텍스트 & 이미지 업데이트
+            if let grade = grade {
+                var config = self.levelSelectedButton.configuration
+                let attributedTitle = NSAttributedString(
+                    string: grade.isEmpty ? "선택해주세요" : grade,
+                    attributes: [.font: customFont]
+                )
+                config?.attributedTitle = AttributedString(attributedTitle)
+                self.levelSelectedButton.configuration = config
+
+                // ✅ `LHColors.fromShortKor(_:)`를 활용해 한국어 → 이미지 변환
+                let gradeColor = LHColors.fromEng(grade)
+                self.levelOptionImage.isHidden = false
+                self.levelOptionImage.image = gradeColor.toImage()
+            }
+
+            // ✅ 홀드 버튼 텍스트 & 이미지 업데이트 (`LHColors.fromShortKor(_:)` 활용)
+            if let hold = hold {
+                var config = self.holdSelectedButton.configuration
+                let attributedTitle = NSAttributedString(
+                    string: hold.isEmpty ? "선택해주세요" : hold,
+                    attributes: [.font: customFont]
+                )
+                config?.attributedTitle = AttributedString(attributedTitle)
+                self.holdSelectedButton.configuration = config
+
+                // ✅ `LHColors.fromShortKor(_:)`를 활용해 한국어 → 이미지 변환
+                let holdColor = LHColors.fromEng(hold)
+                self.holdOptionImage.isHidden = false
+                self.holdOptionImage.image = holdColor.toImage()
+            }
+        }
+    }
+
+
     private func bindButton() {
         backButton.rx.tap
             .bind { [weak self] in
@@ -202,6 +243,19 @@ class UploadOptionView : UIView {
             $0.trailing.equalToSuperview().offset(-16)
             $0.centerY.equalTo(holdOptionLabel)
         }
+        
+        holdOptionLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(16)
+            $0.top.equalToSuperview()
+            $0.height.equalTo(56)
+        }
+        
+        holdOptionImage.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(16)
+            $0.top.equalToSuperview()
+            $0.height.equalTo(56)
+        }
+        
         
         bottomSeparatorLine.snp.makeConstraints {
             $0.height.equalTo(1)

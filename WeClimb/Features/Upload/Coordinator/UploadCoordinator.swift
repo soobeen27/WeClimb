@@ -126,6 +126,18 @@ final class UploadCoordinator: BaseCoordinator {
             builder: levelHoldFilterBuilder, gymName: gymName)
         addDependency(levelHoldFilterModalCoordinator)
         levelHoldFilterModalCoordinator.start()
+        
+        // ✅ LevelHoldFilterVC에서 클로저를 설정하여 값을 저장
+        levelHoldFilterModalCoordinator.onLevelHoldFiltersApplied = { [weak self] levelFilters, holdFilters in
+               guard let self = self else { return }
+
+               print("Coordinator에서 받은 레벨: \(levelFilters), 홀드: \(holdFilters)")
+
+               // ✅ 필터 값을 저장
+               self.selectedLevelFilters = levelFilters
+               self.selectedHoldFilters = holdFilters
+           }
+
     }
     
     private func presentHoldFilter(gymName: String) {
