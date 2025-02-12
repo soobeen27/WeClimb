@@ -35,8 +35,6 @@ final class TabBarCoordinator: BaseCoordinator {
         let uploadCoordinator = builder.buildUploadCoordinator(tabBarController: tabBarController)
         let notificationCoordinator = builder.buildNotificationCoordinator()
         let userPageMainCoordinator = builder.buildUserPageMainCoordinator()
-        
-        let userPageCoordinator = builder.buildUserPageCoordinator()
 
         self.uploadCoordinator = uploadCoordinator
 
