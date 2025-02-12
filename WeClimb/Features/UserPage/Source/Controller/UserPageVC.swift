@@ -35,31 +35,87 @@ class UserPageVC: UIViewController {
     private let userNameLabel: UILabel = {
       let label = UILabel()
         label.text = "WeClimb"
+        label.font = UserPageConst.userInfo.Font.userNameLabelFont
+        label.textColor = UserPageConst.userInfo.Color.userNameLabelColor
         return label
     }()
     
     private let userImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "person.circle")
+        imageView.image = UserPageConst.userInfo.Image.baseImage
         return imageView
     }()
     
-    private let userInfoLabel: UILabel = {
-        let label = UILabel()
-        label.text = "180cm.212cm"
+    private let userInfoLabel: UIStackView = {
+        let stv = UIStackView()
+        stv.axis = .horizontal
+        stv.alignment = .leading
+        stv.distribution = .fill
+        stv.spacing = UserPageConst.userInfo.Spacing.userInfoSpacing
+        return stv
+    }()
+    
+    private let userHeightInfo: UILabel = {
+       let label = UILabel()
+        label.text = "180"
+        label.font = UserPageConst.userInfo.Font.userInfoLabelFont
+        label.textColor = UserPageConst.userInfo.Color.userInfoLabelColor
         return label
     }()
     
-    private let homeGymButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("홈짐 설정하기", for: .normal)
-        button.tintColor = .black
-        return button
+    private let infoDote: UILabel = {
+        let label = UILabel()
+        label.text = UserPageConst.userInfo.Text.dote
+        label.textColor = UserPageConst.userInfo.Color.userInfoDoteColor
+        return label
     }()
+    
+    private let userArmReachInfo: UILabel = {
+        let label = UILabel()
+        label.text = "180"
+        label.font = UserPageConst.userInfo.Font.userInfoLabelFont
+        label.textColor = UserPageConst.userInfo.Color.userInfoLabelColor
+        return label
+    }()
+    
+    private let homeGymButtonStackView: UIStackView = {
+        let stv = UIStackView()
+        stv.axis = .horizontal
+        stv.alignment = .center
+        stv.distribution = .fillProportionally
+        stv.spacing = 5
+        stv.backgroundColor = UserPageConst.userInfo.Color.homeGymbackgroundColor
+        stv.layer.cornerRadius = 8
+        return stv
+    }()
+
+    private let homeImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UserPageConst.userInfo.Image.homeImage
+        return imageView
+    }()
+    
+    private let homeGymButtonText: UILabel = {
+        let label = UILabel()
+        label.text = UserPageConst.userInfo.Text.homeGymSettingText
+        label.font = UserPageConst.userInfo.Font.homeGymSettingTextFont
+        label.textColor = UserPageConst.userInfo.Color.homeGymSettingColor
+        label.setContentHuggingPriority(.required, for: .horizontal)
+        return label
+    }()
+    
+    private let chevronRightImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UserPageConst.userInfo.Image.chevronRightImage
+        return imageView
+    }()
+    
     
     private let userEditButton: UIButton = {
         let button = UIButton()
-        button.setTitle("편집", for: .normal)
+        button.setTitle(UserPageConst.userInfo.Text.editButtonText, for: .normal)
+        button.setTitleColor(UserPageConst.userInfo.Color.userEditButtonColor, for: .normal)
+        button.titleLabel?.font = UserPageConst.userInfo.Font.userInfoLabelFont
         return button
     }()
     
@@ -70,7 +126,7 @@ class UserPageVC: UIViewController {
     
     private let indicatorBar: UIView = {
         let view = UIView()
-        view.backgroundColor = .gray
+        view.backgroundColor = UserPageConst.userInfo.Color.indicatorBarColor
         return view
     }()
     
@@ -130,10 +186,37 @@ class UserPageVC: UIViewController {
     
     private func userInfoLayout() {
         [
+            userHeightInfo,
+            infoDote,
+            userArmReachInfo,
+        ].forEach { userInfoLabel.addArrangedSubview($0) }
+        
+        [
+            homeImageView,
+            homeGymButtonText,
+            chevronRightImageView
+        ].forEach { homeGymButtonStackView.addArrangedSubview($0) }
+        
+        homeImageView.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(10)
+            $0.size.equalTo(UserPageConst.userInfo.Size.symbolSize)
+        }
+        
+//        homeGymButtonText.snp.makeConstraints {
+//            $0.width.equalTo(70)
+//            $0.height.equalTo(16)
+//        }
+        
+        chevronRightImageView.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(10)
+            $0.size.equalTo(UserPageConst.userInfo.Size.symbolSize)
+        }
+        
+        [
             userNameLabel,
             userImageView,
             userInfoLabel,
-            homeGymButton,
+            homeGymButtonStackView,
             userEditButton,
             indicatorBar,
             segmentedControl,
@@ -141,32 +224,31 @@ class UserPageVC: UIViewController {
         
         userImageView.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(16)
-            $0.top.equalToSuperview().offset(32)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(16)
             $0.height.width.equalTo(80)
         }
         
         userNameLabel.snp.makeConstraints {
-            $0.leading.equalTo(userImageView.snp.trailing).offset(8)
-            $0.trailing.equalTo(userEditButton.snp.leading).offset(-8)
-            $0.top.equalToSuperview().offset(32)
+            $0.leading.equalTo(userImageView.snp.trailing).offset(12)
+            $0.trailing.equalTo(userEditButton.snp.leading)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(16)
         }
         
         userInfoLabel.snp.makeConstraints {
             $0.leading.equalTo(userNameLabel)
-            $0.top.equalTo(userNameLabel.snp.bottom).offset(8)
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.top.equalTo(userNameLabel.snp.bottom).offset(2)
         }
         
-        homeGymButton.snp.makeConstraints {
+        homeGymButtonStackView.snp.makeConstraints {
             $0.leading.equalTo(userNameLabel)
             $0.top.equalTo(userInfoLabel.snp.bottom).offset(12)
+            $0.width.equalTo(120)
+            $0.height.equalTo(26)
         }
         
         userEditButton.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(16)
             $0.trailing.equalToSuperview().offset(-16)
-            $0.top.equalToSuperview().offset(16)
-            $0.width.equalTo(120)
-            $0.height.equalTo(26)
         }
         
         indicatorBar.snp.makeConstraints {
