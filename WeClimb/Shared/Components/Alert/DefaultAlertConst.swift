@@ -43,7 +43,7 @@ enum DefaultAlertConst {
     }
     
     static let numberOfLinesDescription: Int = 10
-    static let borderWidthButton: CGFloat = 10
+    static let borderWidthButton: CGFloat = 1
     
     enum Animation {
         static let fadeInDuration: TimeInterval = 0.3

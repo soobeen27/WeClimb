@@ -12,10 +12,15 @@ import RxCocoa
 
 class SearchResultVC: UIViewController {
     var coordinator: SearchResultCoordinator?
+    
+    var toUpoadVC: ((SearchResultItem) -> Void)?
+    
     private let disposeBag = DisposeBag()
     
     private var viewModel: SearchResultVM
     var query: String?
+    
+    private var searchStyle: SearchStyle
     
     private lazy var searchRightViewContainer: SearchFieldRightView = {
         let container = SearchFieldRightView()
@@ -78,11 +83,12 @@ class SearchResultVC: UIViewController {
     }()
     
     private let selectedSegmentIndexSubject = BehaviorSubject<Int>(value: SearchConst.defaultSegmentIndex)
-
-    init(viewModel: SearchResultVM) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
+    
+    init(viewModel: SearchResultVM, searchStyle: SearchStyle) {
+          self.viewModel = viewModel
+          self.searchStyle = searchStyle
+          super.init(nibName: nil, bundle: nil)
+      }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -100,6 +106,54 @@ class SearchResultVC: UIViewController {
         setLayout()
         bindUI()
         bindButtons()
+        applySearchStyle()
+    }
+    
+    private func applySearchStyle() {
+         switch searchStyle {
+         case .defaultSearch:
+             setupDefaultSearchStyle()
+         case .uploadSearch:
+             setupUploadSearchStyle()
+         }
+     }
+    
+    private func setupDefaultSearchStyle() {
+    }
+    
+    private func setupUploadSearchStyle() {
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        
+        navigationItem.title = "암장"
+        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysOriginal)
+        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapBackButton))
+        navigationItem.leftBarButtonItem = backButton
+        
+        self.backButton.isHidden = true
+        segmentedControl.isHidden = true
+        bottomLineView.isHidden = true
+        
+        searchTextField.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).inset(SearchConst.SearchResult.Spacing.textFieldTopSpacing)
+            $0.trailing.equalToSuperview().inset(SearchConst.SearchResult.Spacing.textFieldRightSpacing)
+            $0.leading.equalToSuperview().inset(SearchConst.SearchResult.Spacing.textFieldRightSpacing)
+            $0.height.equalTo(SearchConst.SearchResult.Size.textFieldHeight)
+        }
+        
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(searchTextField.snp.bottom).offset(16)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
+        }
+    }
+
+    @objc private func didTapBackButton() {
+        tabBarController?.selectedIndex = 0
+        
+        tabBarController?.tabBar.isHidden = false
+         UIView.animate(withDuration: 0.1, animations: {
+             self.tabBarController?.tabBar.alpha = 1
+         })
     }
     
     private func setLayout() {
@@ -145,12 +199,18 @@ class SearchResultVC: UIViewController {
         let input = SearchResultVMImpl.Input(
             query: searchTextField.rx.text.orEmpty.asObservable(),
             selectedSegment: selectedSegmentIndexSubject.asObservable(),
-              SavedRecentVisitItems: saveItemSubject
+            SavedRecentVisitItems: saveItemSubject
         )
         
         let output = viewModel.transform(input: input)
         
         output.items
+            .map { items in
+                if self.searchStyle == .uploadSearch {
+                    return items.filter { $0.type == .gym }
+                }
+                return items
+            }
             .bind(to: tableView.rx.items) { (tableView, index, item) in
                 switch item.type {
                 case .gym:
@@ -169,8 +229,13 @@ class SearchResultVC: UIViewController {
         
         tableView.rx.modelSelected(SearchResultItem.self)
             .bind(onNext: { [weak self] item in
-                guard self != nil else { return }
-                saveItemSubject.onNext(item)
+                guard let self = self else { return }
+                
+                if self.searchStyle == .uploadSearch {
+                    self.toUpoadVC?(item)
+                } else {
+                    saveItemSubject.onNext(item)
+                }
             })
             .disposed(by: disposeBag)
         

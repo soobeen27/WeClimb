@@ -46,21 +46,29 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
     func transform(input: Input) -> Output {
         let cellData = BehaviorSubject(value: [(text: String, image: String, isChecked: Bool)]())
         let appliedFilters = PublishSubject<(level: [String], hold: [String])>()
-
-        fetchGymData(gymName: input.gymName) { [weak self] in
-            guard let self = self else { return }
-            self.updateLevelData(cellData: cellData)
-        }
-
+        
         input.segmentedControlSelection
             .subscribe(onNext: { [weak self] index in
                 guard let self = self else { return }
                 self.selectedSegmentIndex.onNext(index)
-                
-                if index == 0 {
-                    self.updateLevelData(cellData: cellData)
+
+                if self.gym == nil {
+                    self.fetchGymData(gymName: input.gymName) { [weak self] in
+                        guard let self = self else { return }
+                        
+                        if index == 0 {
+                            self.updateLevelData(cellData: cellData)
+                        } else {
+                            self.updateHoldData(cellData: cellData)
+                        }
+                    }
                 } else {
-                    self.updateHoldData(cellData: cellData)
+                    
+                    if index == 0 {
+                        self.updateLevelData(cellData: cellData)
+                    } else {
+                        self.updateHoldData(cellData: cellData)
+                    }
                 }
             })
             .disposed(by: disposeBag)
@@ -97,12 +105,11 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
             })
             .disposed(by: disposeBag)
     }
-
+    
     private func updateLevelData(cellData: BehaviorSubject<[(text: String, image: String, isChecked: Bool)]>) {
         guard let gym = gym else { return }
 
         let levelData = gym.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
-        print("Level data: \(levelData)")
 
         var levelTextImageData = levelData.map { (text: $0.colorTextChange(), image: $0.imageTextChange(), isChecked: false) }
 
@@ -119,7 +126,6 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
 
     private func updateHoldData(cellData: BehaviorSubject<[(text: String, image: String, isChecked: Bool)]>) {
         var holdTextImageData = Hold.allCases.map { (text: $0.koreanHold, image: $0.imageName, isChecked: false) }
-        print("Hold data: \(holdTextImageData)")
 
         if let selectedIndexes = try? selectedHoldItems.value() {
             for index in selectedIndexes {
@@ -128,8 +134,7 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
                 }
             }
         }
- 
-
+        
         cellData.onNext(holdTextImageData)
     }
 
@@ -148,7 +153,6 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
                 }
                 currentItems[index].isChecked = true
             }
-
 
             let selectedIndexes = currentItems.indices.filter { currentItems[$0].isChecked }
 

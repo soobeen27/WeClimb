@@ -9,5 +9,9 @@ import Swinject
 
 final class GymUseCaseAssembly: Assembly {
     func assemble(container: Container) {
+        container.register(FetchGymInfoUseCase.self) { resolver in
+            FetchGymInfoUseCaseImpl(gymRepository: resolver.resolve(GymRepository.self)!
+            )
+        }
     }
 }

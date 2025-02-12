@@ -44,6 +44,7 @@ final class AppDIContainer {
             UploadAssembly(),
             UserPageAssembly(),
             TabBarAssembly(),
+            LevelHoldFilterAssembly(),
         ], container: container)
     }
     
