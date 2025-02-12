@@ -19,20 +19,21 @@ class UserFeedTableCell: UITableViewCell {
     
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .darkGray
+        label.font = UserPageConst.FeedCell.Font.dateLabelFont
+        label.textColor = UserPageConst.FeedCell.Color.dateLabelFontColor
         return label
     }()
     
     private let likeImage: UIImageView = {
-        let img = UIImageView(image: UIImage(systemName: "heart.fill"))
-        img.tintColor = .lightGray
+        let img = UIImageView()
+        img.image = UserPageConst.FeedCell.Image.likeImage
         return img
     }()
     
     private let likeCountLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        label.font = UserPageConst.FeedCell.Font.valueLabelFont
+        label.textColor = UserPageConst.FeedCell.Color.valueLabelFontColor
         return label
     }()
     
@@ -45,14 +46,15 @@ class UserFeedTableCell: UITableViewCell {
     }()
     
     private let commentImage: UIImageView = {
-        let img = UIImageView(image: UIImage(systemName: "message.fill"))
-        img.tintColor = .lightGray
+        let img = UIImageView()
+        img.image = UserPageConst.FeedCell.Image.commentImage
         return img
     }()
     
     private let commentCountLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        label.font = UserPageConst.FeedCell.Font.valueLabelFont
+        label.textColor = UserPageConst.FeedCell.Color.valueLabelFontColor
         return label
     }()
     
@@ -66,9 +68,9 @@ class UserFeedTableCell: UITableViewCell {
     
     private let captionLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.textColor = .black
-        label.numberOfLines = 0
+        label.font = UserPageConst.FeedCell.Font.captionLabelFont
+        label.textColor = UserPageConst.FeedCell.Color.captionLabelFontColor
+        label.numberOfLines = 1
         return label
     }()
     

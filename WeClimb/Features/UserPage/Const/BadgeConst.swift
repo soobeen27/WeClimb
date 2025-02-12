@@ -39,5 +39,9 @@ enum BadgeConst {
         static let locaction: UIImage? =
         UIImage.locationIconFill.resize(targetSize: BadgeConst.Size.badgeImage)?
             .withTintColor(BadgeConst.Color.text)
+        
+        static let markerImage: UIImage? = UIImage.locationIconFill
+            .resize(targetSize: CGSize(width: Size.gymNameMarkerHeight, height: Size.gymNameMarkerHeight))?
+            .withTintColor(Color.gymNameMarkerColor, renderingMode: .alwaysOriginal)
     }
 }

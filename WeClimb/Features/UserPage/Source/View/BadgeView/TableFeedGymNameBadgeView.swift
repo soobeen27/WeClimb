@@ -26,28 +26,24 @@ class TableFeedGymNameBadgeView: UIView {
     }()
     
     private let markerImageView: UIImageView = {
-        let imageView = UIImageView(image: .locationIconFill)
-        imageView.backgroundColor = .clear
-        imageView.tintColor = BadgeConst.Color.gymNameMarkerColor
-        imageView.image = imageView.image?.withRenderingMode(.alwaysTemplate)
+        let imageView = UIImageView()
+        imageView.image = BadgeConst.Image.markerImage
         return imageView
     }()
     
-    init() {
+    init(gymNameText: String? = nil) {
         super.init(frame: .zero)
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+        self.gymNameText = gymNameText
         setLayout()
     }
     
-    required init?(coder: NSCoder) {
+    required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     private func setLayout() {
         self.backgroundColor = BadgeConst.Color.gymNameBackgroundColor
+        self.layer.cornerRadius = 8
         
         [
             gymName,
@@ -55,13 +51,15 @@ class TableFeedGymNameBadgeView: UIView {
         ].forEach { self.addSubview($0) }
         
         markerImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(BadgeConst.Spacing.gymNameMargin)
+            $0.leading.equalToSuperview().offset(10)
             $0.width.height.equalTo(BadgeConst.Size.gymNameMarkerHeight)
+            $0.centerY.equalToSuperview()
         }
         
         gymName.snp.makeConstraints {
-            $0.leading.equalTo(markerImageView.snp.trailing).offset(BadgeConst.Spacing.gymNameValueMargin)
+            $0.leading.equalTo(markerImageView.snp.trailing).offset(5)
             $0.trailing.equalToSuperview().offset(-BadgeConst.Spacing.gymNameMargin)
+            $0.centerY.equalToSuperview()
         }
     }
 }

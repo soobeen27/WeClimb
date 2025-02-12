@@ -54,6 +54,40 @@ enum UserPageConst {
                 .resize(targetSize: CGSize(width: Size.symbolSize, height: Size.symbolSize))?
                 .withTintColor(Color.homeGymSettingSymbolColor, renderingMode: .alwaysOriginal)
         }
+    }
+    
+    enum FeedCell {
+        enum Text {
+            static let userNameLabelFont = UIFont.customFont(style: .heading2SemiBold)
+            static let userNameLabelColor: UIColor = UIColor.labelStrong
+            
+            
+        }
         
+        enum Font {
+            static let dateLabelFont = UIFont.customFont(style: .caption1Medium)
+            static let valueLabelFont = UIFont.customFont(style: .caption1Regular)
+            static let captionLabelFont = UIFont.customFont(style: .body2Medium)
+        }
+        
+        enum Color {
+            static let dateLabelFontColor: UIColor = UIColor.labelNeutral
+            static let symbolColor: UIColor = UIColor.labelAlternative
+            static let valueLabelFontColor: UIColor = UIColor.labelAlternative
+            static let captionLabelFontColor: UIColor = UIColor.labelNormal
+        }
+        
+        enum Size {
+            static let symbolSize: CGFloat = 12
+        }
+        enum Image {
+            static let likeImage: UIImage? = UIImage.heartIcon
+                .resize(targetSize: CGSize(width: Size.symbolSize, height: Size.symbolSize))?
+                .withTintColor(Color.symbolColor, renderingMode: .alwaysOriginal)
+            
+            static let commentImage: UIImage? = UIImage.commentIcon
+                .resize(targetSize: CGSize(width: Size.symbolSize, height: Size.symbolSize))?
+                .withTintColor(Color.symbolColor, renderingMode: .alwaysOriginal)
+        }
     }
 }
