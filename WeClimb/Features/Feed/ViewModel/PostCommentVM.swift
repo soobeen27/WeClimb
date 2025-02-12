@@ -57,7 +57,15 @@ class PostCommentVMImpl: PostCommentVM {
     let cellDatasRelay = BehaviorRelay<[CommentCellData]>.init(value: [])
     private var postItem: PostItem?
     
-    init(addCommentUseCase: AddCommentUseCase, fetchCommentUseCase: FetchCommentUseCase, deleteCommentUseCase: DeleteCommentUseCase, userInfoFromUIDUseCase: UserInfoFromUIDUseCase, myUserInfoUseCase: MyUserInfoUseCase, myUIDUseCase: MyUIDUseCase, userReportUseCase: UserReportUseCase, addBlackListUseCase: AddBlackListUseCase) {
+    init(addCommentUseCase: AddCommentUseCase,
+         fetchCommentUseCase: FetchCommentUseCase,
+         deleteCommentUseCase: DeleteCommentUseCase,
+         userInfoFromUIDUseCase: UserInfoFromUIDUseCase,
+         myUserInfoUseCase: MyUserInfoUseCase,
+         myUIDUseCase: MyUIDUseCase,
+         userReportUseCase: UserReportUseCase,
+         addBlackListUseCase: AddBlackListUseCase)
+    {
         self.addCommentUseCase = addCommentUseCase
         self.fetchCommentUseCase = fetchCommentUseCase
         self.deleteCommentUseCase = deleteCommentUseCase

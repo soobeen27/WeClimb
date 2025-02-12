@@ -21,5 +21,8 @@ final class PostDataSourceAssembly: Assembly {
         container.register(FetchMediasDataSource.self) { _ in
             FetchMediasDataSourceImpl()
         }
+        container.register(PostDeleteDataSource.self) { _ in
+            PostDeleteDataSourceImpl()
+        }
     }
 }

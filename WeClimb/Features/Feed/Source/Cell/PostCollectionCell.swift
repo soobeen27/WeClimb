@@ -57,6 +57,8 @@ class PostCollectionCell: UICollectionViewCell {
     
     let currentPost = BehaviorRelay<PostItem?>(value: nil)
     
+    let additonalButtonTapped = BehaviorRelay<(postItem: PostItem, isMine: Bool)?>(value: nil)
+    
     private var user: User? {
         didSet {
             guard let user, let postItem else { return }
@@ -114,6 +116,8 @@ class PostCollectionCell: UICollectionViewCell {
         disposeBag = DisposeBag()
         caption = nil
         mediaCollectionView.setContentOffset(.zero, animated: false)
+        additonalButtonTapped.accept(nil)
+        currentPost.accept(nil)
     }
     
     func configure(postItem: PostItem, postCollectionCellVM: PostCollectionCellVM) {
@@ -137,7 +141,9 @@ class PostCollectionCell: UICollectionViewCell {
             postItem: postItem,
             likeButtonTap: postSidebarView.likeButtonTap,
             currentMediaIndex: currentMediaIndexRelay,
-            commentButtonTap: postSidebarView.commentButtonTap)
+            commentButtonTap: postSidebarView.commentButtonTap,
+            additionalButtonTap: postSidebarView.additionalActionButtonTap
+        )
         )
         
         output.user
@@ -177,6 +183,8 @@ class PostCollectionCell: UICollectionViewCell {
         output.currentPost
             .bind(to: currentPost)
             .disposed(by: disposeBag)
+        
+        output.addtionalButtonTapData.bind(to: additonalButtonTapped).disposed(by: disposeBag)
     }
     
     private func bindSnapShot(mediaItems: [MediaItem]) {

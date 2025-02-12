@@ -15,5 +15,8 @@ final class PostUseCaseAssembly: Assembly {
         container.register(FetchMediasUseCase.self) { resolver in
             FetchMediasUseCaseImpl(fetchMediasRepository: resolver.resolve(FetchMediasRepository.self)!)
         }
+        container.register(PostDeleteUseCase.self) { resolver in
+            PostDeleteUseCaseImpl(postDeleteRepository: resolver.resolve(PostDeleteRepository.self)!)
+        }
     }
 }

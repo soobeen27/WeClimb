@@ -11,7 +11,12 @@ final class FeedAssembly: Assembly {
     func assemble(container: Container) {
         container.register(FeedVM.self) { resolver in
             FeedVMImpl(mainFeedUseCase: resolver.resolve(MainFeedUseCase.self)!,
-                       myUserInfo: resolver.resolve(MyUserInfoUseCase.self)!)
+                       myUserInfo: resolver.resolve(MyUserInfoUseCase.self)!,
+                       userReportUseCase: resolver.resolve(UserReportUseCase.self)!,
+                       addBlackListUseCase: resolver.resolve(AddBlackListUseCase.self)!,
+                       postDeleteUseCase: resolver.resolve(PostDeleteUseCase.self)!,
+                       myUIDUseCase: resolver.resolve(MyUIDUseCase.self)!
+            )
         }
         
         container.register(PostCollectionCellVM.self) { resolver in
