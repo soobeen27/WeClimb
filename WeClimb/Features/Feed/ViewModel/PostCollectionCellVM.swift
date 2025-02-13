@@ -16,6 +16,7 @@ protocol PostCollectionCellInput {
     var likeButtonTap: ControlEvent<Void> { get }
     var currentMediaIndex: BehaviorRelay<Int> { get }
     var commentButtonTap: ControlEvent<Void> { get }
+    var additionalButtonTap: ControlEvent<Void> { get }
 }
 
 protocol PostCollectionCellOutput {
@@ -25,6 +26,7 @@ protocol PostCollectionCellOutput {
     var mediaItems: Observable<[MediaItem]> { get }
     var levelHoldImages: Observable<(level: UIImage?, hold: UIImage?)> { get }
     var currentPost: BehaviorRelay<PostItem?> { get }
+    var addtionalButtonTapData: Observable<(postItem: PostItem, isMine: Bool)?> { get }
 }
 
 protocol PostCollectionCellVM {
@@ -44,7 +46,8 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         let postItem: PostItem
         let likeButtonTap: ControlEvent<Void>
         let currentMediaIndex: BehaviorRelay<Int>
-        var commentButtonTap: ControlEvent<Void>
+        let commentButtonTap: ControlEvent<Void>
+        let additionalButtonTap: ControlEvent<Void>
     }
     
     struct Output: PostCollectionCellOutput {
@@ -53,7 +56,8 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         let isLike: BehaviorRelay<Bool?>
         let mediaItems: Observable<[MediaItem]>
         let levelHoldImages: Observable<(level: UIImage?, hold: UIImage?)>
-        var currentPost: BehaviorRelay<PostItem?>
+        let currentPost: BehaviorRelay<PostItem?>
+        let addtionalButtonTapData: Observable<(postItem: PostItem, isMine: Bool)?>
     }
 
     init(userInfoFromUIDUseCase: UserInfoFromUIDUseCase, myUIDUseCase: MyUIDUseCase, likePostUseCase: LikePostUseCase, fetchMediasUseCase: FetchMediasUseCase) {
@@ -89,7 +93,8 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
             isLike: isLike,
             mediaItems: Observable.error(FirebaseError.documentNil),
             levelHoldImages: Observable.just((UIImage.closeIcon, UIImage.closeIcon)),
-            currentPost: BehaviorRelay<PostItem?>.init(value: nil)
+            currentPost: BehaviorRelay<PostItem?>.init(value: nil),
+            addtionalButtonTapData: Observable.just(nil)
         )}
 
         let refs = pathToRef(paths: paths)
@@ -116,13 +121,27 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
             .map { input.postItem }
             .bind(to: currentPost)
             .disposed(by: disposeBag)
+//        (postItem: PostItem, type: FeedMenuSelection)
+        let addtionalButtonTapData = input.additionalButtonTap
+            .flatMap{ [weak self] () -> Observable<(postItem: PostItem, isMine: Bool)?> in
+                guard let self else { return Observable.just(nil) }
+                let isMine = self.isMyPost(uid: input.postItem.authorUID)
+                return Observable.just((postItem: input.postItem, isMine: isMine))
+            }
         
+//        input.additionalButtonTap
+//            .subscribe(onNext: { [weak self] in
+//                guard let self else { return }
+//                self.isMyPost(uid: input.postItem.authorUID)
+//            })
+//            .disposed(by: disposeBag)
                 
         return Output(
             user: user, likeCount: likeCount,
             isLike: isLike, mediaItems: medias,
             levelHoldImages: levelHoldImages,
-            currentPost: currentPost
+            currentPost: currentPost,
+            addtionalButtonTapData: addtionalButtonTapData
         )
     }
     
@@ -164,5 +183,10 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
     }
     private func holdStringToImage(_ string: String) -> UIImage {
         LHColors.fromHoldEng(string).toImage()
+    }
+    
+    private func isMyPost(uid: String) -> Bool {
+        guard let myUID else { return false }
+        return myUID == uid
     }
 }

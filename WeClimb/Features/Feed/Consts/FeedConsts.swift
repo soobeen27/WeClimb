@@ -119,7 +119,32 @@ enum FeedConsts {
         enum Text {
             static let slash: String = "/"
         }
+    }
+    
+    enum Menu {
+        enum Text {
+            static let delete = "삭제하기"
+            static let report = "신고하기"
+            static let block = "차단하기"
+        }
         
+        enum Color {
+            static let background: UIColor = UIColor.fillSolidLightWhite
+            static let text: UIColor = UIColor.labelNeutral
+            static let seperator: UIColor = UIColor.lineSolidLight
+        }
+        enum Font {
+            static let text: UIFont = UIFont.customFont(style: .label2Medium)
+        }
+        enum Size {
+            static let width: CGFloat = 250
+            static let padding: CGFloat = 16
+            static let cornerRadius: CGFloat = 15
+            static let textLabelWidth: CGFloat = 218
+        }
         
+        enum Constraint {
+            static let bottom: CGFloat = 190
+        }
     }
 }
