@@ -9,7 +9,7 @@ import Foundation
 
 protocol UploadBuilder {
     func buildUploadMedia(gymItem: SearchResultItem) -> UploadMediaVC
-    func buildUploadPost(gymName: String) -> UploadPostVC
+    func buildUploadPost(gymName: String, mediaItems: [MediaUploadData]) -> UploadPostVC
     func buildUploadMenuView() -> UploadMenuVC
 }
 
@@ -30,8 +30,8 @@ final class UploadBuilderImpl: UploadBuilder {
         return UploadMediaVC(gymItem: gymItem, viewModel: viewModel)
     }
     
-    func buildUploadPost(gymName: String) -> UploadPostVC {
-        let viewModel: UploadVM = container.resolve(UploadVM.self)
-        return UploadPostVC(gymName: gymName, viewModel: viewModel)
+    func buildUploadPost(gymName: String, mediaItems: [MediaUploadData]) -> UploadPostVC {
+        let viewModel: UploadPostVM = container.resolve(UploadPostVM.self)
+        return UploadPostVC(gymName: gymName, mediaItems: mediaItems, viewModel: viewModel)
     }
 }

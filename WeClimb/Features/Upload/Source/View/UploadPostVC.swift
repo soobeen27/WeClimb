@@ -9,12 +9,14 @@ import UIKit
 
 import SnapKit
 import RxSwift
+import RxRelay
 
 class UploadPostVC: UIViewController {
     var coordinator: UploadPostCoordinator?
     
     private let gymName: String
-    private let viewModel: UploadVM
+    private let mediaItems: [MediaUploadData]
+    private let viewModel: UploadPostVM
     private var disposeBag = DisposeBag()
     
     private let topSeparatorLine: UIView = {
@@ -85,8 +87,12 @@ class UploadPostVC: UIViewController {
         return view
     }()
     
-    init(gymName: String, viewModel: UploadVM) {
+    private let captionTextSubject = PublishRelay<String>()
+    private let submitButtonTap = PublishRelay<Void>()
+    
+    init(gymName: String, mediaItems: [MediaUploadData], viewModel: UploadPostVM) {
         self.gymName = gymName
+        self.mediaItems = mediaItems
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -101,7 +107,8 @@ class UploadPostVC: UIViewController {
         setLayout()
         self.uploadTextView.textView.delegate = self
         setupKeyboardObservers()
-        bindCell()
+//        bindCell()
+        bindViewModel()
     }
     
     deinit {
@@ -163,19 +170,49 @@ class UploadPostVC: UIViewController {
         return layout
     }
     
-    private func bindCell() {
-        self.viewModel.mediaUploadDataRelay
+    private func bindViewModel() {
+        let input = UploadPostVMImpl.Input(
+            submitButtonTap: submitButton.rx.tap.asObservable(),
+            captionText: uploadTextView.textView.rx.text.orEmpty.asObservable(),
+            gymName: gymName,
+            mediaItems: mediaItems
+        )
+
+        let output = viewModel.transform(input: input)
+
+        output.uploadResult
             .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] result in
+                switch result {
+                case .success:
+                    print("게시물이 성공적으로 업로드됨")
+                    self?.navigationController?.popToRootViewController(animated: true)
+                case .failure(let error):
+                    print("게시물 업로드 실패: \(error.localizedDescription)")
+                }
+            })
+            .disposed(by: disposeBag)
+
+        Observable.just(mediaItems)
             .bind(to: collectionView.rx.items(
                 cellIdentifier: UploadPostCollectionCell.className,
                 cellType: UploadPostCollectionCell.self)
             ) { row, data, cell in
-//                print(" mediaUploadDataRelay 업데이트됨: \(data)개의 항목")
                 cell.configure(with: data)
             }
             .disposed(by: disposeBag)
     }
 
+//    private func bindCell() {
+//           Observable.just(mediaItems)
+//               .bind(to: collectionView.rx.items(
+//                   cellIdentifier: UploadPostCollectionCell.className,
+//                   cellType: UploadPostCollectionCell.self)
+//               ) { row, data, cell in
+//                   cell.configure(with: data)
+//               }
+//               .disposed(by: disposeBag)
+//       }
     
     private func setLayout() {
         view.backgroundColor = UIColor.fillSolidDarkBlack

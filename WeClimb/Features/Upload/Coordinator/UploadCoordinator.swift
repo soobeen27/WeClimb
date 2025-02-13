@@ -125,8 +125,8 @@ final class UploadCoordinator: BaseCoordinator {
             uploadMediaCoordinator.onLevelHoldFiltersApplied?(levelFilters, holdFilters)
         }
         
-        uploadMediaCoordinator.onFinish = {
-            self.navigateToUploadPostVC(gymName: gymItem.name)
+        uploadMediaCoordinator.onFinish = { [weak self] mediaData in
+            self?.navigateToUploadPostVC(gymName: gymItem.name, mediaItems: mediaData)
         }
     }
     
@@ -162,13 +162,12 @@ final class UploadCoordinator: BaseCoordinator {
         }
     }
     
-    private func navigateToUploadPostVC(gymName: String) {
+    func navigateToUploadPostVC(gymName: String, mediaItems: [MediaUploadData]) {
         let uploadPostCoordinator = UploadPostCoordinator(
-            navigationController: navigationController, gymName: gymName, builder: builder)
+            navigationController: navigationController, gymName: gymName, mediaItems: mediaItems, builder: builder)
         addDependency(uploadPostCoordinator)
         uploadPostCoordinator.start()
     }
-    
 }
 
 extension UploadCoordinator {

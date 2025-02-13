@@ -16,7 +16,7 @@ class UploadMediaVC: UIViewController {
     var coordinator: UploadMediaCoordinator?
     
     var onBackButton: (() -> Void)?
-    var onNextButton: (() -> Void)?
+    var onNextButton: (([MediaUploadData]) -> Void)?
     
     var onLevelFilter: ((String) -> String)?
     var onHoldFilter: ((String) -> String)?
@@ -204,7 +204,7 @@ class UploadMediaVC: UIViewController {
         )
 
         let output = viewModel.transform(input: input)
-
+        
         output.mediaItems
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] mediaItems in
@@ -216,6 +216,14 @@ class UploadMediaVC: UIViewController {
                 } else {
                     self.reloadMediaUI()
                 }
+            })
+            .disposed(by: disposeBag)
+        
+        output.alertTrigger
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] in
+                self?.showAlert()
+                self?.reloadMediaUI()
             })
             .disposed(by: disposeBag)
         
@@ -258,13 +266,26 @@ class UploadMediaVC: UIViewController {
             self?.selectedMediaIndexSubject.onNext(index)
         }
     }
+
+    private func showAlert() {
+        let alert = DefaultAlertVC(alertType: .titleDescription, interfaceStyle: .dark)
+        alert.setTitle("영상 길이 초과", "2분 이내의 영상을 업로드해주세요.")
+        alert.setCustomButtonTitle("확인")
+        alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  //StatusNegative
+        
+        alert.modalPresentationStyle = .overCurrentContext
+        alert.modalTransitionStyle = .crossDissolve
+        present(alert, animated: false, completion: nil)
+    }
     
     private func bindOptionButtonActions() {
         uploadOptionView.didTapBackButton = { [weak self] in
             self?.onBackButton?()
         }
+        
         uploadOptionView.didTapNextButton = { [weak self] in
-            self?.onNextButton?()
+            let selectedMediaItems = self?.viewModel.mediaUploadDataRelay.value ?? []
+            self?.onNextButton?(selectedMediaItems)
         }
         
         uploadOptionView.selectedLevelButton = { [weak self] in
@@ -350,14 +371,11 @@ class UploadMediaVC: UIViewController {
 
 extension UploadMediaVC: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        let mediaData: [(index: Int, mediaItem: PHPickerResult)] = results.enumerated().map { (index, mediaItem) in
-            return (index, mediaItem)
-        }
-        
-        let pickedMediaItems = mediaData.map { $0.mediaItem }
-        
-        mediaItemsSubject.onNext(pickedMediaItems)
+//        print("선택된 미디어 개수: \(results.count)")
 
+        self.mediaItemsSubject.onNext(results)
+        
         picker.dismiss(animated: true)
     }
 }
+

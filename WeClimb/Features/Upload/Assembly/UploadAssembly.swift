@@ -9,13 +9,40 @@ import Swinject
 
 final class UploadAssembly: Assembly {
     func assemble(container: Container) {
-//        container.register(UploadVM.self) { resolver in
-//            UploadVMImpl()
-//        }
-        container.register(UploadVM.self) { _ in
-            UploadVMImpl()
-        }.inObjectScope(.container)
+        container.register(UploadPostDataSource.self) { _ in
+            UploadPostDataSourceImpl()
+        }
+        
+        container.register(UserReadDataSource.self) { _ in
+            UserReadDataSourceImpl()
+        }
+        
+        container.register(UploadPostRepository.self) { resolver in
+            UploadPostRepositoryImpl(uploadPostDataSource: resolver.resolve(UploadPostDataSource.self)!)
+        }
+        
+        container.register(UserReadRepository.self) { resolver in
+            UserReadRepositoryImpl(userReadDataSource: resolver.resolve(UserReadDataSource.self)!)
+        }
 
+        container.register(UploadPostUseCase.self) { resolver in
+            UploadPostUseCaseImpl(uploadPostRepository: resolver.resolve(UploadPostRepository.self)!
+            )
+        }
+
+        container.register(MyUserInfoUseCase.self) { resolver in
+            MyUserInfoUseCaseImpl(userReadRepository: resolver.resolve(UserReadRepository.self)!
+            )
+        }
+        
+        container.register(UploadVM.self) { resolver in
+            UploadVMImpl()
+        }
+        
+        container.register(UploadPostVM.self) { resolver in
+            UploadPostVMImpl(uploadPostUseCase: resolver.resolve(UploadPostUseCase.self)!,
+                             myUserInfoUseCase: resolver.resolve(MyUserInfoUseCase.self)!)
+        }
     }
 }
 

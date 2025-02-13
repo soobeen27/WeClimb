@@ -12,16 +12,17 @@ final class UploadPostCoordinator: BaseCoordinator {
     private let builder: UploadBuilder
     
     private let gymName: String
-//    private let mediaItems: [MediaUploadData]
+    private let mediaItems: [MediaUploadData]
     
-    init(navigationController: UINavigationController, gymName: String, builder: UploadBuilder) {
+    init(navigationController: UINavigationController, gymName: String, mediaItems: [MediaUploadData], builder: UploadBuilder) {
         self.navigationController = navigationController
         self.gymName = gymName
         self.builder = builder
+        self.mediaItems = mediaItems
     }
     
     override func start() {
-        let uploadPostVC = builder.buildUploadPost(gymName: gymName)
+        let uploadPostVC = builder.buildUploadPost(gymName: gymName, mediaItems: mediaItems)
         uploadPostVC.coordinator = self
         navigationController.pushViewController(uploadPostVC, animated: true)
     }

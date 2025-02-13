@@ -22,6 +22,7 @@ struct MediaUploadData {
     var hold: String?
     var grade: String?
     let thumbnailURL: URL?
+    let capturedAt: Date?
 }
 
 protocol UploadPostDataSource {

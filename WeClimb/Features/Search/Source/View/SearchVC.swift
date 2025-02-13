@@ -167,6 +167,11 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         backButton.tintColor = .white
         
         navigationItem.leftBarButtonItem = backButton
+        
+        view.backgroundColor = UIColor.fillSolidDarkBlack
+        self.tableView.backgroundColor = UIColor.fillSolidDarkBlack
+        self.searchTextField.textColor = UIColor.white
+        self.titleLabel.textColor = UIColor.white
     }
     
     @objc private func didTapCloseButton() {
