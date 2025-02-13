@@ -107,7 +107,6 @@ class UploadPostVC: UIViewController {
         setLayout()
         self.uploadTextView.textView.delegate = self
         setupKeyboardObservers()
-//        bindCell()
         bindViewModel()
     }
     
@@ -171,9 +170,11 @@ class UploadPostVC: UIViewController {
     }
     
     private func bindViewModel() {
+        let submitTap = submitButton.rx.tap.asObservable()
+
         let input = UploadPostVMImpl.Input(
-            submitButtonTap: submitButton.rx.tap.asObservable(),
-            captionText: uploadTextView.textView.rx.text.orEmpty.asObservable(),
+            submitButtonTap: submitTap,
+            captionText: submitTap.withLatestFrom(uploadTextView.textView.rx.text.orEmpty),
             gymName: gymName,
             mediaItems: mediaItems
         )
@@ -202,17 +203,6 @@ class UploadPostVC: UIViewController {
             }
             .disposed(by: disposeBag)
     }
-
-//    private func bindCell() {
-//           Observable.just(mediaItems)
-//               .bind(to: collectionView.rx.items(
-//                   cellIdentifier: UploadPostCollectionCell.className,
-//                   cellType: UploadPostCollectionCell.self)
-//               ) { row, data, cell in
-//                   cell.configure(with: data)
-//               }
-//               .disposed(by: disposeBag)
-//       }
     
     private func setLayout() {
         view.backgroundColor = UIColor.fillSolidDarkBlack

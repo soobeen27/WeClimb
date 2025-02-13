@@ -45,58 +45,63 @@ final class UploadVMImpl : UploadVM {
     private let disposeBag = DisposeBag()
     
     private let mediaItemsRelay = BehaviorRelay<[PHPickerResult]>(value: [])
- private let alertTriggerRelay = PublishRelay<Void>()
+    private let alertTriggerRelay = PublishRelay<Void>()
     var mediaUploadDataRelay = BehaviorRelay<[MediaUploadData]>(value: [])
+    
+    func transform(input: UploadInput) -> UploadOutput {
         
-        func transform(input: UploadInput) -> UploadOutput {
-            
-            input.mediaSelection
-                .subscribe(onNext: { [weak self] mediaItems in
-                    self?.mediaItemsRelay.accept(mediaItems)
-                    self?.processMediaItems(mediaItems: mediaItems)
-                })
-                .disposed(by: disposeBag)
-            
-            input.gradeSelection
-                .subscribe(onNext: { [weak self] (index, newGrade) in
-                    guard let self = self else { return }
-                    
-                    var mediaList = self.mediaUploadDataRelay.value
-                    guard index >= 0, index < mediaList.count else { return }
-
-                    if mediaList[index].grade == newGrade { return }
-
-                    var updatedMedia = mediaList[index]
-                    updatedMedia.grade = newGrade
-                    mediaList[index] = updatedMedia
-
-                    self.mediaUploadDataRelay.accept(mediaList)
-                })
-                .disposed(by: disposeBag)
-
-            input.holdSelection
-                .subscribe(onNext: { [weak self] (index, newHold) in
-                    guard let self = self else { return }
-                    
-                    var mediaList = self.mediaUploadDataRelay.value
-                    guard index >= 0, index < mediaList.count else { return }
-
-                    if mediaList[index].hold == newHold { return }
-                    
-                    var updatedMedia = mediaList[index]
-                    updatedMedia.hold = newHold
-                    mediaList[index] = updatedMedia
-
-                    self.mediaUploadDataRelay.accept(mediaList)
-                })
-                .disposed(by: disposeBag)
-
-            return Output(
-                mediaItems: mediaUploadDataRelay.asObservable(),
-                alertTrigger: alertTriggerRelay.asObservable()
-            )
-        }
-
+        input.mediaSelection
+            .subscribe(onNext: { [weak self] mediaItems in
+                self?.mediaItemsRelay.accept(mediaItems)
+                self?.processMediaItems(mediaItems: mediaItems)
+            })
+            .disposed(by: disposeBag)
+        
+        input.gradeSelection
+            .subscribe(onNext: { [weak self] (index, newGrade) in
+                guard let self = self else { return }
+                
+                var mediaList = self.mediaUploadDataRelay.value
+                guard index >= 0, index < mediaList.count else { return }
+                
+                let convertedGrade = LHColors.fromKoreanFull(newGrade).toEng()
+                
+                if mediaList[index].grade == convertedGrade { return }
+                
+                var updatedMedia = mediaList[index]
+                updatedMedia.grade = convertedGrade
+                mediaList[index] = updatedMedia
+                
+                self.mediaUploadDataRelay.accept(mediaList)
+            })
+            .disposed(by: disposeBag)
+        
+        input.holdSelection
+            .subscribe(onNext: { [weak self] (index, newHold) in
+                guard let self = self else { return }
+                guard let newHold = newHold else { return }
+                
+                var mediaList = self.mediaUploadDataRelay.value
+                guard index >= 0, index < mediaList.count else { return }
+                
+                let convertedHold = LHColors.fromKoreanFull(newHold).toHoldEng()
+                
+                if mediaList[index].hold == convertedHold { return }
+                
+                var updatedMedia = mediaList[index]
+                updatedMedia.hold = convertedHold
+                mediaList[index] = updatedMedia
+                
+                self.mediaUploadDataRelay.accept(mediaList)
+            })
+            .disposed(by: disposeBag)
+        
+        return Output(
+            mediaItems: mediaUploadDataRelay.asObservable(),
+            alertTrigger: alertTriggerRelay.asObservable()
+        )
+    }
+    
     private func processMediaItems(mediaItems: [PHPickerResult]) {
         let group = DispatchGroup()
         var models = [MediaUploadData?](repeating: nil, count: mediaItems.count)
@@ -156,11 +161,11 @@ final class UploadVMImpl : UploadVM {
                     }
                     
                     let capturedAt = getCapturedDate(from: url)
-
+                    
                     let tempImageURL = FileManager.default.temporaryDirectory
                         .appendingPathComponent(UUID().uuidString)
                         .appendingPathExtension("jpg")
-
+                    
                     do {
                         try FileManager.default.copyItem(at: url, to: tempImageURL)
                         
@@ -191,7 +196,7 @@ final class UploadVMImpl : UploadVM {
 }
 
 extension UploadVMImpl {
-
+    
     func getCapturedDate(from imageURL: URL) -> Date? {
         guard let imageSource = CGImageSourceCreateWithURL(imageURL as CFURL, nil),
               let imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any] else {
@@ -211,10 +216,10 @@ extension UploadVMImpl {
         
         let attributes = try? FileManager.default.attributesOfItem(atPath: imageURL.path)
         let creationDate = attributes?[.creationDate] as? Date
-
+        
         return creationDate
     }
-
+    
     private func parseExifDate(_ dateString: String) -> Date? {
         let possibleFormats = [
             "yyyy:MM:dd HH:mm:ss",
@@ -225,7 +230,7 @@ extension UploadVMImpl {
         
         let formatter = DateFormatter()
         formatter.timeZone = TimeZone(identifier: "UTC")
-
+        
         for format in possibleFormats {
             formatter.dateFormat = format
             if let date = formatter.date(from: dateString) {

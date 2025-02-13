@@ -281,6 +281,7 @@ class UploadMediaVC: UIViewController {
     private func bindOptionButtonActions() {
         uploadOptionView.didTapBackButton = { [weak self] in
             self?.onBackButton?()
+            VideoManager.shared.stopVideo()
         }
         
         uploadOptionView.didTapNextButton = { [weak self] in

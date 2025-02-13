@@ -241,7 +241,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                 let cell: UITableViewCell
                 if item.type == .gym {
                     let gymCell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className, for: IndexPath(row: row, section: SearchConst.defaultSectionNumbers)) as! SearchGymTableCell
-                    gymCell.configure(with: item)
+                    gymCell.configure(with: item, searchStyle: self.searchStyle)
                     
                     gymCell.onDelete = { [weak self] itemToDelete in
                         self?.deleteItem(itemToDelete, at: row)
@@ -250,7 +250,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                     cell = gymCell
                 } else {
                     let userCell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className, for: IndexPath(row: row, section: SearchConst.defaultSectionNumbers)) as! SearchUserTableCell
-                    userCell.configure(with: item)
+                    userCell.configure(with: item, searchStyle: self.searchStyle)
                     
                     userCell.onDelete = { [weak self] itemToDelete in
                         self?.deleteItem(itemToDelete, at: row)
@@ -320,12 +320,16 @@ class SearchVC: UIViewController, UITextFieldDelegate {
 
 extension SearchVC {
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        searchTextField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
-        searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
-        
+//        if searchStyle != .uploadSearch {
+//            searchTextField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
+//            searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
+//        }
         if searchStyle == .uploadSearch {
             return
         }
+        
+        searchTextField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
+        searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
         
         self.searchTextField.snp.updateConstraints {
             $0.leading.equalToSuperview().offset(SearchConst.Search.Spacing.textFieldSpacing)

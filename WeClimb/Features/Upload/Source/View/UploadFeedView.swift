@@ -105,16 +105,19 @@ class UploadFeedView: UIView {
                 cell.configure(with: data)
             }
             .disposed(by: disposeBag)
-        
+
         self.viewModel.mediaUploadDataRelay
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] mediaItems in
                 guard let self = self else { return }
-                
+
                 if !mediaItems.isEmpty {
                     self.totalMediaCount = mediaItems.count
                     self.updateCurrentIndex()
-                    self.playFirstMedia()
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        self.playFirstMedia()
+                    }
                 }
             })
             .disposed(by: disposeBag)
@@ -162,6 +165,8 @@ extension UploadFeedView: UICollectionViewDelegate {
         targetX = round(targetX / moveDistance) * moveDistance
         
         targetContentOffset.pointee.x = targetX
+        
+        VideoManager.shared.stopVideo()
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
