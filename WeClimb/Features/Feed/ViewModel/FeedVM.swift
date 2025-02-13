@@ -13,10 +13,13 @@ import RxCocoa
 
 protocol FeedInput {
     var fetchType: BehaviorRelay<FetchPostType> { get }
+    var additionalButtonTap: Observable<(postItem: PostItem, isMine: Bool)?> { get }
+    var additionalButtonTapType: PublishRelay<FeedMenuSelection> { get }
 }
 
 protocol FeedOutput {
     var postItems: BehaviorRelay<[PostItem]> { get }
+    var isMine: Observable<Bool> { get }
 }
 
 protocol FeedVM {
@@ -56,24 +59,44 @@ class FeedVMImpl: FeedVM {
     private let disposeBag = DisposeBag()
     private let mainFeedUseCase: MainFeedUseCase
     private let myUserInfo: MyUserInfoUseCase
+    private let userReportUseCase: UserReportUseCase
+    private let addBlackListUseCase: AddBlackListUseCase
+    private let postDeleteUseCase: PostDeleteUseCase
+    private let myUIDUseCase: MyUIDUseCase
     
     private let postItemRelay: BehaviorRelay<[PostItem]> = .init(value: [])
     
-    init(mainFeedUseCase: MainFeedUseCase, myUserInfo: MyUserInfoUseCase) {
+    init(mainFeedUseCase: MainFeedUseCase,
+         myUserInfo: MyUserInfoUseCase,
+         userReportUseCase: UserReportUseCase,
+         addBlackListUseCase: AddBlackListUseCase,
+         postDeleteUseCase: PostDeleteUseCase,
+         myUIDUseCase: MyUIDUseCase
+    )
+    {
         self.mainFeedUseCase = mainFeedUseCase
         self.myUserInfo = myUserInfo
+        self.userReportUseCase = userReportUseCase
+        self.addBlackListUseCase = addBlackListUseCase
+        self.postDeleteUseCase = postDeleteUseCase
+        self.myUIDUseCase = myUIDUseCase
         fetchPost(type: .initial)
     }
     
     struct Input: FeedInput {
         let fetchType: BehaviorRelay<FetchPostType>
+        let additionalButtonTap: Observable<(postItem: PostItem, isMine: Bool)?>
+        let additionalButtonTapType: PublishRelay<FeedMenuSelection>
     }
     
     struct Output: FeedOutput {
         let postItems: BehaviorRelay<[PostItem]>
+        let isMine: Observable<Bool>
     }
     
     func transform(input: FeedInput) -> FeedOutput {
+        var currentPostItem: PostItem?
+        
         input.fetchType
             .throttle(.seconds(3), scheduler: MainScheduler.instance)
             .subscribe { [weak self] in
@@ -81,7 +104,41 @@ class FeedVMImpl: FeedVM {
             }
             .disposed(by: disposeBag)
         
-        return Output(postItems: postItemRelay)
+        let isMine = input.additionalButtonTap.compactMap { data in
+            currentPostItem = data?.postItem
+            return data?.isMine
+        }
+        
+        input.additionalButtonTapType.subscribe(onNext: { [weak self] selection in
+            guard let self, let currentPostItem else { return }
+            switch selection {
+            case .block:
+                self.addBlackListUseCase.execute(blockedUser: currentPostItem.authorUID)
+                    .subscribe(onSuccess: { _ in
+//                        추가 행동 추가 예정
+                    }, onFailure: { error in
+                        print("error blocking \(error)")
+                    }).disposed(by: self.disposeBag)
+            case .delete:
+                self.postDeleteUseCase.execute(uid: currentPostItem.postUID)
+                    .subscribe(onSuccess: { _ in
+                        self.fetchPost(type: .initial)
+                    }, onFailure: { error in
+                        print("error deleting \(error)")
+                    }).disposed(by: self.disposeBag)
+            case .report:
+                guard let myUID = try? self.myUIDUseCase.execute() else { break }
+                self.userReportUseCase.execute(content: "신고자: \(myUID)",
+                                               userName: currentPostItem.authorUID)
+                    .subscribe(onCompleted: { [weak self] in
+                        guard let self else { return }
+                    }, onError: { error in
+                        print("error reporting \(error)")
+                    }).disposed(by: self.disposeBag)
+            }
+        }).disposed(by: disposeBag)
+        
+        return Output(postItems: postItemRelay, isMine: isMine)
     }
     
     private func fetchPost(type: FetchPostType) {

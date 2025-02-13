@@ -54,10 +54,10 @@ final class TabBarAssembly: Assembly {
         }
         
         // FeedVM 등록
-        container.register(FeedVM.self) { resolver in
-            let mainFeedUseCase = resolver.resolve(MainFeedUseCase.self)!
-            let myUserInfoUseCase = resolver.resolve(MyUserInfoUseCase.self)!
-            return FeedVMImpl(mainFeedUseCase: mainFeedUseCase, myUserInfo: myUserInfoUseCase)
-        }
+//        container.register(FeedVM.self) { resolver in
+//            let mainFeedUseCase = resolver.resolve(MainFeedUseCase.self)!
+//            let myUserInfoUseCase = resolver.resolve(MyUserInfoUseCase.self)!
+//            return FeedVMImpl(mainFeedUseCase: mainFeedUseCase, myUserInfo: myUserInfoUseCase)
+//        }
     }
 }

@@ -8,6 +8,8 @@
 import UIKit
 
 import SnapKit
+import RxSwift
+import RxCocoa
 
 class PostCommentVC: UIViewController {
     
@@ -15,14 +17,34 @@ class PostCommentVC: UIViewController {
     
     private let commentVM: PostCommentVM
     
+    private var lastContentOffset: CGPoint = .zero
     private let postItem: PostItem
+    private let disposeBag = DisposeBag()
+    private let commentCellDatasRelay = BehaviorRelay<[CommentCellData]>.init(value: [])
+    private let cellLongPressed = PublishRelay<(commentUID: String, authorUID: String)>()
+    private let additionalActionTapped = PublishRelay<CommentAdditionalAction>()
     
     private let titleView = CommentTitleView()
     private let textFieldView = CommentTFView()
+    private let commentTableView: UITableView = {
+        let tv = UITableView()
+        tv.backgroundColor = CommentConsts.backgroundColor
+        tv.separatorStyle = .none
+        tv.register(PostCommentTableCell.self, forCellReuseIdentifier: PostCommentTableCell.className)
+        return tv
+    }()
+    private let customAlert: DefaultAlertVC = {
+        let alert = DefaultAlertVC(alertType: .title)
+        alert.modalPresentationStyle = .overCurrentContext
+        return alert
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
+        bindViewModel()
+        bindTableView()
+        setKeyboard()
     }
     
     init(viewModel: PostCommentVM, postItem: PostItem) {
@@ -35,10 +57,87 @@ class PostCommentVC: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func bindViewModel() {
+        let input = PostCommentVMImpl.Input(postItem: Observable.just(postItem), sendButtonTap: textFieldView.sendButtonTap, cellLongPressed: cellLongPressed, additonalActionTapped: additionalActionTapped)
+        let output = commentVM.transform(input: input)
+        
+        output.commentCellDatas.bind(to: commentCellDatasRelay).disposed(by: disposeBag)
+        
+        output.postOwnerName
+            .asDriver(onErrorJustReturn: "")
+            .drive(onNext: { [weak self] name in
+                guard let self else { return }
+                self.textFieldView.postOwnerName = name
+            })
+            .disposed(by: disposeBag)
+        
+        output.isMyComment
+            .asDriver(onErrorJustReturn: false)
+            .drive(onNext: { [weak self] isMine in
+                guard let self else { return }
+                self.presentAlert(isMyComment: isMine)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindTableView() {
+        commentCellDatasRelay
+            .bind(to: commentTableView.rx
+                .items(
+                    cellIdentifier: PostCommentTableCell.className,
+                    cellType: PostCommentTableCell.self))
+                    { [weak self] (row, item, cell) in
+                        guard let self else { return }
+                        cell.configure(data: item)
+                        cell.longPress.bind(to: self.cellLongPressed).disposed(by: cell.disposeBag)
+                    }.disposed(by: disposeBag)
+        commentTableView.rx.setDelegate(self).disposed(by: disposeBag)
+    }
+    
+    private func setKeyboard() {
+          NotificationCenter.default.rx.notification(UIResponder.keyboardWillShowNotification)
+              .asDriver(onErrorDriveWith: .empty())
+              .drive(onNext: { [weak self] notification in
+                  guard let userInfo = notification.userInfo,
+                        let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+                        let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
+                        let curveValue = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
+                        let self
+                  else { return }
+                  let animationOption = UIView.AnimationOptions(rawValue: curveValue << 16)
+                  
+                  UIView.animate(withDuration: duration, delay: 0, options: animationOption) {
+                      self.textFieldView.snp.updateConstraints {
+                          $0.bottom.equalToSuperview().inset(keyboardFrame.height - 10)
+                          self.view.layoutIfNeeded()
+                      }
+                  }
+              })
+              .disposed(by: disposeBag)
+          NotificationCenter.default.rx.notification(UIResponder.keyboardWillHideNotification)
+              .asDriver(onErrorDriveWith: .empty())
+              .drive(onNext: { [weak self] notification in
+                  guard let userInfo = notification.userInfo,
+                        let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
+                        let curveValue = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
+                        let self
+                  else { return }
+                  let animationOption = UIView.AnimationOptions(rawValue: curveValue << 16)
+
+                  UIView.animate(withDuration: duration, delay: 0, options: animationOption) {
+                      self.textFieldView.snp.updateConstraints {
+                          $0.bottom.equalToSuperview()
+                          self.view.layoutIfNeeded()
+                      }
+                  }
+              })
+              .disposed(by: disposeBag)
+      }
+    
     private func setLayout() {
         view.backgroundColor = CommentConsts.backgroundColor
         
-        [titleView, textFieldView]
+        [titleView, textFieldView, commentTableView]
             .forEach { view.addSubview($0) }
         
         titleView.snp.makeConstraints {
@@ -51,5 +150,89 @@ class PostCommentVC: UIViewController {
             $0.bottom.leading.trailing.equalToSuperview()
             $0.height.equalTo(CommentConsts.TextFieldView.Size.height)
         }
+        
+        commentTableView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
+            $0.top.equalTo(titleView.snp.bottom)
+            $0.bottom.equalTo(textFieldView.snp.top)
+        }
+    }
+    private func presentAlert(isMyComment: Bool) {
+        var actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        if isMyComment {
+            actionSheet = deleteCommentAlert()
+        } else {
+            actionSheet = reportBlockAlert()
+        }
+        self.present(actionSheet, animated: true, completion: nil)
+    }
+    
+    private func deleteCommentAlert() -> UIAlertController {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let deleteAction = UIAlertAction(title: CommentConsts.Alert.delete, style: .destructive) { [weak self] _ in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.customAlert.setTitle(CommentConsts.Alert.alertDeleteTitle)
+                self.present(self.customAlert, animated: false)
+                self.customAlert.customAction = { [weak self] in
+                    guard let self else { return }
+                    self.additionalActionTapped.accept(.delete)
+                }
+            }
+
+        }
+        let cancelAction = UIAlertAction(title: CommentConsts.Alert.cancel, style: .cancel, handler: nil)
+        
+        [deleteAction, cancelAction]
+            .forEach {
+                actionSheet.addAction($0)
+            }
+        return actionSheet
+
+    }
+    
+    private func reportBlockAlert() -> UIAlertController {
+           let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+           
+        let reportAction = UIAlertAction(title: CommentConsts.Alert.report, style: .default) { [weak self] _ in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.customAlert.setTitle(CommentConsts.Alert.alertReportTitle)
+                self.present(self.customAlert, animated: false)
+                self.customAlert.customAction = { [weak self] in
+                    guard let self else { return }
+                    self.additionalActionTapped.accept(.report)
+                }
+            }
+           }
+        let blockAction = UIAlertAction(title: CommentConsts.Alert.block, style: .destructive) { [weak self] _ in
+               guard let self else { return }
+            DispatchQueue.main.async {
+                self.customAlert.setTitle(CommentConsts.Alert.alertBlockTitle)
+                self.present(self.customAlert, animated: false)
+                self.customAlert.customAction = { [weak self] in
+                    guard let self else { return }
+                    self.additionalActionTapped.accept(.block)
+                }
+            }
+           }
+        let cancelAction = UIAlertAction(title: CommentConsts.Alert.cancel, style: .cancel, handler: nil)
+           
+           [reportAction, blockAction, cancelAction]
+               .forEach {
+                   actionSheet.addAction($0)
+               }
+           return actionSheet
+       }
+}
+
+extension PostCommentVC: UITableViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let currentOffset = scrollView.contentOffset.y
+        
+        if currentOffset + 30 < lastContentOffset.y {
+            self.view.endEditing(true)
+        }
+        lastContentOffset = scrollView.contentOffset
     }
 }
