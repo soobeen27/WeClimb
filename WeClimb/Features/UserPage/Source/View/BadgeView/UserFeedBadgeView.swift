@@ -49,7 +49,7 @@ class UserFeedBadgeView: UIView {
     
     private let valueBadge: TableFeedValueBadgeView = {
         let value = TableFeedValueBadgeView()
-        value.leftImage = BadgeConst.Image.locaction
+
         return value
     }()
     
@@ -71,15 +71,20 @@ class UserFeedBadgeView: UIView {
     
     private func setData() {
         guard let model = feedBageModel else { return }
-//        nameBadge.gymNameText = model.gymName
-//        valueBadge.leftImage = model.hold
-//        valueBadge.text = model.holdValue
+        
+        nameBadge.gymNameText = model.gymName
+        
+        if let holdColors = model.hold, let firstHold = holdColors.first {
+            valueBadge.colorName = firstHold
+        }
+        
+        valueBadge.text = "\(model.hold?.count ?? 0)"
+        setGymThmbnail(urlString: model.gymThmbnail)
     }
     
     func resetToDefalueState() {
         nameBadge.gymNameText = nil
-        valueBadge.fontColor = nil
-        valueBadge.leftImage = nil
+        valueBadge.colorName = nil
         valueBadge.text = nil
         gymThmbnail.image = nil
         disposeBag = DisposeBag()
@@ -102,7 +107,7 @@ class UserFeedBadgeView: UIView {
         if let urlString, let url = URL(string: urlString) {
             gymThmbnail.kf.setImage(with: url)
         } else {
-            gymThmbnail.image = UIImage.defaultAvatarProfile
+            gymThmbnail.image = UIImage.appleIcon
         }
     }
     
