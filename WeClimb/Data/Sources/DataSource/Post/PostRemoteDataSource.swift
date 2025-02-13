@@ -19,35 +19,55 @@ final class PostRemoteDataSourceImpl: PostRemoteDataSource {
     
     func fetchUserPosts(userUID: String) -> Single<[Post]> {
         return Single.deferred {
-            let postsRef = self.db.collection("posts")
+            let userRef = self.db.collection("users").document(userUID)
             
             return Single<[Post]>.create { single in
-                postsRef.whereField("authorUID", isEqualTo: userUID)
-                    .order(by: "creationDate", descending: true)
-                    .getDocuments { snapshot, error in
-                        if let error = error {
-                            print("❌ Firestore Fetch Error: \(error.localizedDescription)")
-                            single(.failure(error))
-                            return
-                        }
-                        
-                        guard let documents = snapshot?.documents, !documents.isEmpty else {
-                            print("⚠️ Firestore 데이터 없음! userUID: \(userUID)")
-                            single(.success([]))
-                            return
-                        }
-                        
-                        do {
-                            let posts: [Post] = try documents.compactMap { doc in
-                                return try doc.data(as: Post.self)
+                userRef.getDocument { snapshot, error in
+                    if let error = error {
+                        print("❌ Firestore Fetch Error: \(error.localizedDescription)")
+                        single(.failure(error))
+                        return
+                    }
+                    
+                    guard let data = snapshot?.data(),
+                          let postRefs = data["posts"] as? [DocumentReference], !postRefs.isEmpty else {
+                        print("⚠️ Firestore 데이터 없음! userUID: \(userUID)")
+                        single(.success([]))
+                        return
+                    }
+                    
+//                    print("✅ 가져온 posts reference 개수: \(postRefs.count)")
+                    
+                    let postFetchObservables = postRefs.map { ref in
+                        return Single<Post>.create { single in
+                            ref.getDocument { postSnapshot, error in
+                                if let error = error {
+                                    single(.failure(error))
+                                    return
+                                }
+                                guard let postData = postSnapshot?.data() else {
+                                    single(.failure(NSError(domain: "FirestoreError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Post 데이터 없음"])))
+                                    return
+                                }
+                                do {
+                                    let post = try postSnapshot?.data(as: Post.self)
+//                                    print("✅ 가져온 포스트: \(post?.postUID ?? "N/A")")
+                                    single(.success(post!))
+                                } catch {
+                                    single(.failure(error))
+                                }
                             }
-//                            print("✅ Firestore에서 가져온 포스트 개수: \(posts.count)")
-                            single(.success(posts))
-                        } catch {
-                            print("❌ 데이터 변환 오류: \(error.localizedDescription)")
-                            single(.failure(error))
+                            return Disposables.create()
                         }
                     }
+                    
+                    Single.zip(postFetchObservables)
+                        .map { posts in
+                            return posts.sorted { $0.creationDate > $1.creationDate }
+                        }
+                        .subscribe(single)
+                        .disposed(by: DisposeBag())
+                }
                 
                 return Disposables.create()
             }
