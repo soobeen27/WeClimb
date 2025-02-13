@@ -10,7 +10,7 @@ import Foundation
 protocol UserPageBuilder {
 //    func buildBookMarkSearch() -> BookMarkSearchVC
 //    func buildManageBookMark() -> ManageBookMarkVC
-//    func buildUserPage() -> UserPageVC
+    func buildUserPage() -> UserPageVC
 }
 
 final class UserPageBuilderImpl: UserPageBuilder {
@@ -29,9 +29,14 @@ final class UserPageBuilderImpl: UserPageBuilder {
 //        let viewModel: ManageBookMarkVM = container.resolve(ManageBookMarkVM.self)
 //        return ManageBookMarkVC(viewModel: viewModel)
 //    }
-//    
-//    func buildUserPage() -> UserPageVC {
-//        let viewModel: UserPageVM = container.resolve(UserPageVM.self)
-//        return UserPageVC(viewModel: viewModel)
-//    }
+    
+    func buildUserPage() -> UserPageVC {
+        let userUID = try! FirestoreHelper.userUID()
+        
+        let userFeedPageVM = container.assembler.resolver.resolve(UserFeedPageVM.self, argument: userUID)!
+        
+//        let userSummaryPageVM: UserSummaryPageVM = container.resolve(UserSummaryPageVM.self)
+        
+        return UserPageVC(userFeedPageVM: userFeedPageVM/*, userSummaryPageVM: userSummaryPageVM*/)
+    }
 }
