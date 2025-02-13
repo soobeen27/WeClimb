@@ -17,6 +17,7 @@ class PostCommentVC: UIViewController {
     
     private let commentVM: PostCommentVM
     
+    private var lastContentOffset: CGPoint = .zero
     private let postItem: PostItem
     private let disposeBag = DisposeBag()
     private let commentCellDatasRelay = BehaviorRelay<[CommentCellData]>.init(value: [])
@@ -43,6 +44,7 @@ class PostCommentVC: UIViewController {
         setLayout()
         bindViewModel()
         bindTableView()
+        setKeyboard()
     }
     
     init(viewModel: PostCommentVM, postItem: PostItem) {
@@ -89,7 +91,48 @@ class PostCommentVC: UIViewController {
                         cell.configure(data: item)
                         cell.longPress.bind(to: self.cellLongPressed).disposed(by: cell.disposeBag)
                     }.disposed(by: disposeBag)
+        commentTableView.rx.setDelegate(self).disposed(by: disposeBag)
     }
+    
+    private func setKeyboard() {
+          NotificationCenter.default.rx.notification(UIResponder.keyboardWillShowNotification)
+              .asDriver(onErrorDriveWith: .empty())
+              .drive(onNext: { [weak self] notification in
+                  guard let userInfo = notification.userInfo,
+                        let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+                        let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
+                        let curveValue = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
+                        let self
+                  else { return }
+                  let animationOption = UIView.AnimationOptions(rawValue: curveValue << 16)
+                  
+                  UIView.animate(withDuration: duration, delay: 0, options: animationOption) {
+                      self.textFieldView.snp.updateConstraints {
+                          $0.bottom.equalToSuperview().inset(keyboardFrame.height - 10)
+                          self.view.layoutIfNeeded()
+                      }
+                  }
+              })
+              .disposed(by: disposeBag)
+          NotificationCenter.default.rx.notification(UIResponder.keyboardWillHideNotification)
+              .asDriver(onErrorDriveWith: .empty())
+              .drive(onNext: { [weak self] notification in
+                  guard let userInfo = notification.userInfo,
+                        let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
+                        let curveValue = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
+                        let self
+                  else { return }
+                  let animationOption = UIView.AnimationOptions(rawValue: curveValue << 16)
+
+                  UIView.animate(withDuration: duration, delay: 0, options: animationOption) {
+                      self.textFieldView.snp.updateConstraints {
+                          $0.bottom.equalToSuperview()
+                          self.view.layoutIfNeeded()
+                      }
+                  }
+              })
+              .disposed(by: disposeBag)
+      }
     
     private func setLayout() {
         view.backgroundColor = CommentConsts.backgroundColor
@@ -181,4 +224,15 @@ class PostCommentVC: UIViewController {
                }
            return actionSheet
        }
+}
+
+extension PostCommentVC: UITableViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let currentOffset = scrollView.contentOffset.y
+        
+        if currentOffset + 30 < lastContentOffset.y {
+            self.view.endEditing(true)
+        }
+        lastContentOffset = scrollView.contentOffset
+    }
 }

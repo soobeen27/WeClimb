@@ -31,10 +31,12 @@ class CommentTFView: UIView {
     var sendButtonTap: Driver<String> {
         return sendButton.rx.tap.compactMap { [weak self] _ -> String? in
             guard let self else { return nil }
-            if commentTF.text == "" {
+            let storedText = self.commentTF.text
+            self.commentTF.text = nil
+            if storedText == "" {
                 return nil
             }
-            return commentTF.text
+            return storedText
         }.asDriver(onErrorJustReturn: "")
     }
     
