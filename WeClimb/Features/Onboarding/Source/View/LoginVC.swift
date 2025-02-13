@@ -72,6 +72,7 @@ class LoginVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         loginBind()
+        guestLogin()
     }
     
     private func setLayout() {
@@ -151,6 +152,14 @@ class LoginVC: UIViewController {
                     print(OnboardingConst.Login.Text.failureLoginText, error.localizedDescription)
                 }
             })
+            .disposed(by: disposeBag)
+    }
+    
+    private func guestLogin() {
+        guestLoginButton.rx.tap
+            .bind { [weak self] in
+                self?.loginButtonSelected?(.tabBar)
+            }
             .disposed(by: disposeBag)
     }
     

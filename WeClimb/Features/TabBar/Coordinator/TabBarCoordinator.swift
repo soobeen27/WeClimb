@@ -34,7 +34,7 @@ final class TabBarCoordinator: BaseCoordinator {
         let searchCoordinator = builder.buildSearchCoordinator()
         let uploadCoordinator = builder.buildUploadCoordinator(tabBarController: tabBarController)
         let notificationCoordinator = builder.buildNotificationCoordinator()
-        let userPageCoordinator = builder.buildUserPageCoordinator()
+        let userPageMainCoordinator = builder.buildUserPageMainCoordinator()
 
         self.uploadCoordinator = uploadCoordinator
 
@@ -42,20 +42,20 @@ final class TabBarCoordinator: BaseCoordinator {
         addDependency(searchCoordinator)
         addDependency(uploadCoordinator)
         addDependency(notificationCoordinator)
-        addDependency(userPageCoordinator)
-
+        addDependency(userPageMainCoordinator)
+        
         feedCoordinator.start()
         searchCoordinator.start()
 //        uploadCoordinator.start()
         notificationCoordinator.start()
-        userPageCoordinator.start()
+        userPageMainCoordinator.start()
         
         tabBarController.viewControllers = [
             feedCoordinator.navigationController,
             searchCoordinator.navigationController,
             uploadCoordinator.navigationController,
             notificationCoordinator.navigationController,
-            userPageCoordinator.navigationController
+            userPageMainCoordinator.navigationController
         ]
     }
     

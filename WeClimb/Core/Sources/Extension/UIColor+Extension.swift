@@ -67,3 +67,41 @@ extension UIColor {
     static let statusNegative = UIColor(hex: "FB283E")
     static let primaryStrong = UIColor(hex: "8726E3")
 }
+
+extension UIColor {
+    static let accentWhite = UIColor(hex: "#FFF")
+    static let accentRed = UIColor(hex: "#FFE6E9")
+    static let accentOrange = UIColor(hex: "#FEF4E6")
+    static let accentYellow = UIColor(hex: "#FEFBE6")
+    static let accentLigthGreen = UIColor(hex: "#E6FFD4")
+    
+    static let accentGreen = UIColor(hex: "#D9FFE6")
+    static let accentMint = UIColor(hex: "#DEFAFF")
+    static let accentBlue = UIColor(hex: "#00AEFF")
+    static let accentNavy = UIColor(hex: "#3385FF")
+    static let accentPurple = UIColor(hex: "#6541F2")
+    
+    static let accentPink = UIColor(hex: "#F553DA")
+    static let accentBrown = UIColor(hex: "#663A00")
+    static let accentGray = UIColor(hex: "#95969D")
+    static let accentBlack = UIColor(hex: "#BFC0C4")
+}
+
+extension UIColor {
+    static let gradeWhite =  UIColor(hex: "#FFFFFF")
+    static let gradeRed = UIColor(hex: "#FC4154")
+    static let gradeOrange = UIColor(hex: "#FF9200")
+    static let gradeYellow = UIColor(hex: "FAD70F")
+    static let gradeLightGreen = UIColor(hex: "#6BE016")
+    
+    static let gradeGreen = UIColor(hex: "#00BF40")
+    static let gradeMint = UIColor(hex: "#28D0ED")
+    static let gradeBlue = UIColor(hex: "#00AEFF")
+    static let gradeNavy = UIColor(hex: "#3385FF")
+    static let gradePurple = UIColor(hex: "#6541F2")
+    
+    static let gradePink = UIColor(hex: "#F553DA")
+    static let gradeBrown = UIColor(hex: "#663A00")
+    static let gradeGray = UIColor(hex: "#95969D")
+    static let gradeBlack = UIColor(hex: "#141415")
+}

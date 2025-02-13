@@ -33,5 +33,12 @@ final class PostRepositoryAssembly: Assembly {
             PostDeleteRepositoryImpl(postDeleteDataSource: resolver.resolve(PostDeleteDataSource.self)!)
         }
         
+        container.register(PostAggregationRepository.self) { resolver in
+            PostAggregationRepositoryImpl(
+                postRemoteDataSource: resolver.resolve(PostRemoteDataSource.self)!,
+                mediaRemoteDataSource: resolver.resolve(MediaRemoteDataSource.self)!
+            )
+        }
+        
     }
 }

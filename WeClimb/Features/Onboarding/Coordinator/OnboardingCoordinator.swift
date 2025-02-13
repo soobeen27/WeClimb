@@ -35,6 +35,11 @@ final class OnboardingCoordinator: BaseCoordinator {
             self?.removeDependency(loginCoordinator)
             self?.showPrivacyPolicy()
         }
+        
+        loginCoordinator.onTabBarPage = { [weak self] in
+            self?.removeDependency(loginCoordinator)
+            self?.moveToTabBar()
+        }
     }
     
     private func showPrivacyPolicy() {

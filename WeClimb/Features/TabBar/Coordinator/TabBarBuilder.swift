@@ -12,7 +12,7 @@ protocol TabBarBuilder {
     func buildSearchCoordinator() -> SearchCoordinator
     func buildUploadCoordinator(tabBarController: UITabBarController) -> UploadCoordinator
     func buildNotificationCoordinator() -> NotificationCoordinator
-    func buildUserPageCoordinator() -> UserPageCoordinator
+    func buildUserPageMainCoordinator() -> UserPageMainCoordinator
 }
 
 final class TabBarBuilderImpl: TabBarBuilder {
@@ -85,9 +85,10 @@ final class TabBarBuilderImpl: TabBarBuilder {
         return coordinator
     }
     
-    func buildUserPageCoordinator() -> UserPageCoordinator {
+    func buildUserPageMainCoordinator() -> UserPageMainCoordinator {
         let navigationController = UINavigationController()
-        let coordinator = UserPageCoordinator(navigationController: navigationController)
+        let userPageBuilder: UserPageBuilder = AppDIContainer.shared.resolve(UserPageBuilder.self)
+        let coordinator = UserPageMainCoordinator(navigationController: navigationController, builder: userPageBuilder)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage.avatarIcon,
