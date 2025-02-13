@@ -11,9 +11,14 @@ import SnapKit
 
 class TableFeedValueBadgeView: UIView {
     
-    var leftImage: UIImage? {
+    var colorName: String? {
         didSet {
-            colorImage.image = leftImage
+            if let colorName = colorName {
+                let lhColor = LHColors.fromEng(colorName)
+                self.backgroundColor = lhColor.toBackgroundAccent()
+                self.colorImage.image = lhColor.toImage()
+                self.badgeCountLabel.textColor = lhColor.toFontColor()
+            }
         }
     }
     
@@ -23,22 +28,16 @@ class TableFeedValueBadgeView: UIView {
         }
     }
     
-    var fontColor: UIColor? {
-        didSet {
-            badgeCountLabel.textColor = fontColor
-        }
-    }
-    
     private let colorImage: UIImageView = {
         let img = UIImageView()
         img.contentMode = .scaleAspectFit
-        img.image = img.image?.withRenderingMode(.alwaysTemplate)
+        img.image = .colorGray
         return img
     }()
     
     private let badgeCountLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .white
+        label.textColor = .black
         return label
     }()
     
