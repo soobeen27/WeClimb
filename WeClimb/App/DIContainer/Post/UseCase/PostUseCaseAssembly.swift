@@ -15,5 +15,10 @@ final class PostUseCaseAssembly: Assembly {
         container.register(FetchMediasUseCase.self) { resolver in
             FetchMediasUseCaseImpl(fetchMediasRepository: resolver.resolve(FetchMediasRepository.self)!)
         }
+        
+        container.register(FetchUserFeedInfoUseCase.self) { resolver in
+            FetchUserFeedInfoUseCaseImpl(postAggregationRepository:
+                resolver.resolve(PostAggregationRepository.self)!)
+        }
     }
 }

@@ -2,21 +2,32 @@
 //  UserPageCoordinator.swift
 //  WeClimb
 //
-//  Created by 윤대성 on 12/20/24.
+//  Created by 윤대성 on 2/6/25.
 //
 
 import UIKit
 
 final class UserPageCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
+    private let builder: UserPageBuilder
     
-    init(navigationController: UINavigationController) {
+    var onFinish: (() -> Void)?
+    
+    init(navigationController: UINavigationController, builder: UserPageBuilder) {
         self.navigationController = navigationController
+        self.builder = builder
     }
     
     override func start() {
-        let userPageVC = UserPageVC()
+        showUserPage()
+    }
+    
+    private func showUserPage() {
+        let userPageVC = builder.buildUserPage()
         userPageVC.coordinator = self
+        
+        // 회원 정보수정 탭 이벤트
+        
         navigationController.pushViewController(userPageVC, animated: true)
     }
 }
