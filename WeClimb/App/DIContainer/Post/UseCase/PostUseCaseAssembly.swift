@@ -17,7 +17,7 @@ final class PostUseCaseAssembly: Assembly {
         }
         container.register(PostDeleteUseCase.self) { resolver in
             PostDeleteUseCaseImpl(postDeleteRepository: resolver.resolve(PostDeleteRepository.self)!)
-        
+        }
         container.register(FetchUserFeedInfoUseCase.self) { resolver in
             FetchUserFeedInfoUseCaseImpl(postAggregationRepository:
                 resolver.resolve(PostAggregationRepository.self)!)

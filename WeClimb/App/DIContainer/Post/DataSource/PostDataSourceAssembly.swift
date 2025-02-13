@@ -23,6 +23,7 @@ final class PostDataSourceAssembly: Assembly {
         }
         container.register(PostDeleteDataSource.self) { _ in
             PostDeleteDataSourceImpl()
+        }
         container.register(MediaRemoteDataSource.self) { _ in
             MediaRemoteDataSourceImpl()
         }
