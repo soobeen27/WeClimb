@@ -149,9 +149,6 @@ class FeedVC: UIViewController {
     
     private func presentMenu(isMine: Bool) {
         let tabBarHeight: CGFloat = tabBarController?.tabBar.frame.height ?? 0
-        
-//        feedMenuView = FeedMenuView()
-//        guard let feedMenuView else { return }
         feedMenuView.isMine = isMine
         view.addSubview(feedMenuView)
         feedMenuView.snp.makeConstraints {
@@ -163,10 +160,8 @@ class FeedVC: UIViewController {
     }
     
     private func dismissMenu() {
-//        guard let feedMenuView else { return }
         feedMenuView.alpha = 0
         feedMenuView.removeFromSuperview()
-//        feedMenuView = nil
         postCollectionView.isScrollEnabled = true
     }
     
@@ -175,11 +170,12 @@ class FeedVC: UIViewController {
             .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { [weak self] type in
                 guard let self else { return }
+                self.dismissMenu()
                 self.presentAlert(type: type)
             })
             .disposed(by: disposeBag)
     }
-    
+        
     private func presentAlert(type: FeedMenuSelection) {
         var titleText: String = ""
         switch type {
