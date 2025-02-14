@@ -62,6 +62,13 @@ enum CommentConsts {
         enum Color {
             static let date: UIColor = UIColor.labelAlternative
         }
+        enum Date {
+            static let week = "주"
+            static let day = "일"
+            static let hour = "시간"
+            static let minute = "분"
+            static let moment = "방금"
+        }
     }
     
     enum Alert {
