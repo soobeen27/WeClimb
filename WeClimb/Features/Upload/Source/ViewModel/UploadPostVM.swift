@@ -49,88 +49,94 @@ class UploadPostVMImpl: UploadPostVM {
     func transform(input: UploadPostInput) -> UploadPostOutput {
         let uploadResult = PublishRelay<Result<Void, Error>>()
         
+        let captionTextRelay = BehaviorRelay<String>(value: "")
+        input.captionText
+            .bind(to: captionTextRelay)
+            .disposed(by: disposeBag)
+        
         let compressedMediaObservable = compressMediaItems(input.mediaItems)
+            .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
         
         input.submitButtonTap
-            .withLatestFrom(Observable.combineLatest(input.captionText, compressedMediaObservable))
+            .withLatestFrom(Observable.combineLatest(captionTextRelay, compressedMediaObservable))
             .flatMapLatest { [weak self] (caption, compressedMediaURLs) -> Observable<Result<Void, Error>> in
                 guard let self = self else { return Observable.just(.failure(CommonError.selfNil)) }
                 
                 let updatedMediaItems = zip(input.mediaItems, compressedMediaURLs).map { original, compressedURL in
                     MediaUploadData(
-                        url: compressedURL, 
+                        url: compressedURL,
                         hold: original.hold,
                         grade: original.grade,
                         thumbnailURL: original.thumbnailURL,
-                        capturedAt: original.capturedAt
+                        capturedDate: original.capturedDate
                     )
                 }
                 
                 return self.uploadPost(caption: caption, mediaItems: updatedMediaItems, gymName: input.gymName)
             }
+            .observe(on: MainScheduler.instance)
             .bind(to: uploadResult)
             .disposed(by: disposeBag)
         
         return Output(uploadResult: uploadResult.asObservable())
     }
+
     
     private func compressMediaItems(_ mediaItems: [MediaUploadData]) -> Observable<[URL]> {
         return Observable.create { observer in
-            var compressedURLs = [URL]()
-            let dispatchGroup = DispatchGroup()
-            
-            for media in mediaItems {
-                let originalURL = media.url
-                dispatchGroup.enter()
+            let dispatchQueue = DispatchQueue(label: "mediaCompressionQueue", qos: .background)
+            dispatchQueue.async {
+                var compressedURLs = [URL]()
+                let dispatchGroup = DispatchGroup()
+                
+                for media in mediaItems {
+                    let originalURL = media.url
+                    dispatchGroup.enter()
 
-                if self.isImage(url: originalURL) {
-                    if let imageData = try? Data(contentsOf: originalURL),
-                       let image = UIImage(data: imageData),
-                       let compressedData = self.compressImage(image: image) {
+                    if self.isImage(url: originalURL) {
+                        if let imageData = try? Data(contentsOf: originalURL),
+                           let image = UIImage(data: imageData),
+                           let compressedData = self.compressImage(image: image) {
 
-                        let compressedURL = FileManager.default.temporaryDirectory
-                            .appendingPathComponent(UUID().uuidString)
-                            .appendingPathExtension("jpg")
+                            let compressedURL = FileManager.default.temporaryDirectory
+                                .appendingPathComponent(UUID().uuidString)
+                                .appendingPathExtension("jpg")
 
-                        do {
-                            try compressedData.write(to: compressedURL)
-                            compressedURLs.append(compressedURL)
-                        } catch {
-//                            print("이미지 압축 저장 실패: \(error)")
-                            compressedURLs.append(originalURL)
-                        }
-                    } else {
-//                        print("이미지 변환 실패: \(originalURL)")
-                        compressedURLs.append(originalURL)
-                    }
-                    dispatchGroup.leave()
-
-                } else if self.isVideo(url: originalURL) {
-                    self.compressVideo(inputURL: originalURL) { compressedURL in
-                        if let compressedURL = compressedURL {
-//                            print("비디오 압축 완료: \(compressedURL)")
-                            compressedURLs.append(compressedURL)
+                            do {
+                                try compressedData.write(to: compressedURL)
+                                compressedURLs.append(compressedURL)
+                            } catch {
+                                compressedURLs.append(originalURL)
+                            }
                         } else {
-//                            print("비디오 압축 실패: 원본 유지")
                             compressedURLs.append(originalURL)
                         }
                         dispatchGroup.leave()
+
+                    } else if self.isVideo(url: originalURL) {
+                        self.compressVideo(inputURL: originalURL) { compressedURL in
+                            if let compressedURL = compressedURL {
+                                compressedURLs.append(compressedURL)
+                            } else {
+                                compressedURLs.append(originalURL)
+                            }
+                            dispatchGroup.leave()
+                        }
+                    } else {
+                        compressedURLs.append(originalURL)
+                        dispatchGroup.leave()
                     }
-                } else {
-                    compressedURLs.append(originalURL)
-                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.notify(queue: .main) {
+                    observer.onNext(compressedURLs)
+                    observer.onCompleted()
                 }
             }
-            
-            dispatchGroup.notify(queue: .main) {
-//                print("모든 미디어 압축 완료, 업로드 시작")
-                observer.onNext(compressedURLs)
-                observer.onCompleted()
-            }
-            
             return Disposables.create()
         }
     }
+
 
     private func isImage(url: URL) -> Bool {
         let imageExtensions = ["jpg", "jpeg", "png", "heic"]
@@ -187,8 +193,6 @@ extension UploadPostVMImpl {
         ],
         progressQueue: .main,
         progressHandler: { progress in
-            let percent = Int(progress.fractionCompleted * 100)
-//            print("비디오 압축 진행중: \(percent)%")
         },
                                           
         completion: { [weak self] result in

@@ -74,7 +74,6 @@ class LevelHoldFilterVC: UIViewController {
     private var filterType: FilterType
     
     let appliedFiltersSubject = PublishSubject<[String]>()
-//    var onLevelHoldFiltersApplied: ((String, String) -> Void)?
     var onFiltersApplied: ((String, String) -> Void)?
     
     init(gymName: String, viewModel: LevelHoldFilterVM, filterType: FilterType = .level) {

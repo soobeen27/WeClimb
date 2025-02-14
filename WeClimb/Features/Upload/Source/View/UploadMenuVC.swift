@@ -18,6 +18,7 @@ class UploadMenuVC: UIViewController {
         label.text = "어떤 게시물인가요?"
         label.font = UIFont.customFont(style: .label1SemiBold)
         label.textAlignment = .left
+        label.textColor = .labelStrong
         return label
     }()
     

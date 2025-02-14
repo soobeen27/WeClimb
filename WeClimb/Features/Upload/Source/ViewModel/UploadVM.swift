@@ -60,38 +60,46 @@ final class UploadVMImpl : UploadVM {
         input.gradeSelection
             .subscribe(onNext: { [weak self] (index, newGrade) in
                 guard let self = self else { return }
-                
+
                 var mediaList = self.mediaUploadDataRelay.value
-                guard index >= 0, index < mediaList.count else { return }
-                
-                let convertedGrade = LHColors.fromKoreanFull(newGrade).toEng()
-                
-                if mediaList[index].grade == convertedGrade { return }
-                
+                guard index >= 0, index < mediaList.count else {
+                    return
+                }
+
+                let engGrade = LHColors.fromKoreanFull(newGrade).toEng()
+
+                if mediaList[index].grade == engGrade {
+                    return
+                }
+
                 var updatedMedia = mediaList[index]
-                updatedMedia.grade = convertedGrade
+                updatedMedia.grade = engGrade
                 mediaList[index] = updatedMedia
-                
+
                 self.mediaUploadDataRelay.accept(mediaList)
             })
             .disposed(by: disposeBag)
-        
+
         input.holdSelection
             .subscribe(onNext: { [weak self] (index, newHold) in
                 guard let self = self else { return }
                 guard let newHold = newHold else { return }
-                
+
                 var mediaList = self.mediaUploadDataRelay.value
-                guard index >= 0, index < mediaList.count else { return }
-                
-                let convertedHold = LHColors.fromKoreanFull(newHold).toHoldEng()
-                
-                if mediaList[index].hold == convertedHold { return }
-                
+                guard index >= 0, index < mediaList.count else {
+                    return
+                }
+
+                let engHold = LHColors.fromKoreanFull(newHold).toHoldEng()
+
+                if mediaList[index].hold == engHold {
+                    return
+                }
+
                 var updatedMedia = mediaList[index]
-                updatedMedia.hold = convertedHold
+                updatedMedia.hold = engHold
                 mediaList[index] = updatedMedia
-                
+
                 self.mediaUploadDataRelay.accept(mediaList)
             })
             .disposed(by: disposeBag)
@@ -148,7 +156,7 @@ final class UploadVMImpl : UploadVM {
                         hold: nil,
                         grade: "",
                         thumbnailURL: tempVideoURL,
-                        capturedAt: creationDate
+                        capturedDate: creationDate
                     )
                     group.leave()
                 }
@@ -174,7 +182,7 @@ final class UploadVMImpl : UploadVM {
                             hold: nil,
                             grade: "",
                             thumbnailURL: tempImageURL,
-                            capturedAt: capturedAt
+                            capturedDate: capturedAt
                         )
                     } catch {
                         print("이미지 저장 실패: \(error.localizedDescription)")

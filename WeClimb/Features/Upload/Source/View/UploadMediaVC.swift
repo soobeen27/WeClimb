@@ -293,7 +293,7 @@ class UploadMediaVC: UIViewController {
             guard let self = self else { return }
             _ = self.onLevelFilter?(self.gymItem.name)
         }
-
+        
         uploadOptionView.selectedHoldButton = { [weak self] in
             guard let self = self else { return }
             _ = self.onHoldFilter?(self.gymItem.name)
@@ -301,21 +301,30 @@ class UploadMediaVC: UIViewController {
         
         coordinator?.onLevelHoldFiltersApplied = { [weak self] levelFilters, holdFilters in
             guard let self = self else { return }
-
+            
             self.shouldUpdateUI = false
- 
-            let currentIndex = (try? self.selectedMediaIndexSubject.value()) ?? 0
-            var mediaList = self.viewModel.mediaUploadDataRelay.value
-
-            guard currentIndex >= 0, currentIndex < mediaList.count else { return }
-
-            var updatedMedia = mediaList[currentIndex]
-            updatedMedia.grade = levelFilters
-            updatedMedia.hold = holdFilters
-            mediaList[currentIndex] = updatedMedia
-
-            self.viewModel.mediaUploadDataRelay.accept(mediaList)
-
+            
+            self.selectedGradeSubject.onNext(levelFilters)
+            self.selectedHoldSubject.onNext(holdFilters)
+            
+//            let currentIndex = (try? self.selectedMediaIndexSubject.value()) ?? 0
+//            var mediaList = self.viewModel.mediaUploadDataRelay.value
+//            
+//            guard currentIndex >= 0, currentIndex < mediaList.count else {
+//                return
+//            }
+//            
+//            var updatedMedia = mediaList[currentIndex]
+//            
+//            let convertedGrade = LHColors.fromKoreanFull(levelFilters).toEng()
+//            let convertedHold = LHColors.fromKoreanFull(holdFilters).toHoldEng()
+//            
+//            updatedMedia.grade = convertedGrade
+//            updatedMedia.hold = convertedHold
+//            mediaList[currentIndex] = updatedMedia
+//            
+//            self.viewModel.mediaUploadDataRelay.accept(mediaList)
+            
             self.uploadOptionView.updateOptionView(
                 grade: levelFilters,
                 hold: holdFilters
