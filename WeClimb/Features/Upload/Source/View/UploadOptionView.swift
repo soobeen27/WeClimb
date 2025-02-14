@@ -161,33 +161,39 @@ class UploadOptionView : UIView {
             let customFont = UIFont.customFont(style: .label2Regular)
             
             if let grade = grade {
+                
+                let koreanGrade = grade.isEmpty ? "선택해주세요" : LHColors.fromEng(grade).toKorean()
+                
                 var config = self.levelSelectedButton.configuration
                 let attributedTitle = NSAttributedString(
-                    string: grade.isEmpty ? "선택해주세요" : grade,
+                    string: koreanGrade,
                     attributes: [.font: customFont]
                 )
                 config?.attributedTitle = AttributedString(attributedTitle)
                 self.levelSelectedButton.configuration = config
                 
-                let levelColor = LHColors.fromKoreanFull(grade).toImage()
+                let levelColor = LHColors.fromKoreanFull(koreanGrade).toImage()
                 self.levelOptionImage.image = levelColor
                 self.levelOptionImage.isHidden = (levelColor == UIImage.closeIconCircle)
-                
             }
             
             if let hold = hold {
+                
+                let holdColorName = hold.replacingOccurrences(of: "hold", with: "")
+                
+                let koreanHold = hold.isEmpty ? "선택해주세요" : LHColors.fromEng(holdColorName).toKorean()
+                
                 var config = self.holdSelectedButton.configuration
                 let attributedTitle = NSAttributedString(
-                    string: hold.isEmpty ? "선택해주세요" : hold,
+                    string: koreanHold,
                     attributes: [.font: customFont]
                 )
                 config?.attributedTitle = AttributedString(attributedTitle)
                 self.holdSelectedButton.configuration = config
                 
-                let holdColor = LHColors.fromKoreanFull(hold).toImage()
+                let holdColor = LHColors.fromKoreanFull(koreanHold).toImage()
                 self.holdOptionImage.image = holdColor
                 self.holdOptionImage.isHidden = (holdColor == UIImage.closeIconCircle)
-                
             }
         }
     }

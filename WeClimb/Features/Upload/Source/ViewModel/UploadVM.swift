@@ -62,18 +62,12 @@ final class UploadVMImpl : UploadVM {
                 guard let self = self else { return }
 
                 var mediaList = self.mediaUploadDataRelay.value
-                guard index >= 0, index < mediaList.count else {
-                    return
-                }
+                guard index >= 0, index < mediaList.count else { return }
 
-                let engGrade = LHColors.fromKoreanFull(newGrade).toEng()
-
-                if mediaList[index].grade == engGrade {
-                    return
-                }
+                if mediaList[index].grade == newGrade { return }
 
                 var updatedMedia = mediaList[index]
-                updatedMedia.grade = engGrade
+                updatedMedia.grade = newGrade
                 mediaList[index] = updatedMedia
 
                 self.mediaUploadDataRelay.accept(mediaList)
@@ -86,18 +80,12 @@ final class UploadVMImpl : UploadVM {
                 guard let newHold = newHold else { return }
 
                 var mediaList = self.mediaUploadDataRelay.value
-                guard index >= 0, index < mediaList.count else {
-                    return
-                }
+                guard index >= 0, index < mediaList.count else { return }
 
-                let engHold = LHColors.fromKoreanFull(newHold).toHoldEng()
-
-                if mediaList[index].hold == engHold {
-                    return
-                }
+                if mediaList[index].hold == newHold { return }
 
                 var updatedMedia = mediaList[index]
-                updatedMedia.hold = engHold
+                updatedMedia.hold = newHold
                 mediaList[index] = updatedMedia
 
                 self.mediaUploadDataRelay.accept(mediaList)

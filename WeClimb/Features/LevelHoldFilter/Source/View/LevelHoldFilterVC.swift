@@ -99,7 +99,6 @@ class LevelHoldFilterVC: UIViewController {
 
     }
 
-    
     private func bindUI(gymName: String) {
         selectedSegmentIndexSubject.onNext(filterType.index)
         
