@@ -320,10 +320,6 @@ class SearchVC: UIViewController, UITextFieldDelegate {
 
 extension SearchVC {
     func textFieldDidBeginEditing(_ textField: UITextField) {
-//        if searchStyle != .uploadSearch {
-//            searchTextField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
-//            searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
-//        }
         if searchStyle == .uploadSearch {
             return
         }
