@@ -32,9 +32,8 @@ enum SearchStyle {
 
 class SearchVC: UIViewController, UITextFieldDelegate {
     var coordinator: SearchCoordinator?
-//    var toSearchResult: ((String) -> String)?
-    var toSearchResult: ((String) -> Void)?
     
+    var toSearchResult: ((String) -> Void)?
     var toUploadSearchResult: ((String) -> Void)?
     
     private let searchStyle: SearchStyle
@@ -138,15 +137,18 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     }
     
     private func applySearchStyle() {
-         switch searchStyle {
-         case .defaultSearch:
-             setupDefaultSearchStyle()
-         case .uploadSearch:
-             setupUploadSearchStyle()
-         }
-     }
-    
-    private func setupDefaultSearchStyle() {
+        let isDarkMode = traitCollection.userInterfaceStyle == .dark
+        
+        if isDarkMode {
+            setupUploadSearchStyle()
+        } else {
+            switch searchStyle {
+            case .defaultSearch:
+                return
+            case .uploadSearch:
+                setupUploadSearchStyle()
+            }
+        }
     }
     
     private func setupUploadSearchStyle() {
