@@ -6,12 +6,16 @@
 //
 
 import UIKit
+import RxSwift
 
 final class LevelHoldFilterCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
     private let builder: LevelHoldFilterBuilder
     
+    private let disposeBag = DisposeBag()
+    
     var gymName: String
+    var onLevelHoldFiltersApplied: ((String, String) -> Void)?
     
     init(navigationController: UINavigationController, builder: LevelHoldFilterBuilder, gymName: String) {
         self.navigationController = navigationController
@@ -25,6 +29,12 @@ final class LevelHoldFilterCoordinator: BaseCoordinator {
         levelHoldFilterVC.setFilterViewTheme(theme: .dark)
         
         navigationController.presentCustomHeightModal(modalVC: levelHoldFilterVC, heightRatio: 0.84)
+        
+        levelHoldFilterVC.onFiltersApplied = { [weak self] levelFilters, holdFilters in
+            guard let self = self else { return }
+            
+            self.onLevelHoldFiltersApplied?(levelFilters, holdFilters)
+        }
     }
     
     func startHoldIndex() {
@@ -33,5 +43,11 @@ final class LevelHoldFilterCoordinator: BaseCoordinator {
         levelHoldFilterVC.setFilterViewTheme(theme: .dark)
         
         navigationController.presentCustomHeightModal(modalVC: levelHoldFilterVC, heightRatio: 0.84)
+        
+        levelHoldFilterVC.onFiltersApplied = { [weak self] levelFilters, holdFilters in
+            guard let self = self else { return }
+            
+            self.onLevelHoldFiltersApplied?(levelFilters, holdFilters)
+        }
     }
 }

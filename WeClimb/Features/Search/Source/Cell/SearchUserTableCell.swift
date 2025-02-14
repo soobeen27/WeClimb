@@ -88,16 +88,16 @@ class SearchUserTableCell: UITableViewCell {
         }
     }
     
-    func configure(with item: SearchResultItem) {
-        
+    func configure(with item: SearchResultItem, searchStyle: SearchStyle) {
         if item.imageName.isEmpty || URL(string: item.imageName) == nil {
             userImageView.image = UIImage.defaultAvatarProfile
         } else {
             let imageURL = URL(string: item.imageName)
             userImageView.kf.setImage(with: imageURL)
         }
-        
+
         userNameLabel.text = item.name
+
         if let height = item.height, let armReach = item.armReach {
             userInfoLabel.text = String(format: SearchConst.Text.UserInfo.heightAndArmReachLabel, "\(height)", "\(armReach)")
         } else if let height = item.height {
@@ -106,6 +106,12 @@ class SearchUserTableCell: UITableViewCell {
             userInfoLabel.text = String(format: SearchConst.Text.UserInfo.armReachLabel, "\(armReach)")
         } else {
             userInfoLabel.text = nil
+        }
+
+        if searchStyle == .uploadSearch {
+            self.backgroundColor = .fillSolidDarkBlack
+            userNameLabel.textColor = .labelWhite
+            userInfoLabel.textColor = .labelWhite
         }
     }
     

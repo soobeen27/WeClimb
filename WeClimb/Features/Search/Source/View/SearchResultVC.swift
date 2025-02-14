@@ -123,11 +123,13 @@ class SearchResultVC: UIViewController {
     
     private func setupUploadSearchStyle() {
         navigationController?.setNavigationBarHidden(false, animated: false)
+        navigationController?.navigationBar.barTintColor = UIColor.fillSolidDarkBlack
         
         navigationItem.title = "암장"
         let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysOriginal)
         let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapBackButton))
         navigationItem.leftBarButtonItem = backButton
+        backButton.tintColor = .white
         
         self.backButton.isHidden = true
         segmentedControl.isHidden = true
@@ -145,6 +147,10 @@ class SearchResultVC: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
             $0.leading.trailing.equalToSuperview()
         }
+        
+        view.backgroundColor = UIColor.fillSolidDarkBlack
+        self.tableView.backgroundColor = UIColor.fillSolidDarkBlack
+        self.searchTextField.textColor = UIColor.white
     }
 
     @objc private func didTapBackButton() {
@@ -215,12 +221,13 @@ class SearchResultVC: UIViewController {
                 switch item.type {
                 case .gym:
                     let cell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className) as! SearchGymTableCell
-                    cell.configure(with: item)
+                    cell.configure(with: item, searchStyle: self.searchStyle)
                     cell.shouldShowDeleteButton = false
                     return cell
+                    
                 case .user:
                     let cell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className) as! SearchUserTableCell
-                    cell.configure(with: item)
+                    cell.configure(with: item, searchStyle: self.searchStyle)
                     cell.shouldShowDeleteButton = false
                     return cell
                 }
