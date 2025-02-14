@@ -234,6 +234,7 @@ class UploadPostVC: UIViewController {
         }
         
         bottomSeparatorLine.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(submitButton.snp.top).offset(-16)
             $0.height.equalTo(1)
         }
@@ -245,7 +246,7 @@ class UploadPostVC: UIViewController {
         }
         
         submitButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-16)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(48)
         }
@@ -304,7 +305,7 @@ extension UploadPostVC: UITextViewDelegate {
 
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
 
-        let keyboardHeight = keyboardFrame.height - view.safeAreaInsets.bottom - 48 - 16
+        let keyboardHeight = keyboardFrame.height - view.safeAreaInsets.bottom - 80
         let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.3
 
         uploadTextViewBottomConstraint?.update(offset: -keyboardHeight)
@@ -317,7 +318,7 @@ extension UploadPostVC: UITextViewDelegate {
     @objc private func keyboardWillHide(_ notification: Notification) {
         let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.3
         
-        uploadTextViewBottomConstraint?.update(offset: +16)
+        uploadTextViewBottomConstraint?.update(offset: 0)
         
         UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()

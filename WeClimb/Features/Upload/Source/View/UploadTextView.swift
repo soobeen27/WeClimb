@@ -82,7 +82,6 @@ class UploadTextView : UIView {
         
         titleLabel.snp.makeConstraints {
             $0.leading.top.equalToSuperview().offset(16)
-            //            $0.height.equalTo(56)
         }
         
         textView.snp.makeConstraints {
