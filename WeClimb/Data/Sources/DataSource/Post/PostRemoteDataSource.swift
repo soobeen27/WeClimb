@@ -16,6 +16,7 @@ protocol PostRemoteDataSource {
 
 final class PostRemoteDataSourceImpl: PostRemoteDataSource {
     private let db = Firestore.firestore()
+    private let disposeBag = DisposeBag()
     
     func fetchUserPosts(userUID: String) -> Single<[Post]> {
         return Single.deferred {
@@ -51,8 +52,13 @@ final class PostRemoteDataSourceImpl: PostRemoteDataSource {
                                 }
                                 do {
                                     let post = try postSnapshot?.data(as: Post.self)
-//                                    print("✅ 가져온 포스트: \(post?.postUID ?? "N/A")")
-                                    single(.success(post!))
+                                    if let post = post {
+                                        print(" Firestore에서 Post 변환 성공! postUID: \(post.postUID)")
+                                        single(.success(post))
+                                    } else {
+                                        print(" Post 변환 실패: nil 반환됨")
+                                        single(.failure(NSError(domain: "FirestoreError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Post 변환 실패"])))
+                                    }
                                 } catch {
                                     single(.failure(error))
                                 }
@@ -61,12 +67,23 @@ final class PostRemoteDataSourceImpl: PostRemoteDataSource {
                         }
                     }
                     
-                    Single.zip(postFetchObservables)
+//                    print("🔥 postFetchObservables count: \(postFetchObservables.count)")
+                    
+                    return Single.zip(postFetchObservables)
+                        .do(onSubscribe: {
+                        })
                         .map { posts in
                             return posts.sorted { $0.creationDate > $1.creationDate }
                         }
-                        .subscribe(single)
-                        .disposed(by: DisposeBag())
+                        .subscribe(
+                            onSuccess: { posts in
+                                single(.success(posts))
+                            },
+                            onFailure: { error in
+                                single(.failure(error))
+                            }
+                        )
+                        .disposed(by: self.disposeBag)
                 }
                 
                 return Disposables.create()
