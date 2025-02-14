@@ -131,6 +131,12 @@ class UploadMediaVC: UIViewController {
         bindOptionButtonActions()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        VideoManager.shared.stopVideo()
+    }
+    
     private func setNavigation() {
         navigationController?.setNavigationBarHidden(false, animated: false)
         
@@ -299,25 +305,25 @@ class UploadMediaVC: UIViewController {
     private func bindOptionButtonActions() {
         uploadOptionView.didTapBackButton = { [weak self] in
             self?.onBackButton?()
-            
-            VideoManager.shared.stopVideo()
         }
         
         uploadOptionView.didTapNextButton = { [weak self] in
             let selectedMediaItems = self?.viewModel.mediaUploadDataRelay.value ?? []
             self?.onNextButton?(selectedMediaItems)
-            
-            VideoManager.shared.stopVideo()
         }
         
         uploadOptionView.selectedLevelButton = { [weak self] in
             guard let self = self else { return }
             _ = self.onLevelFilter?(self.gymItem.name)
+            
+            VideoManager.shared.stopVideo()
         }
         
         uploadOptionView.selectedHoldButton = { [weak self] in
             guard let self = self else { return }
             _ = self.onHoldFilter?(self.gymItem.name)
+            
+            VideoManager.shared.stopVideo()
         }
         
         coordinator?.onLevelHoldFiltersApplied = { [weak self] levelFilters, holdFilters in

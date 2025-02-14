@@ -16,6 +16,7 @@ import Kingfisher
 class UploadMediaCollectionCell: UICollectionViewCell {
     private var playerLayer: AVPlayerLayer?
     private var player: AVQueuePlayer?
+    private var playerLooper: AVPlayerLooper?
 
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
@@ -72,17 +73,23 @@ class UploadMediaCollectionCell: UICollectionViewCell {
     }
 
     private func loadVideo(from url: URL) {
-        VideoManager.shared.reset()
+        VideoManager.shared.stopVideo()
 
-        player = AVQueuePlayer(url: url)
+        let playerItem = AVPlayerItem(url: url)
+        player = AVQueuePlayer(playerItem: playerItem)
+        guard let player else { return }
+
+        playerLooper = AVPlayerLooper(player: player, templateItem: playerItem)
+
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.frame = contentView.bounds
         playerLayer?.videoGravity = .resizeAspectFill
         contentView.layer.addSublayer(playerLayer!)
     }
-
+    
     func playVideo() {
         guard let player = player else { return }
+
         VideoManager.shared.playNewVideo(player: player)
     }
 

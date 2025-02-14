@@ -117,10 +117,6 @@ class UploadFeedView: UIView {
                 if !mediaItems.isEmpty {
                     self.totalMediaCount = mediaItems.count
                     self.updateCurrentIndex()
-                    
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-//                        self.playFirstMedia()
-//                    }
                 }
             })
             .disposed(by: disposeBag)
