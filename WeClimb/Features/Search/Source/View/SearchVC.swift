@@ -151,19 +151,46 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     
     private func setupUploadSearchStyle() {
         navigationController?.setNavigationBarHidden(false, animated: false)
-        navigationItem.title = "암장"
-        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysOriginal) 
-        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapBackButton))
-        navigationItem.leftBarButtonItem = backButton
-    }
-
-    @objc private func didTapBackButton() {
-        tabBarController?.selectedIndex = 0
         
-        tabBarController?.tabBar.isHidden = false
-         UIView.animate(withDuration: 0.1, animations: {
-             self.tabBarController?.tabBar.alpha = 1
-         })
+        navigationController?.navigationBar.barStyle = .default
+        navigationController?.navigationBar.barTintColor = UIColor.fillSolidDarkBlack
+        
+        navigationItem.title = "편집"
+        
+        navigationController?.navigationBar.titleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.customFont(style: .heading2SemiBold)
+        ]
+        
+        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysTemplate)
+        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapCloseButton))
+        backButton.tintColor = .white
+        
+        navigationItem.leftBarButtonItem = backButton
+        
+        view.backgroundColor = UIColor.fillSolidDarkBlack
+        self.tableView.backgroundColor = UIColor.fillSolidDarkBlack
+        self.searchTextField.textColor = UIColor.white
+        self.titleLabel.textColor = UIColor.white
+    }
+    
+    @objc private func didTapCloseButton() {
+        let alert = DefaultAlertVC(alertType: .titleDescription, interfaceStyle: .dark)
+        alert.setTitle("정말 나가시겠어요?", "입력된 내용은 저장되지 않아요.")
+        alert.setCustomButtonTitle("삭제")
+        alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  //StatusNegative
+        
+        alert.customAction = { [weak self] in
+            self?.tabBarController?.selectedIndex = 0
+            self?.tabBarController?.tabBar.isHidden = false
+            UIView.animate(withDuration: 0.1, animations: {
+                self?.tabBarController?.tabBar.alpha = 1
+            })
+        }
+        
+        alert.modalPresentationStyle = .overCurrentContext
+        alert.modalTransitionStyle = .crossDissolve
+        present(alert, animated: false, completion: nil)
     }
     
     private func setLayout() {
@@ -214,7 +241,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                 let cell: UITableViewCell
                 if item.type == .gym {
                     let gymCell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className, for: IndexPath(row: row, section: SearchConst.defaultSectionNumbers)) as! SearchGymTableCell
-                    gymCell.configure(with: item)
+                    gymCell.configure(with: item, searchStyle: self.searchStyle)
                     
                     gymCell.onDelete = { [weak self] itemToDelete in
                         self?.deleteItem(itemToDelete, at: row)
@@ -223,7 +250,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                     cell = gymCell
                 } else {
                     let userCell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className, for: IndexPath(row: row, section: SearchConst.defaultSectionNumbers)) as! SearchUserTableCell
-                    userCell.configure(with: item)
+                    userCell.configure(with: item, searchStyle: self.searchStyle)
                     
                     userCell.onDelete = { [weak self] itemToDelete in
                         self?.deleteItem(itemToDelete, at: row)
@@ -293,12 +320,16 @@ class SearchVC: UIViewController, UITextFieldDelegate {
 
 extension SearchVC {
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        searchTextField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
-        searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
-        
+//        if searchStyle != .uploadSearch {
+//            searchTextField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
+//            searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
+//        }
         if searchStyle == .uploadSearch {
             return
         }
+        
+        searchTextField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
+        searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
         
         self.searchTextField.snp.updateConstraints {
             $0.leading.equalToSuperview().offset(SearchConst.Search.Spacing.textFieldSpacing)
