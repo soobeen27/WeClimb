@@ -82,7 +82,6 @@ class UploadMediaVC: UIViewController {
         button.contentVerticalAlignment = .fill
         button.rx.tap
             .bind { [weak self] in
-                print("tapped")
                 self?.phpickerVCPresent()
             }
             .disposed(by: disposeBag)
@@ -135,7 +134,7 @@ class UploadMediaVC: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        VideoManager.shared.stopVideo()
+        VideoManager.shared.UploadStopVideo()
     }
     
     private func setNavigation() {
@@ -165,12 +164,7 @@ class UploadMediaVC: UIViewController {
         alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  //StatusNegative
         
         alert.customAction = { [weak self] in
-            VideoManager.shared.stopVideo()
-            self?.tabBarController?.selectedIndex = 0
-            self?.tabBarController?.tabBar.isHidden = false
-            UIView.animate(withDuration: 0.1, animations: {
-                self?.tabBarController?.tabBar.alpha = 1
-            })
+            self?.onDismiss?()
         }
         
         alert.modalPresentationStyle = .overCurrentContext
@@ -285,7 +279,6 @@ class UploadMediaVC: UIViewController {
             }
             
             shouldFeedUpdateUI = false
-//            shouldFeedUpdateUI = false
         }
         
         self.uploadFeedView?.onMediaIndexChanged = { [weak self] index in
@@ -307,27 +300,27 @@ class UploadMediaVC: UIViewController {
     private func bindOptionButtonActions() {
         uploadOptionView.didTapBackButton = { [weak self] in
             self?.onBackButton?()
-            VideoManager.shared.stopVideo()
+            VideoManager.shared.UploadStopVideo()
         }
         
         uploadOptionView.didTapNextButton = { [weak self] in
             let selectedMediaItems = self?.viewModel.mediaUploadDataRelay.value ?? []
             self?.onNextButton?(selectedMediaItems)
-            VideoManager.shared.stopVideo()
+            VideoManager.shared.UploadStopVideo()
         }
         
         uploadOptionView.selectedLevelButton = { [weak self] in
             guard let self = self else { return }
             _ = self.onLevelFilter?(self.gymItem.name)
             
-            VideoManager.shared.stopVideo()
+            VideoManager.shared.UploadStopVideo()
         }
         
         uploadOptionView.selectedHoldButton = { [weak self] in
             guard let self = self else { return }
             _ = self.onHoldFilter?(self.gymItem.name)
             
-            VideoManager.shared.stopVideo()
+            VideoManager.shared.UploadStopVideo()
         }
         
         coordinator?.onLevelHoldFiltersApplied = { [weak self] levelFilters, holdFilters in

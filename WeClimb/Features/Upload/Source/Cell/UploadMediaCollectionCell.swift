@@ -89,14 +89,14 @@ class UploadMediaCollectionCell: UICollectionViewCell {
     func playVideo() {
         guard let player = player else { return }
         
-        VideoManager.shared.playNewVideo(player: player)
+        VideoManager.shared.UploadPlayNewVideo(player: player)
         self.isPlaying = true
     }
     
     func stopVideo() {
         guard player != nil else { return }
         
-        VideoManager.shared.stopVideo()
+        VideoManager.shared.UploadStopVideo()
         self.isPlaying = false
     }
     

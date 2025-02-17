@@ -161,7 +161,7 @@ extension UploadFeedView: UICollectionViewDelegate {
         
         targetContentOffset.pointee.x = targetX
         
-        VideoManager.shared.stopVideo()
+        VideoManager.shared.UploadStopVideo()
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {

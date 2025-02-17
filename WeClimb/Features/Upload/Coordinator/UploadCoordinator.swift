@@ -64,7 +64,7 @@ final class UploadCoordinator: BaseCoordinator {
     func navigateToTabIndex() {
         tabBarController.selectedIndex = 2
         navigateToSearchVC()
-        dismissUploadView()
+        dismissUploadMenuView()
         
         UIView.animate(
             withDuration: 0.3,
@@ -129,9 +129,9 @@ final class UploadCoordinator: BaseCoordinator {
         }
         
         uploadMediaCoordinator.onDismiss = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             
-            self.navigationController.popToRootViewController(animated: true)
+            VideoManager.shared.UploadReset()
             
             self.tabBarController.selectedIndex = 0
             self.tabBarController.tabBar.isHidden = false
@@ -180,9 +180,9 @@ final class UploadCoordinator: BaseCoordinator {
         uploadPostCoordinator.start()
         
         uploadPostCoordinator.onDismiss = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             
-            self.navigationController.popToRootViewController(animated: true)
+            VideoManager.shared.UploadReset()
 
             self.tabBarController.selectedIndex = 0
             self.tabBarController.tabBar.isHidden = false
@@ -194,7 +194,7 @@ final class UploadCoordinator: BaseCoordinator {
 }
 
 extension UploadCoordinator {
-    func dismissUploadView() {
+    func dismissUploadMenuView() {
         guard let uploadViewController = uploadMenuVC else { return }
         
         UIView.animate(
