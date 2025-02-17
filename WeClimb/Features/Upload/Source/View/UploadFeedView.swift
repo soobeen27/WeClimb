@@ -13,7 +13,6 @@ import RxSwift
 class UploadFeedView: UIView {
     private var disposeBag = DisposeBag()
     private let viewModel: UploadVM
-    var isPlaying: Bool = true
     
     var selectedMediaItems: [MediaUploadData] = []
     
@@ -58,9 +57,6 @@ class UploadFeedView: UIView {
         super.layoutSubviews()
         
         collectionView.collectionViewLayout.invalidateLayout()
-        DispatchQueue.main.async { [weak self] in
-            self?.playFirstMedia()
-        }
     }
     
     private func createLayout() -> UICollectionViewLayout {
@@ -100,25 +96,25 @@ class UploadFeedView: UIView {
     
     private func bindCell() {
         self.viewModel.mediaUploadDataRelay
-            .observe(on: MainScheduler.instance)
+            .take(1)
             .bind(to: collectionView.rx.items(
                 cellIdentifier: UploadMediaCollectionCell.className,
                 cellType: UploadMediaCollectionCell.self)
             ) { row, data, cell in
                 cell.configure(with: data)
+                self.playFirstMedia()
             }
             .disposed(by: disposeBag)
 
         self.viewModel.mediaUploadDataRelay
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] mediaItems in
+            .bind { [weak self] mediaItems in
                 guard let self = self else { return }
-
                 if !mediaItems.isEmpty {
                     self.totalMediaCount = mediaItems.count
                     self.updateCurrentIndex()
                 }
-            })
+            }
             .disposed(by: disposeBag)
     }
     
@@ -172,7 +168,7 @@ extension UploadFeedView: UICollectionViewDelegate {
         updateCurrentIndex()
     }
     
-    private func updateCurrentIndex() {
+    func updateCurrentIndex() {
         let itemWidth: CGFloat = 256
         let spacing: CGFloat = 12
         let moveDistance = itemWidth + spacing

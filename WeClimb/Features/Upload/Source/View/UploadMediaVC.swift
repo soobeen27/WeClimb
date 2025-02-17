@@ -106,7 +106,7 @@ class UploadMediaVC: UIViewController {
     private let selectedHoldSubject = BehaviorSubject<String?>(value: nil)
     private let selectedMediaIndexSubject = BehaviorSubject<Int>(value: 0)
     
-    private var shouldUpdateUI = true
+//    private var shouldUpdateUI = true
     private var shouldFeedUpdateUI = true
     
     init(gymItem: SearchResultItem, viewModel: UploadVM) {
@@ -164,6 +164,7 @@ class UploadMediaVC: UIViewController {
         alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  //StatusNegative
         
         alert.customAction = { [weak self] in
+            VideoManager.shared.stopVideo()
             self?.tabBarController?.selectedIndex = 0
             self?.tabBarController?.tabBar.isHidden = false
             UIView.animate(withDuration: 0.1, animations: {
@@ -214,7 +215,7 @@ class UploadMediaVC: UIViewController {
         output.mediaItems
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] mediaItems in
-                guard let self = self, self.shouldUpdateUI else { return }
+                guard let self = self, self.shouldFeedUpdateUI else { return }
 
                 if mediaItems.isEmpty {
                     self.uploadFeedView?.removeFromSuperview()
@@ -282,8 +283,8 @@ class UploadMediaVC: UIViewController {
                 $0.edges.equalToSuperview()
             }
             
-            shouldUpdateUI = true
             shouldFeedUpdateUI = false
+//            shouldFeedUpdateUI = false
         }
         
         self.uploadFeedView?.onMediaIndexChanged = { [weak self] index in
@@ -305,11 +306,13 @@ class UploadMediaVC: UIViewController {
     private func bindOptionButtonActions() {
         uploadOptionView.didTapBackButton = { [weak self] in
             self?.onBackButton?()
+            VideoManager.shared.stopVideo()
         }
         
         uploadOptionView.didTapNextButton = { [weak self] in
             let selectedMediaItems = self?.viewModel.mediaUploadDataRelay.value ?? []
             self?.onNextButton?(selectedMediaItems)
+            VideoManager.shared.stopVideo()
         }
         
         uploadOptionView.selectedLevelButton = { [weak self] in
@@ -328,8 +331,6 @@ class UploadMediaVC: UIViewController {
         
         coordinator?.onLevelHoldFiltersApplied = { [weak self] levelFilters, holdFilters in
             guard let self = self else { return }
-            
-            self.shouldUpdateUI = false
 
             let currentIndex = (try? self.selectedMediaIndexSubject.value()) ?? 0
             var mediaList = self.viewModel.mediaUploadDataRelay.value
@@ -360,6 +361,8 @@ class UploadMediaVC: UIViewController {
                 grade: selectedMedia.grade,
                 hold: selectedMedia.hold
             )
+            
+            self.uploadFeedView?.updateCurrentIndex()
         }
     }
     
