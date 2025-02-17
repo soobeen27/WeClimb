@@ -57,7 +57,6 @@ class UploadPostVC: UIViewController {
         collectionView.register(UploadPostCollectionCell.self, forCellWithReuseIdentifier: UploadPostCollectionCell.className)
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.backgroundColor = UIColor.fillSolidDarkBlack
-//        collectionView.delegate = self
         collectionView.layer.cornerRadius = 11
         return collectionView
     }()
@@ -90,6 +89,22 @@ class UploadPostVC: UIViewController {
     private let captionTextSubject = PublishRelay<String>()
     private let submitButtonTap = PublishRelay<Void>()
     
+    private let loadingOverlayView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        view.isHidden = true
+        return view
+    }()
+
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = .white
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+    
+    var onDismiss: (() -> Void)?
+    
     init(gymName: String, mediaItems: [MediaUploadData], viewModel: UploadPostVM) {
         self.gymName = gymName
         self.mediaItems = mediaItems
@@ -108,6 +123,7 @@ class UploadPostVC: UIViewController {
         self.uploadTextView.textView.delegate = self
         setupKeyboardObservers()
         bindViewModel()
+        bindButtons()
         bindTextView()
     }
     
@@ -142,11 +158,7 @@ class UploadPostVC: UIViewController {
         alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  //StatusNegative
         
         alert.customAction = { [weak self] in
-            self?.tabBarController?.selectedIndex = 0
-            self?.tabBarController?.tabBar.isHidden = false
-            UIView.animate(withDuration: 0.1, animations: {
-                self?.tabBarController?.tabBar.alpha = 1
-            })
+            self?.onDismiss?()
         }
         
         alert.modalPresentationStyle = .overCurrentContext
@@ -188,7 +200,10 @@ class UploadPostVC: UIViewController {
                 switch result {
                 case .success:
                     print("게시물이 성공적으로 업로드됨")
-                    self?.navigationController?.popToRootViewController(animated: true)
+                    self?.loadingOverlayView.isHidden = true
+                    self?.loadingIndicator.stopAnimating()
+                    
+                    self?.onDismiss?()
                 case .failure(let error):
                     print("게시물 업로드 실패: \(error.localizedDescription)")
                 }
@@ -205,10 +220,20 @@ class UploadPostVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    private func bindButtons() {
+        submitButton
+            .rx.tap.asObservable()
+            .subscribe(onNext: { [weak self] in
+                self?.loadingOverlayView.isHidden = false
+                self?.loadingIndicator.startAnimating()
+            })
+            .disposed(by: disposeBag)
+    }
+    
     private func setLayout() {
         view.backgroundColor = UIColor.fillSolidDarkBlack
         
-        [safeAreaBackgroundView, topSeparatorLine, gymButton, collectionView, uploadTextView, bottomSeparatorLine, submitButton]
+        [safeAreaBackgroundView, topSeparatorLine, gymButton, collectionView, uploadTextView, bottomSeparatorLine, submitButton, loadingOverlayView, loadingIndicator]
             .forEach { view.addSubview($0) }
         
         topSeparatorLine.snp.makeConstraints {
@@ -249,6 +274,14 @@ class UploadPostVC: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-16)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(48)
+        }
+        
+        loadingOverlayView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        loadingIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
     }
 }

@@ -106,8 +106,9 @@ class UploadMediaVC: UIViewController {
     private let selectedHoldSubject = BehaviorSubject<String?>(value: nil)
     private let selectedMediaIndexSubject = BehaviorSubject<Int>(value: 0)
     
-//    private var shouldUpdateUI = true
     private var shouldFeedUpdateUI = true
+    
+    var onDismiss: (() -> Void)?
     
     init(gymItem: SearchResultItem, viewModel: UploadVM) {
         self.gymItem = gymItem

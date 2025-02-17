@@ -59,7 +59,6 @@ final class UploadCoordinator: BaseCoordinator {
         }
         
         self.uploadMenuVC = uploadMenuVC
-        
     }
     
     func navigateToTabIndex() {
@@ -128,6 +127,18 @@ final class UploadCoordinator: BaseCoordinator {
         uploadMediaCoordinator.onFinish = { [weak self] mediaData in
             self?.navigateToUploadPostVC(gymName: gymItem.name, mediaItems: mediaData)
         }
+        
+        uploadMediaCoordinator.onDismiss = { [weak self] in
+            guard let self = self else { return }
+            
+            self.navigationController.popToRootViewController(animated: true)
+            
+            self.tabBarController.selectedIndex = 0
+            self.tabBarController.tabBar.isHidden = false
+            UIView.animate(withDuration: 0.1, animations: {
+                self.tabBarController.tabBar.alpha = 1
+            })
+        }
     }
     
     private func presentLevelFilter(gymName: String) {
@@ -167,6 +178,18 @@ final class UploadCoordinator: BaseCoordinator {
             navigationController: navigationController, gymName: gymName, mediaItems: mediaItems, builder: builder)
         addDependency(uploadPostCoordinator)
         uploadPostCoordinator.start()
+        
+        uploadPostCoordinator.onDismiss = { [weak self] in
+            guard let self = self else { return }
+            
+            self.navigationController.popToRootViewController(animated: true)
+
+            self.tabBarController.selectedIndex = 0
+            self.tabBarController.tabBar.isHidden = false
+            UIView.animate(withDuration: 0.1, animations: {
+                self.tabBarController.tabBar.alpha = 1
+            })
+        }
     }
 }
 
