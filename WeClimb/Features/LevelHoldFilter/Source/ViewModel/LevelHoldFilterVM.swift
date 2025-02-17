@@ -178,8 +178,8 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
         let holdFilters = try? selectedHoldItems.value()
             .compactMap { Hold.allCases[$0].koreanHold }
 
-        let selectedLevel = (levelFilters?.isEmpty == false) ? levelFilters!.joined(separator: ", ") : "선택해주세요"
-        let selectedHold = (holdFilters?.isEmpty == false) ? holdFilters!.joined(separator: ", ") : "선택해주세요"
+        let selectedLevel = (levelFilters?.isEmpty == false) ? levelFilters!.joined(separator: ", ") : ""
+        let selectedHold = (holdFilters?.isEmpty == false) ? holdFilters!.joined(separator: ", ") : ""
 
         appliedFilters.onNext((
             level: selectedLevel,

@@ -19,6 +19,7 @@ struct Media: Codable {
     let thumbnailURL: String?
     let height: Int?
     let armReach: Int?
+    let capturedDate: Date?
     //    let authorUID: String
     //    let postUID: String
     //    let gym: String?

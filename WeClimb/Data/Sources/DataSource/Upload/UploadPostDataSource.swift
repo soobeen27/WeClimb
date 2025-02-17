@@ -22,7 +22,7 @@ struct MediaUploadData {
     var hold: String?
     var grade: String?
     let thumbnailURL: URL?
-    let capturedAt: Date?
+    let capturedDate: Date?
 }
 
 protocol UploadPostDataSource {
@@ -130,7 +130,8 @@ class UploadPostDataSourceImpl: UploadPostDataSource {
                                 postRef: nil,
                                 thumbnailURL: data.thumbnailURL?.absoluteString,
                                 height: user.height,
-                                armReach: user.armReach
+                                armReach: user.armReach,
+                                capturedDate: data.capturedDate
                             )
                             
                             do {

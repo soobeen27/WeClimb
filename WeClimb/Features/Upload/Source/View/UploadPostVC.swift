@@ -108,6 +108,7 @@ class UploadPostVC: UIViewController {
         self.uploadTextView.textView.delegate = self
         setupKeyboardObservers()
         bindViewModel()
+        bindTextView()
     }
     
     deinit {
@@ -233,6 +234,7 @@ class UploadPostVC: UIViewController {
         }
         
         bottomSeparatorLine.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(submitButton.snp.top).offset(-16)
             $0.height.equalTo(1)
         }
@@ -244,7 +246,7 @@ class UploadPostVC: UIViewController {
         }
         
         submitButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-16)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(48)
         }
@@ -257,10 +259,26 @@ extension UploadPostVC: UITextViewDelegate {
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        if (text == "\n") {
+        if text == "\n" {
             textView.resignFirstResponder()
+            return false
         }
-        return true
+        
+        let currentText = textView.text ?? ""
+        
+        guard let textRange = Range(range, in: currentText) else { return true }
+        let updatedText = currentText.replacingCharacters(in: textRange, with: text)
+        
+        return updatedText.count <= 1000
+    }
+    
+    private func bindTextView() {
+        uploadTextView.textView.rx.text.orEmpty
+            .map { text -> String in
+                return text == " 내용을 입력해주세요." ? "0/1000" : "\(text.count)/1000"
+            }
+            .bind(to: uploadTextView.textFieldCharCountLabel.rx.text)
+            .disposed(by: disposeBag)
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
@@ -274,7 +292,7 @@ extension UploadPostVC: UITextViewDelegate {
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text == "" {
             textView.textColor = .labelNormal
-            textView.text = " 등반에 관한 설명을 추가하세요!"
+            textView.text = " 내용을 입력해주세요."
         }
     }
     
@@ -287,7 +305,7 @@ extension UploadPostVC: UITextViewDelegate {
 
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
 
-        let keyboardHeight = keyboardFrame.height - view.safeAreaInsets.bottom - 48 - 16
+        let keyboardHeight = keyboardFrame.height - view.safeAreaInsets.bottom - 80
         let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.3
 
         uploadTextViewBottomConstraint?.update(offset: -keyboardHeight)
@@ -300,7 +318,7 @@ extension UploadPostVC: UITextViewDelegate {
     @objc private func keyboardWillHide(_ notification: Notification) {
         let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.3
         
-        uploadTextViewBottomConstraint?.update(offset: +16)
+        uploadTextViewBottomConstraint?.update(offset: 0)
         
         UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()

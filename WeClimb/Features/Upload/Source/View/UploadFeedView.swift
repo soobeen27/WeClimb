@@ -58,6 +58,9 @@ class UploadFeedView: UIView {
         super.layoutSubviews()
         
         collectionView.collectionViewLayout.invalidateLayout()
+        DispatchQueue.main.async { [weak self] in
+            self?.playFirstMedia()
+        }
     }
     
     private func createLayout() -> UICollectionViewLayout {
@@ -114,10 +117,6 @@ class UploadFeedView: UIView {
                 if !mediaItems.isEmpty {
                     self.totalMediaCount = mediaItems.count
                     self.updateCurrentIndex()
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        self.playFirstMedia()
-                    }
                 }
             })
             .disposed(by: disposeBag)

@@ -110,18 +110,21 @@ class SearchResultVC: UIViewController {
     }
     
     private func applySearchStyle() {
-         switch searchStyle {
-         case .defaultSearch:
-             setupDefaultSearchStyle()
-         case .uploadSearch:
-             setupUploadSearchStyle()
-         }
-     }
-    
-    private func setupDefaultSearchStyle() {
+        let isDarkMode = traitCollection.userInterfaceStyle == .dark
+        
+        if isDarkMode {
+            setupDarkModeSearchStyle()
+        } else {
+            switch searchStyle {
+            case .defaultSearch:
+                return
+            case .uploadSearch:
+                setupDarkModeSearchStyle()
+            }
+        }
     }
     
-    private func setupUploadSearchStyle() {
+    private func setupDarkModeSearchStyle() {
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.navigationBar.barTintColor = UIColor.fillSolidDarkBlack
         

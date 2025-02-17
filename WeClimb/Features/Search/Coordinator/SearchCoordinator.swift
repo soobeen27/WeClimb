@@ -11,7 +11,6 @@ final class SearchCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
     private let builder: SearchBuilder
     
-    var onSearchFinish: ((String) -> Void)?
     var onUploadSearchFinish: ((String) -> Void)?
     
     init(navigationController: UINavigationController, builder: SearchBuilder) {
@@ -24,7 +23,7 @@ final class SearchCoordinator: BaseCoordinator {
         searchVC.coordinator = self
         
         searchVC.toSearchResult = { [weak self] query in
-            self?.onSearchFinish?(query)
+            self?.navigateToSearchResult(query: query)
         }
         navigationController.pushViewController(searchVC, animated: true)
     }
