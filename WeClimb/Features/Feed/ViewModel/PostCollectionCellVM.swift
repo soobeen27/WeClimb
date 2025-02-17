@@ -27,6 +27,7 @@ protocol PostCollectionCellOutput {
     var levelHoldImages: Observable<(level: UIImage?, hold: UIImage?)> { get }
     var currentPost: BehaviorRelay<PostItem?> { get }
     var addtionalButtonTapData: Observable<(postItem: PostItem, isMine: Bool)?> { get }
+    var commentCount: Observable<Int> { get }
 }
 
 protocol PostCollectionCellVM {
@@ -58,6 +59,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         let levelHoldImages: Observable<(level: UIImage?, hold: UIImage?)>
         let currentPost: BehaviorRelay<PostItem?>
         let addtionalButtonTapData: Observable<(postItem: PostItem, isMine: Bool)?>
+        let commentCount: Observable<Int>
     }
 
     init(userInfoFromUIDUseCase: UserInfoFromUIDUseCase, myUIDUseCase: MyUIDUseCase, likePostUseCase: LikePostUseCase, fetchMediasUseCase: FetchMediasUseCase) {
@@ -72,6 +74,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         let user = userInfoFromUIDUseCase.execute(uid: input.postItem.authorUID)
         let likeCount = BehaviorRelay(value: getLikeCount(likes: input.postItem.like))
         let isLike = BehaviorRelay(value: getIsLike(likes: input.postItem.like))
+        let commentCount = input.postItem.commentCount ?? 0
 
         input.likeButtonTap
             .asDriver()
@@ -94,7 +97,8 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
             mediaItems: Observable.error(FirebaseError.documentNil),
             levelHoldImages: Observable.just((UIImage.closeIcon, UIImage.closeIcon)),
             currentPost: BehaviorRelay<PostItem?>.init(value: nil),
-            addtionalButtonTapData: Observable.just(nil)
+            addtionalButtonTapData: Observable.just(nil),
+            commentCount: Observable.just(0)
         )}
 
         let refs = pathToRef(paths: paths)
@@ -141,7 +145,8 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
             isLike: isLike, mediaItems: medias,
             levelHoldImages: levelHoldImages,
             currentPost: currentPost,
-            addtionalButtonTapData: addtionalButtonTapData
+            addtionalButtonTapData: addtionalButtonTapData,
+            commentCount: Observable.just(commentCount)
         )
     }
     

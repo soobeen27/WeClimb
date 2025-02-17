@@ -103,6 +103,11 @@ class PostSidebarView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func resetToDefaultState() {
+        commentCountLabel.removeFromSuperview()
+        likeCountLabel.removeFromSuperview()
+    }
+    
     private func setStackView() {
         setLikeStackView()
         setCommentStackView()
