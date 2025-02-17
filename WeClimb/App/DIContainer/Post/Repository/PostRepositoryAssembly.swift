@@ -39,6 +39,9 @@ final class PostRepositoryAssembly: Assembly {
                 mediaRemoteDataSource: resolver.resolve(MediaRemoteDataSource.self)!
             )
         }
+        container.register(PostFilterRepository.self) { resolver in
+            PostFilterRepositoryImpl(postFilterDataSource: resolver.resolve(PostFilterDataSource.self)!)
+        }
         
     }
 }

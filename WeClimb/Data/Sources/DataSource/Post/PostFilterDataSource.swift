@@ -10,7 +10,7 @@ import RxSwift
 import Firebase
 
 protocol PostFilterDataSource {
-    func getFilteredPost(lastSnapshot: QueryDocumentSnapshot?, gymName: String, grade: String,
+    func getFilteredPost(lastSnapshot: QueryDocumentSnapshot?, gymName: String, grade: String?,
                           hold: String?, height: [Int]?,
                          armReach: [Int]?,
                          completion: @escaping (QueryDocumentSnapshot?) -> Void) -> Single<[Post]>
@@ -29,7 +29,7 @@ class PostFilterDataSourceImpl: PostFilterDataSource {
     ///   - armReach: 암리치 범위 [작은수, 큰수]
     ///   - completion: 무한스크롤을 위한 마지막 스냅샷을 넘김. 이걸 따로 저장해뒀다가 더 로딩해야할때 lastSnapshot에 넣으면됨
     /// - Returns: 필터가 적용된 하나의 미디어만 가진 포스트
-    func getFilteredPost(lastSnapshot: QueryDocumentSnapshot? = nil, gymName: String, grade: String,
+    func getFilteredPost(lastSnapshot: QueryDocumentSnapshot? = nil, gymName: String, grade: String?,
                           hold: String? = nil, height: [Int]? = nil,
                          armReach: [Int]? = nil,
                          completion: @escaping (QueryDocumentSnapshot?) -> Void) -> Single<[Post]> {
@@ -47,7 +47,7 @@ class PostFilterDataSourceImpl: PostFilterDataSource {
     }
     
     private func filteredPostQuery(gymName: String,
-                                   grade: String,
+                                   grade: String? = nil,
                                    hold: String? = nil,
                                    height: [Int]? = nil,
                                    armReach: [Int]? = nil,
@@ -55,9 +55,11 @@ class PostFilterDataSourceImpl: PostFilterDataSource {
     ) -> Query {
         var answerQuery = self.db.collection("media")
             .whereField("gym", isEqualTo: gymName)
-            .whereField("grade", isEqualTo: grade)
             .order(by: "creationDate", descending: true)
         
+        if let grade {
+            answerQuery = answerQuery.whereField("grade", isEqualTo: grade)
+        }
         if let hold {
             answerQuery = answerQuery.whereField("hold", isEqualTo: hold)
         }

@@ -30,5 +30,8 @@ final class PostDataSourceAssembly: Assembly {
         container.register(PostRemoteDataSource.self) { _ in
             PostRemoteDataSourceImpl()
         }
+        container.register(PostFilterDataSource.self) { _ in
+            PostFilterDataSourceImpl()
+        }
     }
 }
