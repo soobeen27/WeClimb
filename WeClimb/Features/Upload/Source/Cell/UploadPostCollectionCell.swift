@@ -5,9 +5,7 @@
 //  Created by 머성이 on 12/18/24.
 //
 
-import AVKit
 import UIKit
-import PhotosUI
 import AVFoundation
 
 import SnapKit
@@ -41,14 +39,23 @@ class UploadPostCollectionCell: UICollectionViewCell {
         contentView.addSubview(imageView)
         contentView.backgroundColor = UIColor.fillSolidDarkBlack
 
-        imageView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        imageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
     }
-
+    
     func configure(with mediaItem: MediaUploadData) {
         let url = mediaItem.url
-
+        
+        print("📸 미디어 셀에 들어오는 데이터:")
+        print(" - URL: \(mediaItem.url)")
+        print(" - 촬영 날짜: \(String(describing: mediaItem.capturedDate))")
+        print(" - 썸네일 URL: \(String(describing: mediaItem.thumbnailURL))")
+        print(" - 홀드: \(String(describing: mediaItem.hold))")
+        print(" - 난이도: \(String(describing: mediaItem.grade))")
+        
+        // 기존 UI 업데이트 로직
+        
         if url.pathExtension == "jpg" || url.pathExtension == "png" {
             loadImage(from: url)
         } else if url.pathExtension == "mp4" {

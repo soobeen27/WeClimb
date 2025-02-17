@@ -90,20 +90,20 @@ class UploadMediaCollectionCell: UICollectionViewCell {
         guard let player = player else { return }
         
         VideoManager.shared.playNewVideo(player: player)
-        isPlaying = true
+        self.isPlaying = true
     }
     
     func stopVideo() {
         guard player != nil else { return }
         
         VideoManager.shared.stopVideo()
-        isPlaying = false
+        self.isPlaying = false
     }
     
     @objc private func handleTap() {
         guard player != nil else { return }
         
-        if isPlaying {
+        if self.isPlaying {
             self.stopVideo()
         } else {
             self.playVideo()
