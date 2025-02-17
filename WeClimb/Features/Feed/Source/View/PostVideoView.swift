@@ -31,6 +31,7 @@ class PostVideoView: UIView {
             
     var videoInfo: (url: URL, uid: String)? {
         didSet {
+            deleteDarkOverlay()
             loadVideo()
         }
     }
@@ -80,7 +81,7 @@ class PostVideoView: UIView {
         player = nil
         playerLayer = nil
         loadComplete.onNext(false)
-        overlayView = nil
+        deleteDarkOverlay()
         disposeBag = DisposeBag()
     }
     
@@ -210,6 +211,11 @@ class PostVideoView: UIView {
         overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
         overlayView.isUserInteractionEnabled = false
         addSubview(overlayView)
+    }
+    
+    func deleteDarkOverlay() {
+        overlayView?.removeFromSuperview()
+        overlayView = nil
     }
 }
 
