@@ -109,9 +109,17 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
     private func updateLevelData(cellData: BehaviorSubject<[(text: String, image: String, isChecked: Bool)]>) {
         guard let gym = gym else { return }
 
-        let levelData = gym.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+        let levelData = gym.grade
+            .split(separator: ",")
+            .map { String($0).trimmingCharacters(in: .whitespaces) }
 
-        var levelTextImageData = levelData.map { (text: $0.colorTextChange(), image: $0.imageTextChange(), isChecked: false) }
+        var levelTextImageData = levelData.enumerated().map { index, levelText in
+            let colorType = LHColors.fromShortKor(levelText)
+            let koreanText = colorType.toKorean()
+            let image = colorType.toImageString()
+
+            return (text: koreanText, image: image, isChecked: false)
+        }
 
         if let selectedIndexes = try? selectedLevelItems.value() {
             for index in selectedIndexes {
@@ -120,12 +128,20 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
                 }
             }
         }
-       
+
         cellData.onNext(levelTextImageData)
     }
-
+    
     private func updateHoldData(cellData: BehaviorSubject<[(text: String, image: String, isChecked: Bool)]>) {
-        var holdTextImageData = Hold.allCases.map { (text: $0.koreanHold, image: $0.imageName, isChecked: false) }
+        var holdTextImageData = Hold.allCases.map { holdType in
+            let text = holdType.koreanHold
+
+            let colorType = LHColors.fromKoreanFull(text)
+
+            let image = colorType.toImageString()
+
+            return (text: text, image: image, isChecked: false)
+        }
 
         if let selectedIndexes = try? selectedHoldItems.value() {
             for index in selectedIndexes {
@@ -134,7 +150,7 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
                 }
             }
         }
-        
+
         cellData.onNext(holdTextImageData)
     }
 
@@ -142,7 +158,7 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
         var currentItems = (try? cellData.value()) ?? []
 
         if let index = currentItems.firstIndex(where: { $0.text == item.text }) {
-            
+
             if currentItems[index].isChecked {
                 currentItems[index].isChecked = false
             } else {
@@ -164,9 +180,8 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
 
             cellData.onNext(currentItems)
         }
-       
     }
-
+    
     private func applyFilters(appliedFilters: PublishSubject<(level: String, hold: String)>) {
         let levelFilters = try? selectedLevelItems.value()
             .compactMap { index in

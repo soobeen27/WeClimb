@@ -99,18 +99,26 @@ class LevelHoldFilterTableCell: UITableViewCell {
             titleLabel.font = UIFont.customFont(style: .label2Regular)
         }
         
-        if config.isFirstCell {
-            rightSeparatorLine.isHidden = true
-            leftImage.image = LevelHoldFilterCellConst.Icon.firstCellHarderIcon
-        } else if config.isLastCell {
-            rightSeparatorLine.isHidden = true
-            leftImage.image = LevelHoldFilterCellConst.Icon.lastCellEasierIcon
+        if config.filterType == .level {
+            if config.isFirstCell {
+                rightSeparatorLine.isHidden = true
+                leftImage.image = LevelHoldFilterCellConst.Icon.firstCellHarderIcon
+                leftImage.isHidden = false
+            } else if config.isLastCell {
+                rightSeparatorLine.isHidden = true
+                leftImage.image = LevelHoldFilterCellConst.Icon.lastCellEasierIcon
+                leftImage.isHidden = false
+            } else {
+                rightSeparatorLine.isHidden = false
+                leftImage.image = nil
+                leftImage.isHidden = true
+            }
         } else {
+            leftImage.isHidden = true
             rightSeparatorLine.isHidden = false
             leftImage.image = nil
         }
         
         updateCellStyle(for: theme, isChecked: config.isChecked)
-        
     }
 }
