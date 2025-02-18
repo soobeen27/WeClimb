@@ -120,7 +120,7 @@ class UserPageVC: UIViewController {
     }()
     
     private let segmentedControl: CustomSegmentedControl = {
-        let segCon = CustomSegmentedControl(items: ["요약", "피드"])
+        let segCon = CustomSegmentedControl(items: ["피드"])
         return segCon
     }()
     

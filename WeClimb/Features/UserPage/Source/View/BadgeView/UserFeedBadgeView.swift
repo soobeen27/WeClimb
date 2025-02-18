@@ -33,7 +33,7 @@ class UserFeedBadgeView: UIView {
         view.backgroundColor = BadgeConst.Color.feedBackgroundColor
         [
             nameBadge,
-            badgeStackView,
+            badgeValueView,
             gymThmbnail,
         ].forEach {
             view.addSubview($0)
@@ -49,14 +49,24 @@ class UserFeedBadgeView: UIView {
     
     private let valueBadge: TableFeedValueBadgeView = {
         let value = TableFeedValueBadgeView()
-
+//        value.clipsToBounds = true
+//        value.layer.masksToBounds = true
+        value.layer.cornerRadius = 8
         return value
+    }()
+    
+    private let badgeValueView: UIView = {
+        let view = UIView()
+        return view
     }()
     
     private let badgeStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 4
+        stackView.alignment = .center
+        stackView.distribution = .fillEqually
+        stackView.backgroundColor = .clear
         return stackView
     }()
     
@@ -74,11 +84,21 @@ class UserFeedBadgeView: UIView {
         
         nameBadge.gymNameText = model.gymName
         
-        if let holdColors = model.hold, let firstHold = holdColors.first {
-            valueBadge.colorName = firstHold
+        var holdCountDict: [String: Int] = [:]
+        
+        model.hold?.forEach { holdColor in
+            holdCountDict[holdColor, default: 0] += 1
         }
         
-        valueBadge.text = "\(model.hold?.count ?? 0)"
+        badgeStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        holdCountDict.forEach { (color, count) in
+            let badgeView = TableFeedValueBadgeView()
+            badgeView.colorName = color
+            badgeView.text = "\(count)"
+            badgeStackView.addArrangedSubview(badgeView)
+        }
+        
         setGymThmbnail(urlString: model.gymThmbnail)
     }
     
@@ -91,6 +111,7 @@ class UserFeedBadgeView: UIView {
     }
     
     func configure(with data: FeedBageModel) {
+        print("🛠️ configure 호출됨: \(data)")
         feedBageModel = data
     }
     
@@ -104,6 +125,7 @@ class UserFeedBadgeView: UIView {
     }
     
     private func setGymThmbnail(urlString: String?) {
+        print("🖼️ setGymThmbnail 호출됨, urlString: \(urlString ?? "nil")")
         if let urlString, let url = URL(string: urlString) {
             gymThmbnail.kf.setImage(with: url)
         } else {
@@ -134,13 +156,21 @@ class UserFeedBadgeView: UIView {
             valueBadge,
         ].forEach { badgeStackView.addArrangedSubview($0) }
         
+        badgeValueView.addSubview(badgeStackView)
+        
         badgeStackView.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(4)
+        }
+        
+        badgeValueView.snp.makeConstraints {
+            $0.top.equalTo(nameBadge.snp.bottom).offset(8)
             $0.leading.equalToSuperview().inset(12)
-            $0.centerY.equalToSuperview()
+            $0.trailing.lessThanOrEqualToSuperview().inset(12)
         }
         
         gymThmbnail.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(12)
+            $0.width.height.equalTo(60)
             $0.centerY.equalToSuperview()
         }
         
