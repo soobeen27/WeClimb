@@ -69,16 +69,15 @@ class SearchResultVMImpl: SearchResultVM {
             }
             .flatMapLatest { [weak self] query, segmentIndex -> Observable<[SearchResultItem]> in
                 guard let self = self else { return .empty() }
+
+                let normalizedQuery = query.lowercased().replacingOccurrences(of: " ", with: "")
                 
-                if query != self.cachedQuery {
-                    self.cachedGyms = []
-                    self.cachedUsers = []
-                    self.cachedQuery = query
-                }
-                
-                if query.isEmpty {
+                // ✅ 검색어가 기존 캐시에 포함되면 Firestore 재요청 없이 검색 수행
+                if self.cachedQuery.contains(normalizedQuery) {
                     return Observable.just(self.cachedGyms + self.cachedUsers)
                 }
+                
+                self.cachedQuery = normalizedQuery
                 
                 switch segmentIndex {
                 case 0:

@@ -184,6 +184,7 @@ class UploadPostVC: UIViewController {
     
     private func bindViewModel() {
         let submitTap = submitButton.rx.tap.asObservable()
+        let captionTextRelay = BehaviorRelay<String>(value: "")
 
         let input = UploadPostVMImpl.Input(
             submitButtonTap: submitTap,
@@ -193,23 +194,16 @@ class UploadPostVC: UIViewController {
         )
 
         let output = viewModel.transform(input: input)
-
+        
         output.uploadResult
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] result in
-                switch result {
-                case .success:
-                    print("게시물이 성공적으로 업로드됨")
-                    self?.loadingOverlayView.isHidden = true
-                    self?.loadingIndicator.stopAnimating()
-                    
-                    self?.onDismiss?()
-                case .failure(let error):
-                    print("게시물 업로드 실패: \(error.localizedDescription)")
-                }
+            .bind(onNext: { [weak self] in
+                self?.loadingOverlayView.isHidden = true
+                self?.loadingIndicator.stopAnimating()
+                self?.onDismiss?()
             })
             .disposed(by: disposeBag)
-
+        
         Observable.just(mediaItems)
             .bind(to: collectionView.rx.items(
                 cellIdentifier: UploadPostCollectionCell.className,

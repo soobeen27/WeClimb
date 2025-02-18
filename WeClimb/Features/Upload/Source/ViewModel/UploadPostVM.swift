@@ -18,7 +18,7 @@ protocol UploadPostInput {
 }
 
 protocol UploadPostOutput {
-    var uploadResult: Observable<Result<Void, Error>> { get }
+    var uploadResult: Observable<Void> { get }
 }
 
 protocol UploadPostVM {
@@ -34,16 +34,17 @@ class UploadPostVMImpl: UploadPostVM {
     }
     
     struct Output: UploadPostOutput {
-        let uploadResult: Observable<Result<Void, Error>>
+        let uploadResult: Observable<Void>
     }
     
     private let disposeBag = DisposeBag()
     private let uploadPostUseCase: UploadPostUseCase
     private let myUserInfoUseCase: MyUserInfoUseCase
     
-    let isSubmitPendingRelay = BehaviorRelay<Bool>(value: false)
-    let isCompressionCompleteRelay = BehaviorRelay<Bool>(value: false)
-    let compressedMediaRelay = BehaviorRelay<[URL]?>(value: nil)
+    private let isSubmitPendingRelay = BehaviorRelay<Bool>(value: false)
+    private let isCompressionCompleteRelay = BehaviorRelay<Bool>(value: false)
+    private let compressedMediaRelay = BehaviorRelay<[URL]?>(value: nil)
+    private let latestCaptionRelay = BehaviorRelay<String>(value: "")
     
     init(uploadPostUseCase: UploadPostUseCase, myUserInfoUseCase: MyUserInfoUseCase) {
         self.uploadPostUseCase = uploadPostUseCase
@@ -51,21 +52,22 @@ class UploadPostVMImpl: UploadPostVM {
     }
     
     func transform(input: UploadPostInput) -> UploadPostOutput {
-        let uploadResult = PublishRelay<Result<Void, Error>>()
-        let captionTextRelay = BehaviorRelay<String>(value: "")
+        let uploadSuccess = PublishRelay<Void>()
 
         input.submitButtonTap
-            .subscribe(onNext: { _ in
+            .withLatestFrom(input.captionText)
+            .subscribe(onNext: { latestCaption in
+                self.latestCaptionRelay.accept(latestCaption)
                 self.isSubmitPendingRelay.accept(true)
-                
+
                 if self.isCompressionCompleteRelay.value, let compressedMedia = self.compressedMediaRelay.value {
-                    startUpload(captionTextRelay.value, compressedMedia)
+                    self.startUpload(caption: latestCaption, compressedMediaURLs: compressedMedia, input: input, uploadSuccess: uploadSuccess)
                 }
             })
             .disposed(by: disposeBag)
 
         input.captionText
-            .bind(to: captionTextRelay)
+            .bind(to: latestCaptionRelay)
             .disposed(by: disposeBag)
 
         compressMediaItems(input.mediaItems)
@@ -74,43 +76,46 @@ class UploadPostVMImpl: UploadPostVM {
                 self.isCompressionCompleteRelay.accept(true)
             })
             .disposed(by: disposeBag)
-        
+
         isCompressionCompleteRelay
             .filter { $0 }
             .subscribe(onNext: { _ in
-
                 if self.isSubmitPendingRelay.value, let compressedMedia = self.compressedMediaRelay.value {
-                    startUpload(captionTextRelay.value, compressedMedia)
+                    let latestCaption = self.latestCaptionRelay.value
+                    self.startUpload(caption: latestCaption, compressedMediaURLs: compressedMedia, input: input, uploadSuccess: uploadSuccess)
                 }
             })
             .disposed(by: disposeBag)
 
-        return Output(uploadResult: uploadResult.asObservable())
+        return Output(uploadResult: uploadSuccess.asObservable())
+    }
 
-        func startUpload(_ caption: String, _ compressedMediaURLs: [URL]) {
-
-            let updatedMediaItems: [MediaUploadData] = zip(input.mediaItems, compressedMediaURLs).map { original, compressedURL in
-                MediaUploadData(
-                    url: compressedURL,
-                    hold: original.hold,
-                    grade: original.grade,
-                    thumbnailURL: original.thumbnailURL,
-                    capturedDate: original.capturedDate
-                )
-            }
-
-            uploadPost(caption: caption, mediaItems: updatedMediaItems, gymName: input.gymName)
-                .observe(on: MainScheduler.instance)
-                .subscribe(onNext: { result in
-                    uploadResult.accept(result)
-
-                    self.isSubmitPendingRelay.accept(false)
-                    self.isCompressionCompleteRelay.accept(false)
-                    self.compressedMediaRelay.accept(nil)
-
-                })
-                .disposed(by: disposeBag)
+    private func startUpload(caption: String, compressedMediaURLs: [URL], input: UploadPostInput, uploadSuccess: PublishRelay<Void>) {
+        let updatedMediaItems: [MediaUploadData] = zip(input.mediaItems, compressedMediaURLs).map { original, compressedURL in
+            MediaUploadData(
+                url: compressedURL,
+                hold: original.hold,
+                grade: original.grade,
+                thumbnailURL: original.thumbnailURL,
+                capturedDate: original.capturedDate
+            )
         }
+
+        uploadPost(caption: caption, mediaItems: updatedMediaItems, gymName: input.gymName)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { result in
+                switch result {
+                case .success:
+                    uploadSuccess.accept(())
+                case .failure(let error):
+                    print("업로드 실패: \(error.localizedDescription)")
+                }
+
+                self.isSubmitPendingRelay.accept(false)
+                self.isCompressionCompleteRelay.accept(false)
+                self.compressedMediaRelay.accept(nil)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func compressMediaItems(_ mediaItems: [MediaUploadData]) -> Observable<[URL]> {
