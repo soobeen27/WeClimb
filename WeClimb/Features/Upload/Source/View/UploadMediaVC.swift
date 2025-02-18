@@ -185,7 +185,6 @@ class UploadMediaVC: UIViewController {
     private func bindViewModel() {
         let input = UploadVMImpl.Input(
             mediaSelection: mediaItemsSubject.asObservable(),
-            
             gradeSelection: selectedGradeSubject
                 .distinctUntilChanged()
                 .flatMapLatest { grade in
@@ -193,7 +192,6 @@ class UploadMediaVC: UIViewController {
                         .take(1)
                         .map { index in (index, grade) }
                 },
-
             holdSelection: selectedHoldSubject
                 .distinctUntilChanged()
                 .flatMapLatest { hold in
@@ -201,17 +199,16 @@ class UploadMediaVC: UIViewController {
                         .take(1)
                         .map { index in (index, hold) }
                 },
-
             selectedMediaIndex: selectedMediaIndexSubject.distinctUntilChanged()
         )
-
+        
         let output = viewModel.transform(input: input)
         
         output.mediaItems
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] mediaItems in
                 guard let self = self, self.shouldFeedUpdateUI else { return }
-
+                
                 if mediaItems.isEmpty {
                     self.uploadFeedView?.removeFromSuperview()
                     self.callPHPickerButton.isHidden = false
@@ -223,17 +220,17 @@ class UploadMediaVC: UIViewController {
         
         output.alertTrigger
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] in
-                self?.showAlert()
-                self?.reloadMediaUI()
+            .subscribe(onNext: { [weak self] (title, message) in
+                self?.showAlert(title: title, message: message)
             })
             .disposed(by: disposeBag)
+        
         
         selectedMediaIndexSubject
             .distinctUntilChanged()
             .subscribe(onNext: { [weak self] index in
                 guard let self = self else { return }
-
+                
                 let mediaList = self.viewModel.mediaUploadDataRelay.value
                 guard index >= 0, index < mediaList.count else { return }
 
@@ -285,12 +282,12 @@ class UploadMediaVC: UIViewController {
             self?.selectedMediaIndexSubject.onNext(index)
         }
     }
-
-    private func showAlert() {
+    
+    private func showAlert(title: String, message: String) {
         let alert = DefaultAlertVC(alertType: .titleDescription, interfaceStyle: .dark)
-        alert.setTitle("영상 길이 초과", "2분 이내의 영상을 업로드해주세요.")
+        alert.setTitle(title, message)
         alert.setCustomButtonTitle("확인")
-        alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  //StatusNegative
+        alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  // StatusNegative
         
         alert.modalPresentationStyle = .overCurrentContext
         alert.modalTransitionStyle = .crossDissolve
@@ -304,9 +301,23 @@ class UploadMediaVC: UIViewController {
         }
         
         uploadOptionView.didTapNextButton = { [weak self] in
-            let selectedMediaItems = self?.viewModel.mediaUploadDataRelay.value ?? []
-            self?.onNextButton?(selectedMediaItems)
-            VideoManager.shared.UploadStopVideo()
+            guard let self = self else { return }
+            
+            let selectedMediaItems = self.viewModel.mediaUploadDataRelay.value
+            
+            if selectedMediaItems.isEmpty {
+                self.showAlert(title: "미디어가 없습니다.", message: "업로드할 사진 또는 영상을 선택해주세요.")
+                return
+            }
+            
+            let hasMissingSelection = selectedMediaItems.contains { ($0.grade?.isEmpty ?? true) || $0.hold == nil }
+            
+            if hasMissingSelection {
+                self.showAlert(title: "선택되지 않은 항목이 있습니다.", message: "레벨과 홀드를 모두 선택해주세요.")
+            } else {
+                self.onNextButton?(selectedMediaItems)
+                VideoManager.shared.UploadStopVideo()
+            }
         }
         
         uploadOptionView.selectedLevelButton = { [weak self] in
@@ -325,17 +336,17 @@ class UploadMediaVC: UIViewController {
         
         coordinator?.onLevelHoldFiltersApplied = { [weak self] levelFilters, holdFilters in
             guard let self = self else { return }
-
+            
             let currentIndex = (try? self.selectedMediaIndexSubject.value()) ?? 0
             var mediaList = self.viewModel.mediaUploadDataRelay.value
-
+            
             guard currentIndex >= 0, currentIndex < mediaList.count else { return }
-
+            
             var selectedMedia = mediaList[currentIndex]
-
+            
             let previousGrade = selectedMedia.grade ?? ""
             let previousHold = selectedMedia.hold ?? ""
-
+            
             let convertedGrade = levelFilters.isEmpty ? previousGrade : LHColors.fromKoreanFull(levelFilters).toEng()
             let convertedHold = holdFilters.isEmpty ? previousHold : LHColors.fromKoreanFull(holdFilters).toHoldEng()
             

@@ -21,7 +21,7 @@ protocol UploadInput {
 
 protocol UploadOutput {
     var mediaItems: Observable<[MediaUploadData]> { get }
-    var alertTrigger: Observable<Void> { get }
+    var alertTrigger: Observable<(String, String)> { get }
 }
 
 protocol UploadVM {
@@ -40,13 +40,13 @@ final class UploadVMImpl : UploadVM {
     
     struct Output: UploadOutput {
         let mediaItems: Observable<[MediaUploadData]>
-        let alertTrigger: Observable<Void>
+        let alertTrigger: Observable<(String, String)>
     }
     
     private let disposeBag = DisposeBag()
     
     private let mediaItemsRelay = BehaviorRelay<[PHPickerResult]>(value: [])
-    private let alertTriggerRelay = PublishRelay<Void>()
+    private let alertTriggerRelay = PublishRelay<(String, String)>()
     var mediaUploadDataRelay = BehaviorRelay<[MediaUploadData]>(value: [])
     
     func transform(input: UploadInput) -> UploadOutput {
@@ -133,7 +133,8 @@ final class UploadVMImpl : UploadVM {
                         if duration > 120 {
                             await MainActor.run {
                                 self.mediaUploadDataRelay.accept([])
-                                self.alertTriggerRelay.accept(())
+                                self.alertTriggerRelay.accept(("영상 길이 초과", "2분 이내의 영상을 업로드해주세요."))
+
                             }
                             return
                         }
