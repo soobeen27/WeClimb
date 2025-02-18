@@ -15,7 +15,7 @@ import SnapKit
 struct FeedBageModel {
     let gymName: String?
     let hold: [String]?
-    let gymThmbnail: String?
+    let userFeedThmbnail: String?
 }
 
 class UserFeedBadgeView: UIView {
@@ -99,7 +99,7 @@ class UserFeedBadgeView: UIView {
             badgeStackView.addArrangedSubview(badgeView)
         }
         
-        setGymThmbnail(urlString: model.gymThmbnail)
+        setGymThmbnail(urlString: model.userFeedThmbnail)
     }
     
     func resetToDefalueState() {
