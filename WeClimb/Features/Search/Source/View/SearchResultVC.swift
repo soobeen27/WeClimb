@@ -205,11 +205,21 @@ class SearchResultVC: UIViewController {
     private func bindUI() {
         let saveItemSubject = PublishSubject<SearchResultItem>()
         
+        let searchText = searchTextField.rx.text.orEmpty
+            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+            .distinctUntilChanged()
+
         let input = SearchResultVMImpl.Input(
-            query: searchTextField.rx.text.orEmpty.asObservable(),
+            query: searchText.asObservable(),
             selectedSegment: selectedSegmentIndexSubject.asObservable(),
             SavedRecentVisitItems: saveItemSubject
         )
+        
+        searchText
+            .subscribe(onNext: { text in
+                print("입력된 검색어: \(text)")
+            })
+            .disposed(by: disposeBag)
         
         let output = viewModel.transform(input: input)
         

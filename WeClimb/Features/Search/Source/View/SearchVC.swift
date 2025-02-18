@@ -35,6 +35,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     
     var toSearchResult: ((String) -> Void)?
     var toUploadSearchResult: ((String) -> Void)?
+    var toUploalMediaPost: ((SearchResultItem) -> Void)?
     
     private let searchStyle: SearchStyle
     
@@ -262,6 +263,16 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                 }
                 return cell
             }
+            .disposed(by: disposeBag)
+        
+        tableView.rx.modelSelected(SearchResultItem.self)
+            .bind(onNext: { [weak self] item in
+                guard let self = self else { return }
+                
+                if self.searchStyle == .uploadSearch {
+                    self.toUploalMediaPost?(item)
+                }
+            })
             .disposed(by: disposeBag)
     }
     

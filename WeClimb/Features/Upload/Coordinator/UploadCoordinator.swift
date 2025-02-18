@@ -86,6 +86,11 @@ final class UploadCoordinator: BaseCoordinator {
             self?.removeDependency(searchCoordinator)
             self?.navigateToSearchResultVC(query: query)
         }
+        
+        searchCoordinator.onSelectedSearchCell = { [weak self] result in
+            self?.removeDependency(searchCoordinator)
+            self?.navigateToUploadMedia(gymItem: result)
+        }
     }
     
     func navigateToSearchResultVC(query: String) {
