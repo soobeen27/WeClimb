@@ -7,6 +7,7 @@
 
 import UIKit
 
+import Kingfisher
 import SnapKit
 import RxCocoa
 import RxSwift
@@ -16,14 +17,14 @@ class UserPageVC: UIViewController {
     
     private let disposeBag = DisposeBag()
     
-//    private let userPageVM: UserPageVM
+    //    private let userPageVM: UserPageVM
     private let userFeedPageVM: UserFeedPageVM
-//    private let userSummaryPageVM: UserSummaryPageVM
+    //    private let userSummaryPageVM: UserSummaryPageVM
     
     init(coordinator: UserPageCoordinator? = nil, userFeedPageVM: UserFeedPageVM /*userSummaryPageVM: UserSummaryPageVM*/) {
         self.coordinator = coordinator
         self.userFeedPageVM = userFeedPageVM
-//        self.userSummaryPageVM = userSummaryPageVM
+        //        self.userSummaryPageVM = userSummaryPageVM
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -33,7 +34,7 @@ class UserPageVC: UIViewController {
     
     // MARK: - 유저 정보
     private let userNameLabel: UILabel = {
-      let label = UILabel()
+        let label = UILabel()
         label.text = "WeClimb"
         label.font = UserPageConst.userInfo.Font.userNameLabelFont
         label.textColor = UserPageConst.userInfo.Color.userNameLabelColor
@@ -43,36 +44,14 @@ class UserPageVC: UIViewController {
     private let userImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UserPageConst.userInfo.Image.baseImage
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 40
         return imageView
     }()
     
-    private let userInfoLabel: UIStackView = {
-        let stv = UIStackView()
-        stv.axis = .horizontal
-        stv.alignment = .leading
-        stv.distribution = .fill
-        stv.spacing = UserPageConst.userInfo.Spacing.userInfoSpacing
-        return stv
-    }()
-    
-    private let userHeightInfo: UILabel = {
-       let label = UILabel()
-        label.text = "180"
-        label.font = UserPageConst.userInfo.Font.userInfoLabelFont
-        label.textColor = UserPageConst.userInfo.Color.userInfoLabelColor
-        return label
-    }()
-    
-    private let infoDote: UILabel = {
+    private let userInfoLabel: UILabel = {
         let label = UILabel()
-        label.text = UserPageConst.userInfo.Text.dote
-        label.textColor = UserPageConst.userInfo.Color.userInfoDoteColor
-        return label
-    }()
-    
-    private let userArmReachInfo: UILabel = {
-        let label = UILabel()
-        label.text = "180"
         label.font = UserPageConst.userInfo.Font.userInfoLabelFont
         label.textColor = UserPageConst.userInfo.Color.userInfoLabelColor
         return label
@@ -88,7 +67,7 @@ class UserPageVC: UIViewController {
         stv.layer.cornerRadius = 8
         return stv
     }()
-
+    
     private let homeImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UserPageConst.userInfo.Image.homeImage
@@ -133,10 +112,10 @@ class UserPageVC: UIViewController {
     // MARK: - 피드 세그먼트
     
     // 피드쪽 날짜(월) 필터
-    
     private let userFeedtableView: UITableView = {
         let tableView = UITableView()
         tableView.register(UserFeedTableCell.self, forCellReuseIdentifier: "UserFeedTableCell")
+        tableView.backgroundColor = .clear
         return tableView
     }()
     
@@ -148,7 +127,7 @@ class UserPageVC: UIViewController {
     }()
     
     private let favoriteGym: UIButton = {
-       let button = UIButton()
+        let button = UIButton()
         button.setTitle("+", for: .normal)
         return button
     }()
@@ -176,6 +155,7 @@ class UserPageVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         bindTableFeed()
+        bindUserInfo()
     }
     
     private func setLayout() {
@@ -185,11 +165,10 @@ class UserPageVC: UIViewController {
     }
     
     private func userInfoLayout() {
-        [
-            userHeightInfo,
-            infoDote,
-            userArmReachInfo,
-        ].forEach { userInfoLabel.addArrangedSubview($0) }
+        //        [
+        //            userHeightInfo,
+        //            userArmReachInfo,
+        //        ].forEach { userInfoLabel.addArrangedSubview($0) }
         
         [
             homeImageView,
@@ -201,11 +180,6 @@ class UserPageVC: UIViewController {
             $0.leading.equalToSuperview().offset(10)
             $0.size.equalTo(UserPageConst.userInfo.Size.symbolSize)
         }
-        
-//        homeGymButtonText.snp.makeConstraints {
-//            $0.width.equalTo(70)
-//            $0.height.equalTo(16)
-//        }
         
         chevronRightImageView.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(10)
@@ -280,19 +254,53 @@ class UserPageVC: UIViewController {
     private func bindTableFeed() {
         let input = UserFeedPageVMImpl.Input()
         let output = userFeedPageVM.transform(input: input)
-
+        
         input.fetchUserFeedTrigger.accept(())
-
+        
         output.userFeedList
             .do(onNext: { items in
-//                print("✅ 최종 userFeedList count:", items.count) // ✅ 데이터 개수 확인
-//                items.forEach { print("✅ 최종 변환된 데이터:", $0) } // ✅ 데이터 값 확인
             })
             .observe(on: MainScheduler.instance)
             .bind(to: userFeedtableView.rx.items(cellIdentifier: UserFeedTableCell.identifier, cellType: UserFeedTableCell.self)) { _, viewModel, cell in
-//                print("🟢 Cell에 ViewModel 전달됨: \(viewModel)")
                 cell.configure(with: viewModel)
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func bindUserInfo() {
+        let input = UserFeedPageVMImpl.Input()
+        let output = userFeedPageVM.transform(input: input)
+        
+        input.fetchUserInfoTrigger.accept(())
+        
+        output.userInfo
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] user in
+                guard let self = self else { return }
+                
+                self.userNameLabel.text = user.userName ?? "이름 없음"
+                
+                let height = user.height
+                let armReach = user.armReach ?? nil
+                
+                self.userInfoLabel.text = self.heightArmReach(height: height, armReach: armReach)
+                
+                if let imageURL = user.profileImage, let url = URL(string: imageURL) {
+                    self.userImageView.kf.setImage(with: url)
+                } else {
+                    self.userImageView.image = UIImage.wecilmbProfile
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func heightArmReach(height: Int?, armReach: Int?) -> String {
+        if let height, let armReach {
+            return "\(height)cmㆍ\(armReach)cm"
+        } else if let height {
+            return "\(height)cm"
+        }
+        return "정보가 없어용"
     }
 }
