@@ -26,7 +26,7 @@ class FeedVC: UIViewController {
     
     var commentTapped: ((PostItem) -> Void)?
     
-    private let fetchType: BehaviorRelay<PostFetchType> = .init(value: .initial)
+    private let fetchType: BehaviorRelay<PostFetchType?> = .init(value: .initial)
     private let addtionalButtonTapped = BehaviorRelay<(postItem: PostItem, isMine: Bool)?>(value: nil)
     private let selectedButtonType = PublishRelay<FeedMenuSelection>()
 

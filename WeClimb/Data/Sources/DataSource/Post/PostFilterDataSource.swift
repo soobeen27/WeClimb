@@ -56,6 +56,7 @@ class PostFilterDataSourceImpl: PostFilterDataSource {
         var answerQuery = self.db.collection("media")
             .whereField("gym", isEqualTo: gymName)
             .order(by: "creationDate", descending: true)
+            .limit(to: 30)
         
         if let grade {
             answerQuery = answerQuery.whereField("grade", isEqualTo: grade)
