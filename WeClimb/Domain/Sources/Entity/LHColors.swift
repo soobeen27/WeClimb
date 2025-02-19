@@ -323,3 +323,13 @@ enum LHColors {
     }
 }
 
+extension LHColors {
+    func isBGrade() -> Bool {
+        switch self {
+        case .B1, .B2, .B3, .B4, .B5, .B6, .B7, .B8, .B9:
+            return true
+        default:
+            return false
+        }
+    }
+}
