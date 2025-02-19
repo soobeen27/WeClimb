@@ -77,9 +77,9 @@ class UploadMediaVC: UIViewController {
             .withTintColor(UIColor.labelNormal, renderingMode: .alwaysOriginal)
         button.setImage(imageAddIcon, for: .normal)
         button.layer.cornerRadius = 10
-        button.imageView?.contentMode = .scaleAspectFit
-        button.contentHorizontalAlignment = .fill
-        button.contentVerticalAlignment = .fill
+        button.imageView?.contentMode = .center
+        button.contentHorizontalAlignment = .center
+        button.contentVerticalAlignment = .center
         button.rx.tap
             .bind { [weak self] in
                 self?.phpickerVCPresent()
@@ -322,16 +322,28 @@ class UploadMediaVC: UIViewController {
         
         uploadOptionView.selectedLevelButton = { [weak self] in
             guard let self = self else { return }
-            _ = self.onLevelFilter?(self.gymItem.name)
             
-            VideoManager.shared.UploadStopVideo()
+            let selectedMediaItems = self.viewModel.mediaUploadDataRelay.value
+            
+            if selectedMediaItems.isEmpty {
+                self.showAlert(title: "미디어 없습니다.", message: "미디어를 추가한 후 필터를 선택해주세요.")
+            } else {
+                _ = self.onLevelFilter?(self.gymItem.name)
+                VideoManager.shared.UploadStopVideo()
+            }
         }
         
         uploadOptionView.selectedHoldButton = { [weak self] in
             guard let self = self else { return }
-            _ = self.onHoldFilter?(self.gymItem.name)
             
-            VideoManager.shared.UploadStopVideo()
+            let selectedMediaItems = self.viewModel.mediaUploadDataRelay.value
+            
+            if selectedMediaItems.isEmpty {
+                self.showAlert(title: "미디어 없습니다.", message: "미디어를 추가한 후 필터를 선택해주세요.")
+            } else {
+                _ = self.onHoldFilter?(self.gymItem.name)
+                VideoManager.shared.UploadStopVideo()
+            }
         }
         
         coordinator?.onLevelHoldFiltersApplied = { [weak self] levelFilters, holdFilters in
@@ -399,6 +411,7 @@ class UploadMediaVC: UIViewController {
         callPHPickerButton.snp.makeConstraints {
             $0.centerX.equalTo(selectedMediaView.snp.centerX)
             $0.centerY.equalTo(selectedMediaView.snp.centerY)
+            $0.width.height.equalTo(100)
         }
         
         uploadOptionView.snp.makeConstraints {
