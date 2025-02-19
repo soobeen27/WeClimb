@@ -12,7 +12,8 @@ import RxSwift
 import RxCocoa
 
 protocol FeedInput {
-    var fetchType: BehaviorRelay<FetchPostType> { get }
+    var postType: Observable<PostType> { get }
+    var fetchType: BehaviorRelay<PostFetchType> { get }
     var additionalButtonTap: Observable<(postItem: PostItem, isMine: Bool)?> { get }
     var additionalButtonTapType: PublishRelay<FeedMenuSelection> { get }
 }
@@ -50,7 +51,14 @@ struct PostItem: Hashable {
     }
 }
 
-enum FetchPostType {
+enum PostType {
+    case feed
+    case userPage(uid: String, startIndex: Int)
+    case gym(name: String, startIndex: Int)
+    
+}
+
+enum PostFetchType {
     case initial
     case more
 }
@@ -84,7 +92,8 @@ class FeedVMImpl: FeedVM {
     }
     
     struct Input: FeedInput {
-        let fetchType: BehaviorRelay<FetchPostType>
+        let postType: Observable<PostType>
+        let fetchType: BehaviorRelay<PostFetchType>
         let additionalButtonTap: Observable<(postItem: PostItem, isMine: Bool)?>
         let additionalButtonTapType: PublishRelay<FeedMenuSelection>
     }
@@ -141,7 +150,7 @@ class FeedVMImpl: FeedVM {
         return Output(postItems: postItemRelay, isMine: isMine)
     }
     
-    private func fetchPost(type: FetchPostType) {
+    private func fetchPost(type: PostFetchType) {
         myUserInfo.execute()
             .flatMap { [weak self] user -> Single<[Post]> in
                 guard let self else { return Single.error(UserError.noID) }
