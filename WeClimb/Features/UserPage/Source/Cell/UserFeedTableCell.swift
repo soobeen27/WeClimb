@@ -87,6 +87,8 @@ class UserFeedTableCell: UITableViewCell {
     
     private func setLayout() {
         self.backgroundColor = .clear
+        self.selectionStyle = .none
+        
         [
             dateLabel,
             badgeView,

@@ -265,6 +265,12 @@ class UserPageVC: UIViewController {
                 cell.configure(with: viewModel)
             }
             .disposed(by: disposeBag)
+        
+        userFeedtableView.rx.itemSelected
+            .subscribe(onNext: { [weak self] indexPath in
+                self?.userFeedtableView.deselectRow(at: indexPath, animated: false)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func bindUserInfo() {
