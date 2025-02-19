@@ -205,21 +205,17 @@ class SearchResultVC: UIViewController {
     private func bindUI() {
         let saveItemSubject = PublishSubject<SearchResultItem>()
         
-        let searchText = searchTextField.rx.text.orEmpty
-            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
-            .distinctUntilChanged()
-
+        let searchText = Observable.merge(
+            searchTextField.rx.text.orEmpty
+                .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+                .distinctUntilChanged()
+        )
+        
         let input = SearchResultVMImpl.Input(
             query: searchText.asObservable(),
             selectedSegment: selectedSegmentIndexSubject.asObservable(),
             SavedRecentVisitItems: saveItemSubject
         )
-        
-        searchText
-            .subscribe(onNext: { text in
-                print("입력된 검색어: \(text)")
-            })
-            .disposed(by: disposeBag)
         
         let output = viewModel.transform(input: input)
         
@@ -236,12 +232,14 @@ class SearchResultVC: UIViewController {
                     let cell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className) as! SearchGymTableCell
                     cell.configure(with: item, searchStyle: self.searchStyle)
                     cell.shouldShowDeleteButton = false
+                    cell.selectionStyle = .none
                     return cell
                     
                 case .user:
                     let cell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className) as! SearchUserTableCell
                     cell.configure(with: item, searchStyle: self.searchStyle)
                     cell.shouldShowDeleteButton = false
+                    cell.selectionStyle = .none
                     return cell
                 }
             }

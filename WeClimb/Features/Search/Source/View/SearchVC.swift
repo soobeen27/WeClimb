@@ -249,6 +249,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                     gymCell.onDelete = { [weak self] itemToDelete in
                         self?.deleteItem(itemToDelete, at: row)
                     }
+                    gymCell.selectionStyle = .none
                     
                     cell = gymCell
                 } else {
@@ -258,6 +259,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                     userCell.onDelete = { [weak self] itemToDelete in
                         self?.deleteItem(itemToDelete, at: row)
                     }
+                    userCell.selectionStyle = .none
                     
                     cell = userCell
                 }
