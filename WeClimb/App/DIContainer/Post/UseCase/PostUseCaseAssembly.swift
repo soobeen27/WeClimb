@@ -25,5 +25,8 @@ final class PostUseCaseAssembly: Assembly {
         container.register(PostFilterUseCase.self) { resolver in
             PostFilterUseCaseImpl(postFilterRepository: resolver.resolve(PostFilterRepository.self)!)
         }
+        container.register(PostUseCase.self) { resolver in
+            PostUseCaseImpl(postRepository: resolver.resolve(PostRepository.self)!)
+        }
     }
 }

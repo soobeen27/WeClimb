@@ -15,7 +15,9 @@ final class FeedAssembly: Assembly {
                        userReportUseCase: resolver.resolve(UserReportUseCase.self)!,
                        addBlackListUseCase: resolver.resolve(AddBlackListUseCase.self)!,
                        postDeleteUseCase: resolver.resolve(PostDeleteUseCase.self)!,
-                       myUIDUseCase: resolver.resolve(MyUIDUseCase.self)!
+                       myUIDUseCase: resolver.resolve(MyUIDUseCase.self)!,
+                       userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!,
+                       postUseCase: resolver.resolve(PostUseCase.self)!
             )
         }
         

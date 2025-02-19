@@ -71,6 +71,8 @@ class FeedVMImpl: FeedVM {
     private let addBlackListUseCase: AddBlackListUseCase
     private let postDeleteUseCase: PostDeleteUseCase
     private let myUIDUseCase: MyUIDUseCase
+    private let userInfoFromUIDUseCase: UserInfoFromUIDUseCase
+    private let postUseCase: PostUseCase
     
     private let postItemRelay: BehaviorRelay<[PostItem]> = .init(value: [])
     
@@ -79,7 +81,9 @@ class FeedVMImpl: FeedVM {
          userReportUseCase: UserReportUseCase,
          addBlackListUseCase: AddBlackListUseCase,
          postDeleteUseCase: PostDeleteUseCase,
-         myUIDUseCase: MyUIDUseCase
+         myUIDUseCase: MyUIDUseCase,
+         userInfoFromUIDUseCase: UserInfoFromUIDUseCase,
+         postUseCase: PostUseCase
     )
     {
         self.mainFeedUseCase = mainFeedUseCase
@@ -88,6 +92,8 @@ class FeedVMImpl: FeedVM {
         self.addBlackListUseCase = addBlackListUseCase
         self.postDeleteUseCase = postDeleteUseCase
         self.myUIDUseCase = myUIDUseCase
+        self.userInfoFromUIDUseCase = userInfoFromUIDUseCase
+        self.postUseCase = postUseCase
         fetchPost(type: .initial)
     }
     
