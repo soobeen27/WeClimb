@@ -77,7 +77,7 @@ extension UIColor {
     
     static let accentGreen = UIColor(hex: "#D9FFE6")
     static let accentMint = UIColor(hex: "#DEFAFF")
-    static let accentBlue = UIColor(hex: "#00AEFF")
+    static let accentBlue = UIColor(hex: "#E5F6FE")
     static let accentNavy = UIColor(hex: "#3385FF")
     static let accentPurple = UIColor(hex: "#6541F2")
     

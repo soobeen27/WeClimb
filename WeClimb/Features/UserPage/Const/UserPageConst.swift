@@ -28,7 +28,6 @@ enum UserPageConst {
         }
         
         enum Text {
-            static let dote = "･"
             static let homeGymSettingText: String = "홈짐 설정하기"
             static let editButtonText: String = "편집"
         }

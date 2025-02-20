@@ -22,19 +22,15 @@ final class PostAggregationRepositoryImpl: PostAggregationRepository {
     func getUserFeed(userUID: String) -> Single<[PostWithHold]> {
         return postRemoteDataSource.fetchUserPosts(userUID: userUID)
             .flatMap { posts in
-//                print("📌 PostAggregationRepository에서 받아온 Post 개수: \(posts.count)")
-                
                 let holdFetchObservables = posts.map { post in
-                    self.mediaRemoteDataSource.fetchHolds(for: post.postUID)
-                        .map { holds in
-//                            print("🟢 postUID: \(post.postUID), 가져온 holds: \(holds)")
-                            let postWithHold = PostWithHold(post: post, holds: holds)
-//                            print("✅ 변환된 PostWithHold: \(postWithHold)")
-                            return postWithHold
-                        }
+                    Single.zip(
+                        self.mediaRemoteDataSource.fetchHolds(for: post.postUID),
+                        self.mediaRemoteDataSource.fetchThumbnail(for: post.postUID) // 🔹 썸네일 가져오기
+                    ).map { holds, thumbnail in
+                        let postWithHold = PostWithHold(post: post, holds: holds, thumbnailURL: thumbnail)
+                        return postWithHold
+                    }
                 }
-
-//                print("🔄 holdFetchObservables 개수: \(holdFetchObservables.count)") // ✅ 개수 확인
 
                 return Single.zip(holdFetchObservables)
                     .do(onSuccess: { result in

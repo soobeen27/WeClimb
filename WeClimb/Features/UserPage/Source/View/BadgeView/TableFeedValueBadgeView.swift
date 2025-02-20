@@ -14,9 +14,10 @@ class TableFeedValueBadgeView: UIView {
     var colorName: String? {
         didSet {
             if let colorName = colorName {
-                let lhColor = LHColors.fromEng(colorName)
-                self.backgroundColor = lhColor.toBackgroundAccent()
-                self.colorImage.image = lhColor.toImage()
+                let lhColor = LHColors.fromHoldEng(colorName)
+                let bgColor = lhColor.toBackgroundAccent()
+                self.backgroundColor = bgColor
+                self.colorImage.image = lhColor.toImage(targetSize: CGSize(width: 12, height: 12))
                 self.badgeCountLabel.textColor = lhColor.toFontColor()
             }
         }
@@ -37,19 +38,23 @@ class TableFeedValueBadgeView: UIView {
     
     private let badgeCountLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.font = BadgeConst.Font.badgeFont
         return label
     }()
     
     private let badgeStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
+        stackView.distribution = .fill
         stackView.alignment = .center
+        stackView.layer.cornerRadius = 8
+        stackView.spacing = 4
         return stackView
     }()
     
     init() {
         super.init(frame: .zero)
+        setLayout()
     }
     
     override init(frame: CGRect) {
@@ -72,12 +77,13 @@ class TableFeedValueBadgeView: UIView {
         ].forEach { badgeStackView.addArrangedSubview($0) }
         
         badgeStackView.snp.makeConstraints {
-//            $0.leading.trailing.equalToSuperview()
-            $0.edges.equalToSuperview().inset(12)
+            $0.leading.equalToSuperview()
+            $0.trailing.equalToSuperview().inset(12)
+            $0.height.equalTo(26)
         }
         
-        colorImage.snp.makeConstraints {
-            $0.height.width.equalTo(12)
+        colorImage.snp.remakeConstraints {
+            $0.size.equalTo(BadgeConst.Size.badgeImage)
         }
     }
 }
