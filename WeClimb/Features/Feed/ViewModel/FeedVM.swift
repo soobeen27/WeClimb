@@ -21,6 +21,7 @@ protocol FeedInput {
 protocol FeedOutput {
     var postItems: BehaviorRelay<[PostItem]> { get }
     var isMine: Observable<Bool> { get }
+    var startIndex: BehaviorRelay<Int?> { get }
 }
 
 protocol FeedVM {
@@ -91,6 +92,7 @@ class FeedVMImpl: FeedVM {
     private let postItemRelay: BehaviorRelay<[PostItem]> = .init(value: [])
     private let fetchType = BehaviorRelay<PostFetchType?>.init(value: nil)
     private let postType = BehaviorRelay<PostType?>.init(value: nil)
+    let startIndex = BehaviorRelay<Int?>.init(value: nil)
     
     init(mainFeedUseCase: MainFeedUseCase,
          myUserInfo: MyUserInfoUseCase,
@@ -123,6 +125,7 @@ class FeedVMImpl: FeedVM {
     struct Output: FeedOutput {
         let postItems: BehaviorRelay<[PostItem]>
         let isMine: Observable<Bool>
+        let startIndex: BehaviorRelay<Int?>
     }
     
     func transform(input: FeedInput) -> FeedOutput {
@@ -166,7 +169,7 @@ class FeedVMImpl: FeedVM {
             }
         }).disposed(by: disposeBag)
         
-        return Output(postItems: postItemRelay, isMine: isMine)
+        return Output(postItems: postItemRelay, isMine: isMine, startIndex: startIndex)
     }
     
     private func fetchPost() {
@@ -182,10 +185,16 @@ class FeedVMImpl: FeedVM {
                 switch post {
                 case .feed:
                     self.feedFetchPost()
-                case .gym(let post, let filter, let startIndex):
+                case .gym(let posts, let filter, let startIndex):
                     print("")
-                case .userPage(let post, let startIndex):
-                    print("")
+                case .userPage(let posts, let startIndex):
+                    posts.map { [weak self] posts in
+                        posts.compactMap { self?.postToPostItem(post: $0 ) }
+                    }
+                    .bind(to: self.postItemRelay)
+                    .disposed(by: self.disposeBag)
+                    
+                    self.startIndex.accept(startIndex.value)
                 }
             })
             .disposed(by: disposeBag)

@@ -134,6 +134,15 @@ class FeedVC: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
+        
+        output.startIndex
+            .asDriver()
+            .drive(onNext: { [weak self] startIndex in
+                guard let self, let startIndex else { return }
+                let startIndexPath = IndexPath(item: startIndex, section: 0)
+                self.postCollectionView.scrollToItem(at: startIndexPath, at: .top, animated: false)
+            })
+            .disposed(by: disposeBag)
 
     }
     
