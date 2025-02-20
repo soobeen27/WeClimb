@@ -100,7 +100,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         
         loadRecentVisitItems()
         
-        let searchIcon = SearchConst.Image.searchIcon
+        let searchIcon = UIImageView(image: SearchConst.Image.searchIcon)
         searchIcon.contentMode = .scaleAspectFit
         
         let iconWrapper = UIView(frame: SearchConst.Size.searchIconSize)
@@ -140,55 +140,63 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     private func applySearchStyle() {
         let isDarkMode = traitCollection.userInterfaceStyle == .dark
         
+        switch searchStyle {
+        case .defaultSearch:
+            return
+        case .uploadSearch:
+            setupDarkModeSearchStyle()
+        }
+        
         if isDarkMode {
-            setupUploadSearchStyle()
-        } else {
-            switch searchStyle {
-            case .defaultSearch:
-                return
-            case .uploadSearch:
-                setupUploadSearchStyle()
-            }
+            setupDarkModeSearchStyle()
         }
     }
     
-    private func setupUploadSearchStyle() {
+    private func setupDarkModeSearchStyle() {
+        view.backgroundColor = .fillSolidDarkBlack
+        
         navigationController?.setNavigationBarHidden(false, animated: false)
         
         navigationController?.navigationBar.barStyle = .default
-        navigationController?.navigationBar.barTintColor = UIColor.fillSolidDarkBlack
+        navigationController?.navigationBar.barTintColor = SearchConst.Search.Color.navigationBackground
         
-        navigationItem.title = "편집"
+        navigationItem.title = SearchConst.Search.Text.navigationTitle
         
         navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor.white,
-            .font: UIFont.customFont(style: .heading2SemiBold)
+            .foregroundColor: SearchConst.Search.Color.navigationTitleText,
+            .font: SearchConst.Search.Font.navigationTitle
         ]
         
-        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysTemplate)
-        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapCloseButton))
-        backButton.tintColor = .white
-        
+        let backButton = UIBarButtonItem(
+            image: SearchConst.Search.Image.closeIcon,
+            style: .plain,
+            target: self,
+            action: #selector(didTapCloseButton)
+        )
+        backButton.tintColor = SearchConst.Search.Color.navigationBackButtonTint
         navigationItem.leftBarButtonItem = backButton
         
-        view.backgroundColor = UIColor.fillSolidDarkBlack
-        self.tableView.backgroundColor = UIColor.fillSolidDarkBlack
-        self.searchTextField.textColor = UIColor.white
-        self.titleLabel.textColor = UIColor.white
+        view.backgroundColor = SearchConst.Search.Color.viewBackground
+        tableView.backgroundColor = SearchConst.Search.Color.tableViewBackground
+        searchTextField.textColor = SearchConst.Search.Color.textFieldText
+        titleLabel.textColor = SearchConst.Search.Color.titleLabelText
     }
-    
+
     @objc private func didTapCloseButton() {
         let alert = DefaultAlertVC(alertType: .titleDescription, interfaceStyle: .dark)
-        alert.setTitle("정말 나가시겠어요?", "입력된 내용은 저장되지 않아요.")
-        alert.setCustomButtonTitle("삭제")
-        alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  //StatusNegative
+        alert.setTitle(SearchConst.Search.Text.closeAlertTitle, SearchConst.Search.Text.closeAlertMessage)
+        alert.setCustomButtonTitle(SearchConst.Search.Text.closeAlertConfirmButtonTitle)
+        alert.customButtonTitleColor = SearchConst.Search.Color.alertConfirmButton
         
         alert.customAction = { [weak self] in
-            self?.tabBarController?.selectedIndex = 0
+            self?.tabBarController?.selectedIndex = SearchConst.Search.TabBar.defaultIndex
             self?.tabBarController?.tabBar.isHidden = false
-            UIView.animate(withDuration: 0.1, animations: {
-                self?.tabBarController?.tabBar.alpha = 1
-            })
+            UIView.animate(
+                withDuration: SearchConst.Search.Animation.fadeDuration,
+                animations: {
+                    self?.tabBarController?.tabBar.alpha = SearchConst.Search.Animation.visibleAlpha
+                }
+            )
         }
         
         alert.modalPresentationStyle = .overCurrentContext

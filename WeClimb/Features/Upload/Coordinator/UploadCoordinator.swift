@@ -52,24 +52,25 @@ final class UploadCoordinator: BaseCoordinator {
         tabBarController.view.addSubview(uploadMenuVC.view)
         
         uploadMenuVC.view.snp.makeConstraints {
-            $0.height.equalTo(190 - 54)
-            $0.width.equalTo(250)
+            $0.height.equalTo(UploadMediaConst.UploadMenu.Layout.viewHeight)
+            $0.width.equalTo(UploadMediaConst.UploadMenu.Layout.viewWidth)
             $0.centerX.equalTo(tabBarController.view)
-            $0.bottom.equalTo(tabBarController.tabBar.snp.top).offset(-16)
+            $0.bottom.equalTo(tabBarController.tabBar.snp.top)
+                .offset(UploadMediaConst.UploadMenu.Layout.viewBottomOffset)
         }
         
         self.uploadMenuVC = uploadMenuVC
     }
     
     func navigateToTabIndex() {
-        tabBarController.selectedIndex = 2
+        tabBarController.selectedIndex = UploadMediaConst.UploadMenu.TabBar.uploadTabIndex
         navigateToSearchVC()
         dismissUploadMenuView()
         
         UIView.animate(
-            withDuration: 0.3,
+            withDuration: UploadMediaConst.UploadMenu.Animation.fadeDuration,
             animations: {
-                self.tabBarController.tabBar.alpha = 0
+                self.tabBarController.tabBar.alpha = UploadMediaConst.UploadMenu.TabBar.hiddenAlpha
             }
         ) { _ in
             self.tabBarController.tabBar.isHidden = true
@@ -138,10 +139,10 @@ final class UploadCoordinator: BaseCoordinator {
             
             VideoManager.shared.UploadReset()
             
-            self.tabBarController.selectedIndex = 0
+            self.tabBarController.selectedIndex = UploadMediaConst.UploadMenu.TabBar.defaultIndex
             self.tabBarController.tabBar.isHidden = false
-            UIView.animate(withDuration: 0.1, animations: {
-                self.tabBarController.tabBar.alpha = 1
+            UIView.animate(withDuration: UploadMediaConst.UploadMenu.Animation.tabBarFadeInDuration, animations: {
+                self.tabBarController.tabBar.alpha = UploadMediaConst.UploadMenu.Animation.fadeInAlpha
             })
         }
     }
@@ -188,11 +189,11 @@ final class UploadCoordinator: BaseCoordinator {
             guard let self else { return }
             
             VideoManager.shared.UploadReset()
-
-            self.tabBarController.selectedIndex = 0
+            
+            self.tabBarController.selectedIndex = UploadMediaConst.UploadMenu.TabBar.defaultIndex
             self.tabBarController.tabBar.isHidden = false
-            UIView.animate(withDuration: 0.1, animations: {
-                self.tabBarController.tabBar.alpha = 1
+            UIView.animate(withDuration: UploadMediaConst.UploadMenu.Animation.tabBarFadeInDuration, animations: {
+                self.tabBarController.tabBar.alpha = UploadMediaConst.UploadMenu.Animation.fadeInAlpha
             })
         }
     }
@@ -203,9 +204,9 @@ extension UploadCoordinator {
         guard let uploadViewController = uploadMenuVC else { return }
         
         UIView.animate(
-            withDuration: 0.3,
+            withDuration: UploadMediaConst.UploadMenu.Animation.fadeDuration,
             animations: {
-                uploadViewController.view.alpha = 0
+                uploadViewController.view.alpha = UploadMediaConst.UploadMenu.Animation.fadeDuration
             }
         ) { _ in
             uploadViewController.view.removeFromSuperview()

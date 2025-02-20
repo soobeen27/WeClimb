@@ -121,32 +121,33 @@ class UploadPostVMImpl: UploadPostVM {
     private func compressMediaItems(_ mediaItems: [MediaUploadData]) -> Observable<[URL]> {
         let totalCount = mediaItems.count
         var completedCount = 0
-
+        
         return Observable.from(mediaItems.enumerated())
             .flatMap { (index, media) -> Observable<(Int, URL)> in
                 return Observable.create { observer in
                     let onComplete: (URL) -> Void = { compressedURL in
                         observer.onNext((index, compressedURL))
                         observer.onCompleted()
-
+                        
                         DispatchQueue.main.async {
                             completedCount += 1
-
                             if completedCount == totalCount {
                                 self.isCompressionCompleteRelay.accept(true)
                             }
                         }
                     }
-
-                    if media.url.pathExtension.lowercased() == "jpg" || media.url.pathExtension.lowercased() == "png" {
+                    
+                    if media.url.pathExtension.lowercased() == UploadPostConst.UploadPostVM.MediaFileExtensions.imageJPG ||
+                        media.url.pathExtension.lowercased() == UploadPostConst.UploadPostVM.MediaFileExtensions.imagePNG {
+                        
                         if let imageData = try? Data(contentsOf: media.url),
                            let image = UIImage(data: imageData),
                            let compressedData = self.compressImage(image: image) {
-
+                            
                             let compressedURL = FileManager.default.temporaryDirectory
                                 .appendingPathComponent(UUID().uuidString)
-                                .appendingPathExtension("jpg")
-
+                                .appendingPathExtension(UploadPostConst.UploadPostVM.MediaFileExtensions.imageJPG)
+                            
                             do {
                                 try compressedData.write(to: compressedURL)
                                 onComplete(compressedURL)
@@ -171,7 +172,7 @@ class UploadPostVMImpl: UploadPostVM {
                 return sortedList
             }
     }
-
+    
     private func uploadPost(caption: String, mediaItems: [MediaUploadData], gymName: String) -> Observable<Result<Void, Error>> {
         return self.myUserInfoUseCase.execute()
             .flatMap { user -> Single<Result<Void, Error>> in
@@ -195,7 +196,7 @@ class UploadPostVMImpl: UploadPostVM {
 }
 
 extension UploadPostVMImpl {
-    func compressImage(image: UIImage, quality: CGFloat = 0.3) -> Data? {
+    func compressImage(image: UIImage, quality: CGFloat = UploadPostConst.UploadPostVM.Compression.imageQuality) -> Data? {
         return image.jpegData(compressionQuality: quality)
     }
     
@@ -205,10 +206,11 @@ extension UploadPostVMImpl {
         _ = videoCompressor.compressVideo(videos: [
             .init(
                 source: inputURL,
-                destination: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("mp4"),
+                destination: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+                    .appendingPathExtension(UploadPostConst.UploadPostVM.MediaFileExtensions.videoMP4),
                 configuration: .init(
                     quality: VideoQuality.medium,
-                    videoBitrateInMbps: 2,
+                    videoBitrateInMbps: UploadPostConst.UploadPostVM.Compression.videoBitrate,
                     disableAudio: false,
                     keepOriginalResolution: false,
                     videoSize: nil

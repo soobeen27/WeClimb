@@ -40,7 +40,7 @@ class SearchResultVC: UIViewController {
         textField.font = SearchConst.Font.textFieldFont
         textField.textColor = SearchConst.Color.textFieldTextColor
         
-        let searchIcon = SearchConst.Image.searchIcon
+        let searchIcon = UIImageView(image: SearchConst.Image.searchIcon)
         searchIcon.contentMode = .scaleAspectFit
         let iconWrapper = UIView(frame: SearchConst.Size.searchIconSize)
         iconWrapper.addSubview(searchIcon)
@@ -112,28 +112,33 @@ class SearchResultVC: UIViewController {
     private func applySearchStyle() {
         let isDarkMode = traitCollection.userInterfaceStyle == .dark
         
+        switch searchStyle {
+        case .defaultSearch:
+            return
+        case .uploadSearch:
+            setupDarkModeSearchStyle()
+        }
+        
         if isDarkMode {
             setupDarkModeSearchStyle()
-        } else {
-            switch searchStyle {
-            case .defaultSearch:
-                return
-            case .uploadSearch:
-                setupDarkModeSearchStyle()
-            }
         }
     }
-    
+
     private func setupDarkModeSearchStyle() {
         navigationController?.setNavigationBarHidden(false, animated: false)
-        navigationController?.navigationBar.barTintColor = UIColor.fillSolidDarkBlack
+        navigationController?.navigationBar.barTintColor = SearchConst.SearchResult.Color.navigationBackground
+
+        navigationItem.title = SearchConst.SearchResult.Text.navigationTitle
         
-        navigationItem.title = "암장"
-        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysOriginal)
-        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapBackButton))
+        let backButton = UIBarButtonItem(
+            image: SearchConst.SearchResult.Image.navigationBackIcon,
+            style: .plain,
+            target: self,
+            action: #selector(didTapCloseButton)
+        )
+        backButton.tintColor = SearchConst.Search.Color.navigationBackButtonTint
         navigationItem.leftBarButtonItem = backButton
-        backButton.tintColor = .white
-        
+
         self.backButton.isHidden = true
         segmentedControl.isHidden = true
         bottomLineView.isHidden = true
@@ -146,23 +151,36 @@ class SearchResultVC: UIViewController {
         }
         
         tableView.snp.makeConstraints {
-            $0.top.equalTo(searchTextField.snp.bottom).offset(16)
+            $0.top.equalTo(searchTextField.snp.bottom).offset(SearchConst.SearchResult.Spacing.tableViewTopOffset)
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
             $0.leading.trailing.equalToSuperview()
         }
         
-        view.backgroundColor = UIColor.fillSolidDarkBlack
-        self.tableView.backgroundColor = UIColor.fillSolidDarkBlack
-        self.searchTextField.textColor = UIColor.white
+        view.backgroundColor = SearchConst.SearchResult.Color.viewBackground
+        tableView.backgroundColor = SearchConst.SearchResult.Color.tableViewBackground
+        searchTextField.textColor = SearchConst.SearchResult.Color.searchTextFieldText
     }
-
-    @objc private func didTapBackButton() {
-        tabBarController?.selectedIndex = 0
+    
+    @objc private func didTapCloseButton() {
+        let alert = DefaultAlertVC(alertType: .titleDescription, interfaceStyle: .dark)
+        alert.setTitle(SearchConst.Search.Text.closeAlertTitle, SearchConst.Search.Text.closeAlertMessage)
+        alert.setCustomButtonTitle(SearchConst.Search.Text.closeAlertConfirmButtonTitle)
+        alert.customButtonTitleColor = SearchConst.Search.Color.alertConfirmButton
         
-        tabBarController?.tabBar.isHidden = false
-         UIView.animate(withDuration: 0.1, animations: {
-             self.tabBarController?.tabBar.alpha = 1
-         })
+        alert.customAction = { [weak self] in
+            self?.tabBarController?.selectedIndex = SearchConst.Search.TabBar.defaultIndex
+            self?.tabBarController?.tabBar.isHidden = false
+            UIView.animate(
+                withDuration: SearchConst.Search.Animation.fadeDuration,
+                animations: {
+                    self?.tabBarController?.tabBar.alpha = SearchConst.Search.Animation.visibleAlpha
+                }
+            )
+        }
+        
+        alert.modalPresentationStyle = .overCurrentContext
+        alert.modalTransitionStyle = .crossDissolve
+        present(alert, animated: false, completion: nil)
     }
     
     private func setLayout() {

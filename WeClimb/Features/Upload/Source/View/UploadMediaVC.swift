@@ -28,31 +28,30 @@ class UploadMediaVC: UIViewController {
     lazy var gymButton: UIButton = {
         var config = UIButton.Configuration.plain()
         config.title = gymItem.name
-        config.image = UIImage.locationIconFill.resize(targetSize: CGSize(width: 12, height: 12))?
-            .withTintColor(UIColor.white, renderingMode: .alwaysOriginal)
-        config.baseForegroundColor = UIColor.white
-        config.baseBackgroundColor = UIColor.init(hex: "313235", alpha: 0.4) // fillOpacityDarkHeavy
+        config.image = UploadMediaConst.UploadMediaVC.Image.gymBtn
+        config.baseForegroundColor = UploadMediaConst.UploadMediaVC.Color.gymBtnBaseForeground
+        config.baseBackgroundColor = UploadMediaConst.UploadMediaVC.Color.gymBtnbaseBackground
         config.titleAlignment = .trailing
         config.imagePlacement = .leading
-        config.imagePadding = 4
+        config.imagePadding = UploadMediaConst.UploadMediaVC.Size.gymButtonImagePadding
         
         var titleAttributes = AttributedString(gymItem.name)
-        titleAttributes.font = UIFont.customFont(style: .caption1Medium)
+        titleAttributes.font = UploadMediaConst.UploadMediaVC.Font.gymButton
         
         config.attributedTitle = titleAttributes
         
         let button = UIButton(configuration: config)
         button.tintColor = .white
-        button.layer.zPosition = 1
-        button.backgroundColor = UIColor.init(hex: "313235", alpha: 0.4) // fillOpacityDarkHeavy
-        button.layer.cornerRadius = 8
+        button.layer.zPosition = UploadMediaConst.UploadMediaVC.Size.gymButtonZPosition
+        button.backgroundColor = UploadMediaConst.UploadMediaVC.Color.gymBtnbaseBackground
+        button.layer.cornerRadius = UploadMediaConst.UploadMediaVC.Size.gymButtonCornerRadius
         
         return button
     }()
     
     private let separatorLine: UIView = {
         let view = UIView()
-        view.backgroundColor = .lineOpacityNormal
+        view.backgroundColor = UploadMediaConst.UploadMediaVC.Color.separatorLine
         return view
     }()
     
@@ -66,17 +65,16 @@ class UploadMediaVC: UIViewController {
     
     private lazy var selectedMediaView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.fillSolidDarkBlack
+        view.backgroundColor = UploadMediaConst.UploadMediaVC.Color.mediaView
         view.addSubview(callPHPickerButton)
         return view
     }()
     
     private lazy var callPHPickerButton: UIButton = {
         let button = UIButton()
-        let imageAddIcon = UIImage.imageAddIcon.resize(targetSize: CGSize(width: 20, height: 20))?
-            .withTintColor(UIColor.labelNormal, renderingMode: .alwaysOriginal)
+        let imageAddIcon = UploadMediaConst.UploadMediaVC.Image.PHPickerBtn
         button.setImage(imageAddIcon, for: .normal)
-        button.layer.cornerRadius = 10
+        button.layer.cornerRadius = UploadMediaConst.UploadMediaVC.Size.PHPickerBtnCornerRadius
         button.imageView?.contentMode = .center
         button.contentHorizontalAlignment = .center
         button.contentVerticalAlignment = .center
@@ -90,7 +88,7 @@ class UploadMediaVC: UIViewController {
     
     private lazy var safeAreaBackgroundView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.fillSolidDarkStrong
+        view.backgroundColor = UploadMediaConst.UploadMediaVC.Color.safeAreaBackgroundView
         return view
     }()
     
@@ -143,38 +141,31 @@ class UploadMediaVC: UIViewController {
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.barTintColor = UIColor.fillSolidDarkBlack
         
-        navigationItem.title = "선택"
+        navigationItem.title = UploadMediaConst.UploadMediaVC.Text.navigationTitle
         
         navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor.white,
-            .font: UIFont.customFont(style: .heading2SemiBold)
+            .foregroundColor: UploadMediaConst.UploadMediaVC.Color.navigationForeground,
+            .font: UploadMediaConst.UploadMediaVC.Font.navigation
         ]
         
-        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysTemplate)
-        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapCloseButton))
-        backButton.tintColor = .white
+        let closeIcon = UploadMediaConst.UploadMediaVC.Image.navigationCloseIcon
+        let closeButton = UIBarButtonItem(image: closeIcon, style: .plain, target: self, action: #selector(didTapCloseButton))
+        closeButton.tintColor = .white
         
-        navigationItem.leftBarButtonItem = backButton
+        navigationItem.leftBarButtonItem = closeButton
     }
-    
+   
     @objc private func didTapCloseButton() {
-        let alert = DefaultAlertVC(alertType: .titleDescription, interfaceStyle: .dark)
-        alert.setTitle("정말 나가시겠어요?", "입력된 내용은 저장되지 않아요.")
-        alert.setCustomButtonTitle("삭제")
-        alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  //StatusNegative
-        
-        alert.customAction = { [weak self] in
+        showAlert(title: UploadMediaConst.UploadMediaVC.Text.closeAlertTitle,
+                  message: UploadMediaConst.UploadMediaVC.Text.closeAlertMessage,
+                  CustomBtnTitle: UploadMediaConst.UploadMediaVC.Text.AlertDelete) { [weak self] in
             self?.onDismiss?()
         }
-        
-        alert.modalPresentationStyle = .overCurrentContext
-        alert.modalTransitionStyle = .crossDissolve
-        present(alert, animated: false, completion: nil)
     }
     
     private func phpickerVCPresent() {
         var configuration = PHPickerConfiguration()
-        configuration.selectionLimit = 10
+        configuration.selectionLimit = UploadMediaConst.UploadMediaVC.PHPicker.selectionLimit
         configuration.filter = .any(of: [.images, .videos])
         configuration.preferredAssetRepresentationMode = .current
         let picker = PHPickerViewController(configuration: configuration)
@@ -283,16 +274,19 @@ class UploadMediaVC: UIViewController {
         }
     }
     
-    private func showAlert(title: String, message: String) {
+    private func showAlert(title: String, message: String, CustomBtnTitle: String = UploadMediaConst.UploadMediaVC.Text.AlertConfirm, onConfirmAction: (() -> Void)? = nil) {
         let alert = DefaultAlertVC(alertType: .titleDescription, interfaceStyle: .dark)
         alert.setTitle(title, message)
-        alert.setCustomButtonTitle("확인")
-        alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  // StatusNegative
+        alert.setCustomButtonTitle(CustomBtnTitle)
+        alert.customButtonTitleColor = UploadMediaConst.UploadMediaVC.Color.alertCustomBtnTitle
         
+        alert.customAction = onConfirmAction
+
         alert.modalPresentationStyle = .overCurrentContext
         alert.modalTransitionStyle = .crossDissolve
         present(alert, animated: false, completion: nil)
     }
+
     
     private func bindOptionButtonActions() {
         uploadOptionView.didTapBackButton = { [weak self] in
@@ -306,14 +300,20 @@ class UploadMediaVC: UIViewController {
             let selectedMediaItems = self.viewModel.mediaUploadDataRelay.value
             
             if selectedMediaItems.isEmpty {
-                self.showAlert(title: "미디어가 없습니다.", message: "업로드할 사진 또는 영상을 선택해주세요.")
+                self.showAlert(
+                    title: UploadMediaConst.UploadMediaVC.Text.emptyMediaTitle,
+                    message: UploadMediaConst.UploadMediaVC.Text.emptyMediaMessage
+                )
                 return
             }
             
             let hasMissingSelection = selectedMediaItems.contains { ($0.grade?.isEmpty ?? true) || $0.hold == nil }
             
             if hasMissingSelection {
-                self.showAlert(title: "선택되지 않은 항목이 있습니다.", message: "레벨과 홀드를 모두 선택해주세요.")
+                self.showAlert(
+                    title: UploadMediaConst.UploadMediaVC.Text.missingSelectionTitle,
+                    message: UploadMediaConst.UploadMediaVC.Text.missingSelectionMessage
+                )
             } else {
                 self.onNextButton?(selectedMediaItems)
                 VideoManager.shared.UploadStopVideo()
@@ -326,7 +326,10 @@ class UploadMediaVC: UIViewController {
             let selectedMediaItems = self.viewModel.mediaUploadDataRelay.value
             
             if selectedMediaItems.isEmpty {
-                self.showAlert(title: "미디어 없습니다.", message: "미디어를 추가한 후 필터를 선택해주세요.")
+                self.showAlert(
+                    title: UploadMediaConst.UploadMediaVC.Text.noMediaForFilterTitle,
+                    message: UploadMediaConst.UploadMediaVC.Text.noMediaForFilterMessage
+                )
             } else {
                 _ = self.onLevelFilter?(self.gymItem.name)
                 VideoManager.shared.UploadStopVideo()
@@ -339,7 +342,10 @@ class UploadMediaVC: UIViewController {
             let selectedMediaItems = self.viewModel.mediaUploadDataRelay.value
             
             if selectedMediaItems.isEmpty {
-                self.showAlert(title: "미디어 없습니다.", message: "미디어를 추가한 후 필터를 선택해주세요.")
+                self.showAlert(
+                    title: UploadMediaConst.UploadMediaVC.Text.noMediaForFilterTitle,
+                    message: UploadMediaConst.UploadMediaVC.Text.noMediaForFilterMessage
+                )
             } else {
                 _ = self.onHoldFilter?(self.gymItem.name)
                 VideoManager.shared.UploadStopVideo()
@@ -393,13 +399,13 @@ class UploadMediaVC: UIViewController {
         
         separatorLine.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
-            $0.height.equalTo(1)
+            $0.height.equalTo(UploadMediaConst.UploadMediaVC.Layout.separatorLineHeight)
         }
         
         gymButton.snp.makeConstraints {
-            $0.top.equalTo(separatorLine.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(16)
-            $0.height.equalTo(26)
+            $0.top.equalTo(separatorLine.snp.bottom).offset(UploadMediaConst.UploadMediaVC.Layout.gymButtonTop)
+            $0.leading.equalToSuperview().offset(UploadMediaConst.UploadMediaVC.Layout.gymButtonLeading)
+            $0.height.equalTo(UploadMediaConst.UploadMediaVC.Layout.gymButtonHeight)
         }
         
         selectedMediaView.snp.makeConstraints {
@@ -411,7 +417,7 @@ class UploadMediaVC: UIViewController {
         callPHPickerButton.snp.makeConstraints {
             $0.centerX.equalTo(selectedMediaView.snp.centerX)
             $0.centerY.equalTo(selectedMediaView.snp.centerY)
-            $0.width.height.equalTo(100)
+            $0.width.height.equalTo(UploadMediaConst.UploadMediaVC.Layout.PHPickerButtonSize)
         }
         
         uploadOptionView.snp.makeConstraints {

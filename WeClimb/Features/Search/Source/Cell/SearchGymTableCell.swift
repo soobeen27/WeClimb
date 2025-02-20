@@ -101,10 +101,14 @@ class SearchGymTableCell: UITableViewCell {
             gymImageView.image = SearchConst.Image.emptyDefaultImage
         }
         
-        if searchStyle == .uploadSearch {
+        if searchStyle == .uploadSearch || traitCollection.userInterfaceStyle == .dark {
             self.backgroundColor = .fillSolidDarkBlack
             gymNameLabel.textColor = .labelWhite
             gymLocationLabel.textColor = .labelWhite
+        } else {
+            self.backgroundColor = .white
+            gymNameLabel.textColor = .labelStrong
+            gymNameLabel.textColor = .labelNeutral
         }
     }
     

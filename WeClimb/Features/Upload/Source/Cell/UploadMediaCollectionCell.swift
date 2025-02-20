@@ -54,21 +54,21 @@ class UploadMediaCollectionCell: UICollectionViewCell {
     func configure(with mediaItem: MediaUploadData) {
         let url = mediaItem.url
         
-        if url.pathExtension == "jpg" || url.pathExtension == "png" {
+        if url.pathExtension == UploadMediaConst.cell.MediaFileExtensions.imageJPG || url.pathExtension == UploadMediaConst.cell.MediaFileExtensions.imagePNG {
             loadImage(from: url)
-        } else if url.pathExtension == "mp4" {
+        } else if url.pathExtension == UploadMediaConst.cell.MediaFileExtensions.videoMP4 {
             loadVideo(from: url)
         }
     }
     
     private func loadImage(from url: URL) {
-        imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"), options: [.cacheOriginalImage]) { result in
+        imageView.kf.setImage(with: url, placeholder: UploadMediaConst.cell.Image.placeholder, options: [.cacheOriginalImage]) { result in
             switch result {
             case .success(let value):
                 print("이미지 로드 성공: \(value.image)")
             case .failure(let error):
                 print("이미지 로드 실패: \(error.localizedDescription)")
-                self.imageView.image = UIImage(named: "placeholder")
+                self.imageView.image = UploadMediaConst.cell.Image.placeholder
             }
         }
     }

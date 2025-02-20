@@ -61,34 +61,34 @@ final class UploadVMImpl : UploadVM {
         input.gradeSelection
             .subscribe(onNext: { [weak self] (index, newGrade) in
                 guard let self = self else { return }
-
+                
                 var mediaList = self.mediaUploadDataRelay.value
                 guard index >= 0, index < mediaList.count else { return }
-
+                
                 if mediaList[index].grade == newGrade { return }
-
+                
                 var updatedMedia = mediaList[index]
                 updatedMedia.grade = newGrade
                 mediaList[index] = updatedMedia
-
+                
                 self.mediaUploadDataRelay.accept(mediaList)
             })
             .disposed(by: disposeBag)
-
+        
         input.holdSelection
             .subscribe(onNext: { [weak self] (index, newHold) in
                 guard let self = self else { return }
                 guard let newHold = newHold else { return }
-
+                
                 var mediaList = self.mediaUploadDataRelay.value
                 guard index >= 0, index < mediaList.count else { return }
-
+                
                 if mediaList[index].hold == newHold { return }
-
+                
                 var updatedMedia = mediaList[index]
                 updatedMedia.hold = newHold
                 mediaList[index] = updatedMedia
-
+                
                 self.mediaUploadDataRelay.accept(mediaList)
             })
             .disposed(by: disposeBag)
@@ -102,11 +102,11 @@ final class UploadVMImpl : UploadVM {
     private func processMediaItems(mediaItems: [PHPickerResult]) {
         let group = DispatchGroup()
         var models = [MediaUploadData?](repeating: nil, count: mediaItems.count)
-        let syncQueue = DispatchQueue(label: "com.upload.syncQueue")
-
+        let syncQueue = DispatchQueue(label: UploadMediaConst.UploadVM.Dispatch.syncQueueLabel)
+        
         mediaItems.enumerated().forEach { index, mediaItem in
             group.enter()
-
+            
             if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
                 mediaItem.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { [weak self] (url, error) in
                     guard let self = self, let url = url, error == nil else {
@@ -114,11 +114,11 @@ final class UploadVMImpl : UploadVM {
                         group.leave()
                         return
                     }
-
+                    
                     let tempVideoURL = FileManager.default.temporaryDirectory
                         .appendingPathComponent(UUID().uuidString)
-                        .appendingPathExtension("mp4")
-
+                        .appendingPathExtension(UploadMediaConst.UploadVM.Video.fileExtension)
+                    
                     do {
                         try FileManager.default.copyItem(at: url, to: tempVideoURL)
                         print("비디오 파일이 임시 디렉토리에 저장됨: \(tempVideoURL.path)")
@@ -127,20 +127,22 @@ final class UploadVMImpl : UploadVM {
                         group.leave()
                         return
                     }
-
+                    
                     Task {
                         let duration = await self.getVideoDuration(url: tempVideoURL)
-                        if duration > 120 {
+                        if duration > UploadMediaConst.UploadVM.Video.maxDuration {
                             await MainActor.run {
                                 self.mediaUploadDataRelay.accept([])
-                                self.alertTriggerRelay.accept(("영상 길이 초과", "2분 이내의 영상을 업로드해주세요."))
-
+                                self.alertTriggerRelay.accept((
+                                    UploadMediaConst.UploadVM.Text.videoLengthExceededTitle,
+                                    UploadMediaConst.UploadVM.Text.videoLengthExceededMessage
+                                ))
                             }
                             return
                         }
-
+                        
                         let capturedDate = await self.getVideoMetadataCapturedDate(from: tempVideoURL)
-
+                        
                         syncQueue.sync {
                             models[index] = MediaUploadData(
                                 url: tempVideoURL,
@@ -150,7 +152,7 @@ final class UploadVMImpl : UploadVM {
                                 capturedDate: capturedDate
                             )
                         }
-
+                        
                         group.leave()
                     }
                 }
@@ -161,17 +163,17 @@ final class UploadVMImpl : UploadVM {
                         group.leave()
                         return
                     }
-
+                    
                     let capturedAt = self.getImageMetadataCapturedDate(from: url)
-
+                    
                     let tempImageURL = FileManager.default.temporaryDirectory
                         .appendingPathComponent(UUID().uuidString)
-                        .appendingPathExtension("jpg")
-
+                        .appendingPathExtension(UploadMediaConst.UploadVM.Image.fileExtension)
+                    
                     do {
                         try FileManager.default.copyItem(at: url, to: tempImageURL)
                         print("이미지 저장 완료: \(tempImageURL.path)")
-
+                        
                         syncQueue.sync {
                             models[index] = MediaUploadData(
                                 url: tempImageURL,
@@ -184,14 +186,14 @@ final class UploadVMImpl : UploadVM {
                     } catch {
                         print("이미지 저장 실패: \(error.localizedDescription)")
                     }
-
+                    
                     group.leave()
                 }
             } else {
                 group.leave()
             }
         }
-
+        
         group.notify(queue: .main) { [weak self] in
             guard let self = self else { return }
             let validModels = models.compactMap { $0 }

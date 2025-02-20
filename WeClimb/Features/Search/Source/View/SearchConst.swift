@@ -33,7 +33,8 @@ enum SearchConst {
     }
     
     enum Image {
-        static let searchIcon = UIImageView(image: UIImage(named: "searchIcon"))
+        static let searchIcon = UIImage(named: "searchIcon")?.resize(targetSize: CGSize(width: 20, height: 20))?
+            .withTintColor(UIColor.labelAlternative, renderingMode: .alwaysOriginal)
         static let closeIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysTemplate)
         static let backIcon = UIImage(named: "chevronLeftIcon")?.withRenderingMode(.alwaysTemplate)
         
@@ -91,6 +92,43 @@ enum SearchConst {
     }
     
     enum Search {
+                
+        enum Text {
+            static let navigationTitle = "편집"
+            static let closeAlertTitle = "정말 나가시겠어요?"
+            static let closeAlertMessage = "입력된 내용은 저장되지 않아요."
+            static let closeAlertConfirmButtonTitle = "삭제"
+        }
+        
+        enum Color {
+            static let navigationBackground = UIColor.fillSolidDarkBlack
+            static let navigationTitleText = UIColor.white
+            
+            static let alertConfirmButton = UIColor.statusNegative
+            
+            static let navigationBackButtonTint = UIColor.white
+            
+            static let tableViewBackground = UIColor.fillSolidDarkBlack
+            static let viewBackground = UIColor.fillSolidDarkBlack
+            static let textFieldText = UIColor.white
+            static let titleLabelText = UIColor.white
+        }
+        
+        enum Image {
+            static let searchIcon = UIImage(named: "searchIcon")?.resize(targetSize: CGSize(width: 20, height: 20))?
+                .withTintColor(UIColor.labelAlternative, renderingMode: .alwaysOriginal)
+            static let closeIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysTemplate)
+            static let backIcon = UIImage(named: "chevronLeftIcon")?.withRenderingMode(.alwaysTemplate)
+            
+            static let emptyDefaultImage = UIImage(named: "")
+            static let defaultUserImage = UIImage.avatarIconFill
+            
+            static let circleCancelImage = UIImage(named: "closeIcon.circle")?.withRenderingMode(.alwaysTemplate)
+        }
+        
+        enum Font {
+            static let navigationTitle = UIFont.customFont(style: .heading2SemiBold)
+        }
         
         enum Size {
             static let textFieldHeight: CGFloat = 46
@@ -107,9 +145,35 @@ enum SearchConst {
             static let updatedCancelBtnRightSpacing: CGFloat = -16
             static let returnCancelBtnRightSpacing: CGFloat = 16
         }
+        
+        enum TabBar {
+            static let defaultIndex = 0
+        }
+        
+        enum Animation {
+            static let fadeDuration: TimeInterval = 0.1
+            static let visibleAlpha: CGFloat = 1
+            static let hiddenAlpha: CGFloat = 0
+        }
     }
     
     enum SearchResult {
+        
+        enum Text {
+            static let navigationTitle = "암장"
+        }
+        
+        enum Color {
+            static let navigationBackground = UIColor.fillSolidDarkBlack
+            static let navigationBackButtonTint = UIColor.white
+            static let searchTextFieldText = UIColor.white
+            static let viewBackground = UIColor.fillSolidDarkBlack
+            static let tableViewBackground = UIColor.fillSolidDarkBlack
+        }
+        
+        enum Image {
+            static let navigationBackIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysOriginal)
+        }
         
         enum Size {
             static let backBtnSize: CGFloat = 24
@@ -126,7 +190,21 @@ enum SearchConst {
             static let segmentRightSpacing: CGFloat = 16
             static let segmentTopSpacing: CGFloat = 16
             static let bottomLineTopSpacing: CGFloat = -1
+            
+            static let tableViewTopOffset: CGFloat = 16
         }
+        
+        enum Animation {
+            static let fadeDuration: TimeInterval = 0.1
+            static let visibleAlpha: CGFloat = 1
+            static let hiddenAlpha: CGFloat = 0
+        }
+        
+        enum TabBar {
+              static let defaultSelectedIndex = 0
+          }
+        
+        static let searchDebounceMilliseconds: Int = 500
     }
     
     enum gymCell {

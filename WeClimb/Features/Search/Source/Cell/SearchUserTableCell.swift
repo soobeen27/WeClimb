@@ -108,10 +108,14 @@ class SearchUserTableCell: UITableViewCell {
             userInfoLabel.text = nil
         }
 
-        if searchStyle == .uploadSearch {
+        if searchStyle == .uploadSearch || traitCollection.userInterfaceStyle == .dark {
             self.backgroundColor = .fillSolidDarkBlack
             userNameLabel.textColor = .labelWhite
             userInfoLabel.textColor = .labelWhite
+        } else {
+            self.backgroundColor = .white
+            userNameLabel.textColor = .labelStrong
+            userInfoLabel.textColor = .labelNeutral
         }
     }
     
