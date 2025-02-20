@@ -26,7 +26,7 @@ class UploadTextView : UIView {
         let textView = UITextView()
         textView.font = .customFont(style: .body2Medium)
         textView.textColor = .labelNormal
-        textView.text = " 등반에 관한 설명을 추가하세요!"
+        textView.text = " 내용을 입력해주세요."
         textView.backgroundColor = .fillSolidDarkBlack
         textView.returnKeyType = .done
         textView.layer.cornerRadius = 8
@@ -45,9 +45,9 @@ class UploadTextView : UIView {
         return label
     }()
     
-    private let textFieldCharCountLabel: UILabel = {
+    let textFieldCharCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "0/160"
+        label.text = "0/1000"
         label.font = .customFont(style: .caption1Regular)
         label.textColor = .labelNeutral
         return label
@@ -82,7 +82,6 @@ class UploadTextView : UIView {
         
         titleLabel.snp.makeConstraints {
             $0.leading.top.equalToSuperview().offset(16)
-            //            $0.height.equalTo(56)
         }
         
         textView.snp.makeConstraints {

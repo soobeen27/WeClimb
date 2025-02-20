@@ -21,10 +21,10 @@ class FetchUserFeedInfoUseCaseImpl: FetchUserFeedInfoUseCase {
     }
     
     func execute(userUID: String) -> Single<[PostWithHold]> {
-//        print("🚀 FetchUserFeedInfoUseCase 실행됨 - userUID: \(userUID)")
+        print("🚀 FetchUserFeedInfoUseCase 실행됨 - userUID: \(userUID)")
         return postAggregationRepository.getUserFeed(userUID: userUID)
                 .do(onSuccess: { result in
-//                    print("✅ FetchUserFeedInfoUseCase 결과: \(result.count)개 데이터 반환됨")
+                    print("✅ FetchUserFeedInfoUseCase 결과: \(result.count)개 데이터 반환됨")
                 })
     }
 }

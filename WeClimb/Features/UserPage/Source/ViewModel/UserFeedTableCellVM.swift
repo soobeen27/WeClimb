@@ -10,6 +10,12 @@ import Foundation
 import RxCocoa
 import RxSwift
 
+struct PostWithHold {
+    let post: Post
+    let holds: [String]
+    let thumbnailURL: String?
+}
+
 protocol UserFeedTableCellInput {
     var fetchDataTrigger: ReplaySubject<Void> { get }
 }
@@ -56,7 +62,7 @@ class UserFeedTableCellVMImpl: UserFeedTableCellVM {
         let badgeModel = FeedBageModel(
             gymName: postWithHold.post.gym,
             hold: postWithHold.holds,
-            gymThmbnail: nil
+            userFeedThmbnail: postWithHold.thumbnailURL
         )
         
         return Output(

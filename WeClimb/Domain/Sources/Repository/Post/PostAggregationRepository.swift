@@ -9,11 +9,6 @@ import Foundation
 
 import RxSwift
 
-struct PostWithHold {
-    let post: Post
-    let holds: [String]
-}
-
 protocol PostAggregationRepository {
     func getUserFeed(userUID: String) -> Single<[PostWithHold]>
 }

@@ -19,6 +19,7 @@ enum BadgeConst {
     
     enum Font {
         static let gymNameLabelFont = UIFont.customFont(style: .caption1Medium)
+        static let badgeFont = UIFont.customFont(style: .caption1Medium)
     }
     
     enum Spacing {

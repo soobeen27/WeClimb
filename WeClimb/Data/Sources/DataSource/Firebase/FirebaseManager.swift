@@ -312,79 +312,80 @@ final class FirebaseManager {
                                profileImage: profileImage, additionalInfo: additionalInfo))
             }
     }
-    // MARK: 포스트 업로드
-    func uploadPost(myUID: String, media: [(url: URL, hold: String?, grade: String?, thumbnailURL: String?)], caption: String?, gym: String?, thumbnail: String) async {
-        
-        let storageRef = storage.reference()
-        let db = Firestore.firestore()
-        let postUID = UUID().uuidString
-        let postRef = db.collection("posts").document(postUID)
-        let creationDate = Date()
-        var user: User?
-        getUserInfoFrom(uid: myUID) { result in
-            switch result {
-            case .success(let userdata):
-                user = userdata
-            case .failure(let error):
-                print("Error - while getUserInfoFrom \(error)")
-            }
-        }
-        do {
-            let batch = db.batch()
-            
-            var mediaReferences: [DocumentReference] = []
-            var thumbnails: [String] = []
-            
-            for media in media.enumerated() {
-                let fileName = media.element.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.element.url.lastPathComponent
-                let mediaRef = storageRef.child("users/\(myUID)/\(fileName)")
-                let mediaURL = try await uploadMedia(mediaRef: mediaRef, mediaURL: media.element.url)
-                
-                let thumbnailURL = media.element.thumbnailURL ?? ""
-                thumbnails.append(thumbnailURL)
-                
-                let mediaUID = UUID().uuidString
-                let mediaDocRef = db.collection("media").document(mediaUID)
-                
-                let mediaData = Media(
-                    mediaUID: mediaUID,
-                    url: mediaURL.absoluteString,
-                    hold: media.element.hold,
-                    grade: media.element.grade,
-                    gym: gym,
-                    creationDate: creationDate,
-                    postRef: postRef,
-                    thumbnailURL: thumbnailURL,
-                    height: user?.height,
-                    armReach: user?.armReach
-                )
-                
-                batch.setData(try Firestore.Encoder().encode(mediaData), forDocument: mediaDocRef)
-                
-                mediaReferences.append(mediaDocRef)
-            }
-            let post = Post(postUID: postUID,
-                            authorUID: myUID,
-                            creationDate: creationDate,
-                            caption: caption,
-                            like: nil,
-                            gym: gym,
-                            medias: mediaReferences,
-                            thumbnail: thumbnails.first ?? "",
-                            commentCount: nil
-            )
-            
-            let userRef = db.collection("users").document(myUID)
-            batch.setData(try Firestore.Encoder().encode(post), forDocument: postRef)
-            batch.updateData(["posts": FieldValue.arrayUnion([postRef])], forDocument: userRef)
-            
-            try await batch.commit()
-            print("포스트 업로드 및 미디어 저장 완료")
-            
-        } catch {
-            print("업로드 중 오류 발생: \(error)")
-        }
-    }
+    /// 추가 기능으로 인한 오류 발생으로 주석 처리 해놓겠습니다.
+//    // MARK: 포스트 업로드
+//    func uploadPost(myUID: String, media: [(url: URL, hold: String?, grade: String?, thumbnailURL: String?)], caption: String?, gym: String?, thumbnail: String) async {
+//        
+//        let storageRef = storage.reference()
+//        let db = Firestore.firestore()
+//        let postUID = UUID().uuidString
+//        let postRef = db.collection("posts").document(postUID)
+//        let creationDate = Date()
+//        var user: User?
+//        getUserInfoFrom(uid: myUID) { result in
+//            switch result {
+//            case .success(let userdata):
+//                user = userdata
+//            case .failure(let error):
+//                print("Error - while getUserInfoFrom \(error)")
+//            }
+//        }
+//        do {
+//            let batch = db.batch()
+//            
+//            var mediaReferences: [DocumentReference] = []
+//            var thumbnails: [String] = []
+//            
+//            for media in media.enumerated() {
+//                let fileName = media.element.url.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? media.element.url.lastPathComponent
+//                let mediaRef = storageRef.child("users/\(myUID)/\(fileName)")
+//                let mediaURL = try await uploadMedia(mediaRef: mediaRef, mediaURL: media.element.url)
+//                
+//                let thumbnailURL = media.element.thumbnailURL ?? ""
+//                thumbnails.append(thumbnailURL)
+//                
+//                let mediaUID = UUID().uuidString
+//                let mediaDocRef = db.collection("media").document(mediaUID)
+//                
+//                let mediaData = Media(
+//                    mediaUID: mediaUID,
+//                    url: mediaURL.absoluteString,
+//                    hold: media.element.hold,
+//                    grade: media.element.grade,
+//                    gym: gym,
+//                    creationDate: creationDate,
+//                    postRef: postRef,
+//                    thumbnailURL: thumbnailURL,
+//                    height: user?.height,
+//                    armReach: user?.armReach
+//                )
+//                
+//                batch.setData(try Firestore.Encoder().encode(mediaData), forDocument: mediaDocRef)
+//                
+//                mediaReferences.append(mediaDocRef)
+//            }
+//            let post = Post(postUID: postUID,
+//                            authorUID: myUID,
+//                            creationDate: creationDate,
+//                            caption: caption,
+//                            like: nil,
+//                            gym: gym,
+//                            medias: mediaReferences,
+//                            thumbnail: thumbnails.first ?? "",
+//                            commentCount: nil
+//            )
+//            
+//            let userRef = db.collection("users").document(myUID)
+//            batch.setData(try Firestore.Encoder().encode(post), forDocument: postRef)
+//            batch.updateData(["posts": FieldValue.arrayUnion([postRef])], forDocument: userRef)
+//            
+//            try await batch.commit()
+//            print("포스트 업로드 및 미디어 저장 완료")
+//            
+//        } catch {
+//            print("업로드 중 오류 발생: \(error)")
+//        }
+//    }
     
     func uploadMedia(mediaRef: StorageReference, mediaURL: URL) async throws -> URL {
         try await withCheckedThrowingContinuation { continuation in

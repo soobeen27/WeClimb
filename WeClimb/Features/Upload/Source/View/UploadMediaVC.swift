@@ -131,6 +131,12 @@ class UploadMediaVC: UIViewController {
         bindOptionButtonActions()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        VideoManager.shared.stopVideo()
+    }
+    
     private func setNavigation() {
         navigationController?.setNavigationBarHidden(false, animated: false)
         
@@ -238,12 +244,30 @@ class UploadMediaVC: UIViewController {
                 let selectedMedia = mediaList[index]
                 
                 self.uploadOptionView.updateOptionView(
-                    grade: selectedMedia.grade ?? "선택해주세요",
-                    hold: selectedMedia.hold ?? "선택해주세요"
+                    grade: selectedMedia.grade,
+                    hold: selectedMedia.hold ?? ""
                 )
             })
             .disposed(by: disposeBag)
-    }
+        
+        viewModel.mediaUploadDataRelay
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] mediaList in
+                guard let self = self else { return }
+
+                let currentIndex = (try? self.selectedMediaIndexSubject.value()) ?? 0
+                guard currentIndex >= 0, currentIndex < mediaList.count else { return }
+
+                let selectedMedia = mediaList[currentIndex]
+                
+                self.uploadOptionView.updateOptionView(
+                    grade: selectedMedia.grade,
+                    hold: selectedMedia.hold
+                )
+            })
+            .disposed(by: disposeBag)
+
+        }
 
     private func reloadMediaUI() {
         if shouldFeedUpdateUI {
@@ -281,7 +305,6 @@ class UploadMediaVC: UIViewController {
     private func bindOptionButtonActions() {
         uploadOptionView.didTapBackButton = { [weak self] in
             self?.onBackButton?()
-            VideoManager.shared.stopVideo()
         }
         
         uploadOptionView.didTapNextButton = { [weak self] in
@@ -292,33 +315,50 @@ class UploadMediaVC: UIViewController {
         uploadOptionView.selectedLevelButton = { [weak self] in
             guard let self = self else { return }
             _ = self.onLevelFilter?(self.gymItem.name)
+            
+            VideoManager.shared.stopVideo()
         }
-
+        
         uploadOptionView.selectedHoldButton = { [weak self] in
             guard let self = self else { return }
             _ = self.onHoldFilter?(self.gymItem.name)
+            
+            VideoManager.shared.stopVideo()
         }
         
         coordinator?.onLevelHoldFiltersApplied = { [weak self] levelFilters, holdFilters in
             guard let self = self else { return }
-
+            
             self.shouldUpdateUI = false
- 
+
             let currentIndex = (try? self.selectedMediaIndexSubject.value()) ?? 0
             var mediaList = self.viewModel.mediaUploadDataRelay.value
 
             guard currentIndex >= 0, currentIndex < mediaList.count else { return }
 
-            var updatedMedia = mediaList[currentIndex]
-            updatedMedia.grade = levelFilters
-            updatedMedia.hold = holdFilters
-            mediaList[currentIndex] = updatedMedia
+            var selectedMedia = mediaList[currentIndex]
 
+            let previousGrade = selectedMedia.grade ?? ""
+            let previousHold = selectedMedia.hold ?? ""
+
+            let convertedGrade = levelFilters.isEmpty ? previousGrade : LHColors.fromKoreanFull(levelFilters).toEng()
+            let convertedHold = holdFilters.isEmpty ? previousHold : LHColors.fromKoreanFull(holdFilters).toHoldEng()
+            
+            if previousGrade != convertedGrade {
+                self.selectedGradeSubject.onNext(convertedGrade)
+                selectedMedia.grade = convertedGrade
+            }
+            if previousHold != convertedHold {
+                self.selectedHoldSubject.onNext(convertedHold)
+                selectedMedia.hold = convertedHold
+            }
+            
+            mediaList[currentIndex] = selectedMedia
             self.viewModel.mediaUploadDataRelay.accept(mediaList)
-
+            
             self.uploadOptionView.updateOptionView(
-                grade: levelFilters,
-                hold: holdFilters
+                grade: selectedMedia.grade,
+                hold: selectedMedia.hold
             )
         }
     }
@@ -372,7 +412,6 @@ class UploadMediaVC: UIViewController {
 
 extension UploadMediaVC: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-//        print("선택된 미디어 개수: \(results.count)")
 
         self.mediaItemsSubject.onNext(results)
         
