@@ -314,6 +314,12 @@ enum LHColors {
         return LHColors.imageString[self] ?? "colorDefault"
     }
     
+    func toImage(targetSize: CGSize) -> UIImage {
+        return (LHColors.images[self] ?? UIImage.closeIconCircle)
+            .resize(targetSize: targetSize)?
+            .withRenderingMode(.alwaysOriginal) ?? UIImage.colorGray
+    }
+    
     func toBackgroundAccent() -> UIColor {
         return LHColors.backgroundGrade[self] ?? UIColor.clear
     }

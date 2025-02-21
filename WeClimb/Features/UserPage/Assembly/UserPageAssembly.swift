@@ -13,6 +13,7 @@ final class UserPageAssembly: Assembly {
         container.register(UserFeedPageVM.self) { (resolver, userUID: String) in
             UserFeedPageVMImpl(
                 fetchFeedUseCase: resolver.resolve(FetchUserFeedInfoUseCase.self)!,
+                myUserInfoUseCase: resolver.resolve(MyUserInfoUseCase.self)!,
                 userUID: userUID
             )
         }

@@ -86,6 +86,7 @@ class UserFeedTableCell: UITableViewCell {
     }
     
     private func setLayout() {
+        self.backgroundColor = .clear
         [
             dateLabel,
             badgeView,
@@ -156,6 +157,7 @@ class UserFeedTableCell: UITableViewCell {
         
         output.badgeModel
             .drive(onNext: { [weak self] model in
+                print("🛠 badgeModel emit됨: \(model)")
                 self?.badgeView.configure(with: model)
             })
             .disposed(by: disposeBag)
