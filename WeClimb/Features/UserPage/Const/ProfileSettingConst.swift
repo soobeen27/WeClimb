@@ -29,6 +29,9 @@ enum ProfileSettingConst {
         static let activityLabel: String = "활동"
         
         static let confirmButtonLabel: String = "확인"
+        
+        static let homeGym: String = "홈짐"
+        static let selectionButtonLabel: String = "선택해주세요"
     }
     
     enum Font {
@@ -36,6 +39,7 @@ enum ProfileSettingConst {
         static let basicFont: UIFont = UIFont.customFont(style: .label2Medium)
         static let valueFont: UIFont = UIFont.customFont(style: .caption1Regular)
         static let textFieldFont: UIFont = UIFont.customFont(style: .body2Medium)
+        static let cellValueFont: UIFont = UIFont.customFont(style: .label2Regular)
     }
     
     enum Color {
@@ -51,6 +55,10 @@ enum ProfileSettingConst {
     enum Image {
         static let nonImage: UIImage? = UIImage.nonpicture
             .resize(targetSize: CGSize(width: Size.profileImage, height: Size.profileImage))
+        
+        static let chevronRightImage: UIImage? = UIImage.chevronRightIcon
+            .resize(targetSize: CGSize(width: Size.symbolSize, height: Size.symbolSize))?
+            .withTintColor(Color.valueLabelColor, renderingMode: .alwaysOriginal)
     }
     
     enum Spacing {
@@ -67,6 +75,7 @@ enum ProfileSettingConst {
     enum Size {
         static let profileImage: CGFloat = 80
         static let confirmButtonHeight: CGFloat = 50
+        static let symbolSize: CGFloat = 20
         static let textFieldBorderWidth: CGFloat = 1
     }
 }

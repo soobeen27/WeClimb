@@ -11,9 +11,25 @@ import SnapKit
 import RxCocoa
 import RxSwift
 
+enum UserProfileSettingItem {
+    case homeGym(name: String)
+//    case level(name: String)
+    case other(String)
+}
+
 class UserProfileSettingVC: UIViewController {
     
     private let disposeBag = DisposeBag()
+    private let viewModel: UserProfileSettingVM
+    
+    init(viewModel: UserProfileSettingVM) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private let imageSettingButton: UIImageView = {
         let img = UIImageView()
@@ -65,7 +81,7 @@ class UserProfileSettingVC: UIViewController {
     
     private let nickNameCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "0/50"
+        label.text = "0/12"
         label.textAlignment = .right
         label.font = ProfileSettingConst.Font.valueFont
         label.textColor = ProfileSettingConst.Color.valueLabelColor
@@ -125,7 +141,7 @@ class UserProfileSettingVC: UIViewController {
         textField.keyboardType = .default
         textField.backgroundColor = .clear
         textField.autocapitalizationType = .none
-        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 8, height: 1)) // 8px 여백
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 8, height: 1))
         textField.leftView = paddingView
         textField.leftViewMode = .always
         textField.placeholder = ProfileSettingConst.Text.nickNameTextFieldPlaceholder
@@ -141,9 +157,9 @@ class UserProfileSettingVC: UIViewController {
         let textField = UITextField()
         textField.keyboardType = .numberPad
         textField.backgroundColor = .clear
-        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 8, height: 1)) // 8px 여백
-            textField.leftView = paddingView
-            textField.leftViewMode = .always
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 8, height: 1))
+        textField.leftView = paddingView
+        textField.leftViewMode = .always
         textField.placeholder = ProfileSettingConst.Text.heightTextFieldPlaceholder
         textField.layer.borderColor = ProfileSettingConst.Color.textFieldBorderColor.cgColor
         textField.layer.borderWidth = ProfileSettingConst.Size.textFieldBorderWidth
@@ -157,9 +173,9 @@ class UserProfileSettingVC: UIViewController {
         let textField = UITextField()
         textField.keyboardType = .numberPad
         textField.backgroundColor = .clear
-        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 8, height: 1)) // 8px 여백
-            textField.leftView = paddingView
-            textField.leftViewMode = .always
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 8, height: 1))
+        textField.leftView = paddingView
+        textField.leftViewMode = .always
         textField.placeholder = ProfileSettingConst.Text.armReachTextFieldPlaceholder
         textField.layer.borderColor = ProfileSettingConst.Color.textFieldBorderColor.cgColor
         textField.layer.borderWidth = ProfileSettingConst.Size.textFieldBorderWidth
@@ -187,7 +203,7 @@ class UserProfileSettingVC: UIViewController {
     
     private let activityTableView: UITableView = {
         let tableView = UITableView()
-        
+        tableView.register(ActivityTableViewCell.self, forCellReuseIdentifier: ActivityTableViewCell.identifier)
         return tableView
     }()
     
@@ -204,6 +220,7 @@ class UserProfileSettingVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
+        bindViewModel()
     }
     
     private func setLayout() {
@@ -372,4 +389,44 @@ class UserProfileSettingVC: UIViewController {
             $0.bottom.equalTo(confirmButton.snp.top)
         }
     }
+    
+    private func bindViewModel() {
+        let input = UserProfileSettingImpl.Input()
+        let output = viewModel.transform(input: input)
+        
+        output.settingItems
+            .bind(to: activityTableView.rx.items(cellIdentifier: ActivityTableViewCell.identifier, cellType: ActivityTableViewCell.self)) { row, item, cell in
+                switch item {
+                case .homeGym(let name):
+                    cell.configure(title: "홈짐", value: name)
+                case .other(let title):
+                    cell.configure(title: title, value: "")
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        activityTableView.rx.modelSelected(UserProfileSettingItem.self)
+            .subscribe(onNext: { [weak self] item in
+                guard let self = self else { return }
+                if case .homeGym = item {
+                    self.showHomeGymSelection(input: input)
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func showHomeGymSelection(input: UserProfileSettingImpl.Input) {
+        print("이동햇숴")
+    }
+    
+//        func showHomeGymSelection(input: UserProfileSettingImpl.Input) {
+//            //        let homeGymVC = HomeGymSelectionVC()
+//            //        homeGymVC.selectedGym
+//            //            .subscribe(onNext: { gymName in
+//            //                input.homeGymSelected.accept(gymName) // 선택된 홈짐 업데이트
+//            //            })
+//            //            .disposed(by: disposeBag)
+//            //        present(homeGymVC, animated: true)
+//        }
+//    }
 }
