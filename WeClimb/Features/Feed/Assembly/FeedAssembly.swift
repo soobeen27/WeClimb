@@ -17,7 +17,8 @@ final class FeedAssembly: Assembly {
                        postDeleteUseCase: resolver.resolve(PostDeleteUseCase.self)!,
                        myUIDUseCase: resolver.resolve(MyUIDUseCase.self)!,
                        userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!,
-                       postUseCase: resolver.resolve(PostUseCase.self)!
+                       postUseCase: resolver.resolve(PostUseCase.self)!,
+                       postFilterUseCase: resolver.resolve(PostFilterUseCase.self)!
             )
         }
         

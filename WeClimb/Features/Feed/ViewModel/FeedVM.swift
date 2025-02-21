@@ -73,7 +73,7 @@ struct GymPostFilter {
     let hold: String?
     let height: [Int]?
     let armReach: [Int]?
-    let lastSnapshot: QueryDocumentSnapshot?
+    let lastSnapshot: BehaviorRelay<QueryDocumentSnapshot?>
 }
 
 class FeedVMImpl: FeedVM {
@@ -87,12 +87,14 @@ class FeedVMImpl: FeedVM {
     private let myUIDUseCase: MyUIDUseCase
     private let userInfoFromUIDUseCase: UserInfoFromUIDUseCase
     private let postUseCase: PostUseCase
+    private let postFilterUseCase: PostFilterUseCase
     
     
     private let postItemRelay: BehaviorRelay<[PostItem]> = .init(value: [])
     private let fetchType = BehaviorRelay<PostFetchType?>.init(value: nil)
     private let postType = BehaviorRelay<PostType?>.init(value: nil)
-    let startIndex = BehaviorRelay<Int?>.init(value: nil)
+    private let startIndex = BehaviorRelay<Int?>.init(value: nil)
+    private var lastSnapshot = BehaviorRelay<QueryDocumentSnapshot?>.init(value: nil)
     
     init(mainFeedUseCase: MainFeedUseCase,
          myUserInfo: MyUserInfoUseCase,
@@ -101,7 +103,8 @@ class FeedVMImpl: FeedVM {
          postDeleteUseCase: PostDeleteUseCase,
          myUIDUseCase: MyUIDUseCase,
          userInfoFromUIDUseCase: UserInfoFromUIDUseCase,
-         postUseCase: PostUseCase
+         postUseCase: PostUseCase,
+         postFilterUseCase: PostFilterUseCase
     )
     {
         self.mainFeedUseCase = mainFeedUseCase
@@ -112,6 +115,7 @@ class FeedVMImpl: FeedVM {
         self.myUIDUseCase = myUIDUseCase
         self.userInfoFromUIDUseCase = userInfoFromUIDUseCase
         self.postUseCase = postUseCase
+        self.postFilterUseCase = postFilterUseCase
         fetchPost()
     }
     
@@ -186,7 +190,22 @@ class FeedVMImpl: FeedVM {
                 case .feed:
                     self.feedFetchPost()
                 case .gym(let posts, let filter, let startIndex):
-                    print("")
+                    posts.map { [weak self] posts in
+                        posts.compactMap { self?.postToPostItem(post: $0 ) }
+                    }
+                    .bind(to: self.postItemRelay)
+                    .disposed(by: self.disposeBag)
+                    
+                    self.lastSnapshot
+                        .bind(to: filter.lastSnapshot)
+                        .disposed(by: self.disposeBag)
+                    
+                    startIndex
+                        .bind(to: self.startIndex)
+                        .disposed(by: self.disposeBag)
+                    
+                    self.gymFetchPost(filter: filter)
+                    
                 case .userPage(let posts, let startIndex):
                     posts.map { [weak self] posts in
                         posts.compactMap { self?.postToPostItem(post: $0 ) }
@@ -194,10 +213,28 @@ class FeedVMImpl: FeedVM {
                     .bind(to: self.postItemRelay)
                     .disposed(by: self.disposeBag)
                     
-                    self.startIndex.accept(startIndex.value)
+                    startIndex
+                        .bind(to: self.startIndex)
+                        .disposed(by: self.disposeBag)
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func gymFetchPost(filter: GymPostFilter) {
+        fetchType.subscribe(onNext: { [weak self] fetchType in
+            guard let self, let lastSnapshot = self.lastSnapshot.value  else { return }
+            self.postFilterUseCase.execute(lastSnapshot: lastSnapshot, gymName: filter.gymName, grade: filter.grade, hold: filter.hold, height: filter.height, armReach: filter.armReach) { [weak self] snapshot in
+                guard let self else { return }
+                self.lastSnapshot.accept(snapshot)
+            }.subscribe(onSuccess: { [weak self] posts in
+                guard let self else { return }
+                let newValue = posts.map { self.postToPostItem(post: $0) }
+                self.acceptMorePostItem(postItem: newValue)
+            })
+            .disposed(by: disposeBag)
+        })
+        .disposed(by: disposeBag)
     }
     
     private func feedFetchPost() {
