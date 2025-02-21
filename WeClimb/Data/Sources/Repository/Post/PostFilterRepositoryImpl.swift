@@ -10,7 +10,7 @@ import Foundation
 import Firebase
 import RxSwift
 
-final class PostFilterRepositoryImpl: PostFilterDataSource {
+final class PostFilterRepositoryImpl: PostFilterRepository {
     private let postFilterDataSource: PostFilterDataSource
     
     init(postFilterDataSource: PostFilterDataSource) {
@@ -19,7 +19,7 @@ final class PostFilterRepositoryImpl: PostFilterDataSource {
     
     func getFilteredPost(lastSnapshot: QueryDocumentSnapshot?,
                          gymName: String,
-                         grade: String,
+                         grade: String?,
                          hold: String?,
                          height: [Int]?,
                          armReach: [Int]?,

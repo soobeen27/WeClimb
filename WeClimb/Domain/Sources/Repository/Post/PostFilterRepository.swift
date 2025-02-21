@@ -13,7 +13,7 @@ import RxSwift
 protocol PostFilterRepository {
     func getFilteredPost(lastSnapshot: QueryDocumentSnapshot?,
                          gymName: String,
-                         grade: String,
+                         grade: String?,
                          hold: String?,
                          height: [Int]?,
                          armReach: [Int]?,
