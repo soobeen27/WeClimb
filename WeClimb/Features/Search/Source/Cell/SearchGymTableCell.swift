@@ -18,31 +18,31 @@ class SearchGymTableCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.backgroundColor = SearchConst.Color.gymImageDefaultBackground
-        imageView.layer.cornerRadius = SearchConst.Shape.cellImageCornerRadius
+        imageView.backgroundColor = SearchConst.Cell.Color.gymImageDefaultBackground
+        imageView.layer.cornerRadius = SearchConst.Cell.Shape.cellImageCornerRadius
         imageView.layer.masksToBounds = true
         return imageView
     }()
     
     private let gymLocationLabel: UILabel = {
         let label = UILabel()
-        label.font = SearchConst.Font.gymLocationFont
-        label.textColor = SearchConst.Color.gymLocationtextColor
+        label.font = SearchConst.Cell.Font.gymLocationFont
+        label.textColor = SearchConst.Cell.Color.gymLocationText
         return label
     }()
     
     private let gymNameLabel: UILabel = {
         let label = UILabel()
-        label.font = SearchConst.Font.gymNameFont
-        label.textColor = SearchConst.Color.gymNameTextColor
+        label.font = SearchConst.Cell.Font.gymNameFont
+        label.textColor = SearchConst.Cell.Color.gymNameText
         return label
     }()
     
     private lazy var deleteButton: UIButton = {
         let button = UIButton()
-        button.setTitle(SearchConst.Text.cellCancelBtnTitle, for: .normal)
-        button.setTitleColor(SearchConst.Color.cellCancelBtnTitleColor, for: .normal)
-        button.titleLabel?.font = SearchConst.Font.cellCancelBtnFont
+        button.setTitle(SearchConst.Cell.Text.cellCancelBtnTitle, for: .normal)
+        button.setTitleColor(SearchConst.Cell.Color.cellCancelBtnTitleColor, for: .normal)
+        button.titleLabel?.font = SearchConst.Cell.Font.cellCancelBtnFont
         button.addTarget(self, action: #selector(didTapDeleteButton), for: .touchUpInside)
         return button
     }()
@@ -55,9 +55,23 @@ class SearchGymTableCell: UITableViewCell {
         }
     }
     
+    private var currentItem: SearchResultItem?
+    private var currentSearchStyle: SearchStyle?
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setLayout()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
+            
+            if let currentItem = currentItem, let currentSearchStyle = currentSearchStyle {
+                configure(with: currentItem, searchStyle: currentSearchStyle)
+            }
+        }
     }
     
     private func setLayout() {
@@ -66,23 +80,23 @@ class SearchGymTableCell: UITableViewCell {
             .forEach { contentView.addSubview($0) }
         
         gymImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(SearchConst.gymCell.Spacing.gymImageleftSpacing)
+            $0.leading.equalToSuperview().inset(SearchConst.Cell.Spacing.gymImageleftSpacing)
             $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(SearchConst.gymCell.Size.gymImageSize)
+            $0.width.height.equalTo(SearchConst.Cell.Size.gymImageSize)
         }
         
         gymLocationLabel.snp.makeConstraints {
-            $0.leading.equalTo(gymImageView.snp.trailing).offset(SearchConst.gymCell.Spacing.gymLocationleftSpacing)
+            $0.leading.equalTo(gymImageView.snp.trailing).offset(SearchConst.Cell.Spacing.gymLocationleftSpacing)
             $0.top.equalTo(gymImageView.snp.top)
         }
         
         gymNameLabel.snp.makeConstraints {
             $0.leading.equalTo(gymLocationLabel)
-            $0.top.equalTo(gymLocationLabel.snp.bottom).offset(SearchConst.gymCell.Spacing.gymNameTopSpacing)
+            $0.top.equalTo(gymLocationLabel.snp.bottom).offset(SearchConst.Cell.Spacing.gymNameTopSpacing)
         }
         
         deleteButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(SearchConst.gymCell.Spacing.cancelBtnRightSpacing)
+            $0.trailing.equalToSuperview().inset(SearchConst.Cell.Spacing.cancelBtnRightSpacing)
             $0.centerY.equalToSuperview()
         }
     }
@@ -92,24 +106,41 @@ class SearchGymTableCell: UITableViewCell {
     }
 
     func configure(with item: SearchResultItem, searchStyle: SearchStyle) {
+        
+        currentItem = item
+        currentSearchStyle = searchStyle
+        
         gymNameLabel.text = item.name
         gymLocationLabel.text = item.location
         
         if let imageURL = URL(string: item.imageName), !item.imageName.isEmpty {
-            gymImageView.kf.setImage(with: imageURL, placeholder: SearchConst.Image.emptyDefaultImage)
+            gymImageView.kf.setImage(with: imageURL, placeholder: SearchConst.Common.Image.emptyDefaultImage)
         } else {
-            gymImageView.image = SearchConst.Image.emptyDefaultImage
+            gymImageView.image = SearchConst.Common.Image.emptyDefaultImage
         }
         
-        if searchStyle == .uploadSearch || traitCollection.userInterfaceStyle == .dark {
-            self.backgroundColor = .fillSolidDarkBlack
-            gymNameLabel.textColor = .labelWhite
-            gymLocationLabel.textColor = .labelWhite
-        } else {
-            self.backgroundColor = .white
-            gymNameLabel.textColor = .labelStrong
-            gymNameLabel.textColor = .labelNeutral
+        if searchStyle == .uploadSearch {
+            applyDarkModeStyle()
+            return
         }
+        
+        if traitCollection.userInterfaceStyle == .dark {
+            applyDarkModeStyle()
+        } else {
+            applyLightModeStyle()
+        }
+    }
+
+    private func applyDarkModeStyle() {
+        self.backgroundColor = SearchConst.Cell.Color.backgroundDark
+        gymNameLabel.textColor = SearchConst.Cell.Color.gymNameTextDark
+        gymLocationLabel.textColor = SearchConst.Cell.Color.gymLocationTextDark
+    }
+
+    private func applyLightModeStyle() {
+        self.backgroundColor = SearchConst.Cell.Color.background
+        gymNameLabel.textColor = SearchConst.Cell.Color.gymNameText
+        gymLocationLabel.textColor = SearchConst.Cell.Color.gymLocationText
     }
     
     @objc private func didTapDeleteButton() {

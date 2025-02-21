@@ -15,8 +15,8 @@ class SearchUserTableCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.image = SearchConst.Image.defaultUserImage
-        imageView.layer.cornerRadius = SearchConst.Shape.cellImageCornerRadius
+        imageView.image = SearchConst.Common.Image.defaultUserImage
+        imageView.layer.cornerRadius = SearchConst.Cell.Shape.cellImageCornerRadius
         imageView.layer.masksToBounds = true
         return imageView
     }()
@@ -24,22 +24,20 @@ class SearchUserTableCell: UITableViewCell {
     private let userNameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.customFont(style: .label2SemiBold)
-        label.textColor = .labelStrong
         return label
     }()
     
     private let userInfoLabel : UILabel = {
         let label = UILabel()
         label.font = UIFont.customFont(style: .caption2Regular)
-        label.textColor = .labelNeutral
         return label
     }()
     
     private lazy var deleteButton: UIButton = {
         let button = UIButton()
-        button.setTitle(SearchConst.Text.cellCancelBtnTitle, for: .normal)
-        button.setTitleColor(SearchConst.Color.cellCancelBtnTitleColor, for: .normal)
-        button.titleLabel?.font = SearchConst.Font.cellCancelBtnFont
+        button.setTitle(SearchConst.Cell.Text.cellCancelBtnTitle, for: .normal)
+        button.setTitleColor(SearchConst.Cell.Color.cellCancelBtnTitleColor, for: .normal)
+        button.titleLabel?.font = SearchConst.Cell.Font.cellCancelBtnFont
         button.addTarget(self, action: #selector(didTapDeleteButton), for: .touchUpInside)
         return button
     }()
@@ -52,9 +50,11 @@ class SearchUserTableCell: UITableViewCell {
         }
     }
     
+    private var currentItem: SearchResultItem?
+    private var currentSearchStyle: SearchStyle?
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
         setLayout()
     }
     
@@ -67,28 +67,42 @@ class SearchUserTableCell: UITableViewCell {
             .forEach { contentView.addSubview($0) }
       
         userImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(SearchConst.userCell.Spacing.userImageleftSpacing)
+            $0.leading.equalToSuperview().inset(SearchConst.Cell.Spacing.userImageleftSpacing)
             $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(SearchConst.userCell.Size.userImageSize)
+            $0.width.height.equalTo(SearchConst.Cell.Size.userImageSize)
         }
         
         userNameLabel.snp.makeConstraints {
-            $0.leading.equalTo(userImageView.snp.trailing).offset(SearchConst.userCell.Spacing.userNameleftSpacing)
+            $0.leading.equalTo(userImageView.snp.trailing).offset(SearchConst.Cell.Spacing.userNameleftSpacing)
             $0.top.equalTo(userImageView.snp.top)
         }
         
         userInfoLabel.snp.makeConstraints {
-            $0.top.equalTo(userNameLabel.snp.bottom).offset(SearchConst.userCell.Spacing.userInfoTopSpacing)
+            $0.top.equalTo(userNameLabel.snp.bottom).offset(SearchConst.Cell.Spacing.userInfoTopSpacing)
             $0.leading.equalTo(userNameLabel.snp.leading)
         }
         
         deleteButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(SearchConst.userCell.Spacing.cancelBtnRightSpacing)
+            $0.trailing.equalToSuperview().inset(SearchConst.Cell.Spacing.cancelBtnRightSpacing)
             $0.centerY.equalToSuperview()
         }
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
+            if let currentItem = currentItem, let currentSearchStyle = currentSearchStyle {
+                configure(with: currentItem, searchStyle: currentSearchStyle)
+            }
+        }
+    }
+
     func configure(with item: SearchResultItem, searchStyle: SearchStyle) {
+        
+        currentItem = item
+        currentSearchStyle = searchStyle
+
         if item.imageName.isEmpty || URL(string: item.imageName) == nil {
             userImageView.image = UIImage.defaultAvatarProfile
         } else {
@@ -99,30 +113,43 @@ class SearchUserTableCell: UITableViewCell {
         userNameLabel.text = item.name
 
         if let height = item.height, let armReach = item.armReach {
-            userInfoLabel.text = String(format: SearchConst.Text.UserInfo.heightAndArmReachLabel, "\(height)", "\(armReach)")
+            userInfoLabel.text = String(format: SearchConst.Cell.Text.UserInfo.heightAndArmReachLabel, "\(height)", "\(armReach)")
         } else if let height = item.height {
-            userInfoLabel.text = String(format: SearchConst.Text.UserInfo.heightLabel, "\(height)")
+            userInfoLabel.text = String(format: SearchConst.Cell.Text.UserInfo.heightLabel, "\(height)")
         } else if let armReach = item.armReach {
-            userInfoLabel.text = String(format: SearchConst.Text.UserInfo.armReachLabel, "\(armReach)")
+            userInfoLabel.text = String(format: SearchConst.Cell.Text.UserInfo.armReachLabel, "\(armReach)")
         } else {
             userInfoLabel.text = nil
         }
-
-        if searchStyle == .uploadSearch || traitCollection.userInterfaceStyle == .dark {
-            self.backgroundColor = .fillSolidDarkBlack
-            userNameLabel.textColor = .labelWhite
-            userInfoLabel.textColor = .labelWhite
-        } else {
-            self.backgroundColor = .white
-            userNameLabel.textColor = .labelStrong
-            userInfoLabel.textColor = .labelNeutral
+        
+        if searchStyle == .uploadSearch {
+            applyDarkModeStyle()
+            return
+        }
+        
+        if traitCollection.userInterfaceStyle == .dark {
+            applyDarkModeStyle()
+        }
+        else {
+            applyLightModeStyle()
         }
     }
     
+    private func applyDarkModeStyle() {
+        self.backgroundColor = SearchConst.Cell.Color.backgroundDark
+        userNameLabel.textColor = SearchConst.Cell.Color.userNameTextDark
+        userInfoLabel.textColor = SearchConst.Cell.Color.userInfoTextDark
+    }
+
+    private func applyLightModeStyle() {
+        self.backgroundColor = SearchConst.Cell.Color.background
+        userNameLabel.textColor = SearchConst.Cell.Color.userNameText
+        userInfoLabel.textColor = SearchConst.Cell.Color.userInfoText
+    }
+
     @objc private func didTapDeleteButton() {
         guard let name = userNameLabel.text else { return }
         let itemToDelete = SearchResultItem(type: .user, name: name, imageName: "", location: nil, height: nil, armReach: nil)
         onDelete?(itemToDelete)
     }
 }
-
