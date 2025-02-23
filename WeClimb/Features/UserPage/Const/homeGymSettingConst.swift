@@ -10,7 +10,6 @@ import UIKit
 enum homeGymSettingConst {
     
     enum Text {
-        static let searchBarLabel = "검색하기"
         static let favoriteLabel = "즐겨찾기"
         static let placeholderText = "검색하기"
     }
@@ -19,6 +18,8 @@ enum homeGymSettingConst {
         static let titleColor = UIColor.labelStrong
         static let placeholderBorderColor = UIColor.lineOpacityNormal
         static let placeholderFontColor = UIColor.labelAssistive
+        static let locaction: UIColor = UIColor.labelWhite
+        static let basicMarkColor: UIColor = UIColor.labelAssistive
     }
     
     enum Font {
@@ -32,6 +33,8 @@ enum homeGymSettingConst {
     
     enum Size {
         static let placeholderHeight: CGFloat = 46
+        static let homeGymMarkSize: CGSize = CGSize(width: 13, height: 17)
+        static let badgeImage: CGSize = CGSize(width: 12, height: 12)
     }
     
     enum CornerRadius {
@@ -40,8 +43,15 @@ enum homeGymSettingConst {
     
     enum Image {
         static let locaction: UIImage? =
-        UIImage.locationIconFill.resize(targetSize: BadgeConst.Size.badgeImage)?
-            .withTintColor(BadgeConst.Color.text)
+        UIImage.locationIconFill.resize(targetSize: Size.badgeImage)?
+            .withTintColor(Color.locaction)
+        
+        static let nomalHomeGymMark: UIImage? =
+        UIImage.homeIcon.resize(targetSize: Size.homeGymMarkSize)?
+            .withTintColor(Color.basicMarkColor)
+        
+        static let clickHomeGymMark: UIImage? =
+        UIImage.homeBadge.resize(targetSize: Size.homeGymMarkSize)
     }
 }
 
