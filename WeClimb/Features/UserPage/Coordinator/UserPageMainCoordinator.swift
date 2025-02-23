@@ -33,6 +33,30 @@ final class UserPageMainCoordinator: BaseCoordinator {
         }
     }
     
+    private func showProfileSettingPageVC() {
+        let profileSettingCoordinator = UserProfileSettingCoordinator(navigationController: navigationController, builder: builder)
+        
+        addDependency(profileSettingCoordinator)
+        
+        profileSettingCoordinator.start()
+        
+        profileSettingCoordinator.onFinish = { [weak self] in
+            self?.removeDependency(profileSettingCoordinator)
+        }
+    }
+    
+    private func showHomeGymSettingPageVC() {
+        let homeGymSettingCoordinator = homeGymSettingCoordinator(navigationController: navigationController, builder: builder)
+        
+        addDependency(homeGymSettingCoordinator)
+        
+        homeGymSettingCoordinator.start()
+        
+        homeGymSettingCoordinator.onFinish = { [weak self] in
+            self?.removeDependency(homeGymSettingCoordinator)
+        }
+    }
+    
     
 //    override func start() {
 //        let userPageVC = UserPageVC()

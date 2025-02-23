@@ -19,6 +19,8 @@ enum UserProfileSettingItem {
 
 class UserProfileSettingVC: UIViewController {
     
+    var coordinator: UserProfileSettingCoordinator?
+    
     private let disposeBag = DisposeBag()
     private let viewModel: UserProfileSettingVM
     
