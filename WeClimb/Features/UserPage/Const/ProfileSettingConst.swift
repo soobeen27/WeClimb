@@ -32,6 +32,8 @@ enum ProfileSettingConst {
         
         static let homeGym: String = "홈짐"
         static let selectionButtonLabel: String = "선택해주세요"
+        
+        static let profileSettingTitle: String = "프로필 편집"
     }
     
     enum Font {
@@ -40,6 +42,7 @@ enum ProfileSettingConst {
         static let valueFont: UIFont = UIFont.customFont(style: .caption1Regular)
         static let textFieldFont: UIFont = UIFont.customFont(style: .body2Medium)
         static let cellValueFont: UIFont = UIFont.customFont(style: .label2Regular)
+        static let naviTitleFont: UIFont = UIFont.customFont(style: .heading2SemiBold)
     }
     
     enum Color {
@@ -50,6 +53,8 @@ enum ProfileSettingConst {
         static let confirmButtonColor: UIColor = UIColor.fillSolidDarkBlack
         static let textFieldBorderColor: UIColor = .lineOpacityNormal
         static let textFieldFontColor: UIColor = .labelAssistive
+        static let naviTitleFontColor: UIColor = .labelBlack
+        static let borderColor: UIColor = .lineSolidLight
     }
     
     enum Image {
@@ -59,6 +64,11 @@ enum ProfileSettingConst {
         static let chevronRightImage: UIImage? = UIImage.chevronRightIcon
             .resize(targetSize: CGSize(width: Size.symbolSize, height: Size.symbolSize))?
             .withTintColor(Color.valueLabelColor, renderingMode: .alwaysOriginal)
+        
+        static let backButtonSymbolImage: UIImage? = UIImage.chevronLeftIcon
+            .resize(targetSize: CGSize(width: Size.backButtonSymbol, height: Size.backButtonSymbol))?
+            .withTintColor(Color.naviTitleFontColor, renderingMode: .alwaysOriginal)
+            
     }
     
     enum Spacing {
@@ -77,5 +87,6 @@ enum ProfileSettingConst {
         static let confirmButtonHeight: CGFloat = 50
         static let symbolSize: CGFloat = 20
         static let textFieldBorderWidth: CGFloat = 1
+        static let backButtonSymbol: CGFloat = 24
     }
 }

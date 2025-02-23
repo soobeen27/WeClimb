@@ -20,6 +20,15 @@ final class UserPageMainCoordinator: BaseCoordinator {
         showUserPageVC()
     }
     
+    private func userPageHandleEvent(_ event: UserPageEvent) {
+        switch event {
+        case .showProfileSetting:
+            showProfileSettingPageVC()
+        case .showHomeGymSetting:
+            showHomeGymSettingPageVC()
+        }
+    }
+    
     private func showUserPageVC() {
         let userPageCoordinator = UserPageCoordinator(navigationController: navigationController, builder: builder)
         
@@ -27,9 +36,9 @@ final class UserPageMainCoordinator: BaseCoordinator {
         
         userPageCoordinator.start()
         
-        userPageCoordinator.onFinish = { [weak self] in
+        userPageCoordinator.onFinish = { [weak self] event in
+            self?.userPageHandleEvent(event)
             self?.removeDependency(userPageCoordinator)
-            // 다음으로 갈 곳
         }
     }
     

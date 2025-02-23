@@ -24,8 +24,14 @@ final class UserProfileSettingCoordinator: BaseCoordinator {
     
     private func showUserProfileSettingPage() {
         let profileSettingPage = builder.buildUserProfileSettingPage()
+        profileSettingPage.hidesBottomBarWhenPushed = true
         profileSettingPage.coordinator = self
         
         navigationController.pushViewController(profileSettingPage, animated: true)
+    }
+    
+    func finish() {
+        navigationController.popViewController(animated: true)
+        onFinish?()
     }
 }

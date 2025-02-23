@@ -23,9 +23,9 @@ final class homeGymSettingCoordinator: BaseCoordinator {
     }
     
     private func showUserHomeGymSettingPage() {
-        let homeGymSettingPage = builder.buildUserHomeGymSettingPage()
-        homeGymSettingPage.coordinator = self
-        
-        navigationController.pushViewController(homeGymSettingPage, animated: true)
+//        let homeGymSettingPage = builder.buildUserHomeGymSettingPage()
+//        homeGymSettingPage.coordinator = self
+//        
+//        navigationController.pushViewController(homeGymSettingPage, animated: true)
     }
 }

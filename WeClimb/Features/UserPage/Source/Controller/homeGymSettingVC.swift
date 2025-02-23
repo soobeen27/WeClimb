@@ -57,6 +57,7 @@ class homeGymSettingVC: UIViewController {
     
     init(coordinator: homeGymSettingCoordinator?) {
         self.coordinator = coordinator
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {

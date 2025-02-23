@@ -12,7 +12,7 @@ protocol UserPageBuilder {
 //    func buildManageBookMark() -> ManageBookMarkVC
     func buildUserPage() -> UserPageVC
     func buildUserProfileSettingPage() -> UserProfileSettingVC
-    func buildUserHomeGymSettingPage() -> homeGymSettingVC
+//    func buildUserHomeGymSettingPage() -> homeGymSettingVC
 }
 
 final class UserPageBuilderImpl: UserPageBuilder {
@@ -33,10 +33,12 @@ final class UserPageBuilderImpl: UserPageBuilder {
     }
     
     func buildUserProfileSettingPage() -> UserProfileSettingVC {
-        <#code#>
+        let userProfileSettingVM = container.assembler.resolver.resolve(UserProfileSettingVM.self)!
+        
+        return UserProfileSettingVC(viewModel: userProfileSettingVM)
     }
     
-    func buildUserHomeGymSettingPage() -> homeGymSettingVC {
-        <#code#>
-    }
+//    func buildUserHomeGymSettingPage() -> homeGymSettingVC {
+//        <#code#>
+//    }
 }

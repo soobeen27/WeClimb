@@ -17,6 +17,12 @@ final class UserPageAssembly: Assembly {
                 userUID: userUID
             )
         }
+        
+        container.register(UserProfileSettingVM.self) { resolver in
+            UserProfileSettingImpl(
+                
+            )
+        }
     }
 }
 

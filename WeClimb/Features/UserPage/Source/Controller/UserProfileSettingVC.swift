@@ -223,6 +223,7 @@ class UserProfileSettingVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         bindViewModel()
+        setupNavigationBar()
     }
     
     private func setLayout() {
@@ -415,6 +416,41 @@ class UserProfileSettingVC: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func setupNavigationBar() {
+        navigationItem.title = ProfileSettingConst.Text.profileSettingTitle
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .font: ProfileSettingConst.Font.naviTitleFont,
+            .foregroundColor: ProfileSettingConst.Color.naviTitleFontColor
+        ]
+        navigationController?.navigationBar.titleTextAttributes = titleAttributes
+
+        let backButtonImage = ProfileSettingConst.Image.backButtonSymbolImage
+        let backButton = UIBarButtonItem(image: backButtonImage, style: .plain, target: self, action: #selector(backButtonTapped))
+        
+        navigationItem.leftBarButtonItem = backButton
+        
+        addNavigationBarLayer()
+    }
+    
+    private func addNavigationBarLayer() {
+        guard let navigationBar = navigationController?.navigationBar else { return }
+        
+        let bottomBorder = UIView()
+        bottomBorder.backgroundColor = ProfileSettingConst.Color.borderColor
+
+        navigationBar.addSubview(bottomBorder)
+        
+        bottomBorder.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview()
+            $0.height.equalTo(1)
+        }
+    }
+
+    @objc private func backButtonTapped() {
+        coordinator?.finish()
     }
     
     func showHomeGymSelection(input: UserProfileSettingImpl.Input) {

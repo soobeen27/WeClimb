@@ -12,6 +12,11 @@ import SnapKit
 import RxCocoa
 import RxSwift
 
+enum UserPageEvent {
+    case showProfileSetting
+    case showHomeGymSetting
+}
+
 class UserPageVC: UIViewController {
     var coordinator: UserPageCoordinator?
     
@@ -157,6 +162,7 @@ class UserPageVC: UIViewController {
         bindTableFeed()
         bindUserInfo()
         mainFeedConnecting()
+        bindUserEditButton()
     }
     
     private func setLayout() {
@@ -277,7 +283,7 @@ class UserPageVC: UIViewController {
         let output = userFeedPageVM.transform(input: input)
         
         userFeedtableView.rx.itemSelected
-            .observe(on: MainScheduler.asyncInstance) 
+            .observe(on: MainScheduler.asyncInstance)
             .subscribe(onNext: { [weak self] indexPath in
                 guard let self else { return }
                 
@@ -328,6 +334,24 @@ class UserPageVC: UIViewController {
     private func convertToPosts(from cellVMs: [UserFeedTableCellVM]) -> [Post] {
         return cellVMs.compactMap { ($0 as? UserFeedTableCellVMImpl)?.postWithHold.post }
     }
+    
+    private func bindUserEditButton() {
+        userEditButton.rx.tap
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] in
+                self?.coordinator?.handleEvent(.showProfileSetting)
+            })
+            .disposed(by: disposeBag)
+    }
+
+//    private func bindHomeGymButton() {
+//        homeGymButtonStackView.rx.tapGesture()
+//            .when(.recognized)
+//            .subscribe(onNext: { [weak self] _ in
+//                self?.coordinator?.handleEvent(.showHomeGymSetting)
+//            })
+//            .disposed(by: disposeBag)
+//    }
     
     private func heightArmReach(height: Int?, armReach: Int?) -> String {
         if let height, let armReach {
