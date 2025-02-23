@@ -9,6 +9,7 @@ import Foundation
 
 protocol FeedBuilder {
     func buildFeed() -> FeedVC
+    func buildFeed(postType: PostType) -> FeedVC
     func buildComment(postItem: PostItem) -> PostCommentVC
 }
 
@@ -23,6 +24,11 @@ final class FeedBuilderImpl: FeedBuilder {
         let viewModel: FeedVM = container.resolve(FeedVM.self)
         
         return FeedVC(viewModel: viewModel, postType: .feed)
+    }
+    
+    func buildFeed(postType: PostType) -> FeedVC {
+        let viewModel: FeedVM = container.resolve(FeedVM.self)
+        return FeedVC(viewModel: viewModel, postType: postType)
     }
     
     func buildComment(postItem: PostItem) -> PostCommentVC {

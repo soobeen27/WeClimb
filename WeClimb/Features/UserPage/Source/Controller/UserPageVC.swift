@@ -156,6 +156,7 @@ class UserPageVC: UIViewController {
         setLayout()
         bindTableFeed()
         bindUserInfo()
+        mainFeedConnecting()
     }
     
     private func setLayout() {
@@ -258,8 +259,6 @@ class UserPageVC: UIViewController {
         input.fetchUserFeedTrigger.accept(())
         
         output.userFeedList
-            .do(onNext: { items in
-            })
             .observe(on: MainScheduler.instance)
             .bind(to: userFeedtableView.rx.items(cellIdentifier: UserFeedTableCell.identifier, cellType: UserFeedTableCell.self)) { _, viewModel, cell in
                 cell.configure(with: viewModel)
@@ -269,6 +268,31 @@ class UserPageVC: UIViewController {
         userFeedtableView.rx.itemSelected
             .subscribe(onNext: { [weak self] indexPath in
                 self?.userFeedtableView.deselectRow(at: indexPath, animated: false)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func mainFeedConnecting() {
+        let input = UserFeedPageVMImpl.Input()
+        let output = userFeedPageVM.transform(input: input)
+        
+        userFeedtableView.rx.itemSelected
+            .observe(on: MainScheduler.asyncInstance) 
+            .subscribe(onNext: { [weak self] indexPath in
+                guard let self else { return }
+                
+                let allPosts = convertToPosts(from: output.userFeedList.value)
+                
+                guard !allPosts.isEmpty else { return }
+
+                print("선택된 셀 인덱스: \(indexPath.row)")
+                
+                let postType = PostType.userPage(
+                    post: BehaviorSubject(value: allPosts),
+                    startIndex: BehaviorRelay(value: indexPath.row)
+                )
+
+                coordinator?.showFeed(postType: postType)
             })
             .disposed(by: disposeBag)
     }
@@ -299,6 +323,10 @@ class UserPageVC: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func convertToPosts(from cellVMs: [UserFeedTableCellVM]) -> [Post] {
+        return cellVMs.compactMap { ($0 as? UserFeedTableCellVMImpl)?.postWithHold.post }
     }
     
     private func heightArmReach(height: Int?, armReach: Int?) -> String {

@@ -10,7 +10,8 @@ import UIKit
 final class UserPageCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
     private let builder: UserPageBuilder
-    
+    private var feedCoordinator: FeedChildCoordinator?
+
     var onFinish: (() -> Void)?
     
     init(navigationController: UINavigationController, builder: UserPageBuilder) {
@@ -29,5 +30,13 @@ final class UserPageCoordinator: BaseCoordinator {
         // 회원 정보수정 탭 이벤트
         
         navigationController.pushViewController(userPageVC, animated: true)
+    }
+    
+    func showFeed(postType: PostType) {
+        let feedCoordinator = FeedChildCoordinator(navigationController: navigationController, builder: FeedBuilderImpl())
+        self.feedCoordinator = feedCoordinator
+        addDependency(feedCoordinator)
+        
+        feedCoordinator.showFeed(postType: postType)
     }
 }

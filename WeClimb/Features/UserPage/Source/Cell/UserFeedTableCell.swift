@@ -126,7 +126,7 @@ class UserFeedTableCell: UITableViewCell {
         }
     }
   
-    func configure(with viewModel: UserFeedTableCellVMImpl) {
+    func configure(with viewModel: UserFeedTableCellVM) {
         self.viewModel = viewModel
         disposeBag = DisposeBag()
         
