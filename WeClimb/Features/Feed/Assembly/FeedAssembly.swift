@@ -11,7 +11,15 @@ final class FeedAssembly: Assembly {
     func assemble(container: Container) {
         container.register(FeedVM.self) { resolver in
             FeedVMImpl(mainFeedUseCase: resolver.resolve(MainFeedUseCase.self)!,
-                       myUserInfo: resolver.resolve(MyUserInfoUseCase.self)!)
+                       myUserInfo: resolver.resolve(MyUserInfoUseCase.self)!,
+                       userReportUseCase: resolver.resolve(UserReportUseCase.self)!,
+                       addBlackListUseCase: resolver.resolve(AddBlackListUseCase.self)!,
+                       postDeleteUseCase: resolver.resolve(PostDeleteUseCase.self)!,
+                       myUIDUseCase: resolver.resolve(MyUIDUseCase.self)!,
+                       userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!,
+                       postUseCase: resolver.resolve(PostUseCase.self)!,
+                       postFilterUseCase: resolver.resolve(PostFilterUseCase.self)!
+            )
         }
         
         container.register(PostCollectionCellVM.self) { resolver in
@@ -26,7 +34,12 @@ final class FeedAssembly: Assembly {
             PostCommentVMImpl(addCommentUseCase: resolver.resolve(AddCommentUseCase.self)!,
                               fetchCommentUseCase: resolver.resolve(FetchCommentUseCase.self)!,
                               deleteCommentUseCase: resolver.resolve(DeleteCommentUseCase.self)!,
-                              userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!)
+                              userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!,
+                              myUserInfoUseCase: resolver.resolve(MyUserInfoUseCase.self)!,
+                              myUIDUseCase: resolver.resolve(MyUIDUseCase.self)!,
+                              userReportUseCase: resolver.resolve(UserReportUseCase.self)!,
+                              addBlackListUseCase: resolver.resolve(AddBlackListUseCase.self)!
+            )
         }
     }
 }

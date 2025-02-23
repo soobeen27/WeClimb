@@ -9,24 +9,31 @@ import UIKit
 
 final class UploadMediaCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
+    private let builder: UploadBuilder
+    
     private let gymItem: SearchResultItem
 
     var holdFilterGymName: ((String) -> String)?
     var LevelFilterGymName: ((String) -> String)?
     
-    init(navigationController: UINavigationController, gymItem: SearchResultItem) {
+    var onLevelHoldFiltersApplied: ((String, String) -> Void)?
+    
+    var onFinish:  (([MediaUploadData]) -> Void)?
+    
+    init(navigationController: UINavigationController, gymItem: SearchResultItem, builder: UploadBuilder) {
         self.navigationController = navigationController
         self.gymItem = gymItem
+        self.builder = builder
     }
     
     override func start() {
-        let uploadVM = UploadVM()
-        let uploadMediaVC = UploadMediaVC(gymItem: gymItem, viewModel: uploadVM)
+        let uploadMediaVC = builder.buildUploadMedia(gymItem: gymItem)
         uploadMediaVC.coordinator = self
         
         uploadMediaVC.onBackButton = { [weak self] in
             self?.handleBackButtonTapped()
         }
+        
         navigationController.pushViewController(uploadMediaVC, animated: true)
         
         uploadMediaVC.onLevelFilter = { [weak self] gymName in
@@ -35,6 +42,10 @@ final class UploadMediaCoordinator: BaseCoordinator {
         
         uploadMediaVC.onHoldFilter = { [weak self] gymName in
             self?.holdFilterGymName?(gymName) ?? ""
+        }
+        
+        uploadMediaVC.onNextButton = { [weak self] mediaData in
+            self?.onFinish?(mediaData)
         }
     }
     

@@ -73,6 +73,9 @@ class LevelHoldFilterVC: UIViewController {
     private let cellCountSubject = BehaviorSubject<Int>(value: LevelHoldFilterConst.CellState.initialCellCount)
     private var filterType: FilterType
     
+    let appliedFiltersSubject = PublishSubject<[String]>()
+    var onFiltersApplied: ((String, String) -> Void)?
+    
     init(gymName: String, viewModel: LevelHoldFilterVM, filterType: FilterType = .level) {
         self.viewModel = viewModel
         self.gymName = gymName
@@ -96,7 +99,6 @@ class LevelHoldFilterVC: UIViewController {
 
     }
 
-    
     private func bindUI(gymName: String) {
         selectedSegmentIndexSubject.onNext(filterType.index)
         
@@ -112,19 +114,19 @@ class LevelHoldFilterVC: UIViewController {
         )
         
         let output = viewModel.transform(input: input)
-
+        
         output.cellData
             .do(onNext: { [weak self] data in
                 let totalCount = data.count
                 self?.cellCountSubject.onNext(totalCount)
             })
             .bind(to: tableView.rx.items(cellIdentifier: LevelHoldFilterTableCell.className, cellType: LevelHoldFilterTableCell.self)) { [weak self] index, item, cell in
-
+                
                 guard let totalCount = try? self?.cellCountSubject.value() else { return }
-
+                
                 let isFirstCell = index == LevelHoldFilterConst.CellState.firstIndex
                 let isLastCell = index == (totalCount - LevelHoldFilterConst.CellState.lastIndexOffset)
-
+                
                 let config = LevelHoldFilterCellConfig(
                     text: item.text,
                     imageName: item.image,
@@ -145,15 +147,20 @@ class LevelHoldFilterVC: UIViewController {
                 let selectedIndexes = selectedItems
                 
                 let indexPaths = selectedIndexes.map { IndexPath(row: $0, section: LevelHoldFilterConst.CellState.tableViewSection) }
-
+                
                 self.tableView.reloadRows(at: indexPaths, with: .automatic)
             })
             .disposed(by: disposeBag)
         
-        
         output.appliedFilters
-            .subscribe(onNext: { filters in
-                print("선택된 필터: \(filters)")
+            .subscribe(onNext: { [weak self] filters in
+                guard let self = self else { return }
+                
+                let selectedLevel = filters.level
+                let selectedHold = filters.hold
+
+                self.onFiltersApplied?(selectedLevel, selectedHold)
+                self.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
     }

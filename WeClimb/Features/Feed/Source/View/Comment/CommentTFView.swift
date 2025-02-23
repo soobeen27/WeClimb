@@ -9,6 +9,7 @@ import UIKit
 
 import SnapKit
 import RxSwift
+import RxCocoa
 
 class CommentTFView: UIView {
     
@@ -21,21 +22,32 @@ class CommentTFView: UIView {
     var postOwnerName: String? {
         didSet {
             if let postOwnerName {
-                placeholderText = postOwnerName + CommentConsts.TextFieldView.Text.placeholder
+                let placeholderText = postOwnerName + CommentConsts.TextFieldView.Text.placeholder
+                commentTF.placeholder = placeholderText
             }
         }
     }
     
-    private var placeholderText: String = "댓글 추가"
+    var sendButtonTap: Driver<String> {
+        return sendButton.rx.tap.compactMap { [weak self] _ -> String? in
+            guard let self else { return nil }
+            let storedText = self.commentTF.text
+            self.commentTF.text = nil
+            if storedText == "" {
+                return nil
+            }
+            return storedText
+        }.asDriver(onErrorJustReturn: "")
+    }
     
-    lazy var commentTF: UITextField = {
+    private lazy var commentTF: UITextField = {
         let tf = UITextField()
         tf.borderStyle = .line
         tf.backgroundColor = CommentConsts.TextFieldView.Color.tfBackground
         tf.layer.cornerRadius = CommentConsts.TextFieldView.Size.tfCornerRadius
         tf.layer.borderColor = CommentConsts.TextFieldView.Color.tfStroke.cgColor
         tf.layer.borderWidth = 1
-        tf.attributedPlaceholder = NSAttributedString(string: placeholderText, attributes: [
+        tf.attributedPlaceholder = NSAttributedString(string: "댓글 추가", attributes: [
             NSAttributedString.Key.foregroundColor: CommentConsts.TextFieldView.Color.placeholder,
             NSAttributedString.Key.font: CommentConsts.TextFieldView.Font.placeholder
         ])
@@ -49,7 +61,7 @@ class CommentTFView: UIView {
         return tf
     }()
 
-    lazy var tfRightView: UIView = {
+    private lazy var tfRightView: UIView = {
         let v = UIView()
         v.addSubview(sendButton)
         sendButton.snp.makeConstraints {
@@ -63,7 +75,7 @@ class CommentTFView: UIView {
         return v
     }()
     
-    lazy var sendButton: UIButton = {
+    private lazy var sendButton: UIButton = {
         let button = UIButton()
         button.setImage(CommentConsts.TextFieldView.Image.send, for: .normal)
         

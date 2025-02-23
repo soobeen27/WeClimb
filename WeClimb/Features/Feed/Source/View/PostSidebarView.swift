@@ -27,6 +27,10 @@ class PostSidebarView: UIView {
         return likeButton.rx.tap
     }
     
+    var additionalActionButtonTap: ControlEvent<Void> {
+        return additionalActionButton.rx.tap
+    }
+    
     private lazy var likeButton: UIButton = {
         let button = UIButton()
         button.setImage(FeedConsts.Sidebar.Image.heart, for: .normal)
@@ -72,7 +76,7 @@ class PostSidebarView: UIView {
         return stv
     }()
     
-    private lazy var extraFucButton: UIButton = {
+    private lazy var additionalActionButton: UIButton = {
         let button = UIButton()
         button.setImage(FeedConsts.Sidebar.Image.extraFunc, for: .normal)
         button.tintColor = FeedConsts.Sidebar.Color.tint
@@ -80,7 +84,7 @@ class PostSidebarView: UIView {
     }()
     
     private lazy var sidebarStackView: UIStackView = {
-        let stv = UIStackView(arrangedSubviews: [likeStackView, commentStackView, extraFucButton])
+        let stv = UIStackView(arrangedSubviews: [likeStackView, commentStackView, additionalActionButton])
         stv.axis = .vertical
         stv.spacing = FeedConsts.Sidebar.Size.spacing
         return stv
@@ -97,6 +101,11 @@ class PostSidebarView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func resetToDefaultState() {
+        commentCountLabel.removeFromSuperview()
+        likeCountLabel.removeFromSuperview()
     }
     
     private func setStackView() {

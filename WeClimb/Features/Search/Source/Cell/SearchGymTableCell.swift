@@ -91,14 +91,20 @@ class SearchGymTableCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(with item: SearchResultItem) {
+    func configure(with item: SearchResultItem, searchStyle: SearchStyle) {
         gymNameLabel.text = item.name
         gymLocationLabel.text = item.location
-
+        
         if let imageURL = URL(string: item.imageName), !item.imageName.isEmpty {
             gymImageView.kf.setImage(with: imageURL, placeholder: SearchConst.Image.emptyDefaultImage)
         } else {
             gymImageView.image = SearchConst.Image.emptyDefaultImage
+        }
+        
+        if searchStyle == .uploadSearch {
+            self.backgroundColor = .fillSolidDarkBlack
+            gymNameLabel.textColor = .labelWhite
+            gymLocationLabel.textColor = .labelWhite
         }
     }
     

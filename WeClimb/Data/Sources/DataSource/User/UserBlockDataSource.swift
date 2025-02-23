@@ -20,9 +20,9 @@ class UserBlockDataSourceImpl: UserBlockDataSource {
     func addBlackList(blockedUser uid: String) -> Single<Void> {
         return Single.create { [weak self] single in
             guard let self,
-                  let uid = try? FirestoreHelper.userUID()
+                  let myUid = try? FirestoreHelper.userUID()
             else { return Disposables.create() }
-            let userRef = db.collection("users").document(uid)
+            let userRef = db.collection("users").document(myUid)
             
             userRef.updateData(["blackList" : FieldValue.arrayUnion([uid])]) { error in
                 if let error = error {

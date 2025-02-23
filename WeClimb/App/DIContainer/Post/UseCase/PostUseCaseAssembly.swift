@@ -15,10 +15,18 @@ final class PostUseCaseAssembly: Assembly {
         container.register(FetchMediasUseCase.self) { resolver in
             FetchMediasUseCaseImpl(fetchMediasRepository: resolver.resolve(FetchMediasRepository.self)!)
         }
-        
+        container.register(PostDeleteUseCase.self) { resolver in
+            PostDeleteUseCaseImpl(postDeleteRepository: resolver.resolve(PostDeleteRepository.self)!)
+        }
         container.register(FetchUserFeedInfoUseCase.self) { resolver in
             FetchUserFeedInfoUseCaseImpl(postAggregationRepository:
                 resolver.resolve(PostAggregationRepository.self)!)
+        }
+        container.register(PostFilterUseCase.self) { resolver in
+            PostFilterUseCaseImpl(postFilterRepository: resolver.resolve(PostFilterRepository.self)!)
+        }
+        container.register(PostUseCase.self) { resolver in
+            PostUseCaseImpl(postRepository: resolver.resolve(PostRepository.self)!)
         }
     }
 }

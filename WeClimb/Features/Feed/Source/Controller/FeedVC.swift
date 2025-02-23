@@ -20,11 +20,23 @@ class FeedVC: UIViewController {
     
     private let container = AppDIContainer.shared
     
+    let postType: PostType
+    
     let disposeBag = DisposeBag()
     
     var commentTapped: ((PostItem) -> Void)?
     
-    private let fetchType: BehaviorRelay<FetchPostType> = .init(value: .initial)
+    private let fetchType: BehaviorRelay<PostFetchType?> = .init(value: .initial)
+    private let addtionalButtonTapped = BehaviorRelay<(postItem: PostItem, isMine: Bool)?>(value: nil)
+    private let selectedButtonType = PublishRelay<FeedMenuSelection>()
+
+    private var feedMenuView = FeedMenuView()
+    
+    private let customAlert: DefaultAlertVC = {
+        let alert = DefaultAlertVC(alertType: .title)
+        alert.modalPresentationStyle = .overCurrentContext
+        return alert
+    }()
 
     private lazy var dataSource: UICollectionViewDiffableDataSource<Section, PostItem> = {
         let dataSource = UICollectionViewDiffableDataSource<Section, PostItem>(collectionView: postCollectionView) { [weak self] collectionView, indexPath, item in
@@ -38,7 +50,10 @@ class FeedVC: UIViewController {
                     guard let self, let postItem else { return }
                     self.commentTapped?(postItem)
                 })
-                .disposed(by: disposeBag)
+                .disposed(by: cell.disposeBag)
+            cell.additonalButtonTapped
+                .bind(to: self.addtionalButtonTapped)
+                .disposed(by: cell.disposeBag)
            return cell
         }
         return dataSource
@@ -66,8 +81,9 @@ class FeedVC: UIViewController {
         return collectionView
     }()
         
-    init(viewModel: FeedVM) {
+    init(viewModel: FeedVM, postType: PostType) {
         self.feedVM = viewModel
+        self.postType = postType
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -79,6 +95,7 @@ class FeedVC: UIViewController {
         super.viewDidLoad()
         setLayout()
         bindViewModel()
+        bindMenu()
         hideNavigationBar()
     }
     
@@ -93,13 +110,40 @@ class FeedVC: UIViewController {
     }
     
     private func bindViewModel() {
-        let input = FeedVMImpl.Input(fetchType: fetchType)
-        feedVM.transform(input: input)
-            .postItems.asDriver().drive(onNext: { [weak self] postItems in
+        let input = FeedVMImpl.Input(postType: Observable.just(postType),
+                                     fetchType: fetchType,
+                                     additionalButtonTap: addtionalButtonTapped.asObservable(),
+                                     additionalButtonTapType: selectedButtonType
+        )
+        let output = feedVM.transform(input: input)
+            
+        output.postItems.asDriver().drive(onNext: { [weak self] postItems in
                 guard let self else { return }
                 self.bindSnapshot(postItems: postItems)
             })
             .disposed(by: disposeBag)
+        
+        output.isMine
+            .asDriver(onErrorJustReturn: false)
+            .drive(onNext: { [weak self] isMine in
+                guard let self else { return }
+                if self.postCollectionView.isScrollEnabled {
+                    self.presentMenu(isMine: isMine)
+                } else {
+                    self.dismissMenu()
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        output.startIndex
+            .asDriver()
+            .drive(onNext: { [weak self] startIndex in
+                guard let self, let startIndex else { return }
+                let startIndexPath = IndexPath(item: startIndex, section: 0)
+                self.postCollectionView.scrollToItem(at: startIndexPath, at: .top, animated: false)
+            })
+            .disposed(by: disposeBag)
+
     }
     
     private func bindSnapshot(postItems: [PostItem]) {
@@ -113,6 +157,50 @@ class FeedVC: UIViewController {
             if let mediaCenterCell = findMediaCenterCell(in:  mediaCollectionview) {
                 mediaCenterCell.videoView.playVideo()
             }
+        }
+    }
+    
+    private func presentMenu(isMine: Bool) {
+        let tabBarHeight: CGFloat = tabBarController?.tabBar.frame.height ?? 0
+        feedMenuView.isMine = isMine
+        view.addSubview(feedMenuView)
+        feedMenuView.snp.makeConstraints {
+            $0.trailing.equalToSuperview().offset(-FeedConsts.Menu.Size.padding)
+            $0.top.equalTo(view.snp.bottom).offset(-(FeedConsts.Menu.Constraint.bottom + tabBarHeight))
+        }
+        feedMenuView.alpha = 1
+        postCollectionView.isScrollEnabled = false
+    }
+    
+    private func dismissMenu() {
+        feedMenuView.alpha = 0
+        feedMenuView.removeFromSuperview()
+        postCollectionView.isScrollEnabled = true
+    }
+    
+    private func bindMenu() {
+        feedMenuView.selectedButtonType
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(onNext: { [weak self] type in
+                guard let self else { return }
+                self.dismissMenu()
+                self.presentAlert(type: type)
+            })
+            .disposed(by: disposeBag)
+    }
+        
+    private func presentAlert(type: FeedMenuSelection) {
+        var titleText: String = ""
+        switch type {
+        case .block: titleText = CommentConsts.Alert.alertBlockTitle
+        case .delete: titleText = CommentConsts.Alert.alertDeleteTitle
+        case .report: titleText = CommentConsts.Alert.alertReportTitle
+        }
+        self.customAlert.setTitle(titleText)
+        self.present(self.customAlert, animated: false)
+        self.customAlert.customAction = { [weak self] in
+            guard let self else { return }
+            self.selectedButtonType.accept(type)
         }
     }
     

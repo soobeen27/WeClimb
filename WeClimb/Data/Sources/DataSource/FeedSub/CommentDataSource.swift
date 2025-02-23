@@ -33,12 +33,15 @@ class CommentDataSourceImpl: CommentDataSource {
                 try commentRef.setData(from: comment) { error in
                     if let error = error {
                         print("댓글 다는중 오류\(error)")
+                        single(.failure(error))
                         return
                     }
                     userRef.updateData(["comments" : FieldValue.arrayUnion([commentRef])])
+                    single(.success(()))
                 }
             } catch {
                 print("댓글 작성중 에러")
+                single(.failure(error))
             }
             
             

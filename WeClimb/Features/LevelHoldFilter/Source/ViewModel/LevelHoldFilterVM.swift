@@ -23,7 +23,7 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
 
     struct Output {
         let cellData: Observable<[(text: String, image: String, isChecked: Bool)]>
-        let appliedFilters: Observable<(level: [String], hold: [String])>
+        let appliedFilters: Observable<(level: String, hold: String)>
         let selectedItems: Observable<[Int]>
     }
 
@@ -45,7 +45,7 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
 
     func transform(input: Input) -> Output {
         let cellData = BehaviorSubject(value: [(text: String, image: String, isChecked: Bool)]())
-        let appliedFilters = PublishSubject<(level: [String], hold: [String])>()
+        let appliedFilters = PublishSubject<(level: String, hold: String)>()
         
         input.segmentedControlSelection
             .subscribe(onNext: { [weak self] index in
@@ -167,13 +167,24 @@ class LevelHoldFilterVMImpl: LevelHoldFilterVM {
        
     }
 
-    private func applyFilters(appliedFilters: PublishSubject<(level: [String], hold: [String])>) {
-        let levelFilters = try? selectedLevelItems.value().map { gym?.grade.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }[$0].colorTextChange() ?? "" }
-        let holdFilters = try? selectedHoldItems.value().map { Hold.allCases[$0].koreanHold }
+    private func applyFilters(appliedFilters: PublishSubject<(level: String, hold: String)>) {
+        let levelFilters = try? selectedLevelItems.value()
+            .compactMap { index in
+                gym?.grade.split(separator: ",")
+                    .map { String($0).trimmingCharacters(in: .whitespaces) }[index]
+                    .colorTextChange()
+            }
+        
+        let holdFilters = try? selectedHoldItems.value()
+            .compactMap { Hold.allCases[$0].koreanHold }
+
+        let selectedLevel = (levelFilters?.isEmpty == false) ? levelFilters!.joined(separator: ", ") : ""
+        let selectedHold = (holdFilters?.isEmpty == false) ? holdFilters!.joined(separator: ", ") : ""
 
         appliedFilters.onNext((
-            level: levelFilters ?? [],
-            hold: holdFilters ?? []
+            level: selectedLevel,
+            hold: selectedHold
         ))
     }
+
 }

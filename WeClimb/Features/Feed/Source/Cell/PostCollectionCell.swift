@@ -57,6 +57,8 @@ class PostCollectionCell: UICollectionViewCell {
     
     let currentPost = BehaviorRelay<PostItem?>(value: nil)
     
+    let additonalButtonTapped = BehaviorRelay<(postItem: PostItem, isMine: Bool)?>(value: nil)
+    
     private var user: User? {
         didSet {
             guard let user, let postItem else { return }
@@ -110,10 +112,13 @@ class PostCollectionCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         profileView.resetToDefaultState()
+        postSidebarView.resetToDefaultState()
         viewModel = nil
         disposeBag = DisposeBag()
         caption = nil
         mediaCollectionView.setContentOffset(.zero, animated: false)
+        additonalButtonTapped.accept(nil)
+        currentPost.accept(nil)
     }
     
     func configure(postItem: PostItem, postCollectionCellVM: PostCollectionCellVM) {
@@ -137,7 +142,9 @@ class PostCollectionCell: UICollectionViewCell {
             postItem: postItem,
             likeButtonTap: postSidebarView.likeButtonTap,
             currentMediaIndex: currentMediaIndexRelay,
-            commentButtonTap: postSidebarView.commentButtonTap)
+            commentButtonTap: postSidebarView.commentButtonTap,
+            additionalButtonTap: postSidebarView.additionalActionButtonTap
+        )
         )
         
         output.user
@@ -177,6 +184,12 @@ class PostCollectionCell: UICollectionViewCell {
         output.currentPost
             .bind(to: currentPost)
             .disposed(by: disposeBag)
+        
+        output.addtionalButtonTapData.bind(to: additonalButtonTapped).disposed(by: disposeBag)
+        
+        output.commentCount
+            .bind(to: postSidebarView.commentCountRelay)
+            .disposed(by: disposeBag)
     }
     
     private func bindSnapShot(mediaItems: [MediaItem]) {
@@ -207,11 +220,6 @@ class PostCollectionCell: UICollectionViewCell {
             return "\(height)cm"
         }
         return "정보가 없어용"
-    }
-    
-    private func bindSidebarView(isLike: Bool?, likeCount: Int) {
-        postSidebarView.isLikeRelay.accept(isLike)
-        postSidebarView.likeCountRelay.accept(likeCount)
     }
     
     private func bindMediaIndex() {

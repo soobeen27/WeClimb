@@ -51,11 +51,33 @@ enum CommentConsts {
             static let profileImage: CGSize = CGSize(width: 32, height: 32)
             static let vPadding: CGFloat = 12
             static let hPadding: CGFloat = 16
+            static let spacing: CGFloat = 8
+            static let contentPadding: CGFloat = 10
         }
         enum Font {
             static let userName: UIFont = UIFont.customFont(style: .caption1SemiBold)
             static let content: UIFont = UIFont.customFont(style: .caption1Regular)
             static let date: UIFont = UIFont.customFont(style: .caption2Regular)
         }
+        enum Color {
+            static let date: UIColor = UIColor.labelAlternative
+        }
+        enum Date {
+            static let week = "주"
+            static let day = "일"
+            static let hour = "시간"
+            static let minute = "분"
+            static let moment = "방금"
+        }
+    }
+    
+    enum Alert {
+        static let alertDeleteTitle = "댓글을 삭제하시겠습니까?"
+        static let alertReportTitle = "신고하시겠습니까?"
+        static let alertBlockTitle = "차단하시겠습니까?"
+        static let delete = "삭제"
+        static let cancel = "취소"
+        static let report = "신고"
+        static let block = "차단"
     }
 }

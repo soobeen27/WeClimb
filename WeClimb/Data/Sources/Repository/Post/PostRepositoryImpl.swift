@@ -11,13 +11,13 @@ import Firebase
 import RxSwift
 
 final class PostRepositoryImpl: PostRepository {
-    private let postRepository: PostRepository
+    private let postDataSource: PostDataSource
     
-    init(postRepository: PostRepository) {
-        self.postRepository = postRepository
+    init(postDataSource: PostDataSource) {
+        self.postDataSource = postDataSource
     }
     
     func posts(postRefs: [DocumentReference]) -> Observable<[Post]> {
-        return postRepository.posts(postRefs: postRefs)
+        return postDataSource.posts(postRefs: postRefs)
     }
 }
