@@ -234,6 +234,7 @@ extension FeedVC: UICollectionViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard let collectionView = scrollView as? UICollectionView else { return }
+        VideoManager.shared.reset()
         let contentOffset = scrollView.contentOffset
         let scrollViewHeight = collectionView.frame.size.height
         let scrollContentSizeHeight = collectionView.contentSize.height
