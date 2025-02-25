@@ -13,7 +13,6 @@ import RxSwift
 class UploadFeedView: UIView {
     private var disposeBag = DisposeBag()
     private let viewModel: UploadVM
-    var isPlaying: Bool = true
     
     var selectedMediaItems: [MediaUploadData] = []
     
@@ -22,12 +21,11 @@ class UploadFeedView: UIView {
     
     private lazy var countLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.customFont(style: .caption1Medium)
-        label.textColor = .white
-        label.layer.cornerRadius = 13
+        label.font = UploadMediaConst.FeedView.Font.countLabel
+        label.textColor = UploadMediaConst.FeedView.Color.countLabelText
+        label.layer.cornerRadius = UploadMediaConst.FeedView.Size.countLabelCornerRadius
         label.clipsToBounds = true
-        label.text = "1 / \(totalMediaCount)"
-        label.backgroundColor = UIColor.init(hex: "313235", alpha: 0.4)  // fillOpacityDarkHeavy
+        label.backgroundColor = UploadMediaConst.FeedView.Color.countLabelBackground
         label.textAlignment = .center
         return label
     }()
@@ -58,67 +56,65 @@ class UploadFeedView: UIView {
         super.layoutSubviews()
         
         collectionView.collectionViewLayout.invalidateLayout()
-        DispatchQueue.main.async { [weak self] in
-            self?.playFirstMedia()
-        }
     }
     
     private func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 12
+        layout.minimumLineSpacing = UploadMediaConst.FeedView.Size.CollectionViewItemSpacing
         
-        let itemWidth: CGFloat = 256
+        let itemWidth: CGFloat = UploadMediaConst.FeedView.Size.CollectionViewItemWidth
         let itemHeight: CGFloat = self.frame.height
         
         layout.itemSize = CGSize(width: itemWidth, height: itemHeight)
         
-        let inset: CGFloat = (self.frame.width - itemWidth) / 2
+        let inset: CGFloat = UploadMediaConst.FeedView.Size.CollectionViewInset(viewWidth: self.frame.width)
         layout.sectionInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
         
         return layout
     }
     
     private func setLayout() {
-        self.backgroundColor = UIColor.clear
+        self.backgroundColor = UploadMediaConst.FeedView.Color.CollectionViewBackground
         
         [collectionView, countLabel]
             .forEach { self.addSubview($0) }
         
         countLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.width.equalTo(41)
-            $0.height.equalTo(26)
+            $0.top.equalToSuperview().offset(UploadMediaConst.FeedView.Layout.CountLabelTopOffset)
+            $0.trailing.equalToSuperview().offset(UploadMediaConst.FeedView.Layout.CountLabelTrailingOffset)
+            $0.width.equalTo(UploadMediaConst.FeedView.Layout.CountLabelWidth)
+            $0.height.equalTo(UploadMediaConst.FeedView.Layout.CountLabelHeight)
         }
         
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(countLabel.snp.bottom).offset(16)
+            $0.top.equalTo(countLabel.snp.bottom).offset(UploadMediaConst.FeedView.Layout.CollectionViewTopOffset)
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
+
     
     private func bindCell() {
         self.viewModel.mediaUploadDataRelay
-            .observe(on: MainScheduler.instance)
+            .take(1)
             .bind(to: collectionView.rx.items(
                 cellIdentifier: UploadMediaCollectionCell.className,
                 cellType: UploadMediaCollectionCell.self)
             ) { row, data, cell in
                 cell.configure(with: data)
+                self.playFirstMedia()
             }
             .disposed(by: disposeBag)
 
         self.viewModel.mediaUploadDataRelay
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] mediaItems in
+            .bind { [weak self] mediaItems in
                 guard let self = self else { return }
-
                 if !mediaItems.isEmpty {
                     self.totalMediaCount = mediaItems.count
                     self.updateCurrentIndex()
                 }
-            })
+            }
             .disposed(by: disposeBag)
     }
     
@@ -127,36 +123,36 @@ class UploadFeedView: UIView {
         if let cell = collectionView.cellForItem(at: indexPath) as? UploadMediaCollectionCell {
             cell.playVideo()
         }
-        countLabel.text = "1 / \(totalMediaCount)"
+        countLabel.text = String(format: UploadMediaConst.FeedView.Text.countLabelFormat, UploadMediaConst.FeedView.Scroll.firstMediaDisplayIndex, totalMediaCount)
     }
 }
 
 extension UploadFeedView: UICollectionViewDelegate {
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         
-        let largeItemWidth: CGFloat = 256
-        let spacing: CGFloat = 12
+        let largeItemWidth: CGFloat = UploadMediaConst.FeedView.Size.CollectionViewItemWidth
+        let spacing: CGFloat = UploadMediaConst.FeedView.Size.CollectionViewItemSpacing
         
         let moveDistance = largeItemWidth + spacing
         
-        let sectionInset = (self.frame.width - largeItemWidth) / 2
+        let sectionInset = UploadMediaConst.FeedView.Size.CollectionViewInset(viewWidth: self.frame.width)
         
         let approximatePage = (scrollView.contentOffset.x + sectionInset) / moveDistance
         var nearestPage = round(approximatePage)
         
-        if velocity.x > 0.4 {
-            nearestPage = floor(approximatePage + 1)
-        } else if velocity.x < -0.4 {
-            nearestPage = ceil(approximatePage - 1)
+        if velocity.x > UploadMediaConst.FeedView.Scroll.speedLimit {
+            nearestPage = floor(approximatePage + CGFloat(UploadMediaConst.FeedView.Scroll.nextPageOffset))
+        } else if velocity.x < -UploadMediaConst.FeedView.Scroll.speedLimit {
+            nearestPage = ceil(approximatePage - CGFloat(UploadMediaConst.FeedView.Scroll.nextPageOffset))
         }
         
         var targetX = (nearestPage * moveDistance)
-        
-        if nearestPage == 0 {
+
+        if nearestPage == CGFloat(UploadMediaConst.FeedView.Scroll.firstMediaIndex) {
             targetX -= sectionInset
         }
-        
-        let maxPage = ceil(scrollView.contentSize.width / moveDistance) - 1
+
+        let maxPage = ceil(scrollView.contentSize.width / moveDistance) - CGFloat(UploadMediaConst.FeedView.Scroll.nextPageOffset)
         if nearestPage >= maxPage {
             targetX += sectionInset
         }
@@ -165,23 +161,23 @@ extension UploadFeedView: UICollectionViewDelegate {
         
         targetContentOffset.pointee.x = targetX
         
-        VideoManager.shared.stopVideo()
+        VideoManager.shared.UploadStopVideo()
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         updateCurrentIndex()
     }
     
-    private func updateCurrentIndex() {
-        let itemWidth: CGFloat = 256
-        let spacing: CGFloat = 12
+    func updateCurrentIndex() {
+        let itemWidth: CGFloat = UploadMediaConst.FeedView.Size.CollectionViewItemWidth
+        let spacing: CGFloat = UploadMediaConst.FeedView.Size.CollectionViewItemSpacing
         let moveDistance = itemWidth + spacing
         
         let currentPageIndex = Int(collectionView.contentOffset.x / moveDistance)
         
         onMediaIndexChanged?(currentPageIndex)
         
-        countLabel.text = "\(currentPageIndex + 1) / \(self.totalMediaCount)"
+        countLabel.text = String(format: UploadMediaConst.FeedView.Text.countLabelFormat, currentPageIndex + UploadMediaConst.FeedView.Scroll.nextPageOffset, self.totalMediaCount)
         
         if let indexPath = IndexPath(row: currentPageIndex, section: 0) as IndexPath?,
            let cell = collectionView.cellForItem(at: indexPath) as? UploadMediaCollectionCell {

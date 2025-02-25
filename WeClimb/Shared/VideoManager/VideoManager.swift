@@ -30,4 +30,25 @@ class VideoManager {
     func stopVideo() {
         currentPlayer?.pause()
     }
+    
+    private var uploadPlayer: AVQueuePlayer?
+    
+    func UploadPlayNewVideo(player: AVQueuePlayer) {
+        uploadPlayer?.pause()
+        uploadPlayer = player
+        uploadPlayer?.play()
+    }
+    
+    func UploadPlayCurrentVideo() {
+        uploadPlayer?.play()
+    }
+
+    func UploadReset() {
+        uploadPlayer?.pause()
+        uploadPlayer = nil
+    }
+    
+    func UploadStopVideo() {
+        uploadPlayer?.pause()
+    }
 }

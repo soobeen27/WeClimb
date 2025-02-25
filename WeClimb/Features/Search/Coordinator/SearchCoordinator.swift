@@ -12,6 +12,7 @@ final class SearchCoordinator: BaseCoordinator {
     private let builder: SearchBuilder
     
     var onUploadSearchFinish: ((String) -> Void)?
+    var onSelectedSearchCell: ((SearchResultItem) -> Void)?
     
     init(navigationController: UINavigationController, builder: SearchBuilder) {
         self.navigationController = navigationController
@@ -26,6 +27,10 @@ final class SearchCoordinator: BaseCoordinator {
             self?.navigateToSearchResult(query: query)
         }
         navigationController.pushViewController(searchVC, animated: true)
+        
+        searchVC.toUploalMediaPost = { [weak self] query in
+            self?.onSelectedSearchCell?(query)
+        }
     }
     
     func navigateToSearchResult(query: String) {
@@ -40,6 +45,10 @@ final class SearchCoordinator: BaseCoordinator {
         
         searchVC.toUploadSearchResult = { [weak self] query in
             self?.onUploadSearchFinish?(query)
+        }
+        
+        searchVC.toUploalMediaPost = { [weak self] query in
+            self?.onSelectedSearchCell?(query)
         }
         navigationController.pushViewController(searchVC, animated: true)
     }
