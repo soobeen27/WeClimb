@@ -24,7 +24,7 @@ protocol PostCollectionCellOutput {
     var likeCount: BehaviorRelay<Int> { get }
     var isLike: BehaviorRelay<Bool?> { get }
     var mediaItems: Observable<[MediaItem]> { get }
-    var levelHoldImages: Observable<(level: UIImage?, hold: UIImage?)> { get }
+    var levelHolds: Observable<(level: LHColors?, hold: LHColors?)> { get }
     var currentPost: BehaviorRelay<PostItem?> { get }
     var addtionalButtonTapData: Observable<(postItem: PostItem, isMine: Bool)?> { get }
     var commentCount: Observable<Int> { get }
@@ -56,7 +56,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         let likeCount: BehaviorRelay<Int>
         let isLike: BehaviorRelay<Bool?>
         let mediaItems: Observable<[MediaItem]>
-        let levelHoldImages: Observable<(level: UIImage?, hold: UIImage?)>
+        let levelHolds: Observable<(level: LHColors?, hold: LHColors?)>
         let currentPost: BehaviorRelay<PostItem?>
         let addtionalButtonTapData: Observable<(postItem: PostItem, isMine: Bool)?>
         let commentCount: Observable<Int>
@@ -95,7 +95,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
             likeCount: likeCount,
             isLike: isLike,
             mediaItems: Observable.error(FirebaseError.documentNil),
-            levelHoldImages: Observable.just((UIImage.closeIcon, UIImage.closeIcon)),
+            levelHolds: Observable.just((nil, nil)),
             currentPost: BehaviorRelay<PostItem?>.init(value: nil),
             addtionalButtonTapData: Observable.just(nil),
             commentCount: Observable.just(0)
@@ -107,15 +107,15 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
                 self?.mediaToItem(media: media)
             }
         }.asObservable()
-        let levelHoldImages = input.currentMediaIndex.flatMap { [weak self] index in
-            return medias.compactMap { (medias) -> (level: UIImage?, hold: UIImage?) in
+        let levelHolds = input.currentMediaIndex.flatMap { index in
+            return medias.compactMap { (medias) -> (level: LHColors?, hold: LHColors?) in
                 if medias.isEmpty || index >= medias.count {
                     return (nil, nil)
                 }
                 guard let level = medias[index].grade, let hold = medias[index].hold else { return (nil, nil) }
-                let levelImage = self?.levelStringToImage(level)
-                let holdImage = self?.holdStringToImage(hold)
-                return (level: levelImage, hold: holdImage)
+                let levelLH = LHColors.fromEng(level)
+                let holdLH = LHColors.fromHoldEng(hold)
+                return (level: levelLH, hold: holdLH)
             }
         }
         
@@ -143,7 +143,7 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         return Output(
             user: user, likeCount: likeCount,
             isLike: isLike, mediaItems: medias,
-            levelHoldImages: levelHoldImages,
+            levelHolds: levelHolds,
             currentPost: currentPost,
             addtionalButtonTapData: addtionalButtonTapData,
             commentCount: Observable.just(commentCount)

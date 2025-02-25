@@ -131,7 +131,7 @@ class PostCollectionCell: UICollectionViewCell {
     }
     
     private func configureProfileView(postItem: PostItem, user: User) {
-        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: heightArmReach(height: user.height, armReach: user.armReach), level: .closeIcon, hold: .closeIcon, caption: postItem.caption))
+        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: heightArmReach(height: user.height, armReach: user.armReach), level: nil, hold: nil, caption: postItem.caption))
     }
     
     private func bindViewModel() {
@@ -172,7 +172,7 @@ class PostCollectionCell: UICollectionViewCell {
                 self.bindSnapShot(mediaItems: mediaItems)
         }).disposed(by: disposeBag)
         
-        output.levelHoldImages
+        output.levelHolds
             .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { [weak self] levelHold in
                 guard let level = levelHold.level, let hold = levelHold.hold else { return }

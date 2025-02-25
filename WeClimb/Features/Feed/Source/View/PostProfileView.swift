@@ -17,8 +17,8 @@ struct PostProfileModel {
     let name: String?
     let gymName: String?
     let heightArmReach: String?
-    let level: UIImage?
-    let hold: UIImage?
+    let level: LHColors?
+    let hold: LHColors?
     let caption: String?
 }
 
@@ -40,10 +40,10 @@ class PostProfileView: UIView {
             }
     }
     
-    var gymTapEvent: Observable<String?> {
+    var gymTapEvent: Observable<(gymName: String?, level: LHColors?, hold: LHColors?)> {
         gymTapGestureRecognizer.rx.event
-            .map { [weak self] _ -> String? in
-                return self?.profileModel?.name
+            .map { [weak self] _ -> (gymName: String?, level: LHColors?, hold: LHColors?) in
+                return (gymName: self?.profileModel?.gymName, level: self?.profileModel?.level, hold: self?.profileModel?.hold)
             }
     }
     
@@ -184,9 +184,9 @@ class PostProfileView: UIView {
         profileModel = data
     }
     
-    func updateHoldLevel(hold: UIImage, level: UIImage) {
-        levelTag.rightImage = level
-        holdTag.rightImage = hold
+    func updateHoldLevel(hold: LHColors, level: LHColors) {
+        levelTag.rightImage = level.toImage()
+        holdTag.rightImage = hold.toImage()
     }
     
     required init?(coder: NSCoder) {
@@ -216,8 +216,8 @@ class PostProfileView: UIView {
         nameLabel.text = profileModel.name
         gymTag.text = profileModel.gymName
         heightArmReachLabel.text = profileModel.heightArmReach
-        levelTag.rightImage = profileModel.level
-        holdTag.rightImage = profileModel.hold
+        levelTag.rightImage = profileModel.level?.toImage()
+        holdTag.rightImage = profileModel.hold?.toImage()
         captionLabel.text = profileModel.caption
     }
     
