@@ -78,7 +78,7 @@ final class TabBarCoordinator: BaseCoordinator {
             if itemView.frame.contains(location) {
                 if index == 2 {
                     if let uploadCoordinator = uploadCoordinator, uploadCoordinator.isUploadViewPresented {
-                        uploadCoordinator.dismissUploadView()
+                        uploadCoordinator.dismissUploadMenuView()
                     } else {
                         uploadCoordinator?.start()
                     }

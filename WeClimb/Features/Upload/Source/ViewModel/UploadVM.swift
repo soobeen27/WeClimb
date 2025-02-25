@@ -10,6 +10,7 @@ import RxRelay
 import PhotosUI
 import ImageIO
 import MobileCoreServices
+import AVFoundation
 
 protocol UploadInput {
     var mediaSelection: Observable<[PHPickerResult]> { get }
@@ -20,7 +21,7 @@ protocol UploadInput {
 
 protocol UploadOutput {
     var mediaItems: Observable<[MediaUploadData]> { get }
-    var alertTrigger: Observable<Void> { get }
+    var alertTrigger: Observable<(String, String)> { get }
 }
 
 protocol UploadVM {
@@ -39,13 +40,13 @@ final class UploadVMImpl : UploadVM {
     
     struct Output: UploadOutput {
         let mediaItems: Observable<[MediaUploadData]>
-        let alertTrigger: Observable<Void>
+        let alertTrigger: Observable<(String, String)>
     }
     
     private let disposeBag = DisposeBag()
     
     private let mediaItemsRelay = BehaviorRelay<[PHPickerResult]>(value: [])
-    private let alertTriggerRelay = PublishRelay<Void>()
+    private let alertTriggerRelay = PublishRelay<(String, String)>()
     var mediaUploadDataRelay = BehaviorRelay<[MediaUploadData]>(value: [])
     
     func transform(input: UploadInput) -> UploadOutput {
@@ -60,34 +61,34 @@ final class UploadVMImpl : UploadVM {
         input.gradeSelection
             .subscribe(onNext: { [weak self] (index, newGrade) in
                 guard let self = self else { return }
-
+                
                 var mediaList = self.mediaUploadDataRelay.value
                 guard index >= 0, index < mediaList.count else { return }
-
+                
                 if mediaList[index].grade == newGrade { return }
-
+                
                 var updatedMedia = mediaList[index]
                 updatedMedia.grade = newGrade
                 mediaList[index] = updatedMedia
-
+                
                 self.mediaUploadDataRelay.accept(mediaList)
             })
             .disposed(by: disposeBag)
-
+        
         input.holdSelection
             .subscribe(onNext: { [weak self] (index, newHold) in
                 guard let self = self else { return }
                 guard let newHold = newHold else { return }
-
+                
                 var mediaList = self.mediaUploadDataRelay.value
                 guard index >= 0, index < mediaList.count else { return }
-
+                
                 if mediaList[index].hold == newHold { return }
-
+                
                 var updatedMedia = mediaList[index]
                 updatedMedia.hold = newHold
                 mediaList[index] = updatedMedia
-
+                
                 self.mediaUploadDataRelay.accept(mediaList)
             })
             .disposed(by: disposeBag)
@@ -101,6 +102,7 @@ final class UploadVMImpl : UploadVM {
     private func processMediaItems(mediaItems: [PHPickerResult]) {
         let group = DispatchGroup()
         var models = [MediaUploadData?](repeating: nil, count: mediaItems.count)
+        let syncQueue = DispatchQueue(label: UploadMediaConst.UploadVM.Dispatch.syncQueueLabel)
         
         mediaItems.enumerated().forEach { index, mediaItem in
             group.enter()
@@ -115,7 +117,7 @@ final class UploadVMImpl : UploadVM {
                     
                     let tempVideoURL = FileManager.default.temporaryDirectory
                         .appendingPathComponent(UUID().uuidString)
-                        .appendingPathExtension("mp4")
+                        .appendingPathExtension(UploadMediaConst.UploadVM.Video.fileExtension)
                     
                     do {
                         try FileManager.default.copyItem(at: url, to: tempVideoURL)
@@ -126,52 +128,61 @@ final class UploadVMImpl : UploadVM {
                         return
                     }
                     
-                    let duration = self.getVideoDuration(url: tempVideoURL)
-                    if duration > 120 {
-                        DispatchQueue.main.async {
-                            self.mediaUploadDataRelay.accept([])
-                            self.alertTriggerRelay.accept(())
+                    Task {
+                        let duration = await self.getVideoDuration(url: tempVideoURL)
+                        if duration > UploadMediaConst.UploadVM.Video.maxDuration {
+                            await MainActor.run {
+                                self.mediaUploadDataRelay.accept([])
+                                self.alertTriggerRelay.accept((
+                                    UploadMediaConst.UploadVM.Text.videoLengthExceededTitle,
+                                    UploadMediaConst.UploadVM.Text.videoLengthExceededMessage
+                                ))
+                            }
+                            return
                         }
+                        
+                        let capturedDate = await self.getVideoMetadataCapturedDate(from: tempVideoURL)
+                        
+                        syncQueue.sync {
+                            models[index] = MediaUploadData(
+                                url: tempVideoURL,
+                                hold: nil,
+                                grade: "",
+                                thumbnailURL: tempVideoURL,
+                                capturedDate: capturedDate
+                            )
+                        }
+                        
                         group.leave()
-                        return
                     }
-                    
-                    let attributes = try? FileManager.default.attributesOfItem(atPath: url.path)
-                    let creationDate = attributes?[.creationDate] as? Date
-                    
-                    models[index] = MediaUploadData(
-                        url: tempVideoURL,
-                        hold: nil,
-                        grade: "",
-                        thumbnailURL: tempVideoURL,
-                        capturedDate: creationDate
-                    )
-                    group.leave()
                 }
             } else if mediaItem.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
-                mediaItem.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { [self] (url, error) in
-                    guard let url = url, error == nil else {
+                mediaItem.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { [weak self] (url, error) in
+                    guard let self = self, let url = url, error == nil else {
                         print("이미지 로드 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
                         group.leave()
                         return
                     }
                     
-                    let capturedAt = getCapturedDate(from: url)
+                    let capturedAt = self.getImageMetadataCapturedDate(from: url)
                     
                     let tempImageURL = FileManager.default.temporaryDirectory
                         .appendingPathComponent(UUID().uuidString)
-                        .appendingPathExtension("jpg")
+                        .appendingPathExtension(UploadMediaConst.UploadVM.Image.fileExtension)
                     
                     do {
                         try FileManager.default.copyItem(at: url, to: tempImageURL)
+                        print("이미지 저장 완료: \(tempImageURL.path)")
                         
-                        models[index] = MediaUploadData(
-                            url: tempImageURL,
-                            hold: nil,
-                            grade: "",
-                            thumbnailURL: tempImageURL,
-                            capturedDate: capturedAt
-                        )
+                        syncQueue.sync {
+                            models[index] = MediaUploadData(
+                                url: tempImageURL,
+                                hold: nil,
+                                grade: "",
+                                thumbnailURL: tempImageURL,
+                                capturedDate: capturedAt
+                            )
+                        }
                     } catch {
                         print("이미지 저장 실패: \(error.localizedDescription)")
                     }
@@ -192,41 +203,55 @@ final class UploadVMImpl : UploadVM {
 }
 
 extension UploadVMImpl {
-    
-    func getCapturedDate(from imageURL: URL) -> Date? {
+    private func getImageMetadataCapturedDate(from imageURL: URL) -> Date? {
         guard let imageSource = CGImageSourceCreateWithURL(imageURL as CFURL, nil),
               let imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any] else {
-            print("이미지 메타데이터를 가져올 수 없음.")
             return nil
         }
         
         if let exifData = imageProperties[kCGImagePropertyExifDictionary] as? [CFString: Any],
            let dateString = exifData[kCGImagePropertyExifDateTimeOriginal] as? String {
-            return parseExifDate(dateString)
+            return parseCapturedDate(dateString)
         }
         
         if let tiffData = imageProperties[kCGImagePropertyTIFFDictionary] as? [CFString: Any],
            let dateString = tiffData[kCGImagePropertyTIFFDateTime] as? String {
-            return parseExifDate(dateString)
+            return parseCapturedDate(dateString)
         }
-        
-        let attributes = try? FileManager.default.attributesOfItem(atPath: imageURL.path)
-        let creationDate = attributes?[.creationDate] as? Date
-        
-        return creationDate
+
+        return nil
     }
-    
-    private func parseExifDate(_ dateString: String) -> Date? {
+
+    private func getVideoMetadataCapturedDate(from videoURL: URL) async -> Date? {
+        let asset = AVAsset(url: videoURL)
+
+        do {
+            let metadata = try await asset.load(.metadata)
+            for item in metadata {
+                if item.commonKey == .commonKeyCreationDate {
+                    if let dateString = try? await item.load(.value) as? String {
+                        return parseCapturedDate(dateString)
+                    }
+                }
+            }
+        } catch {
+            print("동영상 메타데이터 로드 실패: \(error.localizedDescription)")
+        }
+        return nil
+    }
+
+    private func parseCapturedDate(_ dateString: String) -> Date? {
         let possibleFormats = [
             "yyyy:MM:dd HH:mm:ss",
             "yyyy-MM-dd'T'HH:mm:ssZ",
             "yyyy:MM:dd HH:mm:ss.SSS",
-            "EEE MMM dd HH:mm:ss Z yyyy"
+            "EEE MMM dd HH:mm:ss Z yyyy",
+            "yyyy-MM-dd HH:mm:ss"
         ]
-        
+
         let formatter = DateFormatter()
         formatter.timeZone = TimeZone(identifier: "UTC")
-        
+
         for format in possibleFormats {
             formatter.dateFormat = format
             if let date = formatter.date(from: dateString) {
@@ -238,8 +263,15 @@ extension UploadVMImpl {
 }
 
 extension UploadVMImpl {
-    func getVideoDuration(url: URL) -> Double {
+    func getVideoDuration(url: URL) async -> Double {
         let asset = AVAsset(url: url)
-        return CMTimeGetSeconds(asset.duration)
+        do {
+            let duration = try await asset.load(.duration)
+            return CMTimeGetSeconds(duration)
+        } catch {
+            print("비디오 길이 로드 실패: \(error.localizedDescription)")
+            return 0.0
+        }
     }
 }
+

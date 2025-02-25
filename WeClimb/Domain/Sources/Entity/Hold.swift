@@ -74,7 +74,7 @@ enum Hold : String, CaseIterable {
         case .purple:
             return "보라"
         case .white:
-            return "하양"
+            return "흰색"
         case .yellow:
             return "노랑"
         }

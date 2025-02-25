@@ -16,11 +16,11 @@ class SearchFieldRightView: UIView {
     
     private let circleCancelButton: UIButton = {
         let button = UIButton(type: .system)
-        let closeIcon = SearchConst.Image.circleCancelImage
+        let closeIcon = SearchConst.textFieldRightView.Image.circleCancelImage
         button.setImage(closeIcon, for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
-        button.tintColor = SearchConst.Color.circleCancelTintColor
-        button.alpha = SearchConst.buttonAlphaHidden
+        button.tintColor = SearchConst.textFieldRightView.Color.circleCancelTint
+        button.alpha = SearchConst.Common.buttonAlphaHidden
         return button
     }()
 
@@ -31,11 +31,27 @@ class SearchFieldRightView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupLayout()
+        applyStyle()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setupLayout()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
+            applyStyle()
+        }
+    }
+    
+    private func applyStyle() {
+        if traitCollection.userInterfaceStyle == .dark {
+            circleCancelButton.tintColor = SearchConst.textFieldRightView.Color.circleCancelTintDark
+        } else {
+            circleCancelButton.tintColor = SearchConst.textFieldRightView.Color.circleCancelTint
+        }
     }
     
     private func setupLayout() {

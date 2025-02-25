@@ -5,9 +5,7 @@
 //  Created by 머성이 on 12/18/24.
 //
 
-import AVKit
 import UIKit
-import PhotosUI
 import AVFoundation
 
 import SnapKit
@@ -41,14 +39,14 @@ class UploadPostCollectionCell: UICollectionViewCell {
         contentView.addSubview(imageView)
         contentView.backgroundColor = UIColor.fillSolidDarkBlack
 
-        imageView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        imageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
     }
-
+    
     func configure(with mediaItem: MediaUploadData) {
         let url = mediaItem.url
-
+        
         if url.pathExtension == "jpg" || url.pathExtension == "png" {
             loadImage(from: url)
         } else if url.pathExtension == "mp4" {

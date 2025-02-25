@@ -35,6 +35,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     
     var toSearchResult: ((String) -> Void)?
     var toUploadSearchResult: ((String) -> Void)?
+    var toUploalMediaPost: ((SearchResultItem) -> Void)?
     
     private let searchStyle: SearchStyle
     
@@ -44,28 +45,28 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         let container = SearchFieldRightView()
         
         container.snp.makeConstraints {
-            $0.width.height.equalTo(SearchConst.Size.rightViewSize)
+            $0.width.height.equalTo(SearchConst.Common.Size.rightViewSize)
         }
         return container
     }()
     
     private let searchTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = SearchConst.Text.searchFieldPlaceholder
-        textField.layer.cornerRadius = SearchConst.Shape.textFieldCornerRadius
-        textField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
-        textField.layer.borderColor = SearchConst.Color.textFieldBorderColor
-        textField.font = SearchConst.Font.textFieldFont
-        textField.textColor = SearchConst.Color.textFieldTextColor
+        textField.placeholder = SearchConst.Common.Text.searchFieldPlaceholder
+        textField.layer.cornerRadius = SearchConst.Common.Shape.textFieldCornerRadius
+        textField.layer.borderWidth = SearchConst.Common.Shape.textFieldBorderWidth
+        textField.layer.borderColor = SearchConst.Common.Color.textFieldBorder
+        textField.font = SearchConst.Common.Font.textFieldFont
+        textField.textColor = SearchConst.Common.Color.textFieldText
         
         return textField
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = SearchConst.Text.recentVisitTitle
-        label.font = SearchConst.Font.textLabelFont
-        label.textColor = SearchConst.Color.textLabelTextColor
+        label.text = SearchConst.Search.Text.recentVisitTitle
+        label.font = SearchConst.Common.Font.textLabelFont
+        label.textColor = SearchConst.Common.Color.textLabelText
         label.textAlignment = .left
         return label
     }()
@@ -75,17 +76,17 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         tableView.separatorStyle = .none
         tableView.register(SearchGymTableCell.self, forCellReuseIdentifier: SearchGymTableCell.className)
         tableView.register(SearchUserTableCell.self, forCellReuseIdentifier: SearchUserTableCell.className)
-        tableView.rowHeight = SearchConst.Size.tableViewRowHeight
+        tableView.rowHeight = SearchConst.Common.Size.tableViewRowHeight
         return tableView
     }()
     
     private let cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        let closeIcon = SearchConst.Image.closeIcon
+        let closeIcon = SearchConst.Common.Image.closeIcon
         button.setImage(closeIcon, for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
-        button.tintColor = SearchConst.Color.cancelBtnTintColor
-        button.alpha = SearchConst.buttonAlphaHidden
+        button.tintColor = SearchConst.Search.Color.cancelBtnTint
+        button.alpha = SearchConst.Common.buttonAlphaHidden
         return button
     }()
     
@@ -94,24 +95,24 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        searchTextField.alpha = SearchConst.buttonAlphaVisible
-        cancelButton.alpha = SearchConst.buttonAlphaVisible
+        searchTextField.alpha = SearchConst.Common.buttonAlphaVisible
+        cancelButton.alpha = SearchConst.Common.buttonAlphaVisible
         
         loadRecentVisitItems()
         
-        let searchIcon = SearchConst.Image.searchIcon
+        let searchIcon = UIImageView(image: SearchConst.Common.Image.searchIcon)
         searchIcon.contentMode = .scaleAspectFit
         
-        let iconWrapper = UIView(frame: SearchConst.Size.searchIconSize)
+        let iconWrapper = UIView(frame: SearchConst.Common.Size.searchIconSize)
         iconWrapper.addSubview(searchIcon)
-        searchIcon.frame.origin = SearchConst.Spacing.searchIconleftSpacing
+        searchIcon.frame.origin = SearchConst.Common.Spacing.searchIconleftSpacing
         
         searchTextField.leftView = iconWrapper
         searchTextField.leftViewMode = .always
         
         searchTextField.rightView = searchRightViewContainer
         searchTextField.rightViewMode = .whileEditing
-        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
+        searchRightViewContainer.setCancelButtonAlpha(SearchConst.Common.buttonAlphaHidden)
     }
     
     init(searchStyle: SearchStyle = .defaultSearch) {
@@ -131,63 +132,96 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         searchTextField.delegate = self
         
         setLayout()
+        applySearchStyle()
         bindTableView()
         bindButtons()
-        applySearchStyle()
     }
     
-    private func applySearchStyle() {
-        let isDarkMode = traitCollection.userInterfaceStyle == .dark
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
         
-        if isDarkMode {
-            setupUploadSearchStyle()
-        } else {
-            switch searchStyle {
-            case .defaultSearch:
-                return
-            case .uploadSearch:
-                setupUploadSearchStyle()
-            }
+        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
+            applySearchStyle()
+            updateTextFieldBorder()
         }
     }
+
+    private func applySearchStyle() {
+        switch searchStyle {
+        case .defaultSearch:
+            if traitCollection.userInterfaceStyle == .dark {
+                setDarkModeSearchStyle()
+            } else {
+                setLightModeSearchStyle()
+            }
+        case .uploadSearch:
+            setUploadSearchStyle()
+        }
+    }
+
+    private func setDarkModeSearchStyle() {
+        view.backgroundColor = SearchConst.Common.Color.viewBackgroundDark
+        tableView.backgroundColor = SearchConst.Common.Color.tableViewBackgroundDark
+        searchTextField.textColor = SearchConst.Common.Color.textFieldTextDark
+        titleLabel.textColor = SearchConst.Common.Color.titleLabelTextDark
+        cancelButton.tintColor = SearchConst.Search.Color.cancelBtnTintDark
+        
+        navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+
+    private func setLightModeSearchStyle() {
+        view.backgroundColor = SearchConst.Common.Color.viewBackground
+        tableView.backgroundColor = SearchConst.Common.Color.tableViewBackground
+        searchTextField.textColor = SearchConst.Common.Color.textFieldText
+        titleLabel.textColor = SearchConst.Common.Color.textLabelText
+        cancelButton.tintColor = SearchConst.Search.Color.cancelBtnTint
+        
+        navigationController?.setNavigationBarHidden(true, animated: false)
+    }
     
-    private func setupUploadSearchStyle() {
+    private func setUploadSearchStyle() {
         navigationController?.setNavigationBarHidden(false, animated: false)
         
         navigationController?.navigationBar.barStyle = .default
-        navigationController?.navigationBar.barTintColor = UIColor.fillSolidDarkBlack
+        navigationController?.navigationBar.barTintColor = SearchConst.Common.Color.navigationBackground
         
-        navigationItem.title = "편집"
+        navigationItem.title = SearchConst.Search.Text.navigationTitle
         
         navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor.white,
-            .font: UIFont.customFont(style: .heading2SemiBold)
+            .foregroundColor: SearchConst.Common.Color.navigationTitleText,
+            .font: SearchConst.Search.Font.navigationTitle
         ]
         
-        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysTemplate)
-        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapCloseButton))
-        backButton.tintColor = .white
+        let closeButton = UIBarButtonItem(
+            image: SearchConst.Common.Image.closeIcon,
+            style: .plain,
+            target: self,
+            action: #selector(didTapCloseButton)
+        )
+        closeButton.tintColor = SearchConst.Common.Color.navigationCloseButtonTint
+        navigationItem.leftBarButtonItem = closeButton
         
-        navigationItem.leftBarButtonItem = backButton
-        
-        view.backgroundColor = UIColor.fillSolidDarkBlack
-        self.tableView.backgroundColor = UIColor.fillSolidDarkBlack
-        self.searchTextField.textColor = UIColor.white
-        self.titleLabel.textColor = UIColor.white
+        view.backgroundColor = SearchConst.Common.Color.viewBackgroundDark
+        tableView.backgroundColor = SearchConst.Common.Color.tableViewBackgroundDark
+        searchTextField.textColor = SearchConst.Common.Color.textFieldTextDark
+        titleLabel.textColor = SearchConst.Common.Color.titleLabelTextDark
     }
-    
+
     @objc private func didTapCloseButton() {
         let alert = DefaultAlertVC(alertType: .titleDescription, interfaceStyle: .dark)
-        alert.setTitle("정말 나가시겠어요?", "입력된 내용은 저장되지 않아요.")
-        alert.setCustomButtonTitle("삭제")
-        alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  //StatusNegative
+        alert.setTitle(SearchConst.Common.Text.Alert.closeAlertTitle, SearchConst.Common.Text.Alert.closeAlertMessage)
+        alert.setCustomButtonTitle(SearchConst.Common.Text.Alert.closeAlertConfirmButtonTitle)
+        alert.customButtonTitleColor = SearchConst.Common.Color.alertConfirmButton
         
         alert.customAction = { [weak self] in
-            self?.tabBarController?.selectedIndex = 0
+            self?.tabBarController?.selectedIndex = SearchConst.Search.TabBar.defaultIndex
             self?.tabBarController?.tabBar.isHidden = false
-            UIView.animate(withDuration: 0.1, animations: {
-                self?.tabBarController?.tabBar.alpha = 1
-            })
+            UIView.animate(
+                withDuration: SearchConst.Search.Animation.fadeDuration,
+                animations: {
+                    self?.tabBarController?.tabBar.alpha = SearchConst.Search.Animation.visibleAlpha
+                }
+            )
         }
         
         alert.modalPresentationStyle = .overCurrentContext
@@ -242,26 +276,38 @@ class SearchVC: UIViewController, UITextFieldDelegate {
             .bind(to: tableView.rx.items) { tableView, row, item in
                 let cell: UITableViewCell
                 if item.type == .gym {
-                    let gymCell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className, for: IndexPath(row: row, section: SearchConst.defaultSectionNumbers)) as! SearchGymTableCell
+                    let gymCell = tableView.dequeueReusableCell(withIdentifier: SearchGymTableCell.className, for: IndexPath(row: row, section: SearchConst.Common.defaultSectionNumbers)) as! SearchGymTableCell
                     gymCell.configure(with: item, searchStyle: self.searchStyle)
                     
                     gymCell.onDelete = { [weak self] itemToDelete in
                         self?.deleteItem(itemToDelete, at: row)
                     }
+                    gymCell.selectionStyle = .none
                     
                     cell = gymCell
                 } else {
-                    let userCell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className, for: IndexPath(row: row, section: SearchConst.defaultSectionNumbers)) as! SearchUserTableCell
+                    let userCell = tableView.dequeueReusableCell(withIdentifier: SearchUserTableCell.className, for: IndexPath(row: row, section: SearchConst.Common.defaultSectionNumbers)) as! SearchUserTableCell
                     userCell.configure(with: item, searchStyle: self.searchStyle)
                     
                     userCell.onDelete = { [weak self] itemToDelete in
                         self?.deleteItem(itemToDelete, at: row)
                     }
+                    userCell.selectionStyle = .none
                     
                     cell = userCell
                 }
                 return cell
             }
+            .disposed(by: disposeBag)
+        
+        tableView.rx.modelSelected(SearchResultItem.self)
+            .bind(onNext: { [weak self] item in
+                guard let self = self else { return }
+                
+                if self.searchStyle == .uploadSearch {
+                    self.toUploalMediaPost?(item)
+                }
+            })
             .disposed(by: disposeBag)
     }
     
@@ -298,7 +344,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     }
     
     func didTapCancelButton() {
-        searchTextField.text = SearchConst.Text.emptyText
+        searchTextField.text = SearchConst.Common.Text.emptyText
         searchTextField.resignFirstResponder()
         searchTextField.layer.borderColor = UIColor.lineOpacityNormal.cgColor
         
@@ -311,42 +357,53 @@ class SearchVC: UIViewController, UITextFieldDelegate {
             $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.returnCancelBtnRightSpacing)
         }
         
-        self.cancelButton.alpha = SearchConst.buttonAlphaHidden
+        self.cancelButton.alpha = SearchConst.Common.buttonAlphaHidden
     }
     
     func didTapSmallCancelButton() {
-        searchTextField.text = SearchConst.Text.emptyText
-        searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
+        searchTextField.text = SearchConst.Common.Text.emptyText
+        searchRightViewContainer.setCancelButtonAlpha(SearchConst.Common.buttonAlphaHidden)
     }
 }
 
 extension SearchVC {
     func textFieldDidBeginEditing(_ textField: UITextField) {
+        
         if searchStyle == .uploadSearch {
             return
         }
         
-        searchTextField.layer.borderWidth = SearchConst.Shape.textFieldBorderWidth
-        searchTextField.layer.borderColor = UIColor.fillSolidDarkBlack.cgColor
+        updateTextFieldBorder()
         
         self.searchTextField.snp.updateConstraints {
             $0.leading.equalToSuperview().offset(SearchConst.Search.Spacing.textFieldSpacing)
             $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.updatedTextFieldRightSpacing)
         }
         
-        self.cancelButton.alpha = SearchConst.buttonAlphaVisible
+        self.cancelButton.alpha = SearchConst.Common.buttonAlphaVisible
         self.cancelButton.snp.updateConstraints {
             $0.trailing.equalToSuperview().offset(SearchConst.Search.Spacing.updatedCancelBtnRightSpacing)
         }
+        
+    }
+    
+    private func updateTextFieldBorder() {
+        let isDarkMode = traitCollection.userInterfaceStyle == .dark
+        let borderColor: CGColor = isDarkMode
+        ?  SearchConst.Search.Color.textFieldTextSelectedDark.cgColor
+            :  SearchConst.Search.Color.textFieldTextSelected.cgColor
+
+        searchTextField.layer.borderWidth = SearchConst.Common.Shape.textFieldBorderWidth
+        searchTextField.layer.borderColor = borderColor
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let newText = (textField.text as NSString?)?.replacingCharacters(in: range, with: string)
         
         if newText?.isEmpty == true {
-            searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaHidden)
+            searchRightViewContainer.setCancelButtonAlpha(SearchConst.Common.buttonAlphaHidden)
         } else {
-            searchRightViewContainer.setCancelButtonAlpha(SearchConst.buttonAlphaVisible)
+            searchRightViewContainer.setCancelButtonAlpha(SearchConst.Common.buttonAlphaVisible)
         }
         return true
     }
@@ -355,8 +412,8 @@ extension SearchVC {
         textField.resignFirstResponder()
         
         if let searchText = textField.text, !searchText.isEmpty {
-            self.searchTextField.alpha = SearchConst.buttonAlphaHidden
-            self.cancelButton.alpha = SearchConst.buttonAlphaHidden
+            self.searchTextField.alpha = SearchConst.Common.buttonAlphaHidden
+            self.cancelButton.alpha = SearchConst.Common.buttonAlphaHidden
             
             switch searchStyle {
             case .defaultSearch:

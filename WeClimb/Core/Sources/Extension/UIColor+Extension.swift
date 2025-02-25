@@ -43,6 +43,9 @@ extension UIColor {
     
     //MARK: - 필터 커스텀 컬러
     static let fillSolidDarkStrong = UIColor(hex: "#1D1E20")
+    
+    static let fillSolidDarkLight = UIColor(hex: "313235")
+    static let BackgroundBlack = UIColor(hex: "141415")
 }
 
 extension UIColor {

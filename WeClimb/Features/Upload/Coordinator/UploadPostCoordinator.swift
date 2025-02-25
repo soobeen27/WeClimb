@@ -14,6 +14,8 @@ final class UploadPostCoordinator: BaseCoordinator {
     private let gymName: String
     private let mediaItems: [MediaUploadData]
     
+    var onDismiss: (() -> Void)?
+    
     init(navigationController: UINavigationController, gymName: String, mediaItems: [MediaUploadData], builder: UploadBuilder) {
         self.navigationController = navigationController
         self.gymName = gymName
@@ -25,5 +27,9 @@ final class UploadPostCoordinator: BaseCoordinator {
         let uploadPostVC = builder.buildUploadPost(gymName: gymName, mediaItems: mediaItems)
         uploadPostVC.coordinator = self
         navigationController.pushViewController(uploadPostVC, animated: true)
+        
+        uploadPostVC.onDismiss = { [weak self] in
+            self?.onDismiss?()
+        }
     }
 }

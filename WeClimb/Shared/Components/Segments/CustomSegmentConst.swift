@@ -12,6 +12,10 @@ enum CustomSegmentConst {
         static let indicatorColor: UIColor = UIColor.fillSolidDarkBlack
         static let normalFontColor: UIColor = UIColor.labelNeutral
         static let selectedFontColor: UIColor = UIColor.labelStrong
+        
+        static let indicatorColorDark: UIColor = UIColor.white
+        static let normalFontColorDark: UIColor = UIColor.white
+        static let selectedFontColorDark: UIColor = UIColor.white
     }
     
     enum Font {

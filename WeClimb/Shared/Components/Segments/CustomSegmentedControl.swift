@@ -61,9 +61,8 @@ class CustomSegmentedControl: UIView {
         }
     }
     
-    
     var onSegmentChanged: ((Int) -> Void)?
-    
+
     init(items: [String]) {
         segmentControl = UISegmentedControl(items: items)
         super.init(frame: .zero)
@@ -72,10 +71,19 @@ class CustomSegmentedControl: UIView {
         initializeIndicatorLayout()
         bindSegmentControl()
         segmentControllerBackgroundColor()
+        applyStyle()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
+            applyStyle()
+        }
     }
     
     private func setupSegmentControl() {
@@ -84,23 +92,13 @@ class CustomSegmentedControl: UIView {
         segmentControl.selectedSegmentIndex = CustomSegmentConst.Size.firstSegmentItem
         segmentControl.selectedSegmentTintColor = .clear
         
-        segmentControl.setTitleTextAttributes([
-            .font: CustomSegmentConst.Font.normalFont,
-            .foregroundColor: CustomSegmentConst.Color.normalFontColor
-        ], for: .normal)
-
-        segmentControl.setTitleTextAttributes([
-            .font: CustomSegmentConst.Font.selectedFont,
-            .foregroundColor: CustomSegmentConst.Color.selectedFontColor
-        ], for: .selected)
+        updateSegmentTextColors()
         
         segmentControl.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.equalToSuperview()
             $0.height.equalTo(CustomSegmentConst.Size.segmentControlHeight)
         }
-        
-        updateSegmentTextColors()
     }
     
     private func updateSegmentTextColors() {
@@ -113,6 +111,20 @@ class CustomSegmentedControl: UIView {
             .font: CustomSegmentConst.Font.selectedFont,
             .foregroundColor: selectedFontColor
         ], for: .selected)
+    }
+    
+    private func applyStyle() {
+        if traitCollection.userInterfaceStyle == .dark {
+            normalFontColor = CustomSegmentConst.Color.normalFontColorDark
+            selectedFontColor = CustomSegmentConst.Color.selectedFontColorDark
+            indicatorView.backgroundColor = CustomSegmentConst.Color.indicatorColorDark
+        } else {
+            normalFontColor = CustomSegmentConst.Color.normalFontColor
+            selectedFontColor = CustomSegmentConst.Color.selectedFontColor
+            indicatorView.backgroundColor = CustomSegmentConst.Color.indicatorColor
+        }
+        
+        updateSegmentTextColors()
     }
     
     private func segmentControllerBackgroundColor() {
@@ -189,11 +201,5 @@ class CustomSegmentedControl: UIView {
     
     private func segmentWidth() -> CGFloat {
         return segmentControl.frame.width / CGFloat(segmentControl.numberOfSegments)
-    }
-}
-
-extension String {
-    func size(withAttributes attributes: [NSAttributedString.Key: Any]) -> CGSize {
-        return (self as NSString).size(withAttributes: attributes)
     }
 }
