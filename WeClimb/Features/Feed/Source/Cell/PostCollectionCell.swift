@@ -128,7 +128,6 @@ class PostCollectionCell: UICollectionViewCell {
         caption = postItem.caption
         bindMediaIndex()
         bindTotalPageCount()
-
     }
     
     private func configureProfileView(postItem: PostItem, user: User) {

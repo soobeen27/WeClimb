@@ -32,6 +32,23 @@ class PostProfileView: UIView {
             bindHideButton()
         }
     }
+    
+    var nameTapEvent: Observable<String?> {
+        userTapGestureRecognizer.rx.event
+            .map { [weak self] _ -> String? in
+                return self?.profileModel?.name
+            }
+    }
+    
+    var gymTapEvent: Observable<String?> {
+        gymTapGestureRecognizer.rx.event
+            .map { [weak self] _ -> String? in
+                return self?.profileModel?.name
+            }
+    }
+    
+    private let userTapGestureRecognizer = UITapGestureRecognizer()
+    private let gymTapGestureRecognizer = UITapGestureRecognizer()
 
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
@@ -42,7 +59,7 @@ class PostProfileView: UIView {
         return imageView
     }()
     
-    private let nameLabel: UILabel = {
+    private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.font = FeedConsts.Profile.Font.name
         label.textColor = FeedConsts.Profile.Color.text
@@ -70,6 +87,7 @@ class PostProfileView: UIView {
             .forEach {
                 view.addSubview($0)
             }
+        view.addGestureRecognizer(userTapGestureRecognizer)
         return view
     }()
     
@@ -79,6 +97,7 @@ class PostProfileView: UIView {
             .forEach {
                 view.addSubview($0)
             }
+        view.addGestureRecognizer(gymTapGestureRecognizer)
         return view
     }()
     
