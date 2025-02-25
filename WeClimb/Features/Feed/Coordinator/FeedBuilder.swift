@@ -22,7 +22,7 @@ final class FeedBuilderImpl: FeedBuilder {
     func buildFeed() -> FeedVC {
         let viewModel: FeedVM = container.resolve(FeedVM.self)
         
-        return FeedVC(viewModel: viewModel)
+        return FeedVC(viewModel: viewModel, postType: .feed)
     }
     
     func buildComment(postItem: PostItem) -> PostCommentVC {

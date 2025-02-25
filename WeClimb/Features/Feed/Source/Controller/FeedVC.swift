@@ -20,11 +20,13 @@ class FeedVC: UIViewController {
     
     private let container = AppDIContainer.shared
     
+    let postType: PostType
+    
     let disposeBag = DisposeBag()
     
     var commentTapped: ((PostItem) -> Void)?
     
-    private let fetchType: BehaviorRelay<FetchPostType> = .init(value: .initial)
+    private let fetchType: BehaviorRelay<PostFetchType?> = .init(value: .initial)
     private let addtionalButtonTapped = BehaviorRelay<(postItem: PostItem, isMine: Bool)?>(value: nil)
     private let selectedButtonType = PublishRelay<FeedMenuSelection>()
 
@@ -79,8 +81,9 @@ class FeedVC: UIViewController {
         return collectionView
     }()
         
-    init(viewModel: FeedVM) {
+    init(viewModel: FeedVM, postType: PostType) {
         self.feedVM = viewModel
+        self.postType = postType
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -107,7 +110,8 @@ class FeedVC: UIViewController {
     }
     
     private func bindViewModel() {
-        let input = FeedVMImpl.Input(fetchType: fetchType,
+        let input = FeedVMImpl.Input(postType: Observable.just(postType),
+                                     fetchType: fetchType,
                                      additionalButtonTap: addtionalButtonTapped.asObservable(),
                                      additionalButtonTapType: selectedButtonType
         )
@@ -128,6 +132,15 @@ class FeedVC: UIViewController {
                 } else {
                     self.dismissMenu()
                 }
+            })
+            .disposed(by: disposeBag)
+        
+        output.startIndex
+            .asDriver()
+            .drive(onNext: { [weak self] startIndex in
+                guard let self, let startIndex else { return }
+                let startIndexPath = IndexPath(item: startIndex, section: 0)
+                self.postCollectionView.scrollToItem(at: startIndexPath, at: .top, animated: false)
             })
             .disposed(by: disposeBag)
 

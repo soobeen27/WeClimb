@@ -23,7 +23,7 @@ final class PostRepositoryAssembly: Assembly {
 //            )
 //        }
         container.register(PostRepository.self) { resolver in
-            PostRepositoryImpl(postRepository: resolver.resolve(PostRepository.self)!)
+            PostRepositoryImpl(postDataSource: resolver.resolve(PostDataSource.self)!)
         }
         
         container.register(FetchMediasRepository.self) { resolver in
@@ -38,6 +38,9 @@ final class PostRepositoryAssembly: Assembly {
                 postRemoteDataSource: resolver.resolve(PostRemoteDataSource.self)!,
                 mediaRemoteDataSource: resolver.resolve(MediaRemoteDataSource.self)!
             )
+        }
+        container.register(PostFilterRepository.self) { resolver in
+            PostFilterRepositoryImpl(postFilterDataSource: resolver.resolve(PostFilterDataSource.self)!)
         }
         
     }
