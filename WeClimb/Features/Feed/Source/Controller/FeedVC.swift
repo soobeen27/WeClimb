@@ -24,11 +24,7 @@ class FeedVC: UIViewController {
     
     let disposeBag = DisposeBag()
     
-    var commentTapped: ((PostItem) -> Void)?
-    
-    var userTapped: ((_ userName: String) -> Void)?
-    
-    var gymTapped: ((_ gymName: String, _ level: LHColors?, _ hold: LHColors?) -> Void)?
+    var onFinish: ((FeedPushType) -> Void)?
     
     private let fetchType: BehaviorRelay<PostFetchType?> = .init(value: .initial)
     private let addtionalButtonTapped = BehaviorRelay<(postItem: PostItem, isMine: Bool)?>(value: nil)
@@ -53,7 +49,7 @@ class FeedVC: UIViewController {
                 .asDriver()
                 .drive(onNext: { [weak self] postItem in
                     guard let self, let postItem else { return }
-                    self.commentTapped?(postItem)
+                    self.onFinish?(.comment(postItem: postItem))
                 })
                 .disposed(by: cell.disposeBag)
             
@@ -63,13 +59,13 @@ class FeedVC: UIViewController {
             
             cell.gymTapInfo.bind(onNext: { [weak self] gym, level, hold in
                 guard let gym, let self else { return }
-                self.gymTapped?(gym, level, hold)
+                self.onFinish?(.gym(gymName: gym, level: level, hold: hold))
             })
             .disposed(by: cell.disposeBag)
             
             cell.userTapInfo.bind(onNext: { [weak self] name in
                 guard let self else { return }
-                self.userTapped?(name)
+                self.onFinish?(.user(userName: name))
             })
             .disposed(by: cell.disposeBag)
             
