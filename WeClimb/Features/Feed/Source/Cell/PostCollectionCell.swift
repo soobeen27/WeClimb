@@ -59,6 +59,9 @@ class PostCollectionCell: UICollectionViewCell {
     
     let additonalButtonTapped = BehaviorRelay<(postItem: PostItem, isMine: Bool)?>(value: nil)
     
+    let gymTapInfo = PublishSubject<(gymName: String?, level: LHColors?, hold: LHColors?)>.init()
+    let userTapInfo = PublishSubject<String>.init()
+    
     private var user: User? {
         didSet {
             guard let user, let postItem else { return }
@@ -68,7 +71,6 @@ class PostCollectionCell: UICollectionViewCell {
     var caption: String?
     
     private var postItem: PostItem?
-    
     
     private lazy var dataSource: UICollectionViewDiffableDataSource<Section, MediaItem> = {
         let dataSource = UICollectionViewDiffableDataSource<Section, MediaItem>(collectionView: mediaCollectionView)
@@ -142,7 +144,9 @@ class PostCollectionCell: UICollectionViewCell {
             likeButtonTap: postSidebarView.likeButtonTap,
             currentMediaIndex: currentMediaIndexRelay,
             commentButtonTap: postSidebarView.commentButtonTap,
-            additionalButtonTap: postSidebarView.additionalActionButtonTap
+            additionalButtonTap: postSidebarView.additionalActionButtonTap,
+            userTap: profileView.userTapEvent,
+            gymTap: profileView.gymTapEvent
         )
         )
         
@@ -188,6 +192,12 @@ class PostCollectionCell: UICollectionViewCell {
         
         output.commentCount
             .bind(to: postSidebarView.commentCountRelay)
+            .disposed(by: disposeBag)
+        
+        output.userTapInfo.bind(to: userTapInfo)
+            .disposed(by: disposeBag)
+        
+        output.gymTapInfo.bind(to: gymTapInfo)
             .disposed(by: disposeBag)
     }
     

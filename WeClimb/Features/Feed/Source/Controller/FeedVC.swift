@@ -26,6 +26,10 @@ class FeedVC: UIViewController {
     
     var commentTapped: ((PostItem) -> Void)?
     
+    var userTapped: ((_ userName: String) -> Void)?
+    
+    var gymTapped: ((_ gymName: String, _ level: LHColors?, _ hold: LHColors?) -> Void)?
+    
     private let fetchType: BehaviorRelay<PostFetchType?> = .init(value: .initial)
     private let addtionalButtonTapped = BehaviorRelay<(postItem: PostItem, isMine: Bool)?>(value: nil)
     private let selectedButtonType = PublishRelay<FeedMenuSelection>()
@@ -44,6 +48,7 @@ class FeedVC: UIViewController {
            else { return UICollectionViewCell() }
             let viewModel = self.container.resolve(PostCollectionCellVM.self)
             cell.configure(postItem: item, postCollectionCellVM: viewModel)
+            
             cell.currentPost
                 .asDriver()
                 .drive(onNext: { [weak self] postItem in
@@ -51,9 +56,23 @@ class FeedVC: UIViewController {
                     self.commentTapped?(postItem)
                 })
                 .disposed(by: cell.disposeBag)
+            
             cell.additonalButtonTapped
                 .bind(to: self.addtionalButtonTapped)
                 .disposed(by: cell.disposeBag)
+            
+            cell.gymTapInfo.bind(onNext: { [weak self] gym, level, hold in
+                guard let gym, let self else { return }
+                self.gymTapped?(gym, level, hold)
+            })
+            .disposed(by: cell.disposeBag)
+            
+            cell.userTapInfo.bind(onNext: { [weak self] name in
+                guard let self else { return }
+                self.userTapped?(name)
+            })
+            .disposed(by: cell.disposeBag)
+            
            return cell
         }
         return dataSource
@@ -135,14 +154,6 @@ class FeedVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-//        output.startIndex
-//            .asDriver()
-//            .drive(onNext: { [weak self] startIndex in
-//                guard let self, let startIndex else { return }
-//                let startIndexPath = IndexPath(item: startIndex, section: 0)
-//                self.postCollectionView.scrollToItem(at: startIndexPath, at: .top, animated: false)
-//            })
-//            .disposed(by: disposeBag)
         if let startIndex = output.startIndex.value {
             scrollTo(startIndex: startIndex)
         }

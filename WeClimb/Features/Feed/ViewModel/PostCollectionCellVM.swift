@@ -17,6 +17,8 @@ protocol PostCollectionCellInput {
     var currentMediaIndex: BehaviorRelay<Int> { get }
     var commentButtonTap: ControlEvent<Void> { get }
     var additionalButtonTap: ControlEvent<Void> { get }
+    var userTap: Observable<Void> { get }
+    var gymTap: Observable<Void> { get }
 }
 
 protocol PostCollectionCellOutput {
@@ -28,6 +30,8 @@ protocol PostCollectionCellOutput {
     var currentPost: BehaviorRelay<PostItem?> { get }
     var addtionalButtonTapData: Observable<(postItem: PostItem, isMine: Bool)?> { get }
     var commentCount: Observable<Int> { get }
+    var gymTapInfo: Observable<(gymName: String?, level: LHColors?, hold: LHColors?)> { get }
+    var userTapInfo: Observable<String> { get }
 }
 
 protocol PostCollectionCellVM {
@@ -49,6 +53,8 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         let currentMediaIndex: BehaviorRelay<Int>
         let commentButtonTap: ControlEvent<Void>
         let additionalButtonTap: ControlEvent<Void>
+        let userTap: Observable<Void>
+        let gymTap: Observable<Void>
     }
     
     struct Output: PostCollectionCellOutput {
@@ -60,6 +66,8 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
         let currentPost: BehaviorRelay<PostItem?>
         let addtionalButtonTapData: Observable<(postItem: PostItem, isMine: Bool)?>
         let commentCount: Observable<Int>
+        let gymTapInfo: Observable<(gymName: String?, level: LHColors?, hold: LHColors?)>
+        let userTapInfo: Observable<String>
     }
 
     init(userInfoFromUIDUseCase: UserInfoFromUIDUseCase, myUIDUseCase: MyUIDUseCase, likePostUseCase: LikePostUseCase, fetchMediasUseCase: FetchMediasUseCase) {
@@ -98,7 +106,9 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
             levelHolds: Observable.just((nil, nil)),
             currentPost: BehaviorRelay<PostItem?>.init(value: nil),
             addtionalButtonTapData: Observable.just(nil),
-            commentCount: Observable.just(0)
+            commentCount: Observable.just(0),
+            gymTapInfo: Observable.just((gymName: "", level: nil, hold: nil)),
+            userTapInfo: Observable.just("")
         )}
 
         let refs = pathToRef(paths: paths)
@@ -139,6 +149,20 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
 //                self.isMyPost(uid: input.postItem.authorUID)
 //            })
 //            .disposed(by: disposeBag)
+        
+        let gymLH = input.gymTap.flatMap {
+            levelHolds.map {
+                (gymName: input.postItem.gym, level: $0.level, hold: $0.hold)
+            }
+        }
+        let userName = input.userTap.flatMap{
+            user.asObservable().map { $0.userName ?? "" }
+        }
+//        let gymLH = levelHolds.map {
+//            (gymName: input.postItem.gym, level: $0.level, hold: $0.hold)
+//        }
+        
+//        let userName = user.asObservable().map { $0.userName ?? "" }
                 
         return Output(
             user: user, likeCount: likeCount,
@@ -146,7 +170,10 @@ class PostCollectionCellVMImpl: PostCollectionCellVM {
             levelHolds: levelHolds,
             currentPost: currentPost,
             addtionalButtonTapData: addtionalButtonTapData,
-            commentCount: Observable.just(commentCount)
+            commentCount: Observable.just(commentCount),
+            gymTapInfo: gymLH,
+            userTapInfo: userName
+            
         )
     }
     
