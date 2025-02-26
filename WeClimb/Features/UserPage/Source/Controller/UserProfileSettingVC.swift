@@ -17,6 +17,11 @@ enum UserProfileSettingItem {
     case other(String)
 }
 
+enum UserProfileSettingEvent {
+    case userPage
+    case homeGymPage
+}
+
 class UserProfileSettingVC: UIViewController {
     
     var coordinator: UserProfileSettingCoordinator?
@@ -206,6 +211,7 @@ class UserProfileSettingVC: UIViewController {
     private let activityTableView: UITableView = {
         let tableView = UITableView()
         tableView.register(ActivityTableViewCell.self, forCellReuseIdentifier: ActivityTableViewCell.identifier)
+        tableView.backgroundColor = .clear
         return tableView
     }()
     
@@ -450,11 +456,11 @@ class UserProfileSettingVC: UIViewController {
     }
 
     @objc private func backButtonTapped() {
-        coordinator?.finish()
+        coordinator?.showReturnPage()
     }
     
     func showHomeGymSelection(input: UserProfileSettingImpl.Input) {
-        print("이동햇숴")
+        coordinator?.showHomeGymPage(.homeGymPage)
     }
     
 //        func showHomeGymSelection(input: UserProfileSettingImpl.Input) {

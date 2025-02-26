@@ -1,5 +1,5 @@
 //
-//  homeGymSettingConst.swift
+//  HomeGymSettingConst.swift
 //  WeClimb
 //
 //  Created by 윤대성 on 2/21/25.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum homeGymSettingConst {
+enum HomeGymSettingConst {
     
     enum Text {
         static let favoriteLabel = "즐겨찾기"
@@ -33,7 +33,7 @@ enum homeGymSettingConst {
     
     enum Size {
         static let placeholderHeight: CGFloat = 46
-        static let homeGymMarkSize: CGSize = CGSize(width: 13, height: 17)
+        static let homeGymMarkSize: CGSize = CGSize(width: 20, height: 20)
         static let badgeImage: CGSize = CGSize(width: 12, height: 12)
     }
     

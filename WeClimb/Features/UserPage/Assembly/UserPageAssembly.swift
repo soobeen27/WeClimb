@@ -23,6 +23,13 @@ final class UserPageAssembly: Assembly {
                 
             )
         }
+        
+        container.register(HomeGymSettingVM.self) { resolver in
+            HomeGymSettingImpl(
+                fetchAllGymsInfoUseCase: resolver.resolve(FetchAllGymsInfoUseCase.self)!,
+                searchGymsUseCase: resolver.resolve(SearchGymsUseCase.self)!,
+                fetchImageURLUseCase: resolver.resolve(FetchImageURLUseCase.self)!)
+        }
     }
 }
 

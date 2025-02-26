@@ -1,5 +1,5 @@
 //
-//  homeGymSettingCell.swift
+//  HomeGymSettingCell.swift
 //  WeClimb
 //
 //  Created by 윤대성 on 2/23/25.
@@ -12,10 +12,11 @@ import RxCocoa
 import RxSwift
 import SnapKit
 
-class homeGymSettingCell: UITableViewCell {
-    static let identifier = "homeGymSettingCell"
+class HomeGymSettingCell: UITableViewCell {
+    static let identifier = "HomeGymSettingCell"
     
-    private let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
+    private let selectRelay = PublishRelay<Void>()
     
     private let gymImageView: UIImageView = {
         let imageView = UIImageView()
@@ -43,14 +44,18 @@ class homeGymSettingCell: UITableViewCell {
     
     private let homeGymMarkImage: UIImageView = {
         let img = UIImageView()
-        img.image = homeGymSettingConst.Image.nomalHomeGymMark
+        img.image = HomeGymSettingConst.Image.nomalHomeGymMark
+        img.isUserInteractionEnabled = true
         img.clipsToBounds = true
         return img
     }()
     
+    var onMarkTapped: (() -> Void)?
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setLayout()
+        setupTapGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -58,6 +63,9 @@ class homeGymSettingCell: UITableViewCell {
     }
     
     private func setLayout() {
+        self.backgroundColor = .clear
+        self.selectionStyle = .none
+        
         [
             gymImageView,
             gymLocationLabel,
@@ -82,9 +90,40 @@ class homeGymSettingCell: UITableViewCell {
         }
         
         homeGymMarkImage.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(16)
             $0.trailing.equalToSuperview().offset(-16)
             $0.centerY.equalToSuperview()
+        }
+    }
+    
+    private func setupTapGesture() {
+        let tapGesture = UITapGestureRecognizer()
+        homeGymMarkImage.addGestureRecognizer(tapGesture)
+        
+        tapGesture.rx.event
+            .map { _ in }
+            .bind(to: selectRelay)
+            .disposed(by: disposeBag)
+    }
+    
+    func selectionObservable() -> Observable<Void> {
+        return selectRelay.asObservable()
+    }
+    
+    func configure(with gym: Gym, isSelected: Observable<Bool>) {
+        gymNameLabel.text = gym.gymName
+        
+        isSelected
+            .subscribe(onNext: { [weak self] selected in
+                self?.homeGymMarkImage.image = selected ? HomeGymSettingConst.Image.clickHomeGymMark : HomeGymSettingConst.Image.nomalHomeGymMark
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func updateGymImage(with url: URL?) {
+        if let url = url {
+            gymImageView.kf.setImage(with: url)
+        } else {
+            gymImageView.image = UIImage(named: "defaultGymImage")
         }
     }
 }

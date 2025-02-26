@@ -61,6 +61,8 @@ class ActivityTableViewCell: UITableViewCell {
     }
     
     private func setLayout() {
+        self.backgroundColor = .clear
+        
         [
             valueLabel,
             chevronRightImageView

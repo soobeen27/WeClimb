@@ -20,15 +20,6 @@ final class UserPageMainCoordinator: BaseCoordinator {
         showUserPageVC()
     }
     
-    private func userPageHandleEvent(_ event: UserPageEvent) {
-        switch event {
-        case .showProfileSetting:
-            showProfileSettingPageVC()
-        case .showHomeGymSetting:
-            showHomeGymSettingPageVC()
-        }
-    }
-    
     private func showUserPageVC() {
         let userPageCoordinator = UserPageCoordinator(navigationController: navigationController, builder: builder)
         
@@ -49,13 +40,14 @@ final class UserPageMainCoordinator: BaseCoordinator {
         
         profileSettingCoordinator.start()
         
-        profileSettingCoordinator.onFinish = { [weak self] in
+        profileSettingCoordinator.onFinish = { [weak self] event in
+            self?.profileSettingPageHandleEvent(event)
             self?.removeDependency(profileSettingCoordinator)
         }
     }
     
     private func showHomeGymSettingPageVC() {
-        let homeGymSettingCoordinator = homeGymSettingCoordinator(navigationController: navigationController, builder: builder)
+        let homeGymSettingCoordinator = HomeGymSettingCoordinator(navigationController: navigationController, builder: builder)
         
         addDependency(homeGymSettingCoordinator)
         
@@ -63,6 +55,25 @@ final class UserPageMainCoordinator: BaseCoordinator {
         
         homeGymSettingCoordinator.onFinish = { [weak self] in
             self?.removeDependency(homeGymSettingCoordinator)
+            self?.showUserPageVC()
+        }
+    }
+    
+    private func userPageHandleEvent(_ event: UserPageEvent) {
+        switch event {
+        case .showProfileSetting:
+            showProfileSettingPageVC()
+        case .showHomeGymSetting:
+            showHomeGymSettingPageVC()
+        }
+    }
+    
+    private func profileSettingPageHandleEvent(_ event: UserProfileSettingEvent) {
+        switch event {
+        case .userPage:
+            showUserPageVC()
+        case .homeGymPage:
+            showHomeGymSettingPageVC()
         }
     }
     
