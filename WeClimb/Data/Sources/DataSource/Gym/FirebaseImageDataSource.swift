@@ -14,25 +14,36 @@ protocol FirebaseImageDataSource {
 }
 
 final class FirebaseImageDataSourceImpl: FirebaseImageDataSource {
-
     private let storage = Storage.storage()
-
+    private let cache = NSCache<NSString, NSString>()
+    
     func fetchImageURL(from gsURL: String) -> Single<String?> {
         return Single.create { [weak self] single in
             guard let self = self else {
                 single(.failure(NSError(domain: "ImageDataSource", code: -1, userInfo: nil)))
                 return Disposables.create()
             }
-
+            
+            if let cachedURL = self.cache.object(forKey: gsURL as NSString) {
+                single(.success(cachedURL as String))
+                return Disposables.create()
+            }
+            
             let storageReference = self.storage.reference(forURL: gsURL)
             storageReference.downloadURL { url, error in
                 if let error = error {
                     single(.failure(error))
                     return
                 }
-                single(.success(url?.absoluteString))
+                
+                if let urlString = url?.absoluteString {
+                    self.cache.setObject(urlString as NSString, forKey: gsURL as NSString)
+                    single(.success(urlString))
+                } else {
+                    single(.success(nil))
+                }
             }
-
+            
             return Disposables.create()
         }
     }

@@ -59,6 +59,9 @@ class PostCollectionCell: UICollectionViewCell {
     
     let additonalButtonTapped = BehaviorRelay<(postItem: PostItem, isMine: Bool)?>(value: nil)
     
+    let gymTapInfo = PublishSubject<(gymName: String?, level: LHColors?, hold: LHColors?)>.init()
+    let userTapInfo = PublishSubject<String>.init()
+    
     private var user: User? {
         didSet {
             guard let user, let postItem else { return }
@@ -68,7 +71,6 @@ class PostCollectionCell: UICollectionViewCell {
     var caption: String?
     
     private var postItem: PostItem?
-    
     
     private lazy var dataSource: UICollectionViewDiffableDataSource<Section, MediaItem> = {
         let dataSource = UICollectionViewDiffableDataSource<Section, MediaItem>(collectionView: mediaCollectionView)
@@ -128,11 +130,10 @@ class PostCollectionCell: UICollectionViewCell {
         caption = postItem.caption
         bindMediaIndex()
         bindTotalPageCount()
-
     }
     
     private func configureProfileView(postItem: PostItem, user: User) {
-        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: heightArmReach(height: user.height, armReach: user.armReach), level: .closeIcon, hold: .closeIcon, caption: postItem.caption))
+        profileView.configure(with: PostProfileModel(profileImage: user.profileImage, name: user.userName, gymName: postItem.gym, heightArmReach: heightArmReach(height: user.height, armReach: user.armReach), level: nil, hold: nil, caption: postItem.caption))
     }
     
     private func bindViewModel() {
@@ -143,7 +144,9 @@ class PostCollectionCell: UICollectionViewCell {
             likeButtonTap: postSidebarView.likeButtonTap,
             currentMediaIndex: currentMediaIndexRelay,
             commentButtonTap: postSidebarView.commentButtonTap,
-            additionalButtonTap: postSidebarView.additionalActionButtonTap
+            additionalButtonTap: postSidebarView.additionalActionButtonTap,
+            userTap: profileView.userTapEvent,
+            gymTap: profileView.gymTapEvent
         )
         )
         
@@ -173,7 +176,7 @@ class PostCollectionCell: UICollectionViewCell {
                 self.bindSnapShot(mediaItems: mediaItems)
         }).disposed(by: disposeBag)
         
-        output.levelHoldImages
+        output.levelHolds
             .asDriver(onErrorDriveWith: .empty())
             .drive(onNext: { [weak self] levelHold in
                 guard let level = levelHold.level, let hold = levelHold.hold else { return }
@@ -189,6 +192,12 @@ class PostCollectionCell: UICollectionViewCell {
         
         output.commentCount
             .bind(to: postSidebarView.commentCountRelay)
+            .disposed(by: disposeBag)
+        
+        output.userTapInfo.bind(to: userTapInfo)
+            .disposed(by: disposeBag)
+        
+        output.gymTapInfo.bind(to: gymTapInfo)
             .disposed(by: disposeBag)
     }
     

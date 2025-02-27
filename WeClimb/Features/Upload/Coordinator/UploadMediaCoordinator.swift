@@ -18,7 +18,9 @@ final class UploadMediaCoordinator: BaseCoordinator {
     
     var onLevelHoldFiltersApplied: ((String, String) -> Void)?
     
-    var onFinish:  (([MediaUploadData]) -> Void)?
+    var onFinish: (([MediaUploadData]) -> Void)?
+    
+    var onDismiss: (() -> Void)?
     
     init(navigationController: UINavigationController, gymItem: SearchResultItem, builder: UploadBuilder) {
         self.navigationController = navigationController
@@ -46,6 +48,10 @@ final class UploadMediaCoordinator: BaseCoordinator {
         
         uploadMediaVC.onNextButton = { [weak self] mediaData in
             self?.onFinish?(mediaData)
+        }
+        
+        uploadMediaVC.onDismiss = { [weak self] in
+            self?.onDismiss?()
         }
     }
     

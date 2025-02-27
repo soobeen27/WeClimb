@@ -17,8 +17,8 @@ struct PostProfileModel {
     let name: String?
     let gymName: String?
     let heightArmReach: String?
-    let level: UIImage?
-    let hold: UIImage?
+    let level: LHColors?
+    let hold: LHColors?
     let caption: String?
 }
 
@@ -32,6 +32,30 @@ class PostProfileView: UIView {
             bindHideButton()
         }
     }
+    
+    var userTapEvent: Observable<Void> {
+        Observable.merge(
+            profileTapGestureRecognizer.rx.event.map { _ in () },
+            nameTapGestureRecognizer.rx.event.map { _ in () },
+            heightArmReachTapGestureRecognizer.rx.event.map { _ in () }
+        )
+    }
+    
+    var gymTapEvent: Observable<Void> {
+        Observable.merge(
+            gymTapGestureRecognizer.rx.event.map { _ in () },
+            levelTapGestureRecognizer.rx.event.map { _ in () },
+            holdTapGestureRecognizer.rx.event.map { _ in () }
+        )
+    }
+    
+    private let profileTapGestureRecognizer = UITapGestureRecognizer()
+    private let nameTapGestureRecognizer = UITapGestureRecognizer()
+    private let heightArmReachTapGestureRecognizer = UITapGestureRecognizer()
+    
+    private let gymTapGestureRecognizer = UITapGestureRecognizer()
+    private let levelTapGestureRecognizer = UITapGestureRecognizer()
+    private let holdTapGestureRecognizer = UITapGestureRecognizer()
 
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
@@ -39,20 +63,26 @@ class PostProfileView: UIView {
         imageView.clipsToBounds = true
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = FeedConsts.Profile.Size.profileImageCornerRadius
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(profileTapGestureRecognizer)
         return imageView
     }()
     
-    private let nameLabel: UILabel = {
+    private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.font = FeedConsts.Profile.Font.name
         label.textColor = FeedConsts.Profile.Color.text
+        label.addGestureRecognizer(nameTapGestureRecognizer)
+        label.isUserInteractionEnabled = true
         return label
     }()
     
-    private let heightArmReachLabel: UILabel = {
+    private lazy var heightArmReachLabel: UILabel = {
         let label = UILabel()
         label.font = FeedConsts.Profile.Font.caption
         label.textColor = UIColor.labelWhite
+        label.isUserInteractionEnabled = true
+        label.addGestureRecognizer(heightArmReachTapGestureRecognizer)
         return label
     }()
     
@@ -82,21 +112,24 @@ class PostProfileView: UIView {
         return view
     }()
     
-    private let gymTag: PostTagView = {
+    private lazy var gymTag: PostTagView = {
         let tagView = PostTagView()
         tagView.leftImage = FeedConsts.Profile.Image.locaction
+        tagView.addGestureRecognizer(gymTapGestureRecognizer)
         return tagView
     }()
     
-    private let levelTag: PostTagView = {
+    private lazy var levelTag: PostTagView = {
         let tagView = PostTagView()
         tagView.text = FeedConsts.Profile.Text.level
+        tagView.addGestureRecognizer(levelTapGestureRecognizer)
         return tagView
     }()
     
-    private let holdTag: PostTagView = {
+    private lazy var holdTag: PostTagView = {
         let tagView = PostTagView()
         tagView.text = FeedConsts.Profile.Text.hold
+        tagView.addGestureRecognizer(holdTapGestureRecognizer)
         return tagView
     }()
     
@@ -165,9 +198,9 @@ class PostProfileView: UIView {
         profileModel = data
     }
     
-    func updateHoldLevel(hold: UIImage, level: UIImage) {
-        levelTag.rightImage = level
-        holdTag.rightImage = hold
+    func updateHoldLevel(hold: LHColors, level: LHColors) {
+        levelTag.rightImage = level.toImage()
+        holdTag.rightImage = hold.toImage()
     }
     
     required init?(coder: NSCoder) {
@@ -197,8 +230,8 @@ class PostProfileView: UIView {
         nameLabel.text = profileModel.name
         gymTag.text = profileModel.gymName
         heightArmReachLabel.text = profileModel.heightArmReach
-        levelTag.rightImage = profileModel.level
-        holdTag.rightImage = profileModel.hold
+        levelTag.rightImage = profileModel.level?.toImage()
+        holdTag.rightImage = profileModel.hold?.toImage()
         captionLabel.text = profileModel.caption
     }
     
@@ -305,6 +338,9 @@ class PostProfileView: UIView {
     }
     
     private func setTagsViewLayout() {
+        tagsView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
+        }
         gymTag.snp.makeConstraints {
             $0.leading.top.equalToSuperview()
         }

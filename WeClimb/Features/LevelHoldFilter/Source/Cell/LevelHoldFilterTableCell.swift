@@ -88,29 +88,55 @@ class LevelHoldFilterTableCell: UITableViewCell {
     }
     
     func configure(with config: LevelHoldFilterCellConfig, theme: LevelHoldFilterVC.FilterViewTheme) {
-        titleLabel.text = config.text
-        iconImage.image = UIImage(named: config.imageName)
+        self.titleLabel.text = config.text
         
+        let color = LHColors.fromKoreanFull(config.text)
+        
+        if color.isBGrade() {
+            let originalImage =  UIImage(named: config.imageName)?.withRenderingMode(.alwaysTemplate)
+            self.iconImage.image = originalImage
+            self.iconImage.tintColor = UIColor.labelNeutral
+        } else {
+            self.iconImage.image = UIImage(named: config.imageName)
+        }
+
         if config.isChecked {
-            titleLabel.font = UIFont.customFont(style: .label2SemiBold)
-            iconImage.image = UIImage(named: config.imageName + LevelHoldFilterCellConst.Text.checkSuffix)
+            self.titleLabel.font = UIFont.customFont(style: .label2SemiBold)
+            
+            if color.isBGrade() {
+                self.iconImage.image = UIImage(named: config.imageName)
+            } else {
+                self.iconImage.image = UIImage(named: config.imageName + LevelHoldFilterCellConst.Text.checkSuffix)
+            }
         } else {
-            iconImage.image = UIImage(named: config.imageName)
-            titleLabel.font = UIFont.customFont(style: .label2Regular)
+            if color.isBGrade() {
+                self.iconImage.image = UIImage(named: config.imageName)?.withRenderingMode(.alwaysTemplate) .withRenderingMode(.alwaysTemplate).withTintColor(UIColor.labelNeutral)
+            } else {
+                self.iconImage.image = UIImage(named: config.imageName)
+            }
+            self.titleLabel.font = UIFont.customFont(style: .label2Regular)
         }
         
-        if config.isFirstCell {
-            rightSeparatorLine.isHidden = true
-            leftImage.image = LevelHoldFilterCellConst.Icon.firstCellHarderIcon
-        } else if config.isLastCell {
-            rightSeparatorLine.isHidden = true
-            leftImage.image = LevelHoldFilterCellConst.Icon.lastCellEasierIcon
+        if config.filterType == .level {
+            if config.isFirstCell {
+                self.rightSeparatorLine.isHidden = true
+                self.leftImage.image = LevelHoldFilterCellConst.Icon.firstCellHarderIcon
+                self.leftImage.isHidden = false
+            } else if config.isLastCell {
+                self.rightSeparatorLine.isHidden = true
+                self.leftImage.image = LevelHoldFilterCellConst.Icon.lastCellEasierIcon
+                self.leftImage.isHidden = false
+            } else {
+                self.rightSeparatorLine.isHidden = false
+                self.leftImage.image = nil
+                self.leftImage.isHidden = true
+            }
         } else {
-            rightSeparatorLine.isHidden = false
-            leftImage.image = nil
+            self.leftImage.isHidden = true
+            self.rightSeparatorLine.isHidden = false
+            self.leftImage.image = nil
         }
         
-        updateCellStyle(for: theme, isChecked: config.isChecked)
-        
+        self.updateCellStyle(for: theme, isChecked: config.isChecked)
     }
 }

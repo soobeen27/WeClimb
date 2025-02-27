@@ -15,28 +15,28 @@ class UploadMenuVC: UIViewController {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "어떤 게시물인가요?"
-        label.font = UIFont.customFont(style: .label1SemiBold)
+        label.text = UploadMenuConst.UploadMenuVC.Text.title
+        label.font = UploadMenuConst.UploadMenuVC.Font.title
         label.textAlignment = .left
-        label.textColor = .labelStrong
+        label.textColor = UploadMenuConst.UploadMenuVC.Color.titleText
         return label
     }()
     
     private let descriptionLabel: UILabel = {
         let label = UILabel()
-        label.text = "게시물의 유형을 선택해주세요."
-        label.font = UIFont.customFont(style: .body2Regular)
+        label.text = UploadMenuConst.UploadMenuVC.Text.description
+        label.font = UploadMenuConst.UploadMenuVC.Font.description
         label.textAlignment = .left
-        label.textColor = .labelNeutral
+        label.textColor = UploadMenuConst.UploadMenuVC.Color.descriptionText
         return label
     }()
     
     private let climbingButton: UIButton = {
         let button = UIButton()
-        button.setTitle("완등", for: .normal)
-        button.titleLabel?.font = UIFont.customFont(style: .label2Medium)
-        button.setTitleColor(.labelNeutral, for: .normal)
-        button.backgroundColor = .clear
+        button.setTitle(UploadMenuConst.UploadMenuVC.Text.climbingBtnTitle, for: .normal)
+        button.titleLabel?.font = UploadMenuConst.UploadMenuVC.Font.climbingBtnTitle
+        button.setTitleColor(UploadMenuConst.UploadMenuVC.Color.climbingBtnTitle, for: .normal)
+        button.backgroundColor = UploadMenuConst.UploadMenuVC.Color.climbingBtnBackground
         button.contentHorizontalAlignment = .left
         return button
     }()
@@ -52,19 +52,24 @@ class UploadMenuVC: UIViewController {
     
     private func addTopBorderToButton(_ button: UIButton) {
         let borderLayer = CALayer()
-        borderLayer.backgroundColor = UIColor.lineSolidLight.cgColor
-        borderLayer.frame = CGRect(x: -16, y: 0, width: 250, height: 1)
+        borderLayer.backgroundColor = UploadMenuConst.UploadMenuVC.Color.buttonTopBorder.cgColor
+        borderLayer.frame = CGRect(
+            x: UploadMenuConst.UploadMenuVC.Size.buttonTopBorderInsetX,
+            y: UploadMenuConst.UploadMenuVC.Size.buttonTopBorderInsetY,
+            width: UploadMenuConst.UploadMenuVC.Size.buttonTopBorderWidth,
+            height: UploadMenuConst.UploadMenuVC.Size.buttonTopBorderHeight
+        )
         
         button.layer.addSublayer(borderLayer)
     }
     
     private func setView() {
-        view.backgroundColor = .white
-        view.layer.cornerRadius = 16
-        view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOpacity = 0.2
-        view.layer.shadowOffset = CGSize(width: 0, height: 0)
-        view.layer.shadowRadius = 10
+        view.backgroundColor = UploadMenuConst.UploadMenuVC.Color.viewBackground
+        view.layer.cornerRadius = UploadMenuConst.UploadMenuVC.Size.viewCornerRadius
+        view.layer.shadowColor = UploadMenuConst.UploadMenuVC.Color.viewShadow.cgColor
+        view.layer.shadowOpacity = UploadMenuConst.UploadMenuVC.Size.viewShadowOpacity
+        view.layer.shadowOffset = UploadMenuConst.UploadMenuVC.Size.viewShadowOffset
+        view.layer.shadowRadius = UploadMenuConst.UploadMenuVC.Size.viewShadowRadius
     }
     
     private func setButton() {
@@ -77,21 +82,21 @@ class UploadMenuVC: UIViewController {
             .forEach { view.addSubview($0) }
         
         titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(16)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(24)
+            $0.top.equalToSuperview().offset(UploadMenuConst.UploadMenuVC.Layout.titleTopOffset)
+            $0.leading.trailing.equalToSuperview().inset(UploadMenuConst.UploadMenuVC.Layout.titleSideInset)
+            $0.height.equalTo(UploadMenuConst.UploadMenuVC.Layout.titleHeight)
         }
         
         descriptionLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(4)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(22)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(UploadMenuConst.UploadMenuVC.Layout.descriptionTopOffset)
+            $0.leading.trailing.equalToSuperview().inset(UploadMenuConst.UploadMenuVC.Layout.descriptionSideInset)
+            $0.height.equalTo(UploadMenuConst.UploadMenuVC.Layout.descriptionHeight)
         }
         
         climbingButton.snp.makeConstraints {
-            $0.top.equalTo(descriptionLabel.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(54)
+            $0.top.equalTo(descriptionLabel.snp.bottom).offset(UploadMenuConst.UploadMenuVC.Layout.climbingBtnTopOffset)
+            $0.leading.trailing.equalToSuperview().inset(UploadMenuConst.UploadMenuVC.Layout.climbingBtnSideInset)
+            $0.height.equalTo(UploadMenuConst.UploadMenuVC.Layout.climbingBtnHeight)
         }
     }
     

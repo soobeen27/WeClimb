@@ -183,10 +183,11 @@ extension String {
             "민": "colorMint",
             "회": "colorGray",
             "핑": "colorPink",
-            "갈": "colorGray",
+            "갈": "colorBrown",
             "노검": "colorDarkYellow",
             "초검": "colorDarkGreen",
             "파검": "colorDarkBlue",
+            "기타": "colorDarkGreen"
         ]
         return colorMap[self] ?? self
     }

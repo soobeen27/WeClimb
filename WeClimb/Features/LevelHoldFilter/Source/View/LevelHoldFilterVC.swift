@@ -96,14 +96,16 @@ class LevelHoldFilterVC: UIViewController {
         setLayout()
         bindUI(gymName: gymName)
         adjustModalHeight()
-
+        
     }
-
+    
     private func bindUI(gymName: String) {
         selectedSegmentIndexSubject.onNext(filterType.index)
         
         segmentedControl.onSegmentChanged = { [weak self] selectedIndex in
-            self?.selectedSegmentIndexSubject.onNext(selectedIndex)
+            guard let self = self else { return }
+            self.filterType = (selectedIndex == 0) ? .level : .hold
+            self.selectedSegmentIndexSubject.onNext(selectedIndex)
         }
         
         let input = LevelHoldFilterVMImpl.Input(
@@ -120,22 +122,27 @@ class LevelHoldFilterVC: UIViewController {
                 let totalCount = data.count
                 self?.cellCountSubject.onNext(totalCount)
             })
+            .map { [weak self] data -> [(text: String, image: String, isChecked: Bool)] in
+                guard let self = self else { return data }
+                return (self.filterType == .level) ? data.reversed() : data
+            }
             .bind(to: tableView.rx.items(cellIdentifier: LevelHoldFilterTableCell.className, cellType: LevelHoldFilterTableCell.self)) { [weak self] index, item, cell in
                 
-                guard let totalCount = try? self?.cellCountSubject.value() else { return }
+                guard let self = self, let totalCount = try? self.cellCountSubject.value() else { return }
                 
-                let isFirstCell = index == LevelHoldFilterConst.CellState.firstIndex
-                let isLastCell = index == (totalCount - LevelHoldFilterConst.CellState.lastIndexOffset)
+                let isFirstCell = (self.filterType == .level) ? (index == LevelHoldFilterConst.CellState.firstIndex) : false
+                let isLastCell = (self.filterType == .level) ? (index == (totalCount - LevelHoldFilterConst.CellState.lastIndexOffset)) : false
                 
                 let config = LevelHoldFilterCellConfig(
                     text: item.text,
                     imageName: item.image,
                     isChecked: item.isChecked,
                     isFirstCell: isFirstCell,
-                    isLastCell: isLastCell
+                    isLastCell: isLastCell,
+                    filterType: self.filterType
                 )
                 
-                cell.configure(with: config, theme: self?.themeType ?? .light)
+                cell.configure(with: config, theme: self.themeType)
             }
             .disposed(by: disposeBag)
         
@@ -158,9 +165,15 @@ class LevelHoldFilterVC: UIViewController {
                 
                 let selectedLevel = filters.level
                 let selectedHold = filters.hold
-
+                
                 self.onFiltersApplied?(selectedLevel, selectedHold)
                 self.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        input.segmentedControlSelection
+            .subscribe(onNext: { [weak self] _ in
+                self?.tableView.reloadData()
             })
             .disposed(by: disposeBag)
     }

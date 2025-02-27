@@ -34,6 +34,7 @@ enum LHColors {
          B7,
          B8,
          B9,
+         etc,
          other
 
     private static let shortKorMap: [String: LHColors] = [
@@ -59,6 +60,18 @@ enum LHColors {
         "노검": .darkYellow,
         "초검": .darkGreen,
         "파검": .darkBlue,
+        
+        "B1": .B1,
+        "B2": .B2,
+        "B3": .B3,
+        "B4": .B4,
+        "B5": .B5,
+        "B6": .B6,
+        "B7": .B7,
+        "B8": .B8,
+        "B9": .B9,
+        
+        "기타": .etc
     ]
 
     private static let engMap: [String: LHColors] = [
@@ -83,7 +96,17 @@ enum LHColors {
         
         "Red": .red,
         "White": .white,
-        "Yellow": .yellow
+        "Yellow": .yellow,
+        
+        "B1": .B1,
+        "B2": .B2,
+        "B3": .B3,
+        "B4": .B4,
+        "B5": .B5,
+        "B6": .B6,
+        "B7": .B7,
+        "B8": .B8,
+        "B9": .B9
     ]
 
     private static let holdEngMap: [String: LHColors] = Dictionary(
@@ -113,7 +136,17 @@ enum LHColors {
         .red: "빨강",
         .white: "흰색",
         .yellow: "노랑",
-        .other: "기타"
+        .other: "기타",
+        
+        .B1: "B1",
+        .B2: "B2",
+        .B3: "B3",
+        .B4: "B4",
+        .B5: "B5",
+        .B6: "B6",
+        .B7: "B7",
+        .B8: "B8",
+        .B9: "B9"
     ]
 
     private static let images: [LHColors: UIImage] = [
@@ -151,6 +184,7 @@ enum LHColors {
         .B8:UIImage.gradeB8,
         .B9:UIImage.gradeB9,
         
+        .etc: UIImage.colorDarkGreen,
         .other: UIImage.closeIconCircle,
     ]
     
@@ -231,6 +265,18 @@ enum LHColors {
         
         .other: UIColor.gray
     ]
+    
+    private static let imageString: [LHColors: String] = [
+        .black: "colorBlack", .blue: "colorBlue", .brown: "colorBrown",
+        .darkBlue: "colorDarkBlue", .darkGreen: "colorDarkGreen", .darkRed: "colorDarkRed",
+        .darkYellow: "colorDarkYellow", .gray: "colorGray", .green: "colorGreen",
+        .lightGreen: "colorLightGreen", .mint: "colorMint", .navy: "colorNavy",
+        .orange: "colorOrange", .pink: "colorPink", .purple: "colorPurple",
+        .red: "colorRed", .white: "colorWhite", .yellow: "colorYellow",
+        .B1: "gradeB1", .B2: "gradeB2", .B3: "gradeB3", .B4: "gradeB4",
+        .B5: "gradeB5", .B6: "gradeB6", .B7: "gradeB7", .B8: "gradeB8",
+        .B9: "gradeB9", .other: "colorDarkGreen"
+        ]
 
     static func fromShortKor(_ string: String) -> LHColors {
         return shortKorMap[string] ?? .other
@@ -264,6 +310,10 @@ enum LHColors {
         return LHColors.images[self] ?? UIImage.closeIconCircle
     }
     
+    func toImageString() -> String {
+        return LHColors.imageString[self] ?? "colorDefault"
+    }
+    
     func toImage(targetSize: CGSize) -> UIImage {
         return (LHColors.images[self] ?? UIImage.closeIconCircle)
             .resize(targetSize: targetSize)?
@@ -276,5 +326,16 @@ enum LHColors {
     
     func toFontColor() -> UIColor {
         return LHColors.gradeFontColor[self] ?? UIColor.black
+    }
+}
+
+extension LHColors {
+    func isBGrade() -> Bool {
+        switch self {
+        case .B1, .B2, .B3, .B4, .B5, .B6, .B7, .B8, .B9:
+            return true
+        default:
+            return false
+        }
     }
 }
