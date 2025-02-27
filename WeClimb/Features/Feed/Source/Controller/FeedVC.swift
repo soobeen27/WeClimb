@@ -24,7 +24,7 @@ class FeedVC: UIViewController {
     
     let disposeBag = DisposeBag()
     
-    var commentTapped: ((PostItem) -> Void)?
+    var onFinish: ((FeedPushType) -> Void)?
     
     private let fetchType: BehaviorRelay<PostFetchType?> = .init(value: .initial)
     private let addtionalButtonTapped = BehaviorRelay<(postItem: PostItem, isMine: Bool)?>(value: nil)
@@ -44,16 +44,31 @@ class FeedVC: UIViewController {
            else { return UICollectionViewCell() }
             let viewModel = self.container.resolve(PostCollectionCellVM.self)
             cell.configure(postItem: item, postCollectionCellVM: viewModel)
+            
             cell.currentPost
                 .asDriver()
                 .drive(onNext: { [weak self] postItem in
                     guard let self, let postItem else { return }
-                    self.commentTapped?(postItem)
+                    self.onFinish?(.comment(postItem: postItem))
                 })
                 .disposed(by: cell.disposeBag)
+            
             cell.additonalButtonTapped
                 .bind(to: self.addtionalButtonTapped)
                 .disposed(by: cell.disposeBag)
+            
+            cell.gymTapInfo.bind(onNext: { [weak self] gym, level, hold in
+                guard let gym, let self else { return }
+                self.onFinish?(.gym(gymName: gym, level: level, hold: hold))
+            })
+            .disposed(by: cell.disposeBag)
+            
+            cell.userTapInfo.bind(onNext: { [weak self] name in
+                guard let self else { return }
+                self.onFinish?(.user(userName: name))
+            })
+            .disposed(by: cell.disposeBag)
+            
            return cell
         }
         return dataSource
@@ -135,15 +150,14 @@ class FeedVC: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        output.startIndex
-            .asDriver()
-            .drive(onNext: { [weak self] startIndex in
-                guard let self, let startIndex else { return }
-                let startIndexPath = IndexPath(item: startIndex, section: 0)
-                self.postCollectionView.scrollToItem(at: startIndexPath, at: .top, animated: false)
-            })
-            .disposed(by: disposeBag)
-
+        if let startIndex = output.startIndex.value {
+            scrollTo(startIndex: startIndex)
+        }
+    }
+    
+    private func scrollTo(startIndex: Int) {
+        let startIndexPath = IndexPath(item: startIndex, section: 0)
+        self.postCollectionView.scrollToItem(at: startIndexPath, at: .top, animated: false)
     }
     
     private func bindSnapshot(postItems: [PostItem]) {
@@ -234,6 +248,7 @@ extension FeedVC: UICollectionViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard let collectionView = scrollView as? UICollectionView else { return }
+        VideoManager.shared.reset()
         let contentOffset = scrollView.contentOffset
         let scrollViewHeight = collectionView.frame.size.height
         let scrollContentSizeHeight = collectionView.contentSize.height
