@@ -18,9 +18,12 @@ final class UserPageAssembly: Assembly {
             )
         }
         
-        container.register(UserProfileSettingVM.self) { resolver in
+        container.register(UserProfileSettingVM.self) { (resolver, userUID: String) in
             UserProfileSettingImpl(
-                
+                checkDuplicationUseCase: resolver.resolve(NicknameDuplicationCheckUseCase.self)!,
+                registerNicknameUseCase: resolver.resolve(NicknameRegisterUseCase.self)!,
+                updateUseCase: resolver.resolve(PersonalDetailUseCase.self)!,
+                userInfoFromUIDUseCase: resolver.resolve(UserInfoFromUIDUseCase.self)!, currentUID: userUID
             )
         }
         

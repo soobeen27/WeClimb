@@ -33,7 +33,9 @@ final class UserPageBuilderImpl: UserPageBuilder {
     }
     
     func buildUserProfileSettingPage() -> UserProfileSettingVC {
-        let userProfileSettingVM = container.assembler.resolver.resolve(UserProfileSettingVM.self)!
+        let userUID = try! FirestoreHelper.userUID()
+        
+        let userProfileSettingVM = container.assembler.resolver.resolve(UserProfileSettingVM.self, argument: userUID)!
         
         return UserProfileSettingVC(viewModel: userProfileSettingVM)
     }
