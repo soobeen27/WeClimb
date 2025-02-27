@@ -44,7 +44,9 @@ final class FeedCoordinator: BaseCoordinator {
         let commentCoordinator = PostCommentCoordinator(navigationController: navigationController, builder: feedBuilder)
         addDependency(commentCoordinator)
         
-        commentCoordinator.start(postItem: postItem)
+        DispatchQueue.main.async {
+            commentCoordinator.start(postItem: postItem)
+        }
         
         commentCoordinator.onFinish = { [weak self] in
             self?.removeDependency(commentCoordinator)
