@@ -17,6 +17,11 @@ enum UserProfileSettingItem {
     case other(String)
 }
 
+enum UserProfileSettingEvent {
+    case userPage
+    case homeGymPage
+}
+
 class UserProfileSettingVC: UIViewController {
     
     var coordinator: UserProfileSettingCoordinator?
@@ -206,6 +211,7 @@ class UserProfileSettingVC: UIViewController {
     private let activityTableView: UITableView = {
         let tableView = UITableView()
         tableView.register(ActivityTableViewCell.self, forCellReuseIdentifier: ActivityTableViewCell.identifier)
+        tableView.backgroundColor = .clear
         return tableView
     }()
     
@@ -396,7 +402,71 @@ class UserProfileSettingVC: UIViewController {
     private func bindViewModel() {
         let input = UserProfileSettingImpl.Input()
         let output = viewModel.transform(input: input)
+
+        nickNameTextField.rx.text.orEmpty
+            .distinctUntilChanged()
+            .bind(to: input.nicknameInput)
+            .disposed(by: disposeBag)
         
+        output.isNicknameValid
+            .drive(onNext: { [weak self] isValid in
+                guard let self = self else { return }
+                let borderColor = isValid ? UIColor.green.cgColor : UIColor.red.cgColor
+                self.nickNameTextField.layer.borderColor = borderColor
+            })
+            .disposed(by: disposeBag)
+
+        nickNameTextField.rx.text.orEmpty
+            .map { "\($0.count)/12" }
+            .bind(to: nickNameCountLabel.rx.text)
+            .disposed(by: disposeBag)
+
+        heightTextField.rx.text.orEmpty
+            .distinctUntilChanged()
+            .bind(to: input.heightInput)
+            .disposed(by: disposeBag)
+
+        armReachTextField.rx.text.orEmpty
+            .distinctUntilChanged()
+            .bind(to: input.armReachInput)
+            .disposed(by: disposeBag)
+
+        output.nicknameText
+            .drive(onNext: { [weak self] nickname in
+                self?.nickNameTextField.placeholder = nickname
+            })
+            .disposed(by: disposeBag)
+        
+        output.heightText
+            .drive(onNext: { [weak self] height in
+                self?.heightTextField.placeholder = height
+            })
+            .disposed(by: disposeBag)
+        
+        output.armReachText
+            .drive(onNext: { [weak self] armReach in
+                self?.armReachTextField.placeholder = armReach
+            })
+            .disposed(by: disposeBag)
+
+        confirmButton.rx.tap
+            .bind(to: input.confirmButtonTap)
+            .disposed(by: disposeBag)
+
+        output.updateResult
+            .drive(onNext: { [weak self] success in
+                guard let self = self else { return }
+                let alert = UIAlertController(
+                    title: success ? "성공" : "실패",
+                    message: success ? "프로필이 업데이트되었습니다." : "업데이트에 실패했습니다.",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "확인", style: .default))
+                self.present(alert, animated: true)
+                coordinator?.showReturnPage()
+            })
+            .disposed(by: disposeBag)
+
         output.settingItems
             .bind(to: activityTableView.rx.items(cellIdentifier: ActivityTableViewCell.identifier, cellType: ActivityTableViewCell.self)) { row, item, cell in
                 switch item {
@@ -407,7 +477,7 @@ class UserProfileSettingVC: UIViewController {
                 }
             }
             .disposed(by: disposeBag)
-        
+
         activityTableView.rx.modelSelected(UserProfileSettingItem.self)
             .subscribe(onNext: { [weak self] item in
                 guard let self = self else { return }
@@ -450,11 +520,11 @@ class UserProfileSettingVC: UIViewController {
     }
 
     @objc private func backButtonTapped() {
-        coordinator?.finish()
+        coordinator?.showReturnPage()
     }
     
     func showHomeGymSelection(input: UserProfileSettingImpl.Input) {
-        print("이동햇숴")
+        coordinator?.showHomeGymPage(.homeGymPage)
     }
     
 //        func showHomeGymSelection(input: UserProfileSettingImpl.Input) {

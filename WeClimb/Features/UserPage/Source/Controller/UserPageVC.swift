@@ -62,14 +62,19 @@ class UserPageVC: UIViewController {
         return label
     }()
     
+    private let homeGymButtonView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UserPageConst.userInfo.Color.homeGymbackgroundColor
+        view.layer.cornerRadius = 8
+        return view
+    }()
+    
     private let homeGymButtonStackView: UIStackView = {
         let stv = UIStackView()
         stv.axis = .horizontal
         stv.alignment = .center
-        stv.distribution = .fillProportionally
+        stv.distribution = .equalSpacing
         stv.spacing = 5
-        stv.backgroundColor = UserPageConst.userInfo.Color.homeGymbackgroundColor
-        stv.layer.cornerRadius = 8
         return stv
     }()
     
@@ -120,6 +125,7 @@ class UserPageVC: UIViewController {
     private let userFeedtableView: UITableView = {
         let tableView = UITableView()
         tableView.register(UserFeedTableCell.self, forCellReuseIdentifier: "UserFeedTableCell")
+        tableView.showsVerticalScrollIndicator = false
         tableView.backgroundColor = .clear
         return tableView
     }()
@@ -155,6 +161,10 @@ class UserPageVC: UIViewController {
         return label
     }()
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        bindUserInfo()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -163,6 +173,7 @@ class UserPageVC: UIViewController {
         bindUserInfo()
         mainFeedConnecting()
         bindUserEditButton()
+        bindHomeGymButton()
     }
     
     private func setLayout() {
@@ -176,6 +187,7 @@ class UserPageVC: UIViewController {
         //            userHeightInfo,
         //            userArmReachInfo,
         //        ].forEach { userInfoLabel.addArrangedSubview($0) }
+        homeGymButtonView.addSubview(homeGymButtonStackView)
         
         [
             homeImageView,
@@ -183,21 +195,11 @@ class UserPageVC: UIViewController {
             chevronRightImageView
         ].forEach { homeGymButtonStackView.addArrangedSubview($0) }
         
-        homeImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(10)
-            $0.size.equalTo(UserPageConst.userInfo.Size.symbolSize)
-        }
-        
-        chevronRightImageView.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(10)
-            $0.size.equalTo(UserPageConst.userInfo.Size.symbolSize)
-        }
-        
         [
             userNameLabel,
             userImageView,
             userInfoLabel,
-            homeGymButtonStackView,
+            homeGymButtonView,
             userEditButton,
             indicatorBar,
             segmentedControl,
@@ -220,11 +222,16 @@ class UserPageVC: UIViewController {
             $0.top.equalTo(userNameLabel.snp.bottom).offset(2)
         }
         
-        homeGymButtonStackView.snp.makeConstraints {
+        homeGymButtonView.snp.makeConstraints {
             $0.leading.equalTo(userNameLabel)
             $0.top.equalTo(userInfoLabel.snp.bottom).offset(12)
-            $0.width.equalTo(120)
+            $0.width.equalTo(116)
             $0.height.equalTo(26)
+        }
+        
+        homeGymButtonStackView.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview()
+            $0.centerX.equalToSuperview()
         }
         
         userEditButton.snp.makeConstraints {
@@ -327,6 +334,17 @@ class UserPageVC: UIViewController {
                 } else {
                     self.userImageView.image = UIImage.wecilmbProfile
                 }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindHomeGymButton() {
+        let tapGesture = UITapGestureRecognizer()
+        homeGymButtonView.addGestureRecognizer(tapGesture)
+
+        tapGesture.rx.event
+            .subscribe(onNext: { [weak self] _ in
+                self?.coordinator?.handleEvent(.showHomeGymSetting)
             })
             .disposed(by: disposeBag)
     }

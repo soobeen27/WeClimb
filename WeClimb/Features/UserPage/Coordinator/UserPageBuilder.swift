@@ -12,7 +12,7 @@ protocol UserPageBuilder {
 //    func buildManageBookMark() -> ManageBookMarkVC
     func buildUserPage() -> UserPageVC
     func buildUserProfileSettingPage() -> UserProfileSettingVC
-//    func buildUserHomeGymSettingPage() -> homeGymSettingVC
+    func buildUserHomeGymSettingPage() -> HomeGymSettingVC
 }
 
 final class UserPageBuilderImpl: UserPageBuilder {
@@ -33,12 +33,16 @@ final class UserPageBuilderImpl: UserPageBuilder {
     }
     
     func buildUserProfileSettingPage() -> UserProfileSettingVC {
-        let userProfileSettingVM = container.assembler.resolver.resolve(UserProfileSettingVM.self)!
+        let userUID = try! FirestoreHelper.userUID()
+        
+        let userProfileSettingVM = container.assembler.resolver.resolve(UserProfileSettingVM.self, argument: userUID)!
         
         return UserProfileSettingVC(viewModel: userProfileSettingVM)
     }
     
-//    func buildUserHomeGymSettingPage() -> homeGymSettingVC {
-//        <#code#>
-//    }
+    func buildUserHomeGymSettingPage() -> HomeGymSettingVC {
+        let homeGymSettingVM = container.assembler.resolver.resolve(HomeGymSettingVM.self)!
+        
+        return HomeGymSettingVC(viewModel: homeGymSettingVM)
+    }
 }

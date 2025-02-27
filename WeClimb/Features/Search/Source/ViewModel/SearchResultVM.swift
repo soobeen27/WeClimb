@@ -39,6 +39,9 @@ class SearchResultVMImpl: SearchResultVM {
     private let gymsSubject = BehaviorSubject<[SearchResultItem]>(value: [])
     private let usersSubject = BehaviorSubject<[SearchResultItem]>(value: [])
     
+    let data = BehaviorRelay<[Gym]>(value: [])
+    var filteredData = BehaviorRelay<[Gym]>(value: [])
+    
     init(fetchAllGymsInfoUseCase: FetchAllGymsInfoUseCase,
          searchGymsUseCase: SearchGymsUseCase,
          userSearchUseCase: UserSearchUseCase,
@@ -126,37 +129,37 @@ class SearchResultVMImpl: SearchResultVM {
     }
     
     private func searchGyms(with query: String) -> Observable<[SearchResultItem]> {
-        if !cachedGyms.isEmpty {
-            let filteredGyms = cachedGyms.filter { $0.name.contains(query) }
-            return Observable.just(filteredGyms)
-        }
-        
-        return searchGymsUseCase.execute(query: query)
-            .flatMap { gyms -> Observable<[SearchResultItem]> in
-                let itemObservables = gyms.map { gym -> Observable<SearchResultItem> in
+        let cachedFilteredGyms = cachedGyms.filter { $0.name.contains(query) }
+        let cachedObservable = Observable.just(cachedFilteredGyms)
+
+        let fetchObservable = searchGymsUseCase.execute(query: query)
+            .flatMapLatest { gyms -> Observable<[SearchResultItem]> in
+                let gymItemObservables = gyms.map { gym in
                     return self.fetchImageURLUseCase.execute(from: gym.profileImage ?? "")
                         .asObservable()
                         .map { imageURLString in
-                            return SearchResultItem(type: .gym,
-                                                    name: gym.gymName,
-                                                    imageName: imageURLString ?? "",
-                                                    location: gym.address,
-                                                    height: nil,
-                                                    armReach: nil)
+                            return SearchResultItem(
+                                type: .gym,
+                                name: gym.gymName,
+                                imageName: imageURLString ?? "",
+                                location: gym.address,
+                                height: nil,
+                                armReach: nil
+                            )
                         }
                 }
-                
-                return Observable.concat(itemObservables)
-                    .toArray()
-                    .asObservable()
-                    .do(onNext: { [weak self] items in
-                        self?.cachedGyms = items
-                    })
+
+                return Observable.combineLatest(gymItemObservables)
             }
+            .do(onNext: { [weak self] items in
+                self?.cachedGyms = items
+            })
             .catch { error in
                 print("검색 중 오류 발생: \(error)")
                 return Observable.just([])
             }
+        
+        return Observable.concat(cachedObservable, fetchObservable)
     }
     
     private func searchUsers(with query: String) -> Observable<[SearchResultItem]> {
@@ -165,7 +168,7 @@ class SearchResultVMImpl: SearchResultVM {
                 self.cachedUsers = users.map { user in
                     return SearchResultItem(type: .user,
                                             name: user.userName ?? "",
-                                            imageName: user.profileImage ?? "",
+                                            imageName: "",
                                             location: nil,
                                             height: user.height,
                                             armReach: user.armReach)
@@ -203,4 +206,3 @@ extension SearchResultVMImpl {
         return []
     }
 }
-

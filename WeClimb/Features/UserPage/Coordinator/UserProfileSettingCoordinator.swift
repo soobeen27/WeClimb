@@ -11,7 +11,7 @@ final class UserProfileSettingCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
     private let builder: UserPageBuilder
     
-    var onFinish: (() -> Void)?
+    var onFinish: ((UserProfileSettingEvent) -> Void)?
     
     init(navigationController: UINavigationController, builder: UserPageBuilder) {
         self.navigationController = navigationController
@@ -30,8 +30,11 @@ final class UserProfileSettingCoordinator: BaseCoordinator {
         navigationController.pushViewController(profileSettingPage, animated: true)
     }
     
-    func finish() {
+    func showReturnPage() {
         navigationController.popViewController(animated: true)
-        onFinish?()
+    }
+    
+    func showHomeGymPage(_ event: UserProfileSettingEvent) {
+        self.onFinish?(.homeGymPage)
     }
 }

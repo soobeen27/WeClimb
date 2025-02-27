@@ -18,7 +18,7 @@ protocol UploadPostInput {
 }
 
 protocol UploadPostOutput {
-    var uploadResult: Observable<Result<Void, Error>> { get }
+    var uploadResult: Observable<Void> { get }
 }
 
 protocol UploadPostVM {
@@ -34,12 +34,17 @@ class UploadPostVMImpl: UploadPostVM {
     }
     
     struct Output: UploadPostOutput {
-        let uploadResult: Observable<Result<Void, Error>>
+        let uploadResult: Observable<Void>
     }
     
     private let disposeBag = DisposeBag()
     private let uploadPostUseCase: UploadPostUseCase
     private let myUserInfoUseCase: MyUserInfoUseCase
+    
+    private let isSubmitPendingRelay = BehaviorRelay<Bool>(value: false)
+    private let isCompressionCompleteRelay = BehaviorRelay<Bool>(value: false)
+    private let compressedMediaRelay = BehaviorRelay<[URL]?>(value: nil)
+    private let latestCaptionRelay = BehaviorRelay<String>(value: "")
     
     init(uploadPostUseCase: UploadPostUseCase, myUserInfoUseCase: MyUserInfoUseCase) {
         self.uploadPostUseCase = uploadPostUseCase
@@ -47,107 +52,127 @@ class UploadPostVMImpl: UploadPostVM {
     }
     
     func transform(input: UploadPostInput) -> UploadPostOutput {
-        let uploadResult = PublishRelay<Result<Void, Error>>()
-        
-        let captionTextRelay = BehaviorRelay<String>(value: "")
-        input.captionText
-            .bind(to: captionTextRelay)
-            .disposed(by: disposeBag)
-        
-        let compressedMediaObservable = compressMediaItems(input.mediaItems)
-            .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
-        
+        let uploadSuccess = PublishRelay<Void>()
+
         input.submitButtonTap
-            .withLatestFrom(Observable.combineLatest(captionTextRelay, compressedMediaObservable))
-            .flatMapLatest { [weak self] (caption, compressedMediaURLs) -> Observable<Result<Void, Error>> in
-                guard let self = self else { return Observable.just(.failure(CommonError.selfNil)) }
-                
-                let updatedMediaItems = zip(input.mediaItems, compressedMediaURLs).map { original, compressedURL in
-                    MediaUploadData(
-                        url: compressedURL,
-                        hold: original.hold,
-                        grade: original.grade,
-                        thumbnailURL: original.thumbnailURL,
-                        capturedDate: original.capturedDate
-                    )
+            .withLatestFrom(input.captionText)
+            .subscribe(onNext: { latestCaption in
+                self.latestCaptionRelay.accept(latestCaption)
+                self.isSubmitPendingRelay.accept(true)
+
+                if self.isCompressionCompleteRelay.value, let compressedMedia = self.compressedMediaRelay.value {
+                    self.startUpload(caption: latestCaption, compressedMediaURLs: compressedMedia, input: input, uploadSuccess: uploadSuccess)
                 }
-                
-                return self.uploadPost(caption: caption, mediaItems: updatedMediaItems, gymName: input.gymName)
-            }
-            .observe(on: MainScheduler.instance)
-            .bind(to: uploadResult)
+            })
             .disposed(by: disposeBag)
-        
-        return Output(uploadResult: uploadResult.asObservable())
+
+        input.captionText
+            .bind(to: latestCaptionRelay)
+            .disposed(by: disposeBag)
+
+        compressMediaItems(input.mediaItems)
+            .subscribe(onNext: { compressedMediaURLs in
+                self.compressedMediaRelay.accept(compressedMediaURLs)
+                self.isCompressionCompleteRelay.accept(true)
+            })
+            .disposed(by: disposeBag)
+
+        isCompressionCompleteRelay
+            .filter { $0 }
+            .subscribe(onNext: { _ in
+                if self.isSubmitPendingRelay.value, let compressedMedia = self.compressedMediaRelay.value {
+                    let latestCaption = self.latestCaptionRelay.value
+                    self.startUpload(caption: latestCaption, compressedMediaURLs: compressedMedia, input: input, uploadSuccess: uploadSuccess)
+                }
+            })
+            .disposed(by: disposeBag)
+
+        return Output(uploadResult: uploadSuccess.asObservable())
     }
 
+    private func startUpload(caption: String, compressedMediaURLs: [URL], input: UploadPostInput, uploadSuccess: PublishRelay<Void>) {
+        let updatedMediaItems: [MediaUploadData] = zip(input.mediaItems, compressedMediaURLs).map { original, compressedURL in
+            MediaUploadData(
+                url: compressedURL,
+                hold: original.hold,
+                grade: original.grade,
+                thumbnailURL: original.thumbnailURL,
+                capturedDate: original.capturedDate
+            )
+        }
+
+        uploadPost(caption: caption, mediaItems: updatedMediaItems, gymName: input.gymName)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { result in
+                switch result {
+                case .success:
+                    uploadSuccess.accept(())
+                case .failure(let error):
+                    print("업로드 실패: \(error.localizedDescription)")
+                }
+
+                self.isSubmitPendingRelay.accept(false)
+                self.isCompressionCompleteRelay.accept(false)
+                self.compressedMediaRelay.accept(nil)
+            })
+            .disposed(by: disposeBag)
+    }
     
     private func compressMediaItems(_ mediaItems: [MediaUploadData]) -> Observable<[URL]> {
-        return Observable.create { observer in
-            let dispatchQueue = DispatchQueue(label: "mediaCompressionQueue", qos: .background)
-            dispatchQueue.async {
-                var compressedURLs = [URL]()
-                let dispatchGroup = DispatchGroup()
-                
-                for media in mediaItems {
-                    let originalURL = media.url
-                    dispatchGroup.enter()
-
-                    if self.isImage(url: originalURL) {
-                        if let imageData = try? Data(contentsOf: originalURL),
+        let totalCount = mediaItems.count
+        var completedCount = 0
+        
+        return Observable.from(mediaItems.enumerated())
+            .flatMap { (index, media) -> Observable<(Int, URL)> in
+                return Observable.create { observer in
+                    let onComplete: (URL) -> Void = { compressedURL in
+                        observer.onNext((index, compressedURL))
+                        observer.onCompleted()
+                        
+                        DispatchQueue.main.async {
+                            completedCount += 1
+                            if completedCount == totalCount {
+                                self.isCompressionCompleteRelay.accept(true)
+                            }
+                        }
+                    }
+                    
+                    if media.url.pathExtension.lowercased() == UploadPostConst.UploadPostVM.MediaFileExtensions.imageJPG ||
+                        media.url.pathExtension.lowercased() == UploadPostConst.UploadPostVM.MediaFileExtensions.imagePNG {
+                        
+                        if let imageData = try? Data(contentsOf: media.url),
                            let image = UIImage(data: imageData),
                            let compressedData = self.compressImage(image: image) {
-
+                            
                             let compressedURL = FileManager.default.temporaryDirectory
                                 .appendingPathComponent(UUID().uuidString)
-                                .appendingPathExtension("jpg")
-
+                                .appendingPathExtension(UploadPostConst.UploadPostVM.MediaFileExtensions.imageJPG)
+                            
                             do {
                                 try compressedData.write(to: compressedURL)
-                                compressedURLs.append(compressedURL)
+                                onComplete(compressedURL)
                             } catch {
-                                compressedURLs.append(originalURL)
+                                onComplete(media.url)
                             }
                         } else {
-                            compressedURLs.append(originalURL)
-                        }
-                        dispatchGroup.leave()
-
-                    } else if self.isVideo(url: originalURL) {
-                        self.compressVideo(inputURL: originalURL) { compressedURL in
-                            if let compressedURL = compressedURL {
-                                compressedURLs.append(compressedURL)
-                            } else {
-                                compressedURLs.append(originalURL)
-                            }
-                            dispatchGroup.leave()
+                            onComplete(media.url)
                         }
                     } else {
-                        compressedURLs.append(originalURL)
-                        dispatchGroup.leave()
+                        self.compressVideo(inputURL: media.url) { compressedURL in
+                            onComplete(compressedURL ?? media.url)
+                        }
                     }
-                }
-                
-                dispatchGroup.notify(queue: .main) {
-                    observer.onNext(compressedURLs)
-                    observer.onCompleted()
+                    return Disposables.create()
                 }
             }
-            return Disposables.create()
-        }
-    }
-
-
-    private func isImage(url: URL) -> Bool {
-        let imageExtensions = ["jpg", "jpeg", "png", "heic"]
-        return imageExtensions.contains(url.pathExtension.lowercased())
+            .toArray()
+            .asObservable()
+            .map { compressedList in
+                let sortedList = compressedList.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
+                return sortedList
+            }
     }
     
-    private func isVideo(url: URL) -> Bool {
-        let videoExtensions = ["mp4", "mov", "avi"]
-        return videoExtensions.contains(url.pathExtension.lowercased())
-    }
-
     private func uploadPost(caption: String, mediaItems: [MediaUploadData], gymName: String) -> Observable<Result<Void, Error>> {
         return self.myUserInfoUseCase.execute()
             .flatMap { user -> Single<Result<Void, Error>> in
@@ -171,7 +196,7 @@ class UploadPostVMImpl: UploadPostVM {
 }
 
 extension UploadPostVMImpl {
-    func compressImage(image: UIImage, quality: CGFloat = 0.3) -> Data? {
+    func compressImage(image: UIImage, quality: CGFloat = UploadPostConst.UploadPostVM.Compression.imageQuality) -> Data? {
         return image.jpegData(compressionQuality: quality)
     }
     
@@ -181,10 +206,11 @@ extension UploadPostVMImpl {
         _ = videoCompressor.compressVideo(videos: [
             .init(
                 source: inputURL,
-                destination: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("mp4"),
+                destination: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+                    .appendingPathExtension(UploadPostConst.UploadPostVM.MediaFileExtensions.videoMP4),
                 configuration: .init(
                     quality: VideoQuality.medium,
-                    videoBitrateInMbps: 2,
+                    videoBitrateInMbps: UploadPostConst.UploadPostVM.Compression.videoBitrate,
                     disableAudio: false,
                     keepOriginalResolution: false,
                     videoSize: nil

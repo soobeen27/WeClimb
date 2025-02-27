@@ -34,6 +34,7 @@ enum ProfileSettingConst {
         static let selectionButtonLabel: String = "선택해주세요"
         
         static let profileSettingTitle: String = "프로필 편집"
+        static let homeGymSettingTitle: String = "홈짐 설정"
     }
     
     enum Font {

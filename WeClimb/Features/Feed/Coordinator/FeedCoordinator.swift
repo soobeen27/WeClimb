@@ -25,8 +25,16 @@ final class FeedCoordinator: BaseCoordinator {
         
         feedChildCoordinator.start()
         
-        feedChildCoordinator.onFinish = { [weak self] postItem in
-            self?.showComment(postItem: postItem)
+        feedChildCoordinator.onFinish = { [weak self] pushType in
+            switch pushType {
+            case .comment(let postItem):
+                self?.showComment(postItem: postItem)
+            case .gym(let gymName, let level, let hold):
+                print("Gym coordinator needed")
+            case .user(let userName):
+                print("userPage coordinator needed")
+            }
+            
         }
     }
     
@@ -35,7 +43,7 @@ final class FeedCoordinator: BaseCoordinator {
         addDependency(commentCoordinator)
         
         commentCoordinator.start(postItem: postItem)
-
+        
         commentCoordinator.onFinish = { [weak self] in
             self?.removeDependency(commentCoordinator)
         }

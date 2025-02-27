@@ -21,31 +21,31 @@ class UploadPostVC: UIViewController {
     
     private let topSeparatorLine: UIView = {
         let view = UIView()
-        view.backgroundColor = .lineOpacityNormal
+        view.backgroundColor = UploadPostConst.UploadPostVC.Color.topSeparator
         return view
     }()
     
     lazy var gymButton: UIButton = {
         var config = UIButton.Configuration.plain()
         config.title = gymName
-        config.image = UIImage.locationIconFill.resize(targetSize: CGSize(width: 12, height: 12))?
-            .withTintColor(UIColor.white, renderingMode: .alwaysOriginal)
-        config.baseForegroundColor = UIColor.white
-        config.baseBackgroundColor = UIColor.init(hex: "313235", alpha: 0.4) // fillOpacityDarkHeavy
+        config.image = UIImage.locationIconFill.resize(targetSize: UploadPostConst.UploadPostVC.Size.gymButtonImage)?
+            .withTintColor(UploadPostConst.UploadPostVC.Color.gymButtonForeground, renderingMode: .alwaysOriginal)
+        config.baseForegroundColor = UploadPostConst.UploadPostVC.Color.gymButtonForeground
+        config.baseBackgroundColor = UploadPostConst.UploadPostVC.Color.gymButtonBackground
         config.titleAlignment = .trailing
         config.imagePlacement = .leading
-        config.imagePadding = 4
+        config.imagePadding = UploadPostConst.UploadPostVC.Size.gymButtonImagePadding
         
         var titleAttributes = AttributedString(gymName)
-        titleAttributes.font = UIFont.customFont(style: .caption1Medium)
+        titleAttributes.font = UploadPostConst.UploadPostVC.Font.gymButtonTitle
         
         config.attributedTitle = titleAttributes
         
         let button = UIButton(configuration: config)
-        button.tintColor = .white
-        button.layer.zPosition = 1
-        button.backgroundColor = UIColor.init(hex: "313235", alpha: 0.4) // fillOpacityDarkHeavy
-        button.layer.cornerRadius = 8
+        button.tintColor = UploadPostConst.UploadPostVC.Color.gymButtonForeground
+        button.layer.zPosition = UploadPostConst.UploadPostVC.Layout.gymButtonZPosition
+        button.backgroundColor = UploadPostConst.UploadPostVC.Color.gymButtonBackground
+        button.layer.cornerRadius = UploadPostConst.UploadPostVC.Size.gymButtonCornerRadius
         
         return button
     }()
@@ -56,9 +56,8 @@ class UploadPostVC: UIViewController {
         collectionView.decelerationRate = .fast
         collectionView.register(UploadPostCollectionCell.self, forCellWithReuseIdentifier: UploadPostCollectionCell.className)
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = UIColor.fillSolidDarkBlack
-//        collectionView.delegate = self
-        collectionView.layer.cornerRadius = 11
+        collectionView.backgroundColor = UploadPostConst.UploadPostVC.Color.collectionViewBackground
+        collectionView.layer.cornerRadius = UploadPostConst.UploadPostVC.Size.collectionViewCornerRadius
         return collectionView
     }()
     
@@ -67,28 +66,44 @@ class UploadPostVC: UIViewController {
     
     private let bottomSeparatorLine: UIView = {
         let view = UIView()
-        view.backgroundColor = .lineOpacityNormal
+        view.backgroundColor = UploadPostConst.UploadPostVC.Color.bottomSeparator
         return view
     }()
     
     private let submitButton: WeClimbButton = {
         let button = WeClimbButton(style: .defaultRectangle)
-        button.setTitle("등록", for: .normal)
-        button.titleLabel?.font = UIFont.customFont(style: .label1SemiBold)
-        button.setTitleColor(.labelStrong, for: .normal)
-        button.backgroundColor = UIColor.white
-        button.layer.zPosition = 1
+        button.setTitle(UploadPostConst.UploadPostVC.Text.submitButtonTitle, for: .normal)
+        button.titleLabel?.font = UploadPostConst.UploadPostVC.Font.submitButtonTitle
+        button.setTitleColor(UploadPostConst.UploadPostVC.Color.submitButtonText, for: .normal)
+        button.backgroundColor = UploadPostConst.UploadPostVC.Color.submitButtonBackground
+        button.layer.zPosition = UploadPostConst.UploadPostVC.Layout.submitButtonZPosition
         return button
     }()
     
     private lazy var safeAreaBackgroundView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.fillSolidDarkStrong
+        view.backgroundColor = UploadPostConst.UploadPostVC.Color.safeAreaBackground
         return view
     }()
     
     private let captionTextSubject = PublishRelay<String>()
     private let submitButtonTap = PublishRelay<Void>()
+    
+    private let loadingOverlayView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UploadPostConst.UploadPostVC.Color.loadingOverlay
+        view.isHidden = true
+        return view
+    }()
+
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = UploadPostConst.UploadPostVC.Color.loadingIndicator
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+    
+    var onDismiss: (() -> Void)?
     
     init(gymName: String, mediaItems: [MediaUploadData], viewModel: UploadPostVM) {
         self.gymName = gymName
@@ -108,6 +123,7 @@ class UploadPostVC: UIViewController {
         self.uploadTextView.textView.delegate = self
         setupKeyboardObservers()
         bindViewModel()
+        bindButtons()
         bindTextView()
     }
     
@@ -119,34 +135,37 @@ class UploadPostVC: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: false)
         
         navigationController?.navigationBar.barStyle = .default
-        navigationController?.navigationBar.barTintColor = UIColor.fillSolidDarkBlack
+        navigationController?.navigationBar.barTintColor = UploadPostConst.UploadPostVC.Color.navigationBarBackground
         
-        navigationItem.title = "편집"
+        navigationItem.title = UploadPostConst.UploadPostVC.Text.navigationTitle
         
         navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor.white,
-            .font: UIFont.customFont(style: .heading2SemiBold)
+            .foregroundColor: UploadPostConst.UploadPostVC.Color.navigationTitleText,
+            .font: UploadPostConst.UploadPostVC.Font.navigationTitle
         ]
         
-        let backIcon = UIImage(named: "closeIcon")?.withRenderingMode(.alwaysTemplate)
-        let backButton = UIBarButtonItem(image: backIcon, style: .plain, target: self, action: #selector(didTapCloseButton))
-        backButton.tintColor = .white
+        let backButton = UIBarButtonItem(
+            image: UploadPostConst.UploadPostVC.Image.navigationBackIcon,
+            style: .plain,
+            target: self,
+            action: #selector(didTapCloseButton)
+        )
+        backButton.tintColor = UploadPostConst.UploadPostVC.Color.navigationButtonTint
         
         navigationItem.leftBarButtonItem = backButton
     }
     
     @objc private func didTapCloseButton() {
         let alert = DefaultAlertVC(alertType: .titleDescription, interfaceStyle: .dark)
-        alert.setTitle("정말 나가시겠어요?", "입력된 내용은 저장되지 않아요.")
-        alert.setCustomButtonTitle("삭제")
-        alert.customButtonTitleColor = UIColor.init(hex: "FB283E")  //StatusNegative
+        alert.setTitle(
+            UploadPostConst.UploadPostVC.Text.closeAlertTitle,
+            UploadPostConst.UploadPostVC.Text.closeAlertMessage
+        )
+        alert.setCustomButtonTitle(UploadPostConst.UploadPostVC.Text.closeAlertButtonTitle)
+        alert.customButtonTitleColor = UploadPostConst.UploadPostVC.Color.alertButtonText
         
         alert.customAction = { [weak self] in
-            self?.tabBarController?.selectedIndex = 0
-            self?.tabBarController?.tabBar.isHidden = false
-            UIView.animate(withDuration: 0.1, animations: {
-                self?.tabBarController?.tabBar.alpha = 1
-            })
+            self?.onDismiss?()
         }
         
         alert.modalPresentationStyle = .overCurrentContext
@@ -157,15 +176,19 @@ class UploadPostVC: UIViewController {
     private func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 12
+        layout.minimumLineSpacing = UploadPostConst.UploadPostVC.Size.collectionViewItemSpacing
         
-        let itemWidth: CGFloat = 125
-        let itemHeight: CGFloat = 222
+        layout.itemSize = CGSize(
+            width: UploadPostConst.UploadPostVC.Size.collectionViewItemWidth,
+            height: UploadPostConst.UploadPostVC.Size.collectionViewItemHeight
+        )
         
-        layout.itemSize = CGSize(width: itemWidth, height: itemHeight)
-        
-        let inset: CGFloat = 12
-        layout.sectionInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
+        layout.sectionInset = UIEdgeInsets(
+            top: UploadPostConst.UploadPostVC.Size.collectionViewSectionInsetTop,
+            left: UploadPostConst.UploadPostVC.Size.collectionViewItemInset,
+            bottom: UploadPostConst.UploadPostVC.Size.collectionViewSectionInsetBottom,
+            right: UploadPostConst.UploadPostVC.Size.collectionViewItemInset
+        )
         
         return layout
     }
@@ -181,20 +204,15 @@ class UploadPostVC: UIViewController {
         )
 
         let output = viewModel.transform(input: input)
-
+        
         output.uploadResult
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] result in
-                switch result {
-                case .success:
-                    print("게시물이 성공적으로 업로드됨")
-                    self?.navigationController?.popToRootViewController(animated: true)
-                case .failure(let error):
-                    print("게시물 업로드 실패: \(error.localizedDescription)")
-                }
+            .bind(onNext: { [weak self] in
+                self?.loadingOverlayView.isHidden = true
+                self?.loadingIndicator.stopAnimating()
+                self?.onDismiss?()
             })
             .disposed(by: disposeBag)
-
+        
         Observable.just(mediaItems)
             .bind(to: collectionView.rx.items(
                 cellIdentifier: UploadPostCollectionCell.className,
@@ -205,27 +223,37 @@ class UploadPostVC: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    private func bindButtons() {
+        submitButton
+            .rx.tap.asObservable()
+            .bind(onNext: { [weak self] in
+                self?.loadingOverlayView.isHidden = false
+                self?.loadingIndicator.startAnimating()
+            })
+            .disposed(by: disposeBag)
+    }
+    
     private func setLayout() {
-        view.backgroundColor = UIColor.fillSolidDarkBlack
+        view.backgroundColor = UploadPostConst.UploadPostVC.Color.background
         
-        [safeAreaBackgroundView, topSeparatorLine, gymButton, collectionView, uploadTextView, bottomSeparatorLine, submitButton]
+        [safeAreaBackgroundView, topSeparatorLine, gymButton, collectionView, uploadTextView, bottomSeparatorLine, submitButton, loadingOverlayView, loadingIndicator]
             .forEach { view.addSubview($0) }
         
         topSeparatorLine.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
-            $0.height.equalTo(1)
+            $0.height.equalTo(UploadPostConst.UploadPostVC.Layout.topSeparatorHeight)
         }
         
         gymButton.snp.makeConstraints {
-            $0.top.equalTo(topSeparatorLine.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(16)
-            $0.height.equalTo(26)
+            $0.top.equalTo(topSeparatorLine.snp.bottom).offset(UploadPostConst.UploadPostVC.Layout.gymButtonTopOffset)
+            $0.leading.equalToSuperview().offset(UploadPostConst.UploadPostVC.Layout.gymButtonLeadingOffset)
+            $0.height.equalTo(UploadPostConst.UploadPostVC.Layout.gymButtonHeight)
         }
         
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(gymButton.snp.bottom).offset(16)
+            $0.top.equalTo(gymButton.snp.bottom).offset(UploadPostConst.UploadPostVC.Layout.collectionViewTopOffset)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(222)
+            $0.height.equalTo(UploadPostConst.UploadPostVC.Layout.collectionViewHeight)
         }
         
         uploadTextView.snp.makeConstraints {
@@ -235,8 +263,8 @@ class UploadPostVC: UIViewController {
         
         bottomSeparatorLine.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(submitButton.snp.top).offset(-16)
-            $0.height.equalTo(1)
+            $0.bottom.equalTo(submitButton.snp.top).offset(UploadPostConst.UploadPostVC.Layout.bottomSeparatorTopOffset)
+            $0.height.equalTo(UploadPostConst.UploadPostVC.Layout.bottomSeparatorHeight)
         }
         
         safeAreaBackgroundView.snp.makeConstraints {
@@ -246,9 +274,9 @@ class UploadPostVC: UIViewController {
         }
         
         submitButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-16)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(48)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(UploadPostConst.UploadPostVC.Layout.submitButtonBottomOffset)
+            $0.leading.trailing.equalToSuperview().inset(UploadPostConst.UploadPostVC.Layout.submitButtonSideInset)
+            $0.height.equalTo(UploadPostConst.UploadPostVC.Layout.submitButtonHeight)
         }
     }
 }
@@ -269,30 +297,32 @@ extension UploadPostVC: UITextViewDelegate {
         guard let textRange = Range(range, in: currentText) else { return true }
         let updatedText = currentText.replacingCharacters(in: textRange, with: text)
         
-        return updatedText.count <= 1000
+        return updatedText.count <= UploadPostConst.UploadPostVC.Keyboard.TextLimit
     }
     
     private func bindTextView() {
         uploadTextView.textView.rx.text.orEmpty
             .map { text -> String in
-                return text == " 내용을 입력해주세요." ? "0/1000" : "\(text.count)/1000"
+                return text == UploadPostConst.UploadPostVC.Text.textViewPlaceholder ?
+                String(format: UploadPostConst.UploadPostVC.Text.textViewCharCountFormat, 0) :
+                String(format: UploadPostConst.UploadPostVC.Text.textViewCharCountFormat, text.count)
             }
             .bind(to: uploadTextView.textFieldCharCountLabel.rx.text)
             .disposed(by: disposeBag)
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-        guard textView.textColor == .labelNormal else { return }
+        guard textView.textColor == UploadPostConst.UploadPostVC.Color.textViewDefault else { return }
         textView.text = nil
-        textView.layer.borderColor = UIColor.white.cgColor
-        textView.font = .customFont(style: .body2SemiBold)
-        textView.textColor = .white
+        textView.layer.borderColor = UploadPostConst.UploadPostVC.Color.textViewEditingBorder.cgColor
+        textView.font = UploadPostConst.UploadPostVC.Font.textViewEditing
+        textView.textColor = UploadPostConst.UploadPostVC.Color.textViewText
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-        if textView.text == "" {
-            textView.textColor = .labelNormal
-            textView.text = " 내용을 입력해주세요."
+        if textView.text.isEmpty {
+            textView.textColor = UploadPostConst.UploadPostVC.Color.textViewDefault
+            textView.text = UploadPostConst.UploadPostVC.Text.textViewPlaceholder
         }
     }
     
@@ -302,11 +332,11 @@ extension UploadPostVC: UITextViewDelegate {
     }
     
     @objc private func keyboardWillShow(_ notification: Notification) {
-
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
 
-        let keyboardHeight = keyboardFrame.height - view.safeAreaInsets.bottom - 80
-        let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.3
+        let keyboardHeight = keyboardFrame.height - view.safeAreaInsets.bottom - UploadPostConst.UploadPostVC.Keyboard.extraPadding
+        let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
+        ?? UploadPostConst.UploadPostVC.Keyboard.defaultAnimationDuration
 
         uploadTextViewBottomConstraint?.update(offset: -keyboardHeight)
         
@@ -316,9 +346,10 @@ extension UploadPostVC: UITextViewDelegate {
     }
     
     @objc private func keyboardWillHide(_ notification: Notification) {
-        let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.3
+        let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
+        ?? UploadPostConst.UploadPostVC.Keyboard.defaultAnimationDuration
         
-        uploadTextViewBottomConstraint?.update(offset: 0)
+        uploadTextViewBottomConstraint?.update(offset: UploadPostConst.UploadPostVC.Keyboard.defaultOffset)
         
         UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()

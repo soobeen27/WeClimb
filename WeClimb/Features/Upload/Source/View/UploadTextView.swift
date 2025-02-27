@@ -16,22 +16,22 @@ class UploadTextView : UIView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "문구"
-        label.font = .customFont(style: .label1Medium)
-        label.textColor = .white
+        label.text = UploadPostConst.UploadTextView.Text.title
+        label.font = UploadPostConst.UploadTextView.Font.title
+        label.textColor = UploadPostConst.UploadTextView.Color.titleText
         return label
     }()
     
     let textView: UITextView = {
         let textView = UITextView()
-        textView.font = .customFont(style: .body2Medium)
-        textView.textColor = .labelNormal
-        textView.text = " 내용을 입력해주세요."
-        textView.backgroundColor = .fillSolidDarkBlack
+        textView.font = UploadPostConst.UploadTextView.Font.textView
+        textView.textColor = UploadPostConst.UploadTextView.Color.textViewText
+        textView.text = UploadPostConst.UploadTextView.Text.placeholder
+        textView.backgroundColor = UploadPostConst.UploadTextView.Color.textViewBackground
         textView.returnKeyType = .done
-        textView.layer.cornerRadius = 8
-        textView.layer.borderWidth = 1
-        textView.layer.borderColor = UIColor.lineOpacityNormal.cgColor
+        textView.layer.cornerRadius = UploadPostConst.UploadTextView.Size.textViewCornerRadius
+        textView.layer.borderWidth = UploadPostConst.UploadTextView.Size.textViewBorderWidth
+        textView.layer.borderColor = UploadPostConst.UploadTextView.Color.textViewBorder.cgColor
         textView.isUserInteractionEnabled = true
         textView.isEditable = true
         return textView
@@ -39,17 +39,17 @@ class UploadTextView : UIView {
     
     private let helpMessageLabel: UILabel = {
         let label = UILabel()
-        label.text = "도움말 메세지"
-        label.font = .customFont(style: .caption1Regular)
-        label.textColor = .labelNeutral
+        label.text = UploadPostConst.UploadTextView.Text.helpMessage
+        label.font = UploadPostConst.UploadTextView.Font.helpMessage
+        label.textColor = UploadPostConst.UploadTextView.Color.helpMessageText
         return label
     }()
     
     let textFieldCharCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "0/1000"
-        label.font = .customFont(style: .caption1Regular)
-        label.textColor = .labelNeutral
+        label.text = UploadPostConst.UploadTextView.Text.charCountFormat
+        label.font = UploadPostConst.UploadTextView.Font.charCount
+        label.textColor = UploadPostConst.UploadTextView.Color.charCountText
         return label
     }()
     
@@ -65,39 +65,40 @@ class UploadTextView : UIView {
     }
     
     override var intrinsicContentSize: CGSize {
-        return CGSize(width: UIView.noIntrinsicMetric, height: 212)
+        return UploadPostConst.UploadTextView.Size.viewIntrinsicContent
     }
     
     private func applyCornerRadius() {
-        layer.cornerRadius = 20
+        layer.cornerRadius = UploadPostConst.UploadTextView.Size.viewCornerRadius
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         clipsToBounds = true
     }
     
     private func setLayout() {
-        self.backgroundColor = UIColor.fillSolidDarkStrong
+        self.backgroundColor = UploadPostConst.UploadTextView.Color.viewBackground
         
         [titleLabel, textView, helpMessageLabel, textFieldCharCountLabel]
             .forEach { self.addSubview($0) }
         
         titleLabel.snp.makeConstraints {
-            $0.leading.top.equalToSuperview().offset(16)
+            $0.leading.equalToSuperview().offset(UploadPostConst.UploadTextView.Layout.titleLeadingOffset)
+            $0.top.equalToSuperview().offset(UploadPostConst.UploadTextView.Layout.titleTopOffset)
         }
         
         textView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
-            $0.height.equalTo(128)
+            $0.leading.trailing.equalToSuperview().inset(UploadPostConst.UploadTextView.Layout.textViewSideInset)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(UploadPostConst.UploadTextView.Layout.textViewTopOffset)
+            $0.height.equalTo(UploadPostConst.UploadTextView.Layout.textViewHeight)
         }
         
         helpMessageLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(16)
-            $0.top.equalTo(textView.snp.bottom).offset(8)
+            $0.leading.equalToSuperview().offset(UploadPostConst.UploadTextView.Layout.helpMessageLeadingOffset)
+            $0.top.equalTo(textView.snp.bottom).offset(UploadPostConst.UploadTextView.Layout.helpMessageTopOffset)
         }
         
         textFieldCharCountLabel.snp.makeConstraints {
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.top.equalTo(textView.snp.bottom).offset(8)
+            $0.trailing.equalToSuperview().offset(UploadPostConst.UploadTextView.Layout.charCountTrailingOffset)
+            $0.top.equalTo(textView.snp.bottom).offset(UploadPostConst.UploadTextView.Layout.charCountTopOffset)
         }
     }
 }

@@ -22,73 +22,71 @@ class UploadOptionView : UIView {
     
     var levelOptionImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage.colorWhite.resize(targetSize: CGSize(width: 16, height: 16))?.withRenderingMode(.alwaysTemplate)
+        imageView.image = UploadMediaConst.UploadOptionView.Image.levelOption
         imageView.isHidden = true
         return imageView
     }()
     
     var levelOptionLabel: UILabel = {
         let label = UILabel()
-        label.text = "레벨"
-        label.font = .customFont(style: .label1Medium)
-        label.textColor = .white
+        label.text = UploadMediaConst.UploadOptionView.Text.levelLabel
+        label.font = UploadMediaConst.UploadOptionView.Font.levelLabel
+        label.textColor = UploadMediaConst.UploadOptionView.Color.labelText
         return label
     }()
     
     let levelSelectedButton: UIButton = {
         var config = UIButton.Configuration.plain()
-        config.title = "선택해주세요"
-        config.image = UIImage.chevronRightIcon.resize(targetSize: CGSize(width: 20, height: 20))?
-            .withTintColor(UIColor.labelAssistive, renderingMode: .alwaysOriginal)
-        config.baseForegroundColor = .labelAssistive
+        config.title = UploadMediaConst.UploadOptionView.Text.selectPlaceholder
+        config.image = UploadMediaConst.UploadOptionView.Image.chevronRight
+        config.baseForegroundColor = UploadMediaConst.UploadOptionView.Color.btnText
         config.titleAlignment = .leading
         config.imagePlacement = .trailing
-        config.imagePadding = 4
-        config.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+        config.imagePadding = UploadMediaConst.UploadOptionView.Layout.btnImagePadding
+        config.contentInsets = UploadMediaConst.UploadOptionView.Layout.btnContentInsets
         
-        var titleAttributes = AttributedString("선택해주세요")
-        titleAttributes.font = UIFont.customFont(style: .label2Regular)
+        var titleAttributes = AttributedString(UploadMediaConst.UploadOptionView.Text.selectPlaceholder)
+        titleAttributes.font = UploadMediaConst.UploadOptionView.Font.selectedButton
         
         config.attributedTitle = titleAttributes
         
         let button = UIButton(configuration: config)
-        button.tintColor = .labelAssistive
+        button.tintColor = UploadMediaConst.UploadOptionView.Color.btnTint
         return button
     }()
     
     var holdOptionImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage.colorWhite.resize(targetSize: CGSize(width: 16, height: 16))?.withRenderingMode(.alwaysTemplate)
+        imageView.image = UploadMediaConst.UploadOptionView.Image.holdOption
         imageView.isHidden = true
         return imageView
     }()
     
     var holdOptionLabel: UILabel = {
         let label = UILabel()
-        label.text = "홀드"
-        label.font = .customFont(style: .label1Medium)
-        label.textColor = .white
+        label.text = UploadMediaConst.UploadOptionView.Text.holdLabel
+        label.font = UploadMediaConst.UploadOptionView.Font.holdLabel
+        label.textColor = UploadMediaConst.UploadOptionView.Color.labelText
         return label
     }()
     
     let holdSelectedButton: UIButton = {
         var config = UIButton.Configuration.plain()
-        config.title = "선택해주세요"
-        config.image = UIImage.chevronRightIcon.resize(targetSize: CGSize(width: 20, height: 20))?
-            .withTintColor(UIColor.labelAssistive, renderingMode: .alwaysOriginal)
-        config.baseForegroundColor = .labelAssistive
+        config.title = UploadMediaConst.UploadOptionView.Text.selectPlaceholder
+        config.image = UploadMediaConst.UploadOptionView.Image.chevronRight
+        config.baseForegroundColor = UploadMediaConst.UploadOptionView.Color.btnText
         config.titleAlignment = .leading
         config.imagePlacement = .trailing
-        config.imagePadding = 4
-        config.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+        config.imagePadding = UploadMediaConst.UploadOptionView.Layout.btnImagePadding
+        config.contentInsets = UploadMediaConst.UploadOptionView.Layout.btnContentInsets
         
-        var titleAttributes = AttributedString("선택해주세요")
-        titleAttributes.font = UIFont.customFont(style: .label2Regular)
+        var titleAttributes = AttributedString(UploadMediaConst.UploadOptionView.Text.selectPlaceholder)
+        titleAttributes.font = UploadMediaConst.UploadOptionView.Font.selectedButton
         
         config.attributedTitle = titleAttributes
         
         let button = UIButton(configuration: config)
-        button.tintColor = .labelAssistive
+        button.tintColor = UploadMediaConst.UploadOptionView.Color.btnTint
         return button
     }()
     
@@ -106,31 +104,31 @@ class UploadOptionView : UIView {
     
     private let backButton: UIButton = {
         let button = WeClimbButton(style: .leftIconRound)
-        button.setTitle("이전", for: .normal)
-        button.titleLabel?.font = UIFont.customFont(style: .caption1Medium)
-        button.setTitleColor(.labelAssistive, for: .normal)
+        button.setTitle(UploadMediaConst.UploadOptionView.Text.backButtonTitle, for: .normal)
+        button.titleLabel?.font = UploadMediaConst.UploadOptionView.Font.button
+        button.setTitleColor(UploadMediaConst.UploadOptionView.Color.backButtonText, for: .normal)
         
-        let arrowLeftIcon = UIImage(named: "arrowLeftIcon")?.withRenderingMode(.alwaysTemplate)
-        button.leftIcon = arrowLeftIcon
-        button.leftIconTintColor = .labelAssistive
+        button.leftIcon = UploadMediaConst.UploadOptionView.Image.backButtonIcon
+        button.leftIconTintColor = UploadMediaConst.UploadOptionView.Color.backButtonText
         
-        button.backgroundColor = UIColor(hex: "313235") // FillSolidDarkLight
+        button.backgroundColor = UploadMediaConst.UploadOptionView.Color.backButtonBackground
         
         return button
     }()
-    
+
     private let nextButton: UIButton = {
         let button = WeClimbButton(style: .rightIconRound)
-        button.setTitle("다음", for: .normal)
-        button.setTitleColor(.black, for: .normal)
-        button.titleLabel?.font = UIFont.customFont(style: .caption1Medium)
+        button.setTitle(UploadMediaConst.UploadOptionView.Text.nextButtonTitle, for: .normal)
+        button.setTitleColor(UploadMediaConst.UploadOptionView.Color.nextButtonText, for: .normal)
+        button.titleLabel?.font = UploadMediaConst.UploadOptionView.Font.button
         
-        button.rightIcon = UIImage(named: "arrowRightIcon")?.withRenderingMode(.alwaysTemplate)
-        button.leftIconTintColor = .black
+        button.rightIcon = UploadMediaConst.UploadOptionView.Image.nextButtonIcon
+        button.leftIconTintColor = UploadMediaConst.UploadOptionView.Color.nextButtonText
         
-        button.backgroundColor = UIColor.white
+        button.backgroundColor = UploadMediaConst.UploadOptionView.Color.nextButtonBackground
         return button
     }()
+
     
     init() {
         super.init(frame: .zero)
@@ -145,24 +143,24 @@ class UploadOptionView : UIView {
     }
     
     override var intrinsicContentSize: CGSize {
-        return CGSize(width: UIView.noIntrinsicMetric, height: 57)
+        return UploadMediaConst.UploadOptionView.Size.viewIntrinsicContent
     }
-    
+
     private func applyCornerRadius() {
-        layer.cornerRadius = 20
+        layer.cornerRadius = UploadMediaConst.UploadOptionView.Size.viewCornerRadius
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         clipsToBounds = true
     }
+
     
     func updateOptionView(grade: String?, hold: String?) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            let customFont = UIFont.customFont(style: .label2Regular)
+            let customFont = UploadMediaConst.UploadOptionView.Font.selectedOption
             
             if let grade = grade {
-                
-                let koreanGrade = grade.isEmpty ? "선택해주세요" : LHColors.fromEng(grade).toKorean()
+                let koreanGrade = grade.isEmpty ? UploadMediaConst.UploadOptionView.Text.defaultSelection : LHColors.fromEng(grade).toKorean()
                 
                 var config = self.levelSelectedButton.configuration
                 let attributedTitle = NSAttributedString(
@@ -174,14 +172,12 @@ class UploadOptionView : UIView {
                 
                 let levelColor = LHColors.fromKoreanFull(koreanGrade).toImage()
                 self.levelOptionImage.image = levelColor
-                self.levelOptionImage.isHidden = (levelColor == UIImage.closeIconCircle)
+                self.levelOptionImage.isHidden = (levelColor == UploadMediaConst.UploadOptionView.Image.defaultGradeColor)
             }
             
             if let hold = hold {
-                
-                let holdColorName = hold.replacingOccurrences(of: "hold", with: "")
-                
-                let koreanHold = hold.isEmpty ? "선택해주세요" : LHColors.fromEng(holdColorName).toKorean()
+                let holdColorName = hold.replacingOccurrences(of: UploadMediaConst.UploadOptionView.Text.holdSuffixToRemove, with: "")
+                let koreanHold = hold.isEmpty ? UploadMediaConst.UploadOptionView.Text.defaultSelection : LHColors.fromEng(holdColorName).toKorean()
                 
                 var config = self.holdSelectedButton.configuration
                 let attributedTitle = NSAttributedString(
@@ -193,7 +189,7 @@ class UploadOptionView : UIView {
                 
                 let holdColor = LHColors.fromKoreanFull(koreanHold).toImage()
                 self.holdOptionImage.image = holdColor
-                self.holdOptionImage.isHidden = (holdColor == UIImage.closeIconCircle)
+                self.holdOptionImage.isHidden = (holdColor == UploadMediaConst.UploadOptionView.Image.defaultHoldColor)
             }
         }
     }
@@ -225,67 +221,68 @@ class UploadOptionView : UIView {
     }
     
     private func setLayout() {
-        self.backgroundColor = UIColor.fillSolidDarkStrong
+        self.backgroundColor = UploadMediaConst.UploadOptionView.Color.viewBackground
         
-        [levelOptionLabel, levelSelectedButton, levelOptionImage, topSeparatorLine, holdOptionLabel, holdSelectedButton, holdOptionImage, bottomSeparatorLine, backButton, nextButton]
-            .forEach { self.addSubview($0) }
+        [levelOptionLabel, levelSelectedButton, levelOptionImage, topSeparatorLine,
+         holdOptionLabel, holdSelectedButton, holdOptionImage, bottomSeparatorLine,
+         backButton, nextButton].forEach { self.addSubview($0) }
         
         levelOptionLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(16)
+            $0.leading.equalToSuperview().offset(UploadMediaConst.UploadOptionView.Layout.defultOffset)
             $0.top.equalToSuperview()
-            $0.height.equalTo(56)
+            $0.height.equalTo(UploadMediaConst.UploadOptionView.Layout.optionLabelHeight)
         }
         
         levelOptionImage.snp.makeConstraints {
-            $0.trailing.equalTo(levelSelectedButton.snp.leading).offset(-8)
+            $0.trailing.equalTo(levelSelectedButton.snp.leading).offset(UploadMediaConst.UploadOptionView.Layout.optionImageSpacing)
             $0.centerY.equalTo(levelOptionLabel)
         }
         
         levelSelectedButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.trailing.equalToSuperview().offset(-UploadMediaConst.UploadOptionView.Layout.defultOffset)
             $0.centerY.equalTo(levelOptionLabel)
         }
         
         topSeparatorLine.snp.makeConstraints {
-            $0.height.equalTo(1)
+            $0.height.equalTo(UploadMediaConst.UploadOptionView.Layout.separatorHeight)
             $0.leading.trailing.equalToSuperview()
             $0.top.equalTo(levelOptionLabel.snp.bottom)
         }
         
         holdOptionLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(16)
+            $0.leading.equalToSuperview().offset(UploadMediaConst.UploadOptionView.Layout.defultOffset)
             $0.top.equalTo(topSeparatorLine.snp.bottom)
-            $0.height.equalTo(56)
+            $0.height.equalTo(UploadMediaConst.UploadOptionView.Layout.optionLabelHeight)
         }
         
         holdSelectedButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().offset(-16)
+            $0.trailing.equalToSuperview().offset(-UploadMediaConst.UploadOptionView.Layout.defultOffset)
             $0.centerY.equalTo(holdOptionLabel)
         }
         
         holdOptionImage.snp.makeConstraints {
-            $0.trailing.equalTo(holdSelectedButton.snp.leading).offset(-8)
+            $0.trailing.equalTo(holdSelectedButton.snp.leading).offset(UploadMediaConst.UploadOptionView.Layout.optionImageSpacing)
             $0.centerY.equalTo(holdOptionLabel)
         }
         
         bottomSeparatorLine.snp.makeConstraints {
-            $0.height.equalTo(1)
+            $0.height.equalTo(UploadMediaConst.UploadOptionView.Layout.separatorHeight)
             $0.leading.trailing.equalToSuperview()
             $0.top.equalTo(holdOptionLabel.snp.bottom)
         }
         
         backButton.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(16)
-            $0.top.equalTo(bottomSeparatorLine.snp.bottom).offset(10)
-            $0.height.equalTo(30)
-            $0.bottom.equalToSuperview().offset(-10)
+            $0.leading.equalToSuperview().offset(UploadMediaConst.UploadOptionView.Layout.defultOffset)
+            $0.top.equalTo(bottomSeparatorLine.snp.bottom).offset(UploadMediaConst.UploadOptionView.Layout.buttonTopOffset)
+            $0.height.equalTo(UploadMediaConst.UploadOptionView.Layout.buttonHeight)
+            $0.bottom.equalToSuperview().offset(UploadMediaConst.UploadOptionView.Layout.buttonBottomOffset)
         }
         
         nextButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().offset(-16)
-            $0.top.equalTo(bottomSeparatorLine.snp.bottom).offset(10)
-            $0.height.equalTo(30)
-            $0.bottom.equalToSuperview().offset(-10)
+            $0.trailing.equalToSuperview().offset(-UploadMediaConst.UploadOptionView.Layout.defultOffset)
+            $0.top.equalTo(bottomSeparatorLine.snp.bottom).offset(UploadMediaConst.UploadOptionView.Layout.buttonTopOffset)
+            $0.height.equalTo(UploadMediaConst.UploadOptionView.Layout.buttonHeight)
+            $0.bottom.equalToSuperview().offset(UploadMediaConst.UploadOptionView.Layout.buttonBottomOffset)
         }
     }
 }
