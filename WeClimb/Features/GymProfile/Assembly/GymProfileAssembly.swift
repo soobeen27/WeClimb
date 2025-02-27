@@ -9,7 +9,9 @@ import Swinject
 
 final class GymProfileAssembly: Assembly {
     func assemble(container: Container) {
-    
+        container.register(GymProfileVM.self) { _ in
+            GymProfileVMImpl()
+        }
     }
 }
 

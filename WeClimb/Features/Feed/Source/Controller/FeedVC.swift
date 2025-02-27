@@ -111,7 +111,6 @@ class FeedVC: UIViewController {
         setLayout()
         bindViewModel()
         bindMenu()
-        hideNavigationBar()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -122,6 +121,7 @@ class FeedVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         VideoManager.shared.playCurrentVideo()
+        hideNavigationBar()
     }
     
     private func bindViewModel() {

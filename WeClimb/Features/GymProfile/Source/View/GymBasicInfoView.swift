@@ -10,7 +10,6 @@ import SnapKit
 import Kingfisher
 
 class GymBasicInfoView: UIView {
-    
     var profileImageURL: URL? {
         didSet {
             guard let url = profileImageURL else { return }
@@ -33,10 +32,18 @@ class GymBasicInfoView: UIView {
     
     private let consts = GymConsts.BasicInfoView.self
 
-    private let profileImageView: UIImageView = {
+    private lazy var borderLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = consts.Color.border
+        return view
+    }()
+    
+    private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.layer.borderWidth = 1
+        imageView.layer.borderColor = consts.Color.border.cgColor
         return imageView
     }()
     
@@ -64,7 +71,7 @@ class GymBasicInfoView: UIView {
     }
     
     private func setLayout() {
-        [profileImageView, nameLabel, addressLabel]
+        [borderLineView ,profileImageView, nameLabel, addressLabel]
             .forEach { self.addSubview($0) }
         
         profileImageView.snp.makeConstraints {
@@ -81,6 +88,11 @@ class GymBasicInfoView: UIView {
         nameLabel.snp.makeConstraints {
             $0.leading.equalTo(profileImageView.snp.trailing).offset(consts.Size.imageNameSpacing)
             $0.top.equalTo(addressLabel.snp.bottom).offset(consts.Size.nameAddresssSpacing)
+        }
+        
+        borderLineView.snp.makeConstraints {
+            $0.height.equalTo(1)
+            $0.top.leading.trailing.equalToSuperview()
         }
         
     }

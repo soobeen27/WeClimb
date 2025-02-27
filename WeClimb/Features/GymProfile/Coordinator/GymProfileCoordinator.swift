@@ -9,17 +9,23 @@ import UIKit
 
 final class GymProfileCoordinator: BaseCoordinator {
     var navigationController: UINavigationController
-    private let builder: GymProfileBuilder
+    private let builder: GymBuilder
     
     var onFinish: (() -> Void)?
     
-    init(navigationController: UINavigationController, builder: GymProfileBuilder) {
+    init(navigationController: UINavigationController, builder: GymBuilder) {
         self.navigationController = navigationController
         self.builder = builder
     }
     
-    override func start() {
-        
+    func start(gymName: String, level: LHColors?, hold: LHColors?) {
+        showGymProfile(gymName: gymName, level: level, hold: hold)
+    }
+    
+    func showGymProfile(gymName: String, level: LHColors?, hold: LHColors?) {
+        let gymProfileVC = builder.buildGymProfile(gymName: gymName, level: level, hold: hold)
+        gymProfileVC.coordinator = self
+        navigationController.pushViewController(gymProfileVC, animated: true)
     }
 
 }
