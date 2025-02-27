@@ -44,13 +44,13 @@ class HomeGymSettingImpl: HomeGymSettingVM {
     }
     
     struct Input: HomeGymSettingInput {
-        let searchQuery: Observable<String> // ✅ 사용자가 검색어 입력
+        let searchQuery: Observable<String>
         let selectHomeGymImage: Observable<Gym>
     }
     
     struct Output: HomeGymSettingOutput {
-        let gyms: Driver<[Gym]>          // ✅ 전체 암장 리스트
-        let filteredGyms: Driver<[Gym]>  // ✅ 검색 결과 리스트
+        let gyms: Driver<[Gym]>
+        let filteredGyms: Driver<[Gym]>
         let selectedHomeGymImage: Driver<Gym?>
         let gymImageURLs: Driver<[String: URL?]>
     }
@@ -60,26 +60,23 @@ class HomeGymSettingImpl: HomeGymSettingVM {
         let filteredGymsRelay = BehaviorRelay<[Gym]>(value: [])
         let selectedGymRelay = BehaviorRelay<Gym?>(value: nil)
 
-        // ✅ 1. 캐싱된 데이터 먼저 반환
         let cachedObservable = Observable.just(cachedGymsRelay.value)
 
-        // ✅ 2. 네트워크 요청을 통해 최신 데이터 가져오기
+
         let fetchObservable = fetchAllGymsInfoUseCase.execute()
             .do(onSuccess: { [weak self] gyms in
-                self?.cachedGymsRelay.accept(gyms) // ✅ 새로운 데이터 캐싱
-                self?.fetchGymImages(gyms: gyms)   // ✅ 이미지 URL 가져오기
+                self?.cachedGymsRelay.accept(gyms)
+                self?.fetchGymImages(gyms: gyms)
             })
             .asObservable()
 
-        // ✅ 3. 캐싱된 데이터 → 최신 데이터 순으로 반환
         let combinedGymsObservable = Observable.concat(cachedObservable, fetchObservable)
-            .share(replay: 1, scope: .whileConnected) // ✅ 중복 요청 방지
+            .share(replay: 1, scope: .whileConnected)
 
         combinedGymsObservable
             .bind(to: gymsRelay)
             .disposed(by: disposeBag)
 
-        // ✅ 4. 검색 기능 (캐싱된 데이터 + 최신 데이터 반영)
         input.searchQuery
             .distinctUntilChanged()
             .flatMapLatest { query in
@@ -90,7 +87,6 @@ class HomeGymSettingImpl: HomeGymSettingVM {
             .bind(to: filteredGymsRelay)
             .disposed(by: disposeBag)
 
-        // ✅ 5. 선택된 홈짐 업데이트
         input.selectHomeGymImage
             .bind(to: selectedGymRelay)
             .disposed(by: disposeBag)
@@ -103,13 +99,12 @@ class HomeGymSettingImpl: HomeGymSettingVM {
         )
     }
 
-    // ✅ 6. 이미지 URL 가져오기 (Firebase Storage)
     private func fetchGymImages(gyms: [Gym]) {
         let imageFetches = gyms.map { gym in
             fetchImageURLUseCase.execute(from: gym.profileImage ?? "")
                 .map { urlString -> (String, URL?) in
                     guard let urlString = urlString, urlString.hasPrefix("https://") else {
-                        return (gym.gymName, nil) // ✅ `https://`가 아니면 nil 반환
+                        return (gym.gymName, nil)
                     }
                     return (gym.gymName, URL(string: urlString))
                 }
