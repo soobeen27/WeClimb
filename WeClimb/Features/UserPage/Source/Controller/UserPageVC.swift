@@ -161,6 +161,10 @@ class UserPageVC: UIViewController {
         return label
     }()
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        bindUserInfo()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

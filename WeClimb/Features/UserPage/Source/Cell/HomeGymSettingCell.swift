@@ -22,23 +22,23 @@ class HomeGymSettingCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.backgroundColor = SearchConst.Color.gymImageDefaultBackground
-        imageView.layer.cornerRadius = SearchConst.Shape.cellImageCornerRadius
+        imageView.backgroundColor = SearchConst.Cell.Color.gymImageDefaultBackground
+        imageView.layer.cornerRadius = SearchConst.Cell.Shape.cellImageCornerRadius
         imageView.layer.masksToBounds = true
         return imageView
     }()
     
     private let gymLocationLabel: UILabel = {
         let label = UILabel()
-        label.font = SearchConst.Font.gymLocationFont
-        label.textColor = SearchConst.Color.gymLocationtextColor
+        label.font = SearchConst.Cell.Font.gymLocationFont
+        label.textColor = SearchConst.Cell.Color.gymLocationText
         return label
     }()
     
     private let gymNameLabel: UILabel = {
         let label = UILabel()
-        label.font = SearchConst.Font.gymNameFont
-        label.textColor = SearchConst.Color.gymNameTextColor
+        label.font = SearchConst.Cell.Font.gymNameFont
+        label.textColor = SearchConst.Cell.Color.gymNameText
         return label
     }()
     
@@ -74,19 +74,19 @@ class HomeGymSettingCell: UITableViewCell {
         ].forEach { self.addSubview($0) }
         
         gymImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(SearchConst.gymCell.Spacing.gymImageleftSpacing)
+            $0.leading.equalToSuperview().inset(SearchConst.Cell.Spacing.gymImageleftSpacing)
             $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(SearchConst.gymCell.Size.gymImageSize)
+            $0.width.height.equalTo(SearchConst.Cell.Size.gymImageSize)
         }
         
         gymLocationLabel.snp.makeConstraints {
-            $0.leading.equalTo(gymImageView.snp.trailing).offset(SearchConst.gymCell.Spacing.gymLocationleftSpacing)
+            $0.leading.equalTo(gymImageView.snp.trailing).offset(SearchConst.Cell.Spacing.gymLocationleftSpacing)
             $0.top.equalTo(gymImageView.snp.top)
         }
         
         gymNameLabel.snp.makeConstraints {
             $0.leading.equalTo(gymLocationLabel)
-            $0.top.equalTo(gymLocationLabel.snp.bottom).offset(SearchConst.gymCell.Spacing.gymNameTopSpacing)
+            $0.top.equalTo(gymLocationLabel.snp.bottom).offset(SearchConst.Cell.Spacing.gymNameTopSpacing)
         }
         
         homeGymMarkImage.snp.makeConstraints {
