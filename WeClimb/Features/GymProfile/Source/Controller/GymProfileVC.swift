@@ -12,12 +12,8 @@ import RxSwift
 import RxCocoa
 
 class GymProfileVC: UIViewController {
-    
-    
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-    
-    
 }

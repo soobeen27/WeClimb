@@ -39,4 +39,23 @@ enum GymConsts {
             static let filter = "Filter"
         }
     }
+    
+    enum BasicInfoView {
+        enum Size {
+            static let padding: CGFloat = 16
+            static let imageNameSpacing: CGFloat = 12
+            static let imageSize: CGSize = CGSize(width: 80, height: 80)
+            static let imageCornerRadius: CGFloat = imageSize.height / 2
+            static let nameAddresssSpacing: CGFloat = 4
+        }
+        enum Color {
+            static let address: UIColor = UIColor.labelNeutral
+            static let name: UIColor = UIColor.labelStrong
+            static let border: UIColor = UIColor.lineSolidLight
+        }
+        enum Font {
+            static let address: UIFont = UIFont.customFont(style: .label2Regular)
+            static let name: UIFont = UIFont.customFont(style: .heading2SemiBold)
+        }
+    }
 }
