@@ -27,9 +27,53 @@ final class UserPageMainCoordinator: BaseCoordinator {
         
         userPageCoordinator.start()
         
-        userPageCoordinator.onFinish = { [weak self] in
+        userPageCoordinator.onFinish = { [weak self] event in
+            self?.userPageHandleEvent(event)
             self?.removeDependency(userPageCoordinator)
-            // 다음으로 갈 곳
+        }
+    }
+    
+    private func showProfileSettingPageVC() {
+        let profileSettingCoordinator = UserProfileSettingCoordinator(navigationController: navigationController, builder: builder)
+        
+        addDependency(profileSettingCoordinator)
+        
+        profileSettingCoordinator.start()
+        
+        profileSettingCoordinator.onFinish = { [weak self] event in
+            self?.profileSettingPageHandleEvent(event)
+            self?.removeDependency(profileSettingCoordinator)
+        }
+    }
+    
+    private func showHomeGymSettingPageVC() {
+        let homeGymSettingCoordinator = HomeGymSettingCoordinator(navigationController: navigationController, builder: builder)
+        
+        addDependency(homeGymSettingCoordinator)
+        
+        homeGymSettingCoordinator.start()
+        
+        homeGymSettingCoordinator.onFinish = { [weak self] in
+            self?.removeDependency(homeGymSettingCoordinator)
+            self?.showUserPageVC()
+        }
+    }
+    
+    private func userPageHandleEvent(_ event: UserPageEvent) {
+        switch event {
+        case .showProfileSetting:
+            showProfileSettingPageVC()
+        case .showHomeGymSetting:
+            showHomeGymSettingPageVC()
+        }
+    }
+    
+    private func profileSettingPageHandleEvent(_ event: UserProfileSettingEvent) {
+        switch event {
+        case .userPage:
+            showUserPageVC()
+        case .homeGymPage:
+            showHomeGymSettingPageVC()
         }
     }
     

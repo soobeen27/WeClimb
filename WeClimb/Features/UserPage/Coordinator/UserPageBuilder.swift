@@ -11,6 +11,8 @@ protocol UserPageBuilder {
 //    func buildBookMarkSearch() -> BookMarkSearchVC
 //    func buildManageBookMark() -> ManageBookMarkVC
     func buildUserPage() -> UserPageVC
+    func buildUserProfileSettingPage() -> UserProfileSettingVC
+    func buildUserHomeGymSettingPage() -> HomeGymSettingVC
 }
 
 final class UserPageBuilderImpl: UserPageBuilder {
@@ -20,16 +22,6 @@ final class UserPageBuilderImpl: UserPageBuilder {
         self.container = container
     }
     
-//    func buildBookMarkSearch() -> BookMarkSearchVC {
-//        let viewModel: BookMarkSearchVM = container.resolve(BookMarkSearchVM.self)
-//        return BookMarkSearchVC(viewModel: viewModel)
-//    }
-//    
-//    func buildManagerBookMark() -> ManageBookMarkVC {
-//        let viewModel: ManageBookMarkVM = container.resolve(ManageBookMarkVM.self)
-//        return ManageBookMarkVC(viewModel: viewModel)
-//    }
-    
     func buildUserPage() -> UserPageVC {
         let userUID = try! FirestoreHelper.userUID()
         
@@ -38,5 +30,19 @@ final class UserPageBuilderImpl: UserPageBuilder {
 //        let userSummaryPageVM: UserSummaryPageVM = container.resolve(UserSummaryPageVM.self)
         
         return UserPageVC(userFeedPageVM: userFeedPageVM/*, userSummaryPageVM: userSummaryPageVM*/)
+    }
+    
+    func buildUserProfileSettingPage() -> UserProfileSettingVC {
+        let userUID = try! FirestoreHelper.userUID()
+        
+        let userProfileSettingVM = container.assembler.resolver.resolve(UserProfileSettingVM.self, argument: userUID)!
+        
+        return UserProfileSettingVC(viewModel: userProfileSettingVM)
+    }
+    
+    func buildUserHomeGymSettingPage() -> HomeGymSettingVC {
+        let homeGymSettingVM = container.assembler.resolver.resolve(HomeGymSettingVM.self)!
+        
+        return HomeGymSettingVC(viewModel: homeGymSettingVM)
     }
 }

@@ -17,7 +17,7 @@ protocol UserFeedPageVMInput {
 }
 
 protocol UserFeedPageVMOutput {
-    var userFeedList: BehaviorRelay<[UserFeedTableCellVMImpl]> { get }
+    var userFeedList: BehaviorRelay<[UserFeedTableCellVM]> { get }
     var isLoading: BehaviorRelay<Bool> { get }
     var userInfo: BehaviorRelay<User?> { get }
 }
@@ -32,7 +32,7 @@ class UserFeedPageVMImpl: UserFeedPageVM {
     private let myUserInfoUseCase: MyUserInfoUseCase
     private let userUID: String
     
-    let userFeedList = BehaviorRelay<[UserFeedTableCellVMImpl]>(value: [])
+    let userFeedList = BehaviorRelay<[UserFeedTableCellVM]>(value: [])
     let isLoading = BehaviorRelay<Bool>(value: false)
     let userInfo = BehaviorRelay<User?>(value: nil)
     
@@ -49,7 +49,7 @@ class UserFeedPageVMImpl: UserFeedPageVM {
     }
     
     struct Output: UserFeedPageVMOutput {
-        let userFeedList: BehaviorRelay<[UserFeedTableCellVMImpl]>
+        let userFeedList: BehaviorRelay<[UserFeedTableCellVM]>
         let isLoading: BehaviorRelay<Bool>
         var userInfo: BehaviorRelay<User?>
     }
