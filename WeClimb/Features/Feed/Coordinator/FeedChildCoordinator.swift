@@ -40,4 +40,9 @@ final class FeedChildCoordinator: BaseCoordinator {
         }
         navigationController.pushViewController(feedVC, animated: true)
     }
+    
+    func showFeed(postType: PostType) {
+        let feedVC = builder.buildFeed(postType: postType)
+        navigationController.pushViewController(feedVC, animated: true)
+    }
 }

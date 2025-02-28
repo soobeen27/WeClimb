@@ -29,13 +29,18 @@ protocol UserFeedTableCellOutput {
 }
 
 protocol UserFeedTableCellVM {
+    var post: Post { get }
     func transform(input: UserFeedTableCellInput) -> UserFeedTableCellOutput
 }
 
 class UserFeedTableCellVMImpl: UserFeedTableCellVM {
     private let disposeBag = DisposeBag()
    
-    private let postWithHold: PostWithHold
+    let postWithHold: PostWithHold
+    
+    var post: Post {
+        return postWithHold.post
+    }
     
     init(postWithHold: PostWithHold) {
         self.postWithHold = postWithHold

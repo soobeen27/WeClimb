@@ -34,7 +34,7 @@ class UserFeedBadgeView: UIView {
         [
             nameBadge,
             badgeValueView,
-            gymThmbnail,
+            userFeedThmbnail,
         ].forEach {
             view.addSubview($0)
         }
@@ -72,10 +72,11 @@ class UserFeedBadgeView: UIView {
     
     // 뱃지 뷰 들어가야함 (색상)
     
-    private let gymThmbnail: UIImageView = {
+    private let userFeedThmbnail: UIImageView = {
         let img = UIImageView()
         img.contentMode = .scaleAspectFill
         img.clipsToBounds = true
+        img.layer.cornerRadius = 6
         return img
     }()
     
@@ -106,7 +107,7 @@ class UserFeedBadgeView: UIView {
         nameBadge.gymNameText = nil
         valueBadge.colorName = nil
         valueBadge.text = nil
-        gymThmbnail.image = nil
+        userFeedThmbnail.image = nil
         disposeBag = DisposeBag()
     }
     
@@ -127,9 +128,9 @@ class UserFeedBadgeView: UIView {
     private func setGymThmbnail(urlString: String?) {
         print("🖼️ setGymThmbnail 호출됨, urlString: \(urlString ?? "nil")")
         if let urlString, let url = URL(string: urlString) {
-            gymThmbnail.kf.setImage(with: url)
+            userFeedThmbnail.kf.setImage(with: url)
         } else {
-            gymThmbnail.image = UIImage.appleIcon
+            userFeedThmbnail.image = UIImage.appleIcon
         }
     }
     
@@ -168,7 +169,7 @@ class UserFeedBadgeView: UIView {
             $0.trailing.lessThanOrEqualToSuperview().inset(12)
         }
         
-        gymThmbnail.snp.makeConstraints {
+        userFeedThmbnail.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(12)
             $0.width.height.equalTo(60)
             $0.centerY.equalToSuperview()
