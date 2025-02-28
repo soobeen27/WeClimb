@@ -7,6 +7,12 @@
 import UIKit
 
 enum GymConsts {
+    enum Profile {
+        enum Color {
+            static let background: UIColor = UIColor.fillSolidLightWhite
+        }
+    }
+    
     enum FilterButton {
         enum Size {
             static let width: CGFloat = 76

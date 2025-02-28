@@ -20,6 +20,13 @@ class GymProfileVC: UIViewController {
     private let hold = BehaviorRelay<LHColors?>(value: nil)
     private let gymProfileVM: GymProfileVM
     
+    private lazy var gymBasicInfoView: GymBasicInfoView = {
+        let v = GymBasicInfoView()
+        v.name = gymName
+        v.address = "서울시 중구"
+        return v
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
@@ -47,6 +54,14 @@ class GymProfileVC: UIViewController {
     }
     
     private func setLayout() {
+        view.backgroundColor = GymConsts.Profile.Color.background
         
+        [gymBasicInfoView]
+            .forEach { view.addSubview($0) }
+        
+        gymBasicInfoView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
+        }
     }
 }
