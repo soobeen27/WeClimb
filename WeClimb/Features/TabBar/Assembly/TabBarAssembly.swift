@@ -29,6 +29,9 @@ final class TabBarAssembly: Assembly {
         container.register(UserPageBuilder.self) { _ in
             UserPageBuilderImpl()
         }
+        container.register(GymBuilder.self) { _ in
+            GymBuilderImpl()
+        }
         
 //         TabBarBuilder 등록
         container.register(TabBarBuilder.self) { resolver in
@@ -37,7 +40,8 @@ final class TabBarAssembly: Assembly {
                 searchBuilder: resolver.resolve(SearchBuilder.self)!,
                 uploadBuilder: resolver.resolve(UploadBuilder.self)!,
                 notificationBuilder: resolver.resolve(NotificationBuilder.self)!,
-                userPageBuilder: resolver.resolve(UserPageBuilder.self)!
+                userPageBuilder: resolver.resolve(UserPageBuilder.self)!,
+                gymBuilder: resolver.resolve(GymBuilder.self)!
             )
         }
         

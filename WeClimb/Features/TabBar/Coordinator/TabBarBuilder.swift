@@ -22,19 +22,21 @@ final class TabBarBuilderImpl: TabBarBuilder {
     private let uploadBuilder: UploadBuilder
     private let notificationBuilder: NotificationBuilder
     private let userPageBuilder: UserPageBuilder
+    private let gymBuilder: GymBuilder
     
-    init(feedBuilder: FeedBuilder, searchBuilder: SearchBuilder, uploadBuilder: UploadBuilder, notificationBuilder: NotificationBuilder, userPageBuilder: UserPageBuilder) {
+    init(feedBuilder: FeedBuilder, searchBuilder: SearchBuilder, uploadBuilder: UploadBuilder, notificationBuilder: NotificationBuilder, userPageBuilder: UserPageBuilder, gymBuilder: GymBuilder) {
         self.feedBuilder = feedBuilder
         self.searchBuilder = searchBuilder
         self.uploadBuilder = uploadBuilder
         self.notificationBuilder = notificationBuilder
         self.userPageBuilder = userPageBuilder
+        self.gymBuilder = gymBuilder
     }
     
     func buildFeedCoordinator() -> FeedCoordinator {
         let navigationController = UINavigationController()
         let feedBuilder: FeedBuilder = AppDIContainer.shared.resolve(FeedBuilder.self)
-        let coordinator = FeedCoordinator(navigationController: navigationController, builder: feedBuilder)
+        let coordinator = FeedCoordinator(navigationController: navigationController, feedBuilder: feedBuilder, gymBuilder: gymBuilder)
         navigationController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage.homeIcon,
